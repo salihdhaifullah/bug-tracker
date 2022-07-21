@@ -1,9 +1,8 @@
-﻿using Microsoft.AspNetCore.Cryptography.KeyDerivation;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using server.Data;
 using server.Models;
 using System.Security.Cryptography;
-
+using server.Services.EmailServices;
 namespace server.Controllers
 {
     [Route("api/[controller]")]
@@ -11,10 +10,14 @@ namespace server.Controllers
     public class AuthController : ControllerBase
     {
         private readonly UserDataContex _contex;
-        public AuthController(UserDataContex contex)
+        private readonly IEmailServices _email;
+
+        public AuthController(UserDataContex contex, IEmailServices email)
         {
             _contex = contex;
+            _email = email;
         }
+
 
         [HttpPost("Singin")]
         public async Task<IActionResult> SingIn(UserSigninReq req)
@@ -43,13 +46,25 @@ namespace server.Controllers
         public async Task<IActionResult> Login(UserLoginReq req)
         {
             var user = _contex.Users.FirstOrDefaultAsync(user => user.Email == req.Email);
-;           if (user.Result == null) return BadRequest("User Not Found");
+            ; if (user.Result == null) return BadRequest("User Not Found");
             bool isMatsh = VerifyPasswardHash(req.Passward, user.Result.HashPassward, user.Result.PasswardSalt);
             if (!isMatsh) return BadRequest("Passward is Wrong");
 
             return Ok("Login Sucses");
+        }
 
-
+        [HttpPost("hello")]
+        public async Task<IActionResult> SendEmail(EmailDto req)
+        {
+            try
+            {
+                _email.SendEmail(req);
+                return Ok("Email Send");
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
 
