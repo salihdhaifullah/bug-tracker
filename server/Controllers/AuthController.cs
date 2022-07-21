@@ -17,7 +17,7 @@ namespace server.Controllers
         }
 
         [HttpPost("Singin")]
-        public async Task<IActionResult> SingIn(UserReq req)
+        public async Task<IActionResult> SingIn(UserSigninReq req)
         {
             bool IsFound = _contex.Users.Any(user => user.Email == req.Email);
             if (IsFound) return BadRequest("User Allredy Exsist");
@@ -39,12 +39,35 @@ namespace server.Controllers
             return Ok(user);
         }
 
+        [HttpPost("login")]
+        public async Task<IActionResult> Login(UserLoginReq req)
+        {
+            var user = _contex.Users.FirstOrDefaultAsync(user => user.Email == req.Email);
+;           if (user.Result == null) return BadRequest("User Not Found");
+            bool isMatsh = VerifyPasswardHash(req.Passward, user.Result.HashPassward, user.Result.PasswardSalt);
+            if (!isMatsh) return BadRequest("Passward is Wrong");
+
+            return Ok("Login Sucses");
+
+
+        }
+
+
         private void CreatePasswardHash(string passward, out string passwardHash, out string passwardSalt)
         {
             using (var hmac = new HMACSHA512())
             {
                 passwardSalt = Convert.ToBase64String(hmac.Key);
                 passwardHash = Convert.ToBase64String(hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(passward)));
+            }
+        }
+
+        private bool VerifyPasswardHash(string passward, string passwardHash, string passwardSalt)
+        {
+            using (var hmac = new HMACSHA512(Convert.FromBase64String(passwardSalt)))
+            {
+                byte[] ComputeHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(passward));
+                return ComputeHash.SequenceEqual(Convert.FromBase64String(passwardHash));
             }
         }
     }
