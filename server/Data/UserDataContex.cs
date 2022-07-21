@@ -1,4 +1,6 @@
-﻿namespace server.Data
+﻿using server.Models;
+
+namespace server.Data
 {
     public class UserDataContex : DbContext
     {
@@ -10,7 +12,8 @@
         {
             modelBuilder.UseSerialColumns();
         }
-        public DbSet<UserData> UsersData { get; set; }
+        public DbSet<User> Users { get; set; }
+
 
     }
 }

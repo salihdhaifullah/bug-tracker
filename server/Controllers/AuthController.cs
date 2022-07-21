@@ -1,73 +1,51 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Cryptography.KeyDerivation;
+using Microsoft.AspNetCore.Mvc;
+using server.Data;
 using server.Models;
 using System.Security.Cryptography;
-using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 
 namespace server.Controllers
 {
-    [Route("api/singin")]
+    [Route("api/[controller]")]
     [ApiController]
     public class AuthController : ControllerBase
     {
-        public static User user = new User();
-
-        public static string HashPassword(string passward)
+        private readonly UserDataContex _contex;
+        public AuthController(UserDataContex contex)
         {
-            byte[] salt = new byte[128 / 8];
-            using (var rngCsp = new RNGCryptoServiceProvider())
+            _contex = contex;
+        }
+
+        [HttpPost("Singin")]
+        public async Task<IActionResult> SingIn(UserReq req)
+        {
+            bool IsFound = _contex.Users.Any(user => user.Email == req.Email);
+            if (IsFound) return BadRequest("User Allredy Exsist");
+
+            CreatePasswardHash(req.Passward, out string passwardHash, out string passwardSalt);
+
+            User user = new()
             {
-                rngCsp.GetNonZeroBytes(salt);
-            }
-            Console.WriteLine($"Salt: {Convert.ToBase64String(salt)}");
+                Email = req.Email,
+                PasswardSalt = passwardSalt,
+                HashPassward = passwardHash,
+                FirstName = req.FirstName,
+                LastName = req.LastName,
+                CreateAt = DateTime.UtcNow
+            };
 
-            string hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(
-                password: passward,
-                salt: salt,
-                prf: KeyDerivationPrf.HMACSHA256,
-                iterationCount: 100000,
-                numBytesRequested: 256 / 8));
-            Console.WriteLine($"Hashed: {hashed}");
-
-            return hashed;
-        }
-
-        public static bool VirfiyPassword(string passward, string hashedPassward)
-        {
-            string userpassward = HashPassword(passward);
-
-            if (userpassward == hashedPassward) return true;
-            else return false;
-
-        }
-        [HttpPost("SingIn")]
-        public ActionResult<User> SingIn(UserREG data)
-        { 
-            user.Id = 1;
-            user.HashPassward = HashPassword(data.Passward);
-            user.Age = data.Age;
-            user.Email = data.Email;
-            user.LastName = data.LastName;
-            user.FirstName = data.FirstName;
-
+            _contex.Users.Add(user);
+            await _contex.SaveChangesAsync();
             return Ok(user);
         }
 
-        [HttpPost("Login")]
-        public ActionResult<User> Login(UserREG data)
+        private void CreatePasswardHash(string passward, out string passwardHash, out string passwardSalt)
         {
-            // test 
-            string hashedPassward = HashPassword("hello");
-            bool isMatsh = VirfiyPassword(data.Passward, hashedPassward);
-
-            if (isMatsh) return Ok("Login Good");
-            else return NotFound("sorray Login fild");
-        }
-
-        [HttpGet("Logout")]
-        public ActionResult Logout()
-        {
-            // test
-            return Ok("Logout scuseful");
+            using (var hmac = new HMACSHA512())
+            {
+                passwardSalt = Convert.ToBase64String(hmac.Key);
+                passwardHash = Convert.ToBase64String(hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(passward)));
+            }
         }
     }
 }
