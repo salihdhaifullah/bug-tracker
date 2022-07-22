@@ -1,9 +1,11 @@
 ﻿using server.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace server.Data
 {
     public class UserDataContex : DbContext
     {
+        #pragma warning disable CS8618
         public UserDataContex(DbContextOptions<UserDataContex> options) : base(options)
         {
 

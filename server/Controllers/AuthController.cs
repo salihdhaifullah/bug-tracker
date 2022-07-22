@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using server.Data;
+using Microsoft.EntityFrameworkCore;
 using server.Models;
-using System.Security.Cryptography;
+using server.Services.PasswardServices;
 using server.Services.EmailServices;
 using server.Services.JsonWebToken;
+
 namespace server.Controllers
 {
     [Route("api/[controller]")]
@@ -13,12 +15,14 @@ namespace server.Controllers
         private readonly UserDataContex _contex;
         private readonly IEmailServices _email;
         private readonly IJsonWebToken _token;
+        private readonly IPasswardServices _passward;
 
-        public AuthController(UserDataContex contex, IEmailServices email, IJsonWebToken token)
+        public AuthController(UserDataContex contex, IEmailServices email, IJsonWebToken token, IPasswardServices passward)
         {
             _contex = contex;
             _email = email;
             _token = token;
+            _passward = passward;
         }
 
 
@@ -28,7 +32,7 @@ namespace server.Controllers
             bool IsFound = _contex.Users.Any(user => user.Email == req.Email);
             if (IsFound) return BadRequest("User Allredy Exsist");
 
-            CreatePasswardHash(req.Passward, out string passwardHash, out string passwardSalt);
+            _passward.CreatePasswardHash(req.Passward, out string passwardHash, out string passwardSalt);
 
             User user = new()
             {
@@ -48,20 +52,20 @@ namespace server.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login(UserLoginReq req)
         {
-            var user = _contex.Users.FirstOrDefaultAsync(user => user.Email == req.Email);
-            ; if (user.Result == null) return BadRequest("User Not Found");
-            bool isMatsh = VerifyPasswardHash(req.Passward, user.Result.HashPassward, user.Result.PasswardSalt);
+            var user = await _contex.Users.FirstOrDefaultAsync(user => user.Email == req.Email);
+            if (user == null) return BadRequest("User Not Found");
+            bool isMatsh = _passward.VerifyPasswardHash(req.Passward, user.HashPassward, user.PasswardSalt);
             if (!isMatsh) return BadRequest("Passward is Wrong");
 
             return Ok("Login Sucses");
         }
-
+        
         [HttpPost("hello")]
         public async Task<IActionResult> SendEmail(EmailDto req)
         {
             try
             {
-                _email.SendEmail(req);
+                await _email.SendEmail(req);
 
                 return Ok("Email Send");
             }
@@ -72,38 +76,21 @@ namespace server.Controllers
         }
 
         [HttpGet("token")]
-        public async Task<IActionResult> SendToken([FromQuery] string id)
+        public IActionResult SendToken([FromQuery] string id)
         {
             string token = _token.GenerateToken(Convert.ToInt32(id));
+
+            Request.Headers.Add("Authorization", "Bearer " + token);
             return Ok(token);
         }
 
         [HttpGet("virfy")]
-        public async Task<IActionResult> Virfy([FromQuery] string token)
+        public IActionResult Virfy([FromQuery] string token)
         {
             int? isValid = _token.VirfiyToken(token);
             if (!Convert.ToBoolean(isValid)) return BadRequest("Token is not Valid");
             return Ok("Token is Valid");
         }
-            
-        private void CreatePasswardHash(string passward, out string passwardHash, out string passwardSalt)
-        {
-            using (var hmac = new HMACSHA512())
-            {
-                passwardSalt = Convert.ToBase64String(hmac.Key);
-                passwardHash = Convert.ToBase64String(hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(passward)));
-            }
-        }
-
-        private bool VerifyPasswardHash(string passward, string passwardHash, string passwardSalt)
-        {
-            using (var hmac = new HMACSHA512(Convert.FromBase64String(passwardSalt)))
-            {
-                byte[] ComputeHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(passward));
-                return ComputeHash.SequenceEqual(Convert.FromBase64String(passwardHash));
-            }
-        }
-
 
     }
 }

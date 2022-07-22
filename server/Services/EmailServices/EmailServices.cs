@@ -14,7 +14,7 @@ namespace server.Services.EmailServices
 		{
 			_configuration = configuration;
 		}
-		public void SendEmail(EmailDto req)
+		public async Task SendEmail(EmailDto req)
 		{
 			var email = new MimeMessage();
 			email.From.Add(MailboxAddress.Parse(_configuration.GetSection("EmailUser").Value));
@@ -23,11 +23,11 @@ namespace server.Services.EmailServices
 			email.Body = new TextPart(TextFormat.Html) { Text = req.Body };
 
 			using var smtp = new SmtpClient();
-			// 
-			smtp.Connect("smtp.gmail.com", 587, SecureSocketOptions.StartTls);
-			smtp.Authenticate(_configuration.GetSection("EmailUser").Value, _configuration.GetSection("EmailPassword").Value);
-			smtp.Send(email);
-			smtp.Disconnect(true);
+             
+			await smtp.ConnectAsync("smtp.gmail.com", 587, SecureSocketOptions.StartTls);
+			await smtp.AuthenticateAsync(_configuration.GetSection("EmailUser").Value, _configuration.GetSection("EmailPassword").Value);
+			await smtp.SendAsync(email);
+			await smtp.DisconnectAsync(true);
 			
 		}
 

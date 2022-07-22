@@ -1,0 +1,6 @@
+{
+  "DB": {
+    "push": "Add-Migration --name",
+    "update": "Update-Database"
+  }
+}

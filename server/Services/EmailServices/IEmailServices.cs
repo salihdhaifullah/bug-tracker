@@ -4,6 +4,6 @@ namespace server.Services.EmailServices
 {
     public interface IEmailServices
     {
-        void SendEmail(EmailDto req); 
+         Task SendEmail(EmailDto req); 
     }
 }
