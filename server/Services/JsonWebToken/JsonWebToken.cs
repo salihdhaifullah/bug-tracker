@@ -26,7 +26,7 @@ namespace server.Services.JsonWebToken
 
             var token = new JwtSecurityToken(
                 claims: claims,
-                expires: DateTime.Now.AddHours(10),
+                expires: DateTime.UtcNow.AddHours(10),
                 signingCredentials: creds
             );
 
@@ -53,9 +53,7 @@ namespace server.Services.JsonWebToken
                 }, out SecurityToken validatedToken);
 
                 var jwtToken = (JwtSecurityToken)validatedToken;
-                Console.WriteLine("Token claims: " + jwtToken);
                 var userId = int.Parse(jwtToken.Claims.First(x => x.Type == "id").Value);
-                Console.WriteLine("User id: " + userId);
                 // return user id from JWT token if validation successful
                 return userId;
             }

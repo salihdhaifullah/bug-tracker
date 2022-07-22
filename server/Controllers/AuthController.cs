@@ -59,7 +59,7 @@ namespace server.Controllers
 
             return Ok("Login Sucses");
         }
-        
+
         [HttpPost("hello")]
         public async Task<IActionResult> SendEmail(EmailDto req)
         {
@@ -79,8 +79,8 @@ namespace server.Controllers
         public IActionResult SendToken([FromQuery] string id)
         {
             string token = _token.GenerateToken(Convert.ToInt32(id));
-
-            Request.Headers.Add("Authorization", "Bearer " + token);
+            CookieOptions cookieOptions = new CookieOptions { Secure = true, HttpOnly = true, SameSite = SameSiteMode.Lax, Expires = DateTimeOffset.UtcNow.AddHours(10) };
+        Response.Cookies.Append("token", token, cookieOptions);
             return Ok(token);
         }
 
