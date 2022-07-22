@@ -78,6 +78,13 @@ namespace server.Controllers
             return Ok(token);
         }
 
+        [HttpGet("virfy")]
+        public async Task<IActionResult> Virfy([FromQuery] string token)
+        {
+            int? isValid = _token.VirfiyToken(token);
+            if (!Convert.ToBoolean(isValid)) return BadRequest("Token is not Valid");
+            return Ok("Token is Valid");
+        }
             
         private void CreatePasswardHash(string passward, out string passwardHash, out string passwardSalt)
         {
