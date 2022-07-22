@@ -23,7 +23,8 @@ namespace server.Services.EmailServices
 			email.Body = new TextPart(TextFormat.Html) { Text = req.Body };
 
 			using var smtp = new SmtpClient();
-			smtp.Connect(_configuration.GetSection("EmailHost").Value, 587, SecureSocketOptions.StartTls);
+			// 
+			smtp.Connect("smtp.gmail.com", 587, SecureSocketOptions.StartTls);
 			smtp.Authenticate(_configuration.GetSection("EmailUser").Value, _configuration.GetSection("EmailPassword").Value);
 			smtp.Send(email);
 			smtp.Disconnect(true);

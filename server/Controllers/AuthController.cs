@@ -3,6 +3,7 @@ using server.Data;
 using server.Models;
 using System.Security.Cryptography;
 using server.Services.EmailServices;
+using server.Services.JsonWebToken;
 namespace server.Controllers
 {
     [Route("api/[controller]")]
@@ -11,11 +12,13 @@ namespace server.Controllers
     {
         private readonly UserDataContex _contex;
         private readonly IEmailServices _email;
+        private readonly IJsonWebToken _token;
 
-        public AuthController(UserDataContex contex, IEmailServices email)
+        public AuthController(UserDataContex contex, IEmailServices email, IJsonWebToken token)
         {
             _contex = contex;
             _email = email;
+            _token = token;
         }
 
 
@@ -59,15 +62,23 @@ namespace server.Controllers
             try
             {
                 _email.SendEmail(req);
+
                 return Ok("Email Send");
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
         }
 
+        [HttpGet("token")]
+        public async Task<IActionResult> SendToken([FromQuery] string id)
+        {
+            string token = _token.GenerateToken(Convert.ToInt32(id));
+            return Ok(token);
+        }
 
+            
         private void CreatePasswardHash(string passward, out string passwardHash, out string passwardSalt)
         {
             using (var hmac = new HMACSHA512())
@@ -85,5 +96,7 @@ namespace server.Controllers
                 return ComputeHash.SequenceEqual(Convert.FromBase64String(passwardHash));
             }
         }
+
+
     }
 }

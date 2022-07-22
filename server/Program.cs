@@ -1,7 +1,7 @@
 global using Microsoft.EntityFrameworkCore;
 using server.Data;
-using server.Models;
 using server.Services.EmailServices;
+using server.Services.JsonWebToken;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +13,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IEmailServices, EmailServices>();
+builder.Services.AddScoped<IJsonWebToken, JsonWebToken>();
 
 var app = builder.Build();
 
