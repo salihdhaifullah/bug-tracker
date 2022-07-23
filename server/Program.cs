@@ -7,7 +7,7 @@ using server.Services.PasswardServices;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddDbContext<UserDataContex>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("Connection")));
+builder.Services.AddDbContext<Context>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("Connection")));
 
 builder.Services.AddScoped<IEmailServices, EmailServices>();
 builder.Services.AddScoped<IJsonWebToken, JsonWebToken>();

@@ -10,7 +10,7 @@
         public int ProjectId { get; set; }
         public Project Project { get; set; }
         public int LabelId { get; set; }
-        public Labels Label { get; set; }
+        public Label Label { get; set; }
         public int AssigneeToId { get; set; }
         public User AssigneeTo { get; set; }
         public int ReporterId { get; set; }

@@ -11,6 +11,5 @@
         public DateTime? VerifiedAt { get; set; } = default;
         public bool IsVerified { get; set; } = false;
         public DateTime CreateAt { get; set; } = default;
-        public Roles Role { get; set; }
     }
 }

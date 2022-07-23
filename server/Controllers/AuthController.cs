@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using server.Data;
 using Microsoft.EntityFrameworkCore;
-using server.Models;
 using server.Services.PasswardServices;
 using server.Services.EmailServices;
 using server.Services.JsonWebToken;
@@ -14,12 +13,12 @@ namespace server.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly UserDataContex _contex;
+        private readonly Context _contex;
         private readonly IEmailServices _email;
         private readonly IJsonWebToken _token;
         private readonly IPasswardServices _passward;
 
-        public AuthController(UserDataContex contex, IEmailServices email, IJsonWebToken token, IPasswardServices passward)
+        public AuthController(Context contex, IEmailServices email, IJsonWebToken token, IPasswardServices passward)
         {
             _contex = contex;
             _email = email;

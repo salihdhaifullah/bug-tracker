@@ -2,7 +2,7 @@
 using MailKit.Security;
 using MimeKit.Text;
 using MimeKit;
-using server.Models;
+using server.Models.api;
 
 namespace server.Services.EmailServices
 {
