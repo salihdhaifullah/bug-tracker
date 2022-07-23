@@ -1,4 +1,4 @@
-﻿using server.Models;
+﻿using server.Models.api;
 
 namespace server.Services.EmailServices
 {

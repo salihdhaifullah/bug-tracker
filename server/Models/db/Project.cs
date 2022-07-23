@@ -1,4 +1,4 @@
-﻿namespace server.Models
+﻿namespace server.Models.db
 {
     public class Project
     {
@@ -7,16 +7,16 @@
         public string Title { get; set; } = String.Empty;
         public string Name { get; set; } = String.Empty;
         public string Description { get; set; } = String.Empty;
-        public Languages[] Languages { get; set; }
         public DateTime CreatedAt { get; set; }
-        public DateTime UpdatedAt { get; set; }
-        public Labels[] Labels { get; set; }
+        public DateTime? UpdatedAt { get; set; }
         public User Manger { get; set; }
-        public User[] Devolbers { get; set; }
-        public User SuperAdmain { get; set; }
+        public User[]? Developers { get; set; }
+        public User[]? Submitter { get; set; }
+        public User[]? Tester { get; set; }
+        public User SuperAdmin { get; set; }
         public Comment[] Comments { get; set; }
-        public Issue[] Issues { get; set; }
-        public Task[] Tasks { get; set; }
-        public Report[] Reports { get; set; }
+        public Issue[]? Issues { get; set; }
+        public Task[]? Tasks { get; set; }
+        public Report[]? Reports { get; set; }
     }
 }

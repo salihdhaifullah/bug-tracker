@@ -5,6 +5,8 @@ using server.Models;
 using server.Services.PasswardServices;
 using server.Services.EmailServices;
 using server.Services.JsonWebToken;
+using server.Models.api;
+using server.Models.db;
 
 namespace server.Controllers
 {
