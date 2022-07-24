@@ -1,6 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+using server.Data;
+using server.Models.api;
+using server.Models.db;
+using server.Services.EmailServices;
+using server.Services.JsonWebToken;
+using server.Services.PasswordServices;
 
 namespace server.Controllers
 {
@@ -8,36 +12,73 @@ namespace server.Controllers
     [ApiController]
     public class ProjectsController : ControllerBase
     {
-        // GET: api/<ProjectsController>
+        private readonly Context _context;
+        private readonly IEmailServices _email;
+        private readonly IJsonWebToken _token;
+        private readonly IPasswordServices _password;
+
+        public ProjectsController(Context context, IEmailServices email, IJsonWebToken token, IPasswordServices password)
+        {
+            _context = context;
+            _email = email;
+            _token = token;
+            _password = password;
+        }
+        [HttpPost("Create")]
+        public async Task<IActionResult> CreateProject(ProjectReq req)
+        {
+            Project ProjectData = new()
+            {
+                MangerId = req.MangerId,
+                Name = req.Name,
+                Title = req.Title,
+                Description = req.Description,
+                CreatedAt = DateTime.UtcNow
+            };
+            var NewProject = await _context.Projects.AddAsync(ProjectData);
+            _context.SaveChanges();
+            return Ok(NewProject.Entity);
+        }
+
+        [HttpPatch("Update")]
+        public async Task<IActionResult> UpdateProject(ProjectReq req)
+        {
+            var ProjectData = await _context.Projects.FindAsync(req.Id);
+            if (ProjectData == null) return NotFound();
+
+            ProjectData.Name = req.Name;
+            ProjectData.Title = req.Title;
+            ProjectData.Description = req.Description;
+            ProjectData.UpdatedAt = DateTime.UtcNow;
+            _context.SaveChanges();
+            return Ok(ProjectData);
+        }
+
+        [HttpPatch("AddDeveloper/{projectId}")]
+        public async Task<IActionResult> AssignProject([FromRoute] string projectId, [FromBody] string[] DevelopersIds)
+        {
+            var ProjectData = await _context.Projects.FindAsync(Convert.ToInt32(projectId));
+            if (ProjectData == null) return NotFound("Project Not Found");
+            if (DevelopersIds == null) return BadRequest("User Not Found");
+            if (ProjectData.DevelopersId?.Length >= 1) return BadRequest("Invalid Request");
+            
+            for (int i = 0; i < DevelopersIds.Length; i++)
+            {
+                var DeveloperData = await _context.Users.FindAsync(Convert.ToInt32(DevelopersIds[i]));
+                if (DeveloperData == null) return BadRequest("User Not Found");
+                ProjectData.DevelopersId[ProjectData.DevelopersId.Length] = Convert.ToInt32(DevelopersIds[i]);
+
+            }
+            await _context.SaveChangesAsync();
+            return Ok(ProjectData);
+        }
+
         [HttpGet]
-        public IEnumerable<string> Get()
+        public IActionResult GetProjects()
         {
-            return new string[] { "value1", "value2" };
+            var Projects =  _context.Projects.ToList();
+            return Ok(Projects);
         }
 
-        // GET api/<ProjectsController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
-        {
-            return "value";
-        }
-
-        // POST api/<ProjectsController>
-        [HttpPost]
-        public void Post([FromBody] string value)
-        {
-        }
-
-        // PUT api/<ProjectsController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
-
-        // DELETE api/<ProjectsController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
-        }
     }
 }

@@ -17,7 +17,7 @@
         public Project Project { get; set; }
         public int LabelId { get; set; }
         public Label Label { get; set; }
-        public int[]? CommentsId { get; set; }
+        public int[]? CommentsId { get; set; } = Array.Empty<int>();
         public Comment[]? Comments { get; set; }
     }
 }

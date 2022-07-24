@@ -1,23 +1,23 @@
 ﻿using System.Security.Cryptography;
-namespace server.Services.PasswardServices
+namespace server.Services.PasswordServices
 {
-    public class PasswardServices : IPasswardServices
+    public class PasswordServices : IPasswordServices
     {
-        public void CreatePasswardHash(string passward, out string passwardHash, out string passwardSalt)
+        public void CreatePasswordHash(string password, out string passwordHash, out string passwordSalt)
         {
             using (var hmac = new HMACSHA512())
             {
-                passwardSalt = Convert.ToBase64String(hmac.Key);
-                passwardHash = Convert.ToBase64String(hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(passward)));
+                passwordSalt = Convert.ToBase64String(hmac.Key);
+                passwordHash = Convert.ToBase64String(hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password)));
             }
         }
 
-        public bool VerifyPasswardHash(string passward, string passwardHash, string passwardSalt)
+        public bool VerifyPasswordHash(string password, string passwordHash, string passwordSalt)
         {
-            using (var hmac = new HMACSHA512(Convert.FromBase64String(passwardSalt)))
+            using (var hmac = new HMACSHA512(Convert.FromBase64String(passwordSalt)))
             {
-                byte[] ComputeHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(passward));
-                return ComputeHash.SequenceEqual(Convert.FromBase64String(passwardHash));
+                byte[] ComputeHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+                return ComputeHash.SequenceEqual(Convert.FromBase64String(passwordHash));
             }
         }
     }

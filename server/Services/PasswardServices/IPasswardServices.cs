@@ -1,8 +1,8 @@
-﻿namespace server.Services.PasswardServices
+﻿namespace server.Services.PasswordServices
 {
-    public interface IPasswardServices
+    public interface IPasswordServices
     {
-        public void CreatePasswardHash(string passward, out string passwardHash, out string passwardSalt);
-        public bool VerifyPasswardHash(string passward, string passwardHash, string passwardSalt);
+        public void CreatePasswordHash(string password, out string passwordHash, out string passwordSalt);
+        public bool VerifyPasswordHash(string password, string passwordHash, string passwordSalt);
     }
 }

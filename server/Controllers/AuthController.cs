@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using server.Data;
 using Microsoft.EntityFrameworkCore;
-using server.Services.PasswardServices;
+using server.Services.PasswordServices;
 using server.Services.EmailServices;
 using server.Services.JsonWebToken;
 using server.Models.api;
@@ -13,52 +13,52 @@ namespace server.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly Context _contex;
+        private readonly Context _context;
         private readonly IEmailServices _email;
         private readonly IJsonWebToken _token;
-        private readonly IPasswardServices _passward;
+        private readonly IPasswordServices _password;
 
-        public AuthController(Context contex, IEmailServices email, IJsonWebToken token, IPasswardServices passward)
+        public AuthController(Context context, IEmailServices email, IJsonWebToken token, IPasswordServices password)
         {
-            _contex = contex;
+            _context = context;
             _email = email;
             _token = token;
-            _passward = passward;
+            _password = password;
         }
 
 
         [HttpPost("Singin")]
-        public async Task<IActionResult> SingIn(UserSigninReq req)
+        public async Task<IActionResult> SingIn(UserSinginReq req)
         {
-            bool IsFound = _contex.Users.Any(user => user.Email == req.Email);
-            if (IsFound) return BadRequest("User Allredy Exsist");
+            bool IsFound = _context.Users.Any(user => user.Email == req.Email);
+            if (IsFound) return BadRequest("User Already Exist");
 
-            _passward.CreatePasswardHash(req.Passward, out string passwardHash, out string passwardSalt);
+            _password.CreatePasswordHash(req.Password, out string passwordHash, out string passwordSalt);
 
             User user = new()
             {
                 Email = req.Email,
-                PasswardSalt = passwardSalt,
-                HashPassward = passwardHash,
+                PasswordSalt = passwordSalt,
+                HashPassword = passwordHash,
                 FirstName = req.FirstName,
                 LastName = req.LastName,
                 CreateAt = DateTime.UtcNow
             };
 
-            _contex.Users.Add(user);
-            await _contex.SaveChangesAsync();
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
             return Ok(user);
         }
 
         [HttpPost("login")]
         public async Task<IActionResult> Login(UserLoginReq req)
         {
-            var user = await _contex.Users.FirstOrDefaultAsync(user => user.Email == req.Email);
+            var user = await _context.Users.FirstOrDefaultAsync(user => user.Email == req.Email);
             if (user == null) return BadRequest("User Not Found");
-            bool isMatsh = _passward.VerifyPasswardHash(req.Passward, user.HashPassward, user.PasswardSalt);
-            if (!isMatsh) return BadRequest("Passward is Wrong");
+            bool isMatch = _password.VerifyPasswordHash(req.Password, user.HashPassword, user.PasswordSalt);
+            if (!isMatch) return BadRequest("Password is Wrong");
 
-            return Ok("Login Sucses");
+            return Ok("Login Success");
         }
 
         [HttpPost("hello")]
@@ -85,10 +85,10 @@ namespace server.Controllers
             return Ok(token);
         }
 
-        [HttpGet("virfy")]
-        public IActionResult Virfy([FromQuery] string token)
+        [HttpGet("verify")]
+        public IActionResult Verify([FromQuery] string token)
         {
-            int? isValid = _token.VirfiyToken(token);
+            int? isValid = _token.VerifyToken(token);
             if (!Convert.ToBoolean(isValid)) return BadRequest("Token is not Valid");
             return Ok("Token is Valid");
         }

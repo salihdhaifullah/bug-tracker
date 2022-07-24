@@ -2,6 +2,7 @@
 {
     public class Feature
     {
+#pragma warning disable CS8618
         public int Id { get; set; }
         public string Name { get; set; } = String.Empty; 
         public string Description { get; set; } = String.Empty;
@@ -16,7 +17,7 @@
         public Project Project { get; set; }
         public int LabelId { get; set; }
         public Label Label { get; set; }
-        public int[]? CommentsId { get; set; }
+        public int[]? CommentsId { get; set; } = Array.Empty<int>();
         public Comment[]? Comments { get; set; }
     }
 }

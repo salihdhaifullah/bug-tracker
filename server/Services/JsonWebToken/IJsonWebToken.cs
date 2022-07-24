@@ -3,6 +3,6 @@
     public interface IJsonWebToken
     {
         public string GenerateToken(int id);
-        public int? VirfiyToken(string token);
+        public int? VerifyToken(string token);
     }
 }

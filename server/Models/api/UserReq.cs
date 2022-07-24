@@ -2,7 +2,7 @@
 
 namespace server.Models.api
 {
-    public class UserSigninReq
+    public class UserSinginReq
     {
         [Required]
         public string FirstName { get; set; } = String.Empty;
@@ -11,7 +11,7 @@ namespace server.Models.api
         [Required, MinLength(8)]
         public string Email { get; set; } = String.Empty;
         [Required, MinLength(6)]
-        public string Passward { get; set; } = String.Empty;
+        public string Password { get; set; } = String.Empty;
     }
 
     public class UserLoginReq
@@ -19,6 +19,6 @@ namespace server.Models.api
         [Required, MinLength(8)]
         public string Email { get; set; } = String.Empty;
         [Required, MinLength(6)]
-        public string Passward { get; set; } = String.Empty;
+        public string Password { get; set; } = String.Empty;
     }
 }

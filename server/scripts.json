@@ -2,5 +2,18 @@
   "DB": {
     "push": "Add-Migration --name",
     "update": "Update-Database"
+  },
+  "DropAllTables": {
+    "
+    DROP TABLE "Comments" cascade;
+    DROP TABLE "Features" cascade;
+    DROP TABLE "Issues" cascade;
+    DROP TABLE "Labels" cascade;
+    DROP TABLE "Likes" cascade;
+    DROP TABLE "Projects" cascade;
+    DROP TABLE "Replies" cascade;
+    DROP TABLE "Tasks" cascade;
+    DROP TABLE "Users" cascade;
+    "
   }
 }

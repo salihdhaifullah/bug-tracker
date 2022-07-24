@@ -2,6 +2,7 @@
 {
     public class Like
     {
+#pragma warning disable CS8618
         public int Id { get; set; }
         public int UserId { get; set; }
         public User User { get; set; }
