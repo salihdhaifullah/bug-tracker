@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using server.Services.EmailServices;
 using server.Services.JsonWebToken;
 using server.Services.PasswordServices;
+using Microsoft.AspNetCore.Authentication;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,8 +18,6 @@ builder.Services.AddScoped<IPasswordServices, PasswordServices>();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
-
 
 var app = builder.Build();
 

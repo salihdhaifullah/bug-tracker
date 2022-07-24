@@ -64,5 +64,14 @@ namespace server.Controllers
             _context.SaveChanges();
             return Ok(OrganizationData);
         }
+
+        public async Task<IActionResult> GetOrganization(OrganizationReq req)
+        {
+            var OrganizationData = await _context.Organizations.FindAsync(req.Id);
+            if (OrganizationData == null) return NotFound();
+            return Ok(OrganizationData);
+        }
+
+        
     }
 }

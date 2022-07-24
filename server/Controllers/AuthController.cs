@@ -6,6 +6,7 @@ using server.Services.EmailServices;
 using server.Services.JsonWebToken;
 using server.Models.api;
 using server.Models.db;
+using Google.Apis.Auth;
 
 namespace server.Controllers
 {
@@ -81,7 +82,7 @@ namespace server.Controllers
         {
             string token = _token.GenerateToken(Convert.ToInt32(id));
             CookieOptions cookieOptions = new CookieOptions { Secure = true, HttpOnly = true, SameSite = SameSiteMode.Lax, Expires = DateTimeOffset.UtcNow.AddHours(10) };
-        Response.Cookies.Append("token", token, cookieOptions);
+            Response.Cookies.Append("token", token, cookieOptions);
             return Ok(token);
         }
 
@@ -92,6 +93,19 @@ namespace server.Controllers
             if (!Convert.ToBoolean(isValid)) return BadRequest("Token is not Valid");
             return Ok("Token is Valid");
         }
+        [HttpGet("Google-Singin")]
+        public async Task<IActionResult> GoogleSingin([FromQuery] string token)
+        {
+            try
+            {
+                var GoogleUser = await GoogleJsonWebSignature.
+            }
+            catch (Exception err)
+            {
 
+                throw err;
+            }
+            return Ok("Token is Valid");
+        }
     }
 }
