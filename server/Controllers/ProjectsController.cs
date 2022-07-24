@@ -60,23 +60,23 @@ namespace server.Controllers
             var ProjectData = await _context.Projects.FindAsync(Convert.ToInt32(projectId));
             if (ProjectData == null) return NotFound("Project Not Found");
             if (DevelopersIds == null) return BadRequest("User Not Found");
-            if (ProjectData.DevelopersId?.Length >= 1) return BadRequest("Invalid Request");
-            
+            if (ProjectData.DevelopersId?.Count >= 1) return BadRequest("Invalid Request");
+
             for (int i = 0; i < DevelopersIds.Length; i++)
             {
                 var DeveloperData = await _context.Users.FindAsync(Convert.ToInt32(DevelopersIds[i]));
                 if (DeveloperData == null) return BadRequest("User Not Found");
-                ProjectData.DevelopersId[ProjectData.DevelopersId.Length] = Convert.ToInt32(DevelopersIds[i]);
-
+                ProjectData.DevelopersId.Add(Convert.ToInt32(DevelopersIds[i]));
             }
             await _context.SaveChangesAsync();
+
             return Ok(ProjectData);
         }
 
         [HttpGet]
         public IActionResult GetProjects()
         {
-            var Projects =  _context.Projects.ToList();
+            var Projects = _context.Projects.ToList();
             return Ok(Projects);
         }
 
