@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import {FormControl, FormGroupDirective, NgForm, Validators} from '@angular/forms';
+import {FormControl, FormGroupDirective, FormGroup, NgForm, Validators} from '@angular/forms';
 import {ErrorStateMatcher} from '@angular/material/core';
 
 export class MyErrorStateMatcher implements ErrorStateMatcher {
@@ -18,13 +18,21 @@ export class LoginComponent  {
   constructor() { }
 
   emailFormControl = new FormControl('', [Validators.required, Validators.email]);
+  passwordFormControl = new FormControl('', [Validators.required, Validators.minLength(8)]);
 
   matcher = new MyErrorStateMatcher();
   hide = true;
 
+  loginForm = new FormGroup({
+    email: this.emailFormControl,
+    password: this.passwordFormControl
+  });
+  
   HandelSubmit = (event: Event) => {
     event.preventDefault();
-    console.log('Form submitted');
+    if (this.emailFormControl.valid && this.passwordFormControl.valid) {
+      console.log(this.loginForm.value);
+      this.loginForm.reset()
+    }
   }
-
 }

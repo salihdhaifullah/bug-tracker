@@ -1,6 +1,6 @@
 <div class="contanier w-full h-full bg-gray-100">
     <div class="flex justify-center h-full w-full items-center ">
-        <form (submit)="HandelSubmit($event)" class="example-form justify-center flex flex-col rounded-md bg-white shadow-lg  py-10 px-20">
+        <form  (submit)="HandelSubmit($event)" class="example-form justify-center flex flex-col rounded-md bg-white shadow-lg  py-10 px-20">
             <div class="flex items-center justify-center w-full flex-col">
                 <mat-icon aria-hidden="false" aria-label="Example login icon" fontIcon="login" class="w-auto h-auto text-3xl material-icons-outlined  flex text-[#0b4ea5]"></mat-icon>
                 <h2 class="text-2xl text-center text-[#0b4ea5]">
@@ -13,7 +13,6 @@
                 <mat-label>Email</mat-label>
                 <input type="email" matInput [formControl]="emailFormControl" [errorStateMatcher]="matcher"
                     placeholder="Ex. pat@example.com">
-                <mat-hint>Errors appear instantly!</mat-hint>
                 <mat-error *ngIf="emailFormControl.hasError('email') && !emailFormControl.hasError('required')">
                     Please enter a valid email address
                 </mat-error>
@@ -24,13 +23,19 @@
 
             <mat-form-field appearance="fill">
                 <mat-label>Enter your password</mat-label>
-                <input matInput [type]="hide ? 'password' : 'text'">
+                <input matInput [formControl]="passwordFormControl" [errorStateMatcher]="matcher" [type]="hide ? 'password' : 'text'">
+                <mat-error *ngIf="passwordFormControl.hasError('minlength') && !passwordFormControl.hasError('required')">
+                    Please enter a password of at least 8 characters
+                </mat-error>
+                <mat-error *ngIf="passwordFormControl.hasError('required')">
+                    Password is <strong>required</strong>
+                </mat-error>
                 <button mat-icon-button matSuffix (click)="hide = !hide" [attr.aria-label]="'Hide password'"
                     [attr.aria-pressed]="hide">
                     <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
                 </button>
             </mat-form-field>
-            <button mat-raised-button  class="mr-auto" color="primary">Submit</button>
+            <button mat-raised-button  class="mr-auto mt-4" color="primary">Submit</button>
         </form>
     </div>
 </div>

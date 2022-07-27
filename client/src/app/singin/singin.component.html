@@ -7,17 +7,28 @@
                     Sign In
                 </h2>
             </div>
+
             <div class="flex flex-row justify-between">
-                <mat-form-field class="mr-2" hintLabel="Max 10 characters" appearance="fill">
-                    <mat-label>Enter some input</mat-label>
-                    <input matInput #input maxlength="10" placeholder="Ex. Nougat">
-                    <mat-hint>{{input.value.length || 0}}/10</mat-hint>
+                <mat-form-field class="mr-2"  appearance="fill">
+                    <mat-label>First Name</mat-label>
+                    <input matInput #input [formControl]="firstNameFormControl" placeholder="First Name">
+                    <mat-error *ngIf="firstNameFormControl.hasError('minlength') && !firstNameFormControl.hasError('required')">
+                        Please enter a name of at least 3 characters
+                    </mat-error>
+                    <mat-error *ngIf="firstNameFormControl.hasError('required')">
+                        First Name is <strong>required</strong>
+                    </mat-error>
                 </mat-form-field>
 
-                <mat-form-field class="ml-2" hintLabel="Max 10 characters" appearance="fill">
-                    <mat-label>Enter some input</mat-label>
-                    <input matInput #input maxlength="10" placeholder="Ex. Nougat">
-                    <mat-hint>{{input.value.length || 0}}/10</mat-hint>
+                <mat-form-field class="ml-2"  appearance="fill">
+                    <mat-label>Last Name</mat-label>
+                    <input matInput #input  [formControl]="lastNameFormControl" placeholder="Last Name">
+                    <mat-error *ngIf="lastNameFormControl.hasError('minlength') && !lastNameFormControl.hasError('required')">
+                        Please enter a name of at least 3 characters
+                    </mat-error>
+                    <mat-error *ngIf="lastNameFormControl.hasError('required')">
+                        Last Name is <strong>required</strong>
+                    </mat-error>
                 </mat-form-field>
             </div>
 
@@ -25,7 +36,6 @@
                 <mat-label>Email</mat-label>
                 <input type="email" matInput [formControl]="emailFormControl" [errorStateMatcher]="matcher"
                     placeholder="Ex. pat@example.com">
-                <mat-hint>Errors appear instantly!</mat-hint>
                 <mat-error *ngIf="emailFormControl.hasError('email') && !emailFormControl.hasError('required')">
                     Please enter a valid email address
                 </mat-error>
@@ -36,12 +46,19 @@
 
             <mat-form-field appearance="fill">
                 <mat-label>Enter your password</mat-label>
-                <input matInput [type]="hide ? 'password' : 'text'">
+                <input matInput [formControl]="passwordFormControl" [errorStateMatcher]="matcher" [type]="hide ? 'password' : 'text'">
+                <mat-error *ngIf="passwordFormControl.hasError('minlength') && !passwordFormControl.hasError('required')">
+                    Please enter a password of at least 8 characters
+                </mat-error>
+                <mat-error *ngIf="passwordFormControl.hasError('required')">
+                    Password is <strong>required</strong>
+                </mat-error>
                 <button mat-icon-button matSuffix (click)="hide = !hide" [attr.aria-label]="'Hide password'"
                     [attr.aria-pressed]="hide">
                     <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
                 </button>
             </mat-form-field>
+
             <button mat-raised-button  class="mr-auto" color="primary">Submit</button>
         </form>
     </div>
