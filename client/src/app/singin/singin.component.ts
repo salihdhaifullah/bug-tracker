@@ -1,7 +1,8 @@
+import { AuthService } from './../../services/my-test.service';
 import { Component } from '@angular/core';
 import {FormControl, FormGroupDirective, FormGroup, NgForm, Validators} from '@angular/forms';
 import {ErrorStateMatcher} from '@angular/material/core';
-
+import { ISinginFormData } from 'src/model/FormData';
 
 export class MyErrorStateMatcher implements ErrorStateMatcher {
   isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
@@ -16,7 +17,7 @@ export class MyErrorStateMatcher implements ErrorStateMatcher {
 })
 export class SinginComponent  {
 
-  constructor() { }
+  constructor(private auth: AuthService) { }
 
   emailFormControl = new FormControl('', [Validators.required, Validators.email]);
   passwordFormControl = new FormControl('', [Validators.required, Validators.minLength(8)]);
@@ -33,12 +34,16 @@ export class SinginComponent  {
     lastName: this.lastNameFormControl
   });
 
-  HandelSubmit = (event: Event) => {
+  HandelSubmit = async (event: Event) => {
     event.preventDefault();
     if (this.emailFormControl.valid && this.passwordFormControl.valid  && this.firstNameFormControl.valid && this.lastNameFormControl.valid) {
 
-      console.log(this.singinForm.value);
-      this.singinForm.reset()
+      this.auth.Singin(this.singinForm.value as ISinginFormData).subscribe(
+        data => {
+          console.log(data);
+          this.singinForm.reset()
+        });
+
     }
   }
 }  
