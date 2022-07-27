@@ -6,7 +6,6 @@ using server.Services.EmailServices;
 using server.Services.JsonWebToken;
 using server.Models.api;
 using server.Models.db;
-using Google.Apis.Auth;
 
 namespace server.Controllers
 {
@@ -91,20 +90,6 @@ namespace server.Controllers
         {
             int? isValid = _token.VerifyToken(token);
             if (!Convert.ToBoolean(isValid)) return BadRequest("Token is not Valid");
-            return Ok("Token is Valid");
-        }
-        [HttpGet("Google-Singin")]
-        public async Task<IActionResult> GoogleSingin([FromQuery] string token)
-        {
-            try
-            {
-                var GoogleUser = await GoogleJsonWebSignature.
-            }
-            catch (Exception err)
-            {
-
-                throw err;
-            }
             return Ok("Token is Valid");
         }
     }

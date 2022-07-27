@@ -24,6 +24,12 @@ namespace server.Controllers
             _token = token;
             _password = password;
         }
+        [HttpGet]
+        public async Task<IActionResult> Index()
+        {
+            return Ok("Login");
+        }
+        [HttpPost]
         public async Task<IActionResult> CreateOrganization(OrganizationReq req)
         {
             Organization OrganizationData = new()
@@ -38,6 +44,7 @@ namespace server.Controllers
             return Ok(NewOrganization.Entity);
         }
 
+        [HttpPatch("update")]
         public async Task<IActionResult> UpdateOrganization(OrganizationReq req)
         {
             var OrganizationData = await _context.Organizations.FindAsync(req.Id);
@@ -50,6 +57,8 @@ namespace server.Controllers
             return Ok(OrganizationData);
         }
 
+
+        [HttpPost("assignee_employs")]
         public async Task<IActionResult> AssigneeEmploys(OrganizationReq req)
         {
             var OrganizationData = await _context.Organizations.FindAsync(req.Id);
@@ -65,9 +74,10 @@ namespace server.Controllers
             return Ok(OrganizationData);
         }
 
-        public async Task<IActionResult> GetOrganization(OrganizationReq req)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetOrganization([FromRoute] string id)
         {
-            var OrganizationData = await _context.Organizations.FindAsync(req.Id);
+            var OrganizationData = await _context.Organizations.FindAsync(id);
             if (OrganizationData == null) return NotFound();
             return Ok(OrganizationData);
         }
