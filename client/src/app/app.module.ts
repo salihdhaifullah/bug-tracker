@@ -18,6 +18,7 @@ import {MatToolbarModule} from '@angular/material/toolbar';
 import { NavbarComponent } from './navbar/navbar.component';
 import {MatSidenavModule} from '@angular/material/sidenav';
 import { DefaultComponent } from './default/default.component';
+import { NewOrganizationComponent } from './new-organization/new-organization.component';
 
 
 @NgModule({
@@ -27,6 +28,7 @@ import { DefaultComponent } from './default/default.component';
     SinginComponent,
     NavbarComponent,
     DefaultComponent,
+    NewOrganizationComponent,
   ],
   imports: [
     BrowserModule,

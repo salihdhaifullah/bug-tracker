@@ -1,0 +1,47 @@
+<div class="w-full h-full">
+    <div class="flex justify-center h-full w-full items-center ">
+        <form (submit)="HandelSubmit($event)"
+            class="example-form justify-center flex flex-col rounded-md bg-white shadow-lg  py-10 px-20">
+            <div class="flex items-center justify-center w-full flex-col">
+                <mat-icon aria-hidden="false" fontIcon="create"
+                    class="w-auto h-auto text-3xl material-icons-outlined  flex text-[#0b4ea5]"></mat-icon>
+                <h2 class="text-2xl text-center text-[#0b4ea5]">
+                    Create Organization
+                </h2>
+            </div>
+
+            <div class="flex flex-row  justify-between">
+                <mat-form-field class="flex-1 mr-2" appearance="fill">
+                    <mat-label>Organization Name</mat-label>
+                    <input matInput #input [formControl]="NameFormControl" placeholder="Organization Name">
+                    <mat-error *ngIf="NameFormControl.hasError('required')">
+                        Organization Name is <strong>required</strong>
+                    </mat-error>
+                </mat-form-field>
+
+                <mat-form-field class="flex-1 ml-2" appearance="fill">
+                    <mat-label>Logo Url</mat-label>
+                    <mat-hint>Optional</mat-hint>
+                    <input type="email" matInput [formControl]="LogoFormControl"
+                        placeholder="EX https://www.google.com">
+                </mat-form-field>
+            </div>
+
+            <mat-form-field class="min-w-[40vw] mt-[20px] mb-6" appearance="fill">
+                <mat-label>Autosize textarea</mat-label>
+                <textarea [formControl]="DescriptionFormControl" class="min-w-[40vw]" matInput placeholder="Description"
+                    cdkTextareaAutosize #autosize="cdkTextareaAutosize" cdkAutosizeMinRows="1"
+                    cdkAutosizeMaxRows="5"></textarea>
+                <mat-error
+                    *ngIf="DescriptionFormControl.hasError('minlength') && !DescriptionFormControl.hasError('required')">
+                    Please enter a Description of at least 10 characters
+                </mat-error>
+                <mat-error *ngIf="DescriptionFormControl.hasError('required')">
+                    Description is <strong>required</strong>
+                </mat-error>
+            </mat-form-field>
+
+            <button mat-raised-button class="mr-auto" color="primary">Submit</button>
+        </form>
+    </div>
+</div>
