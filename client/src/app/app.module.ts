@@ -19,6 +19,14 @@ import { NavbarComponent } from './navbar/navbar.component';
 import {MatSidenavModule} from '@angular/material/sidenav';
 import { DefaultComponent } from './default/default.component';
 import { NewOrganizationComponent } from './new-organization/new-organization.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
+import { ProjectsComponent } from './projects/projects.component';
+import { EmploysComponent } from './employs/employs.component';
+import { ProjectComponent } from './project/project.component';
+import { TicketComponent } from './ticket/ticket.component';
+import { TicketsComponent } from './tickets/tickets.component';
+import { NewProjectComponent } from './new-project/new-project.component';
+import { NewTicketComponent } from './new-ticket/new-ticket.component';
 
 
 @NgModule({
@@ -29,6 +37,14 @@ import { NewOrganizationComponent } from './new-organization/new-organization.co
     NavbarComponent,
     DefaultComponent,
     NewOrganizationComponent,
+    DashboardComponent,
+    ProjectsComponent,
+    EmploysComponent,
+    ProjectComponent,
+    TicketComponent,
+    TicketsComponent,
+    NewProjectComponent,
+    NewTicketComponent,
   ],
   imports: [
     BrowserModule,
