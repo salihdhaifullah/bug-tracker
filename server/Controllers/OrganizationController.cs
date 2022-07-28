@@ -4,7 +4,6 @@ using server.Models.api;
 using server.Data;
 using server.Services.JsonWebToken;
 using server.Services.PasswordServices;
-using server.Services.EmailServices;
 
 namespace server.Controllers
 {
@@ -13,14 +12,12 @@ namespace server.Controllers
     public class OrganizationController : ControllerBase
     {
         private readonly Context _context;
-        private readonly IEmailServices _email;
         private readonly IJsonWebToken _token;
         private readonly IPasswordServices _password;
 
-        public OrganizationController(Context context, IEmailServices email, IJsonWebToken token, IPasswordServices password)
+        public OrganizationController(Context context, IJsonWebToken token, IPasswordServices password)
         {
             _context = context;
-            _email = email;
             _token = token;
             _password = password;
         }
@@ -81,7 +78,5 @@ namespace server.Controllers
             if (OrganizationData == null) return NotFound();
             return Ok(OrganizationData);
         }
-
-        
     }
 }

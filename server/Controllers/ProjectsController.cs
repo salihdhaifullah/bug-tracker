@@ -2,7 +2,6 @@
 using server.Data;
 using server.Models.api;
 using server.Models.db;
-using server.Services.EmailServices;
 using server.Services.JsonWebToken;
 using server.Services.PasswordServices;
 
@@ -13,14 +12,12 @@ namespace server.Controllers
     public class ProjectsController : ControllerBase
     {
         private readonly Context _context;
-        private readonly IEmailServices _email;
         private readonly IJsonWebToken _token;
         private readonly IPasswordServices _password;
 
-        public ProjectsController(Context context, IEmailServices email, IJsonWebToken token, IPasswordServices password)
+        public ProjectsController(Context context, IJsonWebToken token, IPasswordServices password)
         {
             _context = context;
-            _email = email;
             _token = token;
             _password = password;
         }

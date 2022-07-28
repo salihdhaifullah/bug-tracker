@@ -8,6 +8,9 @@
         public string Name { get; set; } = String.Empty;
         public string Description { get; set; } = String.Empty;
         public DateTime CreatedAt { get; set; }
+        public List<Role> Roles { get; set; } 
+        public List<int> RolesId { get; set; } = new List<int>() { };
+        public string Role { get; set; } = String.Empty;
         public DateTime? UpdatedAt { get; set; }
         public bool IsClosed { get; set; } = false;
         public DateTime? ClosedAt { get; set; }
@@ -15,8 +18,6 @@
         public int MangerId { get; set; }
         public User Admin { get; set; } // can do anything  
         public int AdminId { get; set; }
-        public List<User> Submitters { get; set; }
-        public List<int> SubmittersId { get; set; } = new List<int>() { };
         public List<User> Developers { get; set; } // can change status of task that he assigned to 
         public List<int> DevelopersId { get; set; } = new List<int>() { };
         public List<Ticket> Tickets { get; set; }

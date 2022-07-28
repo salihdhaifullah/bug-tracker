@@ -2,7 +2,6 @@
 using server.Data;
 using Microsoft.EntityFrameworkCore;
 using server.Services.PasswordServices;
-using server.Services.EmailServices;
 using server.Services.JsonWebToken;
 using server.Models.api;
 using server.Models.db;
@@ -14,14 +13,12 @@ namespace server.Controllers
     public class AuthController : ControllerBase
     {
         private readonly Context _context;
-        private readonly IEmailServices _email;
         private readonly IJsonWebToken _token;
         private readonly IPasswordServices _password;
 
-        public AuthController(Context context, IEmailServices email, IJsonWebToken token, IPasswordServices password)
+        public AuthController(Context context, IJsonWebToken token, IPasswordServices password)
         {
             _context = context;
-            _email = email;
             _token = token;
             _password = password;
         }
@@ -30,67 +27,61 @@ namespace server.Controllers
         [HttpPost("Singin")]
         public async Task<IActionResult> SingIn(UserSinginReq req)
         {
-            bool IsFound = _context.Users.Any(user => user.Email == req.Email);
-            if (IsFound) return BadRequest("User Already Exist");
-
-            _password.CreatePasswordHash(req.Password, out string passwordHash, out string passwordSalt);
-
-            User user = new()
+            try
             {
-                Email = req.Email,
-                PasswordSalt = passwordSalt,
-                HashPassword = passwordHash,
-                FirstName = req.FirstName,
-                LastName = req.LastName,
-                CreateAt = DateTime.UtcNow
-            };
+                bool IsFound = _context.Users.Any(user => user.Email == req.Email);
+                if (IsFound) return BadRequest("User Already Exist");
 
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-            return Ok(user);
+                _password.CreatePasswordHash(req.Password, out string passwordHash, out string passwordSalt);
+
+                User user = new()
+                {
+                    Email = req.Email,
+                    PasswordSalt = passwordSalt,
+                    HashPassword = passwordHash,
+                    FirstName = req.FirstName,
+                    LastName = req.LastName,
+                    CreateAt = DateTime.UtcNow
+                };
+
+                _context.Users.Add(user);
+                await _context.SaveChangesAsync();
+
+                string token = _token.GenerateToken(Convert.ToInt32(user.Id));
+                CookieOptions cookieOptions = new CookieOptions { Secure = true, HttpOnly = true, SameSite = SameSiteMode.Lax, Expires = DateTimeOffset.UtcNow.AddHours(10) };
+                Response.Cookies.Append("token", token, cookieOptions);
+
+                return Ok(user);
+            }
+            catch (Exception err)
+            {
+                throw err;
+            }
+
         }
 
         [HttpPost("login")]
         public async Task<IActionResult> Login(UserLoginReq req)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(user => user.Email == req.Email);
-            if (user == null) return BadRequest("User Not Found");
-            bool isMatch = _password.VerifyPasswordHash(req.Password, user.HashPassword, user.PasswordSalt);
-            if (!isMatch) return BadRequest("Password is Wrong");
-
-            return Ok("Login Success");
-        }
-
-        [HttpPost("hello")]
-        public async Task<IActionResult> SendEmail(EmailDto req)
-        {
             try
             {
-                await _email.SendEmail(req);
+                var user = await _context.Users.FirstOrDefaultAsync(user => user.Email == req.Email);
+                if (user == null) return BadRequest("User Not Found");
 
-                return Ok("Email Send");
+
+                bool isMatch = _password.VerifyPasswordHash(req.Password, user.HashPassword, user.PasswordSalt);
+                if (!isMatch) return BadRequest("Password is Wrong");
+
+                string token = _token.GenerateToken(Convert.ToInt32(user.Id));
+                CookieOptions cookieOptions = new CookieOptions { Secure = true, HttpOnly = true, SameSite = SameSiteMode.None, Expires = DateTimeOffset.UtcNow.AddHours(10) };
+                Response.Cookies.Append("token", token, cookieOptions);
+                
+                return Ok(user);
             }
-            catch (Exception ex)
+            catch (Exception err)
             {
-                return BadRequest(ex.Message);
+                throw err;
             }
-        }
-
-        [HttpGet("token")]
-        public IActionResult SendToken([FromQuery] string id)
-        {
-            string token = _token.GenerateToken(Convert.ToInt32(id));
-            CookieOptions cookieOptions = new CookieOptions { Secure = true, HttpOnly = true, SameSite = SameSiteMode.Lax, Expires = DateTimeOffset.UtcNow.AddHours(10) };
-            Response.Cookies.Append("token", token, cookieOptions);
-            return Ok(token);
-        }
-
-        [HttpGet("verify")]
-        public IActionResult Verify([FromQuery] string token)
-        {
-            int? isValid = _token.VerifyToken(token);
-            if (!Convert.ToBoolean(isValid)) return BadRequest("Token is not Valid");
-            return Ok("Token is Valid");
         }
     }
 }
