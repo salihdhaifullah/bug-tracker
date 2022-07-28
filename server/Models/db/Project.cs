@@ -8,8 +8,6 @@
         public string Name { get; set; } = String.Empty;
         public string Description { get; set; } = String.Empty;
         public DateTime CreatedAt { get; set; }
-        public List<Role> Roles { get; set; } 
-        public List<int> RolesId { get; set; } = new List<int>() { };
         public string Role { get; set; } = String.Empty;
         public DateTime? UpdatedAt { get; set; }
         public bool IsClosed { get; set; } = false;

@@ -1,0 +1,22 @@
+<mat-sidenav-container class="container">
+    <mat-sidenav #sidebar mode='side' class="bg-[#0f172a] w-[230px] h-full" opened>
+        <app-navbar></app-navbar>
+    </mat-sidenav> 
+    <mat-sidenav-content class="h-[100vh]">
+        <div class="content">
+            <div class="toolbar">
+                <mat-toolbar class="justify-between">
+                    <mat-icon class="ml-[15px] text-[#6D8299]" (click)="sidebar.toggle()">menu</mat-icon>
+                    <div class="mt-[15px]">
+                        <mat-icon class="ml-[15px] text-[#6D8299]">search</mat-icon>
+                        <mat-icon class="ml-[15px] text-[#6D8299]">bookmark_border</mat-icon>
+                        <mat-icon class="ml-[15px] text-[#6D8299]">mail_outline</mat-icon>
+                    </div>
+                </mat-toolbar>
+            </div>
+            <div class="ml-[30px]">
+                <router-outlet></router-outlet>
+            </div>
+        </div>
+    </mat-sidenav-content>
+</mat-sidenav-container>

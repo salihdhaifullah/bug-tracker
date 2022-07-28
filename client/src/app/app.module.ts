@@ -14,13 +14,19 @@ import {MatInputModule} from '@angular/material/input';
 import {MatIconModule} from '@angular/material/icon';
 import {MatButtonModule} from '@angular/material/button';
 import {HttpClientModule} from '@angular/common/http';
+import {MatToolbarModule} from '@angular/material/toolbar';
+import { NavbarComponent } from './navbar/navbar.component';
+import {MatSidenavModule} from '@angular/material/sidenav';
+import { DefaultComponent } from './default/default.component';
 
 
 @NgModule({
   declarations: [
     AppComponent,
     LoginComponent,
-    SinginComponent
+    SinginComponent,
+    NavbarComponent,
+    DefaultComponent,
   ],
   imports: [
     BrowserModule,
@@ -37,7 +43,9 @@ import {HttpClientModule} from '@angular/common/http';
     MatInputModule,
     MatIconModule,
     MatButtonModule,
-    HttpClientModule
+    HttpClientModule,
+    MatToolbarModule,
+    MatSidenavModule
   ],
   providers: [],
   bootstrap: [AppComponent]

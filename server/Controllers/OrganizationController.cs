@@ -21,11 +21,7 @@ namespace server.Controllers
             _token = token;
             _password = password;
         }
-        [HttpGet]
-        public async Task<IActionResult> Index()
-        {
-            return Ok("Login");
-        }
+
         [HttpPost]
         public async Task<IActionResult> CreateOrganization(OrganizationReq req)
         {

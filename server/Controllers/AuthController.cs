@@ -48,7 +48,7 @@ namespace server.Controllers
                 await _context.SaveChangesAsync();
 
                 string token = _token.GenerateToken(Convert.ToInt32(user.Id));
-                CookieOptions cookieOptions = new CookieOptions { Secure = true, HttpOnly = true, SameSite = SameSiteMode.Lax, Expires = DateTimeOffset.UtcNow.AddHours(10) };
+                CookieOptions cookieOptions = new CookieOptions { Secure = true, HttpOnly = true, SameSite = SameSiteMode.None, Expires = DateTimeOffset.UtcNow.AddHours(10) };
                 Response.Cookies.Append("token", token, cookieOptions);
 
                 return Ok(user);
@@ -83,5 +83,19 @@ namespace server.Controllers
                 throw err;
             }
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllUsers() {
+            try
+            {
+                var users = await _context.Users.ToListAsync();
+                return Ok(users);
+            }
+            catch (Exception err)
+            {
+                throw err;
+            }
+        }
+
     }
 }

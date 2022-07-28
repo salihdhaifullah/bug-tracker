@@ -12,7 +12,6 @@ namespace server.Data
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Label> Labels { get; set; }
         public DbSet<Project> Projects { get; set; }
-        public DbSet<Role> Roles { get; set; }
         public DbSet<Organization> Organizations { get; set; }
         public DbSet<Ticket> Tickets  { get; set; }
         public DbSet<User> Users { get; set; }
