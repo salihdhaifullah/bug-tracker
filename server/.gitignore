@@ -14,7 +14,7 @@
 appsettings.json
 Migrations
 .vscode
-
+scripts.json
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs

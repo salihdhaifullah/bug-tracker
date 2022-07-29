@@ -8,9 +8,9 @@ namespace server.Models.db
         public string Description { get; set; } = String.Empty;
         public string? Logo { get; set; } = String.Empty;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-        public List<Project> Projects { get; set; } 
+        public List<Project>? Projects { get; set; } 
         public List<int> ProjectsId { get; set; } = new List<int>() { };
-        public List<User> Employs { get; set; }
+        public List<User>? Employs { get; set; }
         public List<int> EmploysId { get; set; } = new List<int>() { };
         public User Adman { get; set; } 
         public int AdmanId { get; set; }

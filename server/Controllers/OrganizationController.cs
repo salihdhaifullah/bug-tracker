@@ -25,6 +25,8 @@ namespace server.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateOrganization(OrganizationReq req)
         {
+            var hello = Request.Cookies;
+            Console.WriteLine(hello);
             Organization OrganizationData = new()
             {
                 Name = req.Name,

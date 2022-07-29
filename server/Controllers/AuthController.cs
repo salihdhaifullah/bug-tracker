@@ -5,6 +5,7 @@ using server.Services.PasswordServices;
 using server.Services.JsonWebToken;
 using server.Models.api;
 using server.Models.db;
+using Microsoft.AspNetCore.Authorization;
 
 namespace server.Controllers
 {
@@ -84,11 +85,20 @@ namespace server.Controllers
             }
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetAllUsers() {
-            try
+        [AllowAnonymous]
+        [HttpGet] 
+            public async Task<IActionResult> GetAllUsers() {
+            try 
             {
-                var users = await _context.Users.ToListAsync();
+                var users = await _context.Users.Select(u => new 
+                {
+                    u.CreateAt,
+                    u.Email,
+                    u.FirstName,
+                    u.LastName,
+                    u.Id
+                }).ToListAsync();
+                
                 return Ok(users);
             }
             catch (Exception err)

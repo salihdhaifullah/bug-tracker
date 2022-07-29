@@ -1,8 +1,0 @@
-{
-  "DB": {
-    "push": "Add-Migration --name",
-    "update": "Update-Database"
-  },
-  "DropAllTables": "DROP TABLE 'Comments' cascade;"
-  
-}

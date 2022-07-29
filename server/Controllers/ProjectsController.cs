@@ -30,7 +30,8 @@ namespace server.Controllers
                 Name = req.Name,
                 Title = req.Title,
                 Description = req.Description,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
+                DevelopersId = req.DevelopersIds
             };
             var NewProject = await _context.Projects.AddAsync(ProjectData);
             _context.SaveChanges();
