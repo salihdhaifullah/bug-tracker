@@ -2,6 +2,11 @@ using server.Data;
 using Microsoft.EntityFrameworkCore;
 using server.Services.JsonWebToken;
 using server.Services.PasswordServices;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,10 +16,33 @@ builder.Services.AddDbContext<Context>(options => options.UseNpgsql(builder.Conf
 builder.Services.AddScoped<IJsonWebToken, JsonWebToken>();
 builder.Services.AddScoped<IPasswordServices, PasswordServices>();
 
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = false,
+        ValidateAudience = false,
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetSection("secretToken").Value))
+    };
+}
+);
+
+
 // default Services
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+    {
+        Description = "Hello World",
+        In = ParameterLocation.Header,
+        Name = "Authorization",
+        Type = SecuritySchemeType.ApiKey
+    });
+    options.OperationFilter<SecurityRequirementsOperationFilter>();
+});
 
 builder.Services.AddCors(options => options.AddPolicy("Policy", policy => 
         policy.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:4200")
@@ -23,8 +51,7 @@ builder.Services.AddCors(options => options.AddPolicy("Policy", policy =>
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
+if (app.Environment.IsDevelopment()) {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
@@ -33,6 +60,7 @@ app.UseCors("Policy");
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
+
 app.UseAuthorization();
 
 app.MapControllers();

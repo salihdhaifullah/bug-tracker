@@ -7,6 +7,7 @@ using server.Models.api;
 using server.Models.db;
 using Microsoft.AspNetCore.Authorization;
 
+
 namespace server.Controllers
 {
     [Route("api/[controller]")]
@@ -25,7 +26,7 @@ namespace server.Controllers
         }
 
 
-        [HttpPost("Singin")]
+        [HttpPost("Singin"), AllowAnonymous]
         public async Task<IActionResult> SingIn(UserSinginReq req)
         {
             try
@@ -61,7 +62,13 @@ namespace server.Controllers
 
         }
 
-        [HttpPost("login")]
+        private class SuccessRes
+        {
+            public string Token { get; set; }
+            public User User { get; set; }
+        }
+
+        [HttpPost("login"), AllowAnonymous]
         public async Task<IActionResult> Login(UserLoginReq req)
         {
             try
@@ -74,10 +81,14 @@ namespace server.Controllers
                 if (!isMatch) return BadRequest("Password is Wrong");
 
                 string token = _token.GenerateToken(Convert.ToInt32(user.Id));
-                CookieOptions cookieOptions = new CookieOptions { Secure = true, HttpOnly = true, SameSite = SameSiteMode.None, Expires = DateTimeOffset.UtcNow.AddHours(10) };
-                Response.Cookies.Append("token", token, cookieOptions);
-                
-                return Ok(user);
+                // CookieOptions cookieOptions = new CookieOptions { Secure = true, HttpOnly = true, SameSite = SameSiteMode.None, Expires = DateTimeOffset.UtcNow.AddHours(10) };
+                // Response.Cookies.Append("token", token, cookieOptions);
+                var Res = new SuccessRes()
+                {
+                    Token = token,
+                    User = user
+                };
+                return Ok(Res);
             }
             catch (Exception err)
             {
@@ -85,12 +96,13 @@ namespace server.Controllers
             }
         }
 
-        [AllowAnonymous]
-        [HttpGet] 
-            public async Task<IActionResult> GetAllUsers() {
-            try 
+
+        [HttpGet, Authorize]
+        public async Task<IActionResult> GetAllUsers()
+        {
+            try
             {
-                var users = await _context.Users.Select(u => new 
+                var users = await _context.Users.Select(u => new
                 {
                     u.CreateAt,
                     u.Email,
@@ -98,7 +110,7 @@ namespace server.Controllers
                     u.LastName,
                     u.Id
                 }).ToListAsync();
-                
+
                 return Ok(users);
             }
             catch (Exception err)
