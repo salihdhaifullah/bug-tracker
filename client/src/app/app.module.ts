@@ -15,12 +15,12 @@ import {MatButtonModule} from '@angular/material/button';
 import {HttpClientModule} from '@angular/common/http';
 import {MatToolbarModule} from '@angular/material/toolbar';
 import {MatSidenavModule} from '@angular/material/sidenav';
+import { NgChartsModule } from 'ng2-charts';
 
 import { LoginComponent } from './login/login.component';
 import { SinginComponent } from './singin/singin.component';
 import { NavbarComponent } from './navbar/navbar.component';
 import { DefaultComponent } from './default/default.component';
-import { NewOrganizationComponent } from './new-organization/new-organization.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { ProjectsComponent } from './projects/projects.component';
 import { EmploysComponent } from './employs/employs.component';
@@ -29,6 +29,8 @@ import { TicketComponent } from './ticket/ticket.component';
 import { TicketsComponent } from './tickets/tickets.component';
 import { NewProjectComponent } from './new-project/new-project.component';
 import { NewTicketComponent } from './new-ticket/new-ticket.component';
+import { BarChartComponent } from './bar-chart/bar-chart.component';
+import { LineChartComponent } from './line-chart/line-chart.component';
 
 
 
@@ -39,7 +41,6 @@ import { NewTicketComponent } from './new-ticket/new-ticket.component';
     SinginComponent,
     NavbarComponent,
     DefaultComponent,
-    NewOrganizationComponent,
     DashboardComponent,
     ProjectsComponent,
     EmploysComponent,
@@ -48,6 +49,8 @@ import { NewTicketComponent } from './new-ticket/new-ticket.component';
     TicketsComponent,
     NewProjectComponent,
     NewTicketComponent,
+    BarChartComponent,
+    LineChartComponent,
   ],
   imports: [
     BrowserModule,
@@ -68,6 +71,7 @@ import { NewTicketComponent } from './new-ticket/new-ticket.component';
     MatToolbarModule,
     MatSidenavModule,
     MatSelectModule,
+    NgChartsModule,
   ],
   providers: [],
   bootstrap: [AppComponent]

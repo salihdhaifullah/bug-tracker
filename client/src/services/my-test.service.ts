@@ -1,4 +1,4 @@
-import { ISinginFormData, ILoginFormData, ICreateOrganizationFormData, ICreateProjectFormData } from './../model/FormData';
+import { ISinginFormData, ILoginFormData, ICreateProjectFormData } from './../model/FormData';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
@@ -18,16 +18,6 @@ export class AuthService {
 
   public Login(data: ILoginFormData): Observable<any> {
     return this.http.post(this.Auth + "/" + "login", data);
-  }
-}
-
-export class OrganizationService {
-  constructor(private http: HttpClient) {}
-
-  private Organization = environment.apiUrl + '/' + "Organization";
-
-  public CreateOrganization(data: ICreateOrganizationFormData) : Observable<any> {
-    return this.http.post(this.Organization + "/" + "createOrganization", data);
   }
 }
 
