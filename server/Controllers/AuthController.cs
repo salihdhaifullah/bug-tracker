@@ -25,6 +25,12 @@ namespace server.Controllers
             _password = password;
         }
 
+        private class SuccessRes
+        {
+            public string Token { get; set; }
+            public User User { get; set; }
+        }
+
 
         [HttpPost("Singin"), AllowAnonymous]
         public async Task<IActionResult> SingIn(UserSinginReq req)
@@ -49,7 +55,7 @@ namespace server.Controllers
                 _context.Users.Add(user);
                 await _context.SaveChangesAsync();
 
-                string token = _token.GenerateToken(Convert.ToInt32(user.Id));
+                string token = _token.GenerateToken(Convert.ToInt32(user.Id), null);
                 CookieOptions cookieOptions = new CookieOptions { Secure = true, HttpOnly = true, SameSite = SameSiteMode.None, Expires = DateTimeOffset.UtcNow.AddHours(10) };
                 Response.Cookies.Append("token", token, cookieOptions);
 
@@ -60,12 +66,6 @@ namespace server.Controllers
                 throw err;
             }
 
-        }
-
-        private class SuccessRes
-        {
-            public string Token { get; set; }
-            public User User { get; set; }
         }
 
         [HttpPost("login"), AllowAnonymous]
@@ -80,9 +80,7 @@ namespace server.Controllers
                 bool isMatch = _password.VerifyPasswordHash(req.Password, user.HashPassword, user.PasswordSalt);
                 if (!isMatch) return BadRequest("Password is Wrong");
 
-                string token = _token.GenerateToken(Convert.ToInt32(user.Id));
-                // CookieOptions cookieOptions = new CookieOptions { Secure = true, HttpOnly = true, SameSite = SameSiteMode.None, Expires = DateTimeOffset.UtcNow.AddHours(10) };
-                // Response.Cookies.Append("token", token, cookieOptions);
+                string token = _token.GenerateToken(Convert.ToInt32(user.Id), null);
                 var Res = new SuccessRes()
                 {
                     Token = token,
@@ -97,7 +95,7 @@ namespace server.Controllers
         }
 
 
-        [HttpGet, Authorize]
+        [HttpGet, Authorize(Roles = "Admin, User")]
         public async Task<IActionResult> GetAllUsers()
         {
             try

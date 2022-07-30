@@ -14,11 +14,12 @@ namespace server.Services.JsonWebToken
             _configuration = configuration;
         }
         
-        public string GenerateToken(int id)
+        public string GenerateToken(int id, string? role)
         {
             var claims = new List<Claim>
             {
                 new Claim("id", id.ToString()), 
+                new Claim(ClaimTypes.Role, role != null ? role : "User"), 
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetSection("secretToken").Value));

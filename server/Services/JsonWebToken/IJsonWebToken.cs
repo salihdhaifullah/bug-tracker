@@ -2,7 +2,7 @@
 {
     public interface IJsonWebToken
     {
-        public string GenerateToken(int id);
+        public string GenerateToken(int id, string? role);
         public int? VerifyToken(string token);
     }
 }
