@@ -1,5 +1,5 @@
+global using  Microsoft.EntityFrameworkCore;
 using server.Data;
-using Microsoft.EntityFrameworkCore;
 using server.Services.JsonWebToken;
 using server.Services.PasswordServices;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -7,10 +7,15 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
+using Microsoft.AspNetCore.Mvc.NewtonsoftJson;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddControllers().AddNewtonsoftJson(options =>
+         options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+);
+
 builder.Services.AddDbContext<Context>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("Connection")));
 
 builder.Services.AddScoped<IJsonWebToken, JsonWebToken>();
@@ -30,7 +35,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 
 
 // default Services
-builder.Services.AddControllers();
+
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {

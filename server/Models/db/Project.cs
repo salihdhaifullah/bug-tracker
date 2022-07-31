@@ -1,4 +1,7 @@
-﻿namespace server.Models.db
+﻿
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace server.Models.db
 {
     public class Project
     {
@@ -9,15 +12,16 @@
         public string Description { get; set; } = String.Empty;
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
+        [ForeignKey("ProjectMangerId")]
+        public int ProjectMangerId { get; set; }
+        public virtual User ProjectManger { get; set; } 
         public bool IsClosed { get; set; } = false;
         public DateTime? ClosedAt { get; set; }
-        public User Manger { get; set; } // can do anything  
-        public int MangerId { get; set; }
-        public User Admin { get; set; } // can do anything  
-        public int AdminId { get; set; }
-        public List<User>? Developers { get; set; } // can change status of task that he assigned to 
-        public List<int> DevelopersId { get; set; } = new List<int>() { };
-        public List<Ticket>? Tickets { get; set; }
-        public List<int> TicketsId { get; set; } = new List<int>() { };
+        [ForeignKey("TicketsId")]
+        public List<int> TicketsId { get; set; } = new() {};
+        public virtual ICollection<Ticket>? Tickets { get; set; }
+        [ForeignKey("usersRolesId")]
+        public List<int> usersRolesId { get; set; } = new() {};
+        public virtual ICollection<UserRole>? usersRoles { get; set; }
     }
 }

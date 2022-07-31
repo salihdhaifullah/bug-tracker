@@ -19,7 +19,7 @@ namespace server.Services.JsonWebToken
             var claims = new List<Claim>
             {
                 new Claim("id", id.ToString()), 
-                new Claim(ClaimTypes.Role, role != null ? role : "User"), 
+                new Claim(ClaimTypes.Role, role != null ? role : "Developer"), 
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetSection("secretToken").Value));

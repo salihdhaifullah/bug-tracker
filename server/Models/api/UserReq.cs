@@ -21,4 +21,5 @@ namespace server.Models.api
         [Required, MinLength(6)]
         public string Password { get; set; } = String.Empty;
     }
+
 }

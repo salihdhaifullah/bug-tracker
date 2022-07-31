@@ -4,6 +4,7 @@ using server.Models.api;
 using server.Models.db;
 using server.Services.JsonWebToken;
 using server.Services.PasswordServices;
+using Microsoft.AspNetCore.Authorization;
 
 namespace server.Controllers
 {
@@ -21,60 +22,77 @@ namespace server.Controllers
             _token = token;
             _password = password;
         }
-        [HttpPost("Create")]
+        [HttpPost("Create"), Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateProject(ProjectReq req)
         {
             Project ProjectData = new()
             {
-                MangerId = req.MangerId,
                 Name = req.Name,
                 Title = req.Title,
                 Description = req.Description,
+                ProjectMangerId = req.ProjectMangerId,
                 CreatedAt = DateTime.UtcNow,
-                DevelopersId = req.DevelopersIds
             };
             var NewProject = await _context.Projects.AddAsync(ProjectData);
             _context.SaveChanges();
             return Ok(NewProject.Entity);
         }
 
-        [HttpPatch("Update")]
-        public async Task<IActionResult> UpdateProject(ProjectReq req)
+        [HttpPut("AssignDeveloper"), Authorize]
+        public IActionResult AssignDeveloper(ProjectReq req)
         {
-            var ProjectData = await _context.Projects.FindAsync(req.Id);
-            if (ProjectData == null) return NotFound();
-
-            ProjectData.Name = req.Name;
-            ProjectData.Title = req.Title;
-            ProjectData.Description = req.Description;
-            ProjectData.UpdatedAt = DateTime.UtcNow;
+            var Project = _context.Projects.FirstOrDefault(project => project.Id == req.Id);
+            if (Project == null) return BadRequest("Project Not Found");
+            Project.ProjectMangerId = req.ProjectMangerId;
             _context.SaveChanges();
-            return Ok(ProjectData);
+            return Ok(Project);
         }
 
-        [HttpPatch("AddDeveloper/{projectId}")]
-        public async Task<IActionResult> AssignProject([FromRoute] string projectId, [FromBody] string[] DevelopersIds)
-        {
-            var ProjectData = await _context.Projects.FindAsync(Convert.ToInt32(projectId));
-            if (ProjectData == null) return NotFound("Project Not Found");
-            if (DevelopersIds == null) return BadRequest("User Not Found");
-            if (ProjectData.DevelopersId?.Count >= 1) return BadRequest("Invalid Request");
+        // [HttpPatch("Update")]
+        // public async Task<IActionResult> UpdateProject(ProjectReq req)
+        // {
+        //     var ProjectData = await _context.Projects.FindAsync(req.Id);
+        //     if (ProjectData == null) return NotFound();
 
-            for (int i = 0; i < DevelopersIds.Length; i++)
-            {
-                var DeveloperData = await _context.Users.FindAsync(Convert.ToInt32(DevelopersIds[i]));
-                if (DeveloperData == null) return BadRequest("User Not Found");
-                ProjectData.DevelopersId.Add(Convert.ToInt32(DevelopersIds[i]));
-            }
-            await _context.SaveChangesAsync();
+        //     ProjectData.Name = req.Name;
+        //     ProjectData.Title = req.Title;
+        //     ProjectData.Description = req.Description;
+        //     ProjectData.UpdatedAt = DateTime.UtcNow;
+        //     _context.SaveChanges();
+        //     return Ok(ProjectData);
+        // }
 
-            return Ok(ProjectData);
-        }
+        // [HttpPatch("AddDeveloper/{projectId}")]
+        // public async Task<IActionResult> AssignProject([FromRoute] string projectId, [FromBody] string[] DevelopersIds)
+        // {
+        //     var ProjectData = await _context.Projects.FindAsync(Convert.ToInt32(projectId));
+        //     if (ProjectData == null) return NotFound("Project Not Found");
+        //     if (DevelopersIds == null) return BadRequest("User Not Found");
+        //     if (ProjectData.DevelopersId?.Count >= 1) return BadRequest("Invalid Request");
 
-        [HttpGet]
+        //     for (int i = 0; i < DevelopersIds.Length; i++)
+        //     {
+        //         var DeveloperData = await _context.Users.FindAsync(Convert.ToInt32(DevelopersIds[i]));
+        //         if (DeveloperData == null) return BadRequest("User Not Found");
+        //         ProjectData.DevelopersId.Add(Convert.ToInt32(DevelopersIds[i]));
+        //     }
+        //     await _context.SaveChangesAsync();
+
+        //     return Ok(ProjectData);
+        // }
+
+        [HttpGet, AllowAnonymous]
         public IActionResult GetProjects()
         {
-            var Projects = _context.Projects.ToList();
+            var Projects = _context.Projects.Where(p => p.Id == 1)
+            .Include(p => p.Tickets)
+                .Select(p => new {
+                    p.ProjectManger.LastName,
+                    p.ProjectManger.Email,
+                    p.ProjectManger.Id,
+                    p.ProjectManger.CreateAt
+                    });
+            
             return Ok(Projects);
         }
 

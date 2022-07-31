@@ -17,12 +17,14 @@ namespace server.Controllers
         private readonly Context _context;
         private readonly IJsonWebToken _token;
         private readonly IPasswordServices _password;
+        private readonly IConfiguration _configuration;
 
-        public AuthController(Context context, IJsonWebToken token, IPasswordServices password)
+        public AuthController(IConfiguration configuration, Context context, IJsonWebToken token, IPasswordServices password)
         {
             _context = context;
             _token = token;
             _password = password;
+            _configuration = configuration;
         }
 
         private class SuccessRes
@@ -55,10 +57,6 @@ namespace server.Controllers
                 _context.Users.Add(user);
                 await _context.SaveChangesAsync();
 
-                string token = _token.GenerateToken(Convert.ToInt32(user.Id), null);
-                CookieOptions cookieOptions = new CookieOptions { Secure = true, HttpOnly = true, SameSite = SameSiteMode.None, Expires = DateTimeOffset.UtcNow.AddHours(10) };
-                Response.Cookies.Append("token", token, cookieOptions);
-
                 return Ok(user);
             }
             catch (Exception err)
@@ -80,7 +78,12 @@ namespace server.Controllers
                 bool isMatch = _password.VerifyPasswordHash(req.Password, user.HashPassword, user.PasswordSalt);
                 if (!isMatch) return BadRequest("Password is Wrong");
 
-                string token = _token.GenerateToken(Convert.ToInt32(user.Id), null);
+                string token;
+                if (req.Password == _configuration.GetSection("Admin:Password").Value && req.Email == _configuration.GetSection("Admin:Email").Value) 
+                                    token = _token.GenerateToken(Convert.ToInt32(user.Id), Roles.Admin);
+                
+                else  token = _token.GenerateToken(Convert.ToInt32(user.Id), null);
+                
                 var Res = new SuccessRes()
                 {
                     Token = token,
@@ -95,7 +98,7 @@ namespace server.Controllers
         }
 
 
-        [HttpGet, Authorize(Roles = "Admin, User")]
+        [HttpGet, Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAllUsers()
         {
             try
