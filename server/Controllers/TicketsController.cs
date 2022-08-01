@@ -42,8 +42,8 @@ namespace server.Controllers
                 Description = req.Description,
                 CreatedAt = DateTime.UtcNow,
                 ProjectId = req.ProjectId,
-                IsBug = req.IsBug, 
-                IsFeature = req.IsFeature,
+                // IsBug = req.IsBug, 
+                // IsFeature = req.IsFeature,
                 AssigneeToId = req.AssigneeToId,
                 SubmitterId = req.SubmitterId,
 
@@ -51,7 +51,16 @@ namespace server.Controllers
             var NewTicket = await _context.Tickets.AddAsync(TicketData);
             _context.SaveChanges();
             return Ok(NewTicket.Entity);
-
         }  
+
+        [HttpPut("InProgress")]
+        public IActionResult InProgress(TicketReq req)
+        {
+            var Ticket = _context.Tickets.FirstOrDefault(ticket => ticket.Id == 1);
+            if (Ticket == null) return BadRequest("Ticket Not Found");
+            Ticket.Status = "In Progress";
+            _context.SaveChanges();
+            return Ok(Ticket);
+        }
     }
 }

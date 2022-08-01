@@ -7,20 +7,18 @@ namespace server.Models.db
     {
         #pragma warning disable CS8618
         public int Id { get; set; }
-        public bool IsInProgress { get; set; } = false;
+        public string Priority { get; set; } = "Medium"; // Low, Medium, High
+        public string Status { get; set; } = "New"; // New, In Progress, Resolved, Closed
+        public string Type { get; set; } = "Feature"; // Feature, Bug
         public bool IsCompleted { get; set; } = false;
-        public bool IsOpen { get; set; } = false;
-        public bool IsNew { get; set; } = true;
-        public bool IsBug { get; set; } = false;
-        public bool IsFeature { get; set; } = true;
         public string Name { get; set; } = String.Empty;
         public string Description { get; set; } = String.Empty;
         [Required, ForeignKey("AssigneeToId")]
         public int AssigneeToId { get; set; }
-        public virtual User AssigneeTo { get; set; }
+        public virtual User AssigneeTo { get; set; } // User that is assigned to this ticket can Change the status of this ticket
         [Required, ForeignKey("SubmitterId")]
         public int SubmitterId { get; set; }
-        public virtual User Submitter { get; set; }
+        public virtual User Submitter { get; set; } // Only the submitter Or Admin Or Project Manager can Assignee this ticket to someone else
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
         public DateTime? CompletedAt { get; set; }

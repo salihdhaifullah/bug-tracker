@@ -13,7 +13,7 @@ namespace server.Models.db
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
         [ForeignKey("ProjectMangerId")]
-        public int ProjectMangerId { get; set; }
+        public int ProjectMangerId { get; set; } // Project Manager and Admin is the only ones who can add/remove/edit tickets in this project
         public virtual User ProjectManger { get; set; } 
         public bool IsClosed { get; set; } = false;
         public DateTime? ClosedAt { get; set; }

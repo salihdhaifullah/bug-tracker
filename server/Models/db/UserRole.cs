@@ -10,9 +10,9 @@ namespace server.Models.db
         [Required, ForeignKey("UserId")]
         public int UserId { get; set; }
         public virtual User User { get; set; }
-        public string Role { get; set; } = Roles.Developer;
+        public string Role { get; set; } = Roles.Developer; // Developer, Admin, Project Manager, Submitter
         [Required, ForeignKey("ProjectId")]
-        public int ProjectId { get; set; }
+        public int ProjectId { get; set; } // In Each project there a Collection of Users with different roles
         public virtual Project Project { get; set; }
     }
 }
