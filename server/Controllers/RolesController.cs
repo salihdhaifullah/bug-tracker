@@ -49,6 +49,27 @@ namespace server.Controllers
             return Ok(IsFound);
         }
 
+        [HttpDelete("/{id}")]
+        public async Task<IActionResult> DeleteUserRole([FromRoute] int id)
+        {
+            var userRole = await _context.UserRoles.FindAsync(id);
+            if (userRole == null) return NotFound();
+            _context.UserRoles.Remove(userRole);
+            await _context.SaveChangesAsync();
+            return Ok(userRole);
+        }
 
+
+        [HttpPut("/{id}")]
+        public async Task<IActionResult> UpdateUserRole([FromBody] RoleReq value, [FromRoute] int id)
+        {
+            var userRole = await _context.UserRoles.FindAsync(id);
+            if (userRole == null) return NotFound();
+            userRole.UserId = value.UserId;
+            userRole.Role = value.Role;
+            userRole.ProjectId = value.ProjectId;
+            await _context.SaveChangesAsync();
+            return Ok(userRole);
+        }
     }
 }

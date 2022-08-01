@@ -38,53 +38,26 @@ namespace server.Controllers
             return Ok(NewProject.Entity);
         }
 
-        [HttpPut("AssignDeveloper"), Authorize]
-        public IActionResult AssignDeveloper(ProjectReq req)
+
+        [HttpPatch("Update")]
+        public async Task<IActionResult> UpdateProject(ProjectReq req)
         {
-            var Project = _context.Projects.FirstOrDefault(project => project.Id == req.Id);
-            if (Project == null) return BadRequest("Project Not Found");
-            Project.ProjectMangerId = req.ProjectMangerId;
+            var ProjectData = await _context.Projects.FindAsync(req.Id);
+            if (ProjectData == null) return NotFound();
+
+            ProjectData.Name = req.Name;
+            ProjectData.Title = req.Title;
+            ProjectData.Description = req.Description;
+            ProjectData.UpdatedAt = DateTime.UtcNow;
             _context.SaveChanges();
-            return Ok(Project);
+            return Ok(ProjectData);
         }
 
-        // [HttpPatch("Update")]
-        // public async Task<IActionResult> UpdateProject(ProjectReq req)
-        // {
-        //     var ProjectData = await _context.Projects.FindAsync(req.Id);
-        //     if (ProjectData == null) return NotFound();
 
-        //     ProjectData.Name = req.Name;
-        //     ProjectData.Title = req.Title;
-        //     ProjectData.Description = req.Description;
-        //     ProjectData.UpdatedAt = DateTime.UtcNow;
-        //     _context.SaveChanges();
-        //     return Ok(ProjectData);
-        // }
-
-        // [HttpPatch("AddDeveloper/{projectId}")]
-        // public async Task<IActionResult> AssignProject([FromRoute] string projectId, [FromBody] string[] DevelopersIds)
-        // {
-        //     var ProjectData = await _context.Projects.FindAsync(Convert.ToInt32(projectId));
-        //     if (ProjectData == null) return NotFound("Project Not Found");
-        //     if (DevelopersIds == null) return BadRequest("User Not Found");
-        //     if (ProjectData.DevelopersId?.Count >= 1) return BadRequest("Invalid Request");
-
-        //     for (int i = 0; i < DevelopersIds.Length; i++)
-        //     {
-        //         var DeveloperData = await _context.Users.FindAsync(Convert.ToInt32(DevelopersIds[i]));
-        //         if (DeveloperData == null) return BadRequest("User Not Found");
-        //         ProjectData.DevelopersId.Add(Convert.ToInt32(DevelopersIds[i]));
-        //     }
-        //     await _context.SaveChangesAsync();
-
-        //     return Ok(ProjectData);
-        // }
-
-        [HttpGet, AllowAnonymous]
-        public IActionResult GetProjects()
+        [HttpGet("/{id}"), AllowAnonymous]
+        public IActionResult GetProjects([FromRoute] int id)
         {
-            var Projects = _context.Projects.Where(p => p.Id == 1)
+            var Projects = _context.Projects.Where(p => p.Id == id)
             .Include(p => p.Tickets)
                 .Select(p => new {
                     p.ProjectManger.LastName,
@@ -94,6 +67,29 @@ namespace server.Controllers
                     });
             
             return Ok(Projects);
+        }
+
+
+        [HttpGet, AllowAnonymous]
+        public IActionResult GetProjects()
+        {
+            var Projects = _context.Projects.ToList();
+            return Ok(Projects);
+        }
+
+
+        [HttpPut("/{id}"), Authorize(Roles = "Admin")]
+        public IActionResult UpdateProject([FromRoute] int id, [FromBody] ProjectReq req)
+        {
+            var ProjectData = _context.Projects.Find(id);
+            if (ProjectData == null) return NotFound();
+            ProjectData.Name = req.Name;
+            ProjectData.Title = req.Title;
+            ProjectData.Description = req.Description;
+            ProjectData.UpdatedAt = DateTime.UtcNow;
+            ProjectData.ProjectMangerId = req.ProjectMangerId;
+            _context.SaveChanges();
+            return Ok(ProjectData);
         }
 
     }

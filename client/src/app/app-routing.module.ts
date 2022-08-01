@@ -1,3 +1,4 @@
+import { NewTicketComponent } from './new-ticket/new-ticket.component';
 import { NewProjectComponent } from './new-project/new-project.component';
 import { TicketComponent } from './ticket/ticket.component';
 import { ProjectComponent } from './project/project.component';
@@ -11,9 +12,10 @@ const routes: Routes = [
   { path: 'singin', component: SinginComponent },
   { path: 'login', component: LoginComponent },
   { path: 'dashboard', component: DashboardComponent },
-  {path: 'project', component: ProjectComponent},
-  {path: 'ticket', component: TicketComponent},
-  { path: 'new-project', component: NewProjectComponent}
+  { path: 'project', component: ProjectComponent},
+  { path: 'ticket', component: TicketComponent},
+  { path: 'new-project', component: NewProjectComponent},
+  { path: 'new-ticket', component: NewTicketComponent}
 ];
 
 @NgModule({

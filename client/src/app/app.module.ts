@@ -16,6 +16,10 @@ import {HttpClientModule} from '@angular/common/http';
 import {MatToolbarModule} from '@angular/material/toolbar';
 import {MatSidenavModule} from '@angular/material/sidenav';
 import { NgChartsModule } from 'ng2-charts';
+import {MatTableModule} from '@angular/material/table';
+import {MatPaginatorModule} from '@angular/material/paginator';
+
+
 
 import { LoginComponent } from './login/login.component';
 import { SinginComponent } from './singin/singin.component';
@@ -72,6 +76,8 @@ import { LineChartComponent } from './line-chart/line-chart.component';
     MatSidenavModule,
     MatSelectModule,
     NgChartsModule,
+    MatTableModule,
+    MatPaginatorModule,
   ],
   providers: [],
   bootstrap: [AppComponent]
