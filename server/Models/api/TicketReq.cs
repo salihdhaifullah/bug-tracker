@@ -4,14 +4,12 @@ namespace server.Models.api
 {
     public class TicketReq
     {
-        [Required]
         public string Name { get; set; } = String.Empty;
-        [Required]
         public string Description { get; set; } = String.Empty;
-        [Required]
         public int ProjectId { get; set; }
-        public bool IsBug { get; set; } 
-        public bool IsFeature { get; set; }
+        public string Priority { get; set; } = "Medium"; // Low, Medium, High
+        public string Status { get; set; } = "New"; // New, In Progress, Resolved, Closed
+        public string Type { get; set; } = "Feature"; // Feature, Bug
         public int AssigneeToId { get; set; } 
         public int SubmitterId { get; set; }
     }
