@@ -25,6 +25,9 @@ namespace server.Controllers
         [HttpPost("Create"), Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateProject(ProjectReq req)
         {
+            var IsSameName = _context.Projects.Any(project => project.Name == req.Name);
+
+            if (IsSameName) return BadRequest("Project Name Already Exist try another one");
             Project ProjectData = new()
             {
                 Name = req.Name,
@@ -39,23 +42,8 @@ namespace server.Controllers
         }
 
 
-        [HttpPatch("Update")]
-        public async Task<IActionResult> UpdateProject(ProjectReq req)
-        {
-            var ProjectData = await _context.Projects.FindAsync(req.Id);
-            if (ProjectData == null) return NotFound();
-
-            ProjectData.Name = req.Name;
-            ProjectData.Title = req.Title;
-            ProjectData.Description = req.Description;
-            ProjectData.UpdatedAt = DateTime.UtcNow;
-            _context.SaveChanges();
-            return Ok(ProjectData);
-        }
-
-
-        [HttpGet("/{id}"), AllowAnonymous]
-        public IActionResult GetProjects([FromRoute] int id)
+        [HttpGet("{id}"), AllowAnonymous]
+        public IActionResult GetProject([FromRoute] int id)
         {
             var Projects = _context.Projects.Where(p => p.Id == id)
             .Include(p => p.Tickets)
@@ -73,12 +61,19 @@ namespace server.Controllers
         [HttpGet, AllowAnonymous]
         public IActionResult GetProjects()
         {
-            var Projects = _context.Projects.ToList();
+            var Projects = _context.Projects.Select(p => new {
+                p.Name,
+                p.Id,
+                p.Title,
+                p.IsClosed,
+                p.CreatedAt,
+                p.Description,
+            }).ToList();
             return Ok(Projects);
         }
 
 
-        [HttpPut("/{id}"), Authorize(Roles = "Admin")]
+        [HttpPut("Update/{id}"), Authorize(Roles = "Admin")]
         public IActionResult UpdateProject([FromRoute] int id, [FromBody] ProjectReq req)
         {
             var ProjectData = _context.Projects.Find(id);

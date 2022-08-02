@@ -49,7 +49,7 @@ namespace server.Controllers
             return Ok(IsFound);
         }
 
-        [HttpDelete("/{id}")]
+        [HttpDelete("delete/{id}")]
         public async Task<IActionResult> DeleteUserRole([FromRoute] int id)
         {
             var userRole = await _context.UserRoles.FindAsync(id);
@@ -60,7 +60,7 @@ namespace server.Controllers
         }
 
 
-        [HttpPut("/{id}")]
+        [HttpPut("{id}")]
         public async Task<IActionResult> UpdateUserRole([FromBody] RoleReq value, [FromRoute] int id)
         {
             var userRole = await _context.UserRoles.FindAsync(id);

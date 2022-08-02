@@ -1,8 +1,9 @@
-import { ISinginFormData, ILoginFormData, ICreateProjectFormData } from './../model/FormData';
+import { ISinginFormData, ILoginFormData, ICreateProjectFormData } from '../model/FormData';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
+import { IProject } from 'src/types/Projects';
 
 @Injectable({
   providedIn: 'root',
@@ -21,6 +22,7 @@ export class AuthService {
   }
 }
 
+@Injectable()
 export class ProjectService {
   constructor(private http: HttpClient) {}
 
@@ -28,6 +30,10 @@ export class ProjectService {
 
   public CreateProject(data: ICreateProjectFormData) : Observable<any> {
     return this.http.post(this.Project + "/" + "Create", data);
+  }
+
+  public GetProjects() : Observable<IProject[]> {
+    return this.http.get<IProject[]>(this.Project);
   }
 }
 

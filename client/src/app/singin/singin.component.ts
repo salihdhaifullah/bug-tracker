@@ -1,4 +1,4 @@
-import { AuthService } from './../../services/my-test.service';
+import { AuthService } from '../../services/api.service';
 import { Component } from '@angular/core';
 import {FormControl, FormGroupDirective, FormGroup, NgForm, Validators} from '@angular/forms';
 import {ErrorStateMatcher} from '@angular/material/core';

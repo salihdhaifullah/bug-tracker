@@ -1,18 +1,32 @@
-import {AfterViewInit, Component, ViewChild} from '@angular/core';
+import { isLoadingSelector } from './../../context/selectors';
+import { Observable } from 'rxjs';
+import {OnInit , Component, ViewChild} from '@angular/core';
 import {MatPaginator} from '@angular/material/paginator';
 import {MatTableDataSource} from '@angular/material/table';
+import { Store, select } from '@ngrx/store';
+import * as Actions from '../../context/actions';
+import { IAppState } from 'src/context/app.state';
 
 @Component({
   selector: 'app-projects',
   templateUrl: './projects.component.html'
 })
-export class ProjectsComponent implements AfterViewInit {
+export class ProjectsComponent implements OnInit {
   displayedColumns: string[] = ['position', 'name', 'weight', 'symbol'];
   dataSource = new MatTableDataSource<PeriodicElement>(ELEMENT_DATA);
 
+  isLoading$: Observable<boolean>;
+
+  constructor(private store: Store<IAppState>) {
+    this.isLoading$ = this.store.pipe(select(isLoadingSelector));
+  }
 
   @ViewChild(MatPaginator)
   paginator! : MatPaginator;
+
+  ngOnInit() {
+    this.store.dispatch(Actions.getProjects());
+  }
 
   ngAfterViewInit() {
     this.dataSource.paginator = this.paginator;

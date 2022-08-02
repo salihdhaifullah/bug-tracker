@@ -53,7 +53,7 @@ namespace server.Controllers
             return Ok(NewTicket.Entity);
         }  
 
-        [HttpPut("InProgress")]
+        [HttpPut("Status/{id}")]
         public IActionResult InProgress(TicketReq req)
         {
             var Ticket = _context.Tickets.FirstOrDefault(ticket => ticket.Id == 1);
