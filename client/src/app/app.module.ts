@@ -1,5 +1,4 @@
-import { ProjectService } from './../services/api.service';
-import { ProjectsEffects } from './../context/effects';
+import { ProjectService, TicketService } from './../services/api.service';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { NgModule } from '@angular/core';
@@ -29,7 +28,7 @@ import { SinginComponent } from './singin/singin.component';
 import { NavbarComponent } from './navbar/navbar.component';
 import { DefaultComponent } from './default/default.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
-import { ProjectsComponent } from './projects/projects.component';
+import { ProjectsComponent } from './projects/components/projects/projects.component';
 import { EmploysComponent } from './employs/employs.component';
 import { ProjectComponent } from './project/project.component';
 import { TicketComponent } from './ticket/ticket.component';
@@ -39,8 +38,8 @@ import { NewTicketComponent } from './new-ticket/new-ticket.component';
 import { BarChartComponent } from './bar-chart/bar-chart.component';
 import { LineChartComponent } from './line-chart/line-chart.component';
 
-import { reducers } from '../context/reducer';
 import { EffectsModule } from '@ngrx/effects';
+import { ProjectsModule } from './projects/projects.module';
 
 
 
@@ -53,7 +52,6 @@ import { EffectsModule } from '@ngrx/effects';
     NavbarComponent,
     DefaultComponent,
     DashboardComponent,
-    ProjectsComponent,
     EmploysComponent,
     ProjectComponent,
     TicketComponent,
@@ -63,15 +61,10 @@ import { EffectsModule } from '@ngrx/effects';
     BarChartComponent,
     LineChartComponent,
   ],
-  imports: [
+  imports: [ 
     BrowserModule,
     AppRoutingModule,
-    ServiceWorkerModule.register('ngsw-worker.js', {
-      enabled: environment.production,
-      // Register the ServiceWorker as soon as the application is stable
-      // or after 30 seconds (whichever comes first).
-      registrationStrategy: 'registerWhenStable:30000'
-    }),
+    ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production, registrationStrategy: 'registerWhenStable:30000'}),
     BrowserAnimationsModule,
     ReactiveFormsModule,
     MatFormFieldModule,
@@ -85,18 +78,12 @@ import { EffectsModule } from '@ngrx/effects';
     NgChartsModule,
     MatTableModule,
     MatPaginatorModule,
+    ProjectsModule,
     StoreModule.forRoot({}),
-    StoreDevtoolsModule.instrument({
-      maxAge: 25, 
-      logOnly: environment.production, 
-      autoPause: true,
-    }),
-    StoreModule.forFeature('projects', reducers),
     EffectsModule.forRoot(),
-    EffectsModule.forFeature([ProjectsEffects]),
+    StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: environment.production, autoPause: true }),
   ],
-  providers: [ProjectService],
+  providers: [ProjectService, TicketService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
-// ng g c MyComponent --style none

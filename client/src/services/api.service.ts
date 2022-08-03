@@ -4,6 +4,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { IProject } from 'src/types/Projects';
+import { ITicket } from 'src/types/Ticket';
 
 @Injectable({
   providedIn: 'root',
@@ -37,3 +38,15 @@ export class ProjectService {
   }
 }
 
+@Injectable()
+export class TicketService {
+
+  constructor(private http: HttpClient) {}
+  
+  private Ticket = environment.apiUrl + '/' + "Tickets";
+
+  public GetTickets(ProjectId: number) : Observable<ITicket[]> {
+    return this.http.get<ITicket[]>(this.Ticket + `?ProjectId=${ProjectId}`);
+  } 
+  
+}
