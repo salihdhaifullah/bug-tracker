@@ -38,7 +38,7 @@ import {TicketsComponent} from './tickets/tickets.component';
 import { ProjectsComponent } from './projects/projects.component';
 
 import { EffectsModule, EffectsRootModule } from '@ngrx/effects';
-import { ProjectsEffects, TicketsEffects } from 'src/context/effects';
+import { AuthEffects, ProjectsEffects, TicketsEffects } from 'src/context/effects';
 import { ProjectsService, TicketsService } from 'src/services/api.service';
 import { BearerService } from 'src/services/bearer.service';
 
@@ -84,7 +84,8 @@ import { BearerService } from 'src/services/bearer.service';
     StoreModule.forRoot(reducers),
     StoreModule.forFeature('projects', reducers),
     StoreModule.forFeature('tickets', reducers),
-    EffectsModule.forFeature([ProjectsEffects, TicketsEffects]),
+    StoreModule.forFeature('user', reducers),
+    EffectsModule.forFeature([ProjectsEffects, TicketsEffects, AuthEffects]),
     EffectsModule.forRoot([]),
     EffectsRootModule,
     StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: environment.production, autoPause: true }),

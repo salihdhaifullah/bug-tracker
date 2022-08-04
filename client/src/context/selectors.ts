@@ -8,3 +8,4 @@ export const isLoadingSelector = createSelector(selectFeature, state => state.is
 
 export const projectsSelector = createSelector(selectFeature, state => state.projects);
 export const ticketsSelector = createSelector(selectFeature, state => state.tickets);
+export const userSelector = createSelector(selectFeature, state => state.user);

@@ -1,8 +1,13 @@
-import { AuthService } from '../../services/api.service';
+import { ISinginFormData } from 'src/types/User';
+import { IAppState } from 'src/context/app.state';
+import { Store, select } from '@ngrx/store';
+import { User } from 'src/types/User';
+import { Observable } from 'rxjs';
 import { Component } from '@angular/core';
 import {FormControl, FormGroupDirective, FormGroup, NgForm, Validators} from '@angular/forms';
 import {ErrorStateMatcher} from '@angular/material/core';
-import { ISinginFormData } from 'src/model/FormData';
+import * as Actions from 'src/context/actions';
+import { isLoadingSelector, userSelector, errorSelector } from 'src/context/selectors';
 
 export class MyErrorStateMatcher implements ErrorStateMatcher {
   isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
@@ -17,18 +22,26 @@ export class MyErrorStateMatcher implements ErrorStateMatcher {
 })
 export class SinginComponent  {
 
-  constructor(private auth: AuthService) { }
+  isLoading$: Observable<Boolean>;
+  error$: Observable<string | null>; 
+  user$: Observable<User | null>; 
 
-  emailFormControl = new FormControl('', [Validators.required, Validators.email]);
-  passwordFormControl = new FormControl('', [Validators.required, Validators.minLength(8)]);
-  firstNameFormControl = new FormControl('', [Validators.required, Validators.minLength(3)]);
-  lastNameFormControl = new FormControl('', [Validators.required, Validators.minLength(3)]);
+  constructor(private store: Store<IAppState>) {
+    this.isLoading$ = this.store.pipe(select(isLoadingSelector))
+    this.error$ = this.store.pipe(select(errorSelector))
+    this.user$ = this.store.pipe(select(userSelector))
+  }
+
+  emailFormControl = new FormControl<string>('', [Validators.required, Validators.email]);
+  passwordFormControl = new FormControl<string>('', [Validators.required, Validators.minLength(8)]);
+  firstNameFormControl = new FormControl<string>('', [Validators.required, Validators.minLength(3)]);
+  lastNameFormControl = new FormControl<string>('', [Validators.required, Validators.minLength(3)]);
 
   matcher = new MyErrorStateMatcher();
   hide = true;
 
   singinForm = new FormGroup({
-    email: this.emailFormControl,
+    email: this.emailFormControl, 
     password: this.passwordFormControl,
     firstName: this.firstNameFormControl,
     lastName: this.lastNameFormControl
@@ -37,13 +50,13 @@ export class SinginComponent  {
   HandelSubmit = async (event: Event) => {
     event.preventDefault();
     if (this.emailFormControl.valid && this.passwordFormControl.valid  && this.firstNameFormControl.valid && this.lastNameFormControl.valid) {
-
-      this.auth.Singin(this.singinForm.value as ISinginFormData).subscribe(
-        data => {
-          console.log(data);
-          this.singinForm.reset()
-        });
-
+      this.store.dispatch(Actions.postSingIn({SingIn: this.singinForm.value as ISinginFormData}));
     }
+  }
+
+  ngAfterViewInit() {
+    this.user$.subscribe((data: any) => { 
+      console.log(data.user)
+     });  
   }
 }  

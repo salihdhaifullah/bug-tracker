@@ -1,8 +1,13 @@
+import { isLoadingSelector, errorSelector, userSelector } from 'src/context/selectors';
+import { IAppState } from 'src/context/app.state';
+import { Store, select } from '@ngrx/store';
+import { User } from './../../types/User';
+import { Observable } from 'rxjs';
 import { Component } from '@angular/core';
 import {FormControl, FormGroupDirective, FormGroup, NgForm, Validators} from '@angular/forms';
 import {ErrorStateMatcher} from '@angular/material/core';
 import { ILoginFormData} from 'src/model/FormData';
-import { AuthService } from 'src/services/api.service';
+import * as Actions from 'src/context/actions';
 export class MyErrorStateMatcher implements ErrorStateMatcher {
   isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
     const isSubmitted = form && form.submitted;
@@ -16,8 +21,15 @@ export class MyErrorStateMatcher implements ErrorStateMatcher {
 })
 export class LoginComponent  {
 
-  constructor(private auth: AuthService) { }
+  isLoading$: Observable<Boolean>;
+  error$: Observable<string | null>; 
+  user$: Observable<User | null>; 
 
+  constructor(private store: Store<IAppState>) {
+    this.isLoading$ = this.store.pipe(select(isLoadingSelector))
+    this.error$ = this.store.pipe(select(errorSelector))
+    this.user$ = this.store.pipe(select(userSelector))
+  }
 
   emailFormControl = new FormControl('', [Validators.required]); // , Validators.email
   passwordFormControl = new FormControl('', [Validators.required, Validators.minLength(6)]);
@@ -33,13 +45,16 @@ export class LoginComponent  {
   HandelSubmit = (event: Event) => {
     event.preventDefault();
     if (this.emailFormControl.valid && this.passwordFormControl.valid) {
-      this.auth.Login(this.loginForm.value as ILoginFormData).subscribe(
-        data => {
-          sessionStorage.setItem('user', JSON.stringify(data));
-        });
-
-      this.loginForm.reset()
+      this.store.dispatch(Actions.postLogin({Login: this.loginForm.value as ILoginFormData}));
     }
-    console.log("it works")
+
+
   }
+
+  ngAfterViewInit() {
+    this.user$.subscribe((data: any) => { 
+      console.log(data.user)
+     });  
+  }
+
 }

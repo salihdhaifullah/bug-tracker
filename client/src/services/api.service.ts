@@ -5,7 +5,6 @@ import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { IProject } from '.././types/Projects';
 import { ITicket } from '.././types/Tickets';
-import {BearerService} from './bearer.service';
 
 @Injectable()
 

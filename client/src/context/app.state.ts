@@ -1,3 +1,4 @@
+import { User } from './../types/User';
 import { ITicket } from './../types/Tickets';
 import { IProject } from './../types/Projects';
 
@@ -7,4 +8,5 @@ export interface IAppState {
     error: string | null;
     projects: IProject[];
     tickets: ITicket[];
+    user: User | null;
 }
