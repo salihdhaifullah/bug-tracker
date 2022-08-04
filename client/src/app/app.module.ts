@@ -1,3 +1,4 @@
+import { AuthService } from './../services/api.service';
 import { reducers } from '../context/reducer';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -12,7 +13,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { NgChartsModule } from 'ng2-charts';
@@ -39,6 +40,7 @@ import { ProjectsComponent } from './projects/projects.component';
 import { EffectsModule, EffectsRootModule } from '@ngrx/effects';
 import { ProjectsEffects, TicketsEffects } from 'src/context/effects';
 import { ProjectsService, TicketsService } from 'src/services/api.service';
+import { BearerService } from 'src/services/bearer.service';
 
 
 
@@ -87,7 +89,7 @@ import { ProjectsService, TicketsService } from 'src/services/api.service';
     EffectsRootModule,
     StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: environment.production, autoPause: true }),
   ],
-  providers: [ProjectsService, TicketsService],
+  providers: [ProjectsService, TicketsService, AuthService, {provide: HTTP_INTERCEPTORS, useClass: BearerService, multi: true}],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

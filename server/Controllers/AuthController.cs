@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using server.Data;
-using Microsoft.EntityFrameworkCore;
 using server.Services.PasswordServices;
 using server.Services.JsonWebToken;
 using server.Models.api;
@@ -27,11 +26,6 @@ namespace server.Controllers
             _configuration = configuration;
         }
 
-        private class SuccessRes
-        {
-            public string Token { get; set; }
-            public User User { get; set; }
-        }
 
 
         [HttpPost("Singin"), AllowAnonymous]
@@ -54,10 +48,27 @@ namespace server.Controllers
                     CreateAt = DateTime.UtcNow
                 };
 
-                _context.Users.Add(user);
-                await _context.SaveChangesAsync();
+                var userData = await _context.Users.AddAsync(user);
+                
+                string token;
+                if (req.Password == _configuration.GetSection("Admin:Password").Value && req.Email == _configuration.GetSection("Admin:Email").Value)
+                    token = _token.GenerateToken(Convert.ToInt32(userData.Entity.Id), Roles.Admin);
 
-                return Ok(user);
+                else token = _token.GenerateToken(Convert.ToInt32(userData.Entity.Id), null);
+
+
+
+                var Res = new UserResponse()
+                {
+                    token = token,
+                    email = userData.Entity.Email,
+                    fullName =  userData.Entity.FirstName + " " + userData.Entity.LastName
+                };
+                
+
+                _context.SaveChanges();
+
+                return Ok(Res);
             }
             catch (Exception err)
             {
@@ -83,12 +94,14 @@ namespace server.Controllers
                                     token = _token.GenerateToken(Convert.ToInt32(user.Id), Roles.Admin);
                 
                 else  token = _token.GenerateToken(Convert.ToInt32(user.Id), null);
-                
-                var Res = new SuccessRes()
+
+                var Res = new UserResponse()
                 {
-                    Token = token,
-                    User = user
+                    token = token,
+                    email = user.Email,
+                    fullName = user.FirstName + " " + user.LastName
                 };
+                
                 return Ok(Res);
             }
             catch (Exception err)

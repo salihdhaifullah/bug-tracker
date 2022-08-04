@@ -5,4 +5,7 @@ import { Component } from '@angular/core';
   templateUrl: './app.component.html',
 })
 
-export class AppComponent { }
+export class AppComponent { 
+  haveAccount = sessionStorage.getItem('user');
+  user = this.haveAccount && JSON.parse(this.haveAccount);
+}

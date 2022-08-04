@@ -22,4 +22,13 @@ namespace server.Models.api
         public string Password { get; set; } = String.Empty;
     }
 
+
+    public class UserResponse
+    {
+        public string token { get; set; }
+        public string email { get; set; }
+        public string fullName { get; set; }
+
+    }
+
 }
