@@ -1,4 +1,4 @@
-import { ProjectService, TicketService } from './../services/api.service';
+import { reducers } from '../context/reducer';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { NgModule } from '@angular/core';
@@ -21,25 +21,25 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { StoreModule } from '@ngrx/store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 
-
-
 import { LoginComponent } from './login/login.component';
 import { SinginComponent } from './singin/singin.component';
 import { NavbarComponent } from './navbar/navbar.component';
 import { DefaultComponent } from './default/default.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
-import { ProjectsComponent } from './projects/components/projects/projects.component';
 import { EmploysComponent } from './employs/employs.component';
 import { ProjectComponent } from './project/project.component';
 import { TicketComponent } from './ticket/ticket.component';
-import { TicketsComponent } from './tickets/tickets.component';
 import { NewProjectComponent } from './new-project/new-project.component';
 import { NewTicketComponent } from './new-ticket/new-ticket.component';
 import { BarChartComponent } from './bar-chart/bar-chart.component';
 import { LineChartComponent } from './line-chart/line-chart.component';
+import {TicketsComponent} from './tickets/tickets.component';
+import { ProjectsComponent } from './projects/projects.component';
 
-import { EffectsModule } from '@ngrx/effects';
-import { ProjectsModule } from './projects/projects.module';
+import { EffectsModule, EffectsRootModule } from '@ngrx/effects';
+import { ProjectsEffects, TicketsEffects } from 'src/context/effects';
+import { ProjectsService, TicketsService } from 'src/services/api.service';
+
 
 
 
@@ -55,11 +55,12 @@ import { ProjectsModule } from './projects/projects.module';
     EmploysComponent,
     ProjectComponent,
     TicketComponent,
-    TicketsComponent,
     NewProjectComponent,
     NewTicketComponent,
     BarChartComponent,
     LineChartComponent,
+    TicketsComponent,
+    ProjectsComponent,
   ],
   imports: [ 
     BrowserModule,
@@ -78,12 +79,15 @@ import { ProjectsModule } from './projects/projects.module';
     NgChartsModule,
     MatTableModule,
     MatPaginatorModule,
-    ProjectsModule,
-    StoreModule.forRoot({}),
-    EffectsModule.forRoot(),
+    StoreModule.forRoot(reducers),
+    StoreModule.forFeature('projects', reducers),
+    StoreModule.forFeature('tickets', reducers),
+    EffectsModule.forFeature([ProjectsEffects, TicketsEffects]),
+    EffectsModule.forRoot([]),
+    EffectsRootModule,
     StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: environment.production, autoPause: true }),
   ],
-  providers: [ProjectService, TicketService],
+  providers: [ProjectsService, TicketsService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -34,7 +34,7 @@
       <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>
 
-    <h1 *ngIf="isLoading$ | async">Projects........</h1>
+    <h1 *ngIf="isLoading$ | async">loading........</h1>
   
     <mat-paginator [pageSizeOptions]="[5, 10, 20]"
                    showFirstLastButtons 

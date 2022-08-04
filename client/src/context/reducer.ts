@@ -6,7 +6,7 @@ export const initialState: IAppState = {
     isLoading: false,
     error: null,
     projects: [],
-    tickets: [],
+    tickets: []
 }
 
 export const reducers = createReducer(initialState, 

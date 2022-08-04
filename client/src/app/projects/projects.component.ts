@@ -1,11 +1,11 @@
-import { IProject } from '../../../../types/Projects';
-import { isLoadingSelector, errorSelector, projectsSelector } from '../../../../context/selectors';
+import { IProject } from 'src/types/Projects';
+import { isLoadingSelector, errorSelector, projectsSelector } from 'src/context/selectors';
 import { Observable } from 'rxjs';
 import {OnInit , Component, ViewChild} from '@angular/core';
 import {MatPaginator} from '@angular/material/paginator';
 import {MatTableDataSource} from '@angular/material/table';
 import { Store, select } from '@ngrx/store';
-import * as Actions from '../../../../context/actions';
+import * as Actions from 'src/context/actions';
 import { IAppState } from 'src/context/app.state';
 import { MatSort } from '@angular/material/sort';
 
@@ -19,7 +19,7 @@ export class ProjectsComponent implements OnInit {
 
   isLoading$: Observable<Boolean>;
   error$: Observable<string | null>; 
-  projects$: Observable<IProject[]>; 
+  projects$: Observable<IProject[]>;
 
   constructor(private store: Store<IAppState>) {
     this.isLoading$ = this.store.pipe(select(isLoadingSelector));
@@ -38,8 +38,8 @@ export class ProjectsComponent implements OnInit {
   }
 
   ngAfterViewInit() {
-    this.projects$.subscribe(p => { 
-      this.dataSource.data = p,
+    this.projects$.subscribe((p: any) => { 
+      this.dataSource.data = p.projects,
       this.dataSource.paginator = this.paginator,
       this.dataSource.sort = this.sort,
       console.log(p);

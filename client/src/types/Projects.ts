@@ -7,6 +7,3 @@ export interface IProject {
     description: String
 }
 
-export interface IProjectState {
-  projects: IProject[];
-}

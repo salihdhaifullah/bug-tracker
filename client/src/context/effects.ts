@@ -1,17 +1,16 @@
-import { ITicket } from './../types/Ticket';
-import { TicketService } from './../services/api.service';
+import { ITicket } from '../types/Tickets';
 import { getProjects, getProjectsSuccess, getProjectsFailure, getTickets, getTicketsSuccess, getTicketsFailure } from './actions';
-import { Injectable } from "@angular/core";
+import { inject, Injectable } from "@angular/core";
 import { Actions, createEffect, ofType } from "@ngrx/effects";
 import { catchError, map, mergeMap, of } from "rxjs";
-import { ProjectService } from "../services/api.service";
-import { IProject } from 'src/types/Projects';
+import { TicketsService, ProjectsService } from "../services/api.service";
+import { IProject } from '../types/Projects';
 
 
 @Injectable()
-export class ActionsEffects {
+export class ProjectsEffects {
 
-    constructor(private actions$: Actions, private projectsService: ProjectService, private ticketService: TicketService) { }
+    constructor(private actions$: Actions, private projectsService: ProjectsService) { }
 
 
     getProjects$ = createEffect(() =>
@@ -24,16 +23,21 @@ export class ActionsEffects {
                 )
             })
         ));
+}
 
-    getTickets$ = createEffect(() =>
+@Injectable()
+export class TicketsEffects {
+    
+        constructor(private actions$: Actions, private ticketsService: TicketsService) { }
+
+        getTickets$ = createEffect(() =>
         this.actions$.pipe(
             ofType(getTickets),
             mergeMap((action) => {
-                return this.ticketService.GetTickets(action.ProjectId).pipe(
+                return this.ticketsService.GetTickets(action.ProjectId).pipe(
                     map((tickets: ITicket[]) => getTicketsSuccess({ tickets })),
                     catchError(error => of(getTicketsFailure({ error })))
                 )
             })
         ));
-
 }

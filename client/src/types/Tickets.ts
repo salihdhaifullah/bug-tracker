@@ -10,6 +10,3 @@ export interface ITicket {
     isCompleted: Boolean
 }
 
-export interface ITicketState {
-    tickets: ITicket[];
-}
