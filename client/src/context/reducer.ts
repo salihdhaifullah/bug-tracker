@@ -11,16 +11,25 @@ export const initialState: IAppState = {
     user: isFound ? JSON.parse(isFound) : null
 }
 
-export const reducers = createReducer(initialState, 
+const userInitialState: any = {
+    isLoading: false,
+    error: null,
+    user: isFound ? JSON.parse(isFound) : null 
+}
 
-    on(Actions.getProjects, state => ({ ...state, isLoading: true })),
-    on(Actions.getProjectsSuccess, (state, action) => ({ ...state, isLoading: false, projects: action.projects })),
-    on(Actions.getProjectsFailure, (state, action) => ({ ...state, isLoading: false, error: action.error })),
-    
-    on(Actions.getTickets, state => ({ ...state, isLoading: true })),
-    on(Actions.getTicketsSuccess, (state, action) => ({ ...state, isLoading: false, tickets: action.tickets })),
-    on(Actions.getTicketsFailure, (state, action) => ({ ...state, isLoading: false, error: action.error })),
+const projectsInitialState: any = {
+    isLoading: false,
+    error: null,
+    projects: [],
+}
 
+const ticketsInitialState: any = {
+    isLoading: false,
+    error: null,
+    tickets: [],
+}
+
+export const userReducers = createReducer(userInitialState, 
     on(Actions.postLogin, state => ({ ...state, isLoading: true })),
     on(Actions.postLoginSuccess, (state, action) => ({ ...state, isLoading: false, user: action.user })),
     on(Actions.postLoginFailure, (state, action) => ({ ...state, isLoading: false, error: action.error })),
@@ -29,3 +38,18 @@ export const reducers = createReducer(initialState,
     on(Actions.postSingInSuccess, (state, action) => ({ ...state, isLoading: false, user: action.user })),
     on(Actions.postSingInFailure, (state, action) => ({ ...state, isLoading: false, error: action.error }))
 );
+
+
+
+export const projectsReducers = createReducer(projectsInitialState,
+    on(Actions.getProjects, state => ({ ...state, isLoading: true })),
+    on(Actions.getProjectsSuccess, (state, action) => ({ ...state, isLoading: false, projects: action.projects })),
+    on(Actions.getProjectsFailure, (state, action) => ({ ...state, isLoading: false, error: action.error })),
+)
+
+export const ticketsReducers = createReducer(ticketsInitialState,
+    on(Actions.getTickets, state => ({ ...state, isLoading: true })),
+    on(Actions.getTicketsSuccess, (state, action) => ({ ...state, isLoading: false, tickets: action.tickets })),
+    on(Actions.getTicketsFailure, (state, action) => ({ ...state, isLoading: false, error: action.error })),
+)
+

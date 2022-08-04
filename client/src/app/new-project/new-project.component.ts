@@ -1,15 +1,8 @@
 // import { ICreateProjectFormData } from './../../model/FormData';
 // import { ProjectService } from './../../services/my-test.service';
-import { Component, OnInit } from '@angular/core';
-import {FormControl, FormGroupDirective, FormGroup, NgForm, Validators} from '@angular/forms';
-import {ErrorStateMatcher} from '@angular/material/core';
-
-export class MyErrorStateMatcher implements ErrorStateMatcher {
-  isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
-    const isSubmitted = form && form.submitted;
-    return !!(control && control.invalid && (control.dirty || control.touched || isSubmitted));
-  }
-}
+import { Component } from '@angular/core';
+import {FormControl,  FormGroup,  Validators} from '@angular/forms';
+import {MyErrorStateMatcher} from '../MyErrorStateMatcher';
 
 @Component({
   selector: 'app-new-project',

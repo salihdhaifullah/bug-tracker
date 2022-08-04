@@ -43,16 +43,16 @@ namespace server.Controllers
             return Ok(Tickets);
         }
 
-        [HttpPost("Create")]
+        [HttpPost("Create"), Authorize(Roles = "Admin, Submitter, ProjectManger")]
         public async Task<IActionResult> CreateTicket(TicketReq req)
         {
                     // Priority => Low, Medium, High
                     // Status => New, In Progress, Resolved, Closed
                     // Type => Feature, Bug
-
-                    if (req.Type != "Feature" && req.Type !=  "Bug") return BadRequest();
-                    if (req.Priority != "Low" && req.Priority != "Medium" && req.Priority != "High") return BadRequest();
-                    if (req.Status != "New" && req.Status != "Closed" && req.Status != "In Progress" && req.Status != "Resolved") return BadRequest();
+                    
+                    if (req.Type != Types.Feature && req.Type !=  Types.Bug) return BadRequest();
+                    if (req.Priority != Priorates.Low && req.Priority != Priorates.Medium && req.Priority != Priorates.High) return BadRequest();
+                    if (req.Status != Statuses.New && req.Status != Statuses.Closed && req.Status != Statuses.InProgress) return BadRequest();
 
             Ticket TicketData = new()
             {
@@ -72,14 +72,16 @@ namespace server.Controllers
             return Ok(NewTicket.Entity);
         }  
 
-        [HttpPut("Status/{id}")]
+        [HttpPut("Status/{id}"), Authorize(Roles = "Developer")]
         public IActionResult InProgress(TicketReq req)
         {
+            var hello = Request.Headers.Authorization;
+
             var Ticket = _context.Tickets.FirstOrDefault(ticket => ticket.Id == 1);
             if (Ticket == null) return BadRequest("Ticket Not Found");
-            Ticket.Status = "In Progress";
-            _context.SaveChanges();
-            return Ok(Ticket);
+            // Ticket.Status = Statuses.InProgress;
+            // _context.SaveChanges();
+            return Ok(hello);
         }
     }
 }

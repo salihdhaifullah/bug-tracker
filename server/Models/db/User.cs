@@ -9,5 +9,6 @@
         public string HashPassword { get; set; } = String.Empty;
         public string PasswordSalt { get; set; } = String.Empty;
         public DateTime CreateAt { get; set; } = DateTime.UtcNow;
+        public string Role { get; set; } = Roles.Developer;
     }
 }

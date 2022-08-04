@@ -3,7 +3,7 @@
     public class RoleReq
     {
         public string Role { get; set; } = Roles.Developer;
-        public int UserId { get; set; }
+        public List<int> UsersId { get; set; }
         public int ProjectId { get; set; }
     }
 }

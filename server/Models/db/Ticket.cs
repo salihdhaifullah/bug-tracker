@@ -7,9 +7,9 @@ namespace server.Models.db
     {
 #pragma warning disable CS8618
         public int Id { get; set; } 
-        public string Priority { get; set; } = "Medium"; // Low, Medium, High
-        public string Status { get; set; } = "New"; // New, In Progress, Resolved, Closed
-        public string Type { get; set; } = "Feature"; // Feature, Bug
+        public string Priority { get; set; } = Priorates.Medium; // Low, Medium, High
+        public string Status { get; set; } = Statuses.New; // New, In Progress, Resolved, Closed
+        public string Type { get; set; } = Types.Feature; // Feature, Bug
         public bool IsCompleted { get; set; } = false;
         public string Name { get; set; } = String.Empty;
         public string Description { get; set; } = String.Empty;

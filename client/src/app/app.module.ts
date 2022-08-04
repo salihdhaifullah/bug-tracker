@@ -1,5 +1,5 @@
+import { projectsReducers, ticketsReducers, userReducers } from './../context/reducer';
 import { AuthService } from './../services/api.service';
-import { reducers } from '../context/reducer';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { NgModule } from '@angular/core';
@@ -41,6 +41,7 @@ import { EffectsModule, EffectsRootModule } from '@ngrx/effects';
 import { AuthEffects, ProjectsEffects, TicketsEffects } from 'src/context/effects';
 import { ProjectsService, TicketsService } from 'src/services/api.service';
 import { BearerService } from 'src/services/bearer.service';
+import { AssigneUserComponent } from './assigne-user/assigne-user.component';
 
 
 
@@ -63,6 +64,7 @@ import { BearerService } from 'src/services/bearer.service';
     LineChartComponent,
     TicketsComponent,
     ProjectsComponent,
+    AssigneUserComponent,
   ],
   imports: [ 
     BrowserModule,
@@ -81,10 +83,10 @@ import { BearerService } from 'src/services/bearer.service';
     NgChartsModule,
     MatTableModule,
     MatPaginatorModule,
-    StoreModule.forRoot(reducers),
-    StoreModule.forFeature('projects', reducers),
-    StoreModule.forFeature('tickets', reducers),
-    StoreModule.forFeature('user', reducers),
+    StoreModule.forRoot({}),
+    StoreModule.forFeature('projects', projectsReducers),
+    StoreModule.forFeature('tickets', ticketsReducers),
+    StoreModule.forFeature('user', userReducers),
     EffectsModule.forFeature([ProjectsEffects, TicketsEffects, AuthEffects]),
     EffectsModule.forRoot([]),
     EffectsRootModule,

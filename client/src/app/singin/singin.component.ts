@@ -4,17 +4,11 @@ import { Store, select } from '@ngrx/store';
 import { User } from 'src/types/User';
 import { Observable } from 'rxjs';
 import { Component } from '@angular/core';
-import {FormControl, FormGroupDirective, FormGroup, NgForm, Validators} from '@angular/forms';
-import {ErrorStateMatcher} from '@angular/material/core';
+import {FormControl, FormGroup,  Validators} from '@angular/forms';
 import * as Actions from 'src/context/actions';
 import { isLoadingSelector, userSelector, errorSelector } from 'src/context/selectors';
+import { MyErrorStateMatcher } from '../MyErrorStateMatcher';
 
-export class MyErrorStateMatcher implements ErrorStateMatcher {
-  isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
-    const isSubmitted = form && form.submitted;
-    return !!(control && control.invalid && (control.dirty || control.touched || isSubmitted));
-  }
-}
 
 @Component({
   selector: 'app-singin',

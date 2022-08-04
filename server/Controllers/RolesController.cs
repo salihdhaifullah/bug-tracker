@@ -2,6 +2,8 @@
 using server.Data;
 using server.Models.api;
 using server.Models.db;
+using Microsoft.AspNetCore.Authorization;
+
 
 namespace server.Controllers
 {
@@ -19,57 +21,61 @@ namespace server.Controllers
 
         }
 
-        [HttpGet]
-        public IActionResult GetAllUsersRoles()
+        [HttpGet, Authorize]
+        public async Task<IActionResult> GetAllUsers()
         {
-            var roles = _context.UserRoles.ToList();
-            return Ok(roles);
+            try
+            {
+                
+                var users = await _context.Users.Select(u => new
+                {
+                    u.FirstName,
+                    u.LastName,
+                    u.Role,
+                    u.Email,
+                    u.CreateAt,
+                    u.Id,
+                    
+                }).ToListAsync();
+
+                return Ok(users);
+            }
+            catch (Exception err)
+            {
+                throw err;
+            }
         }
 
 
-        [HttpPost]
+        [HttpPatch, Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateUserRole([FromBody] RoleReq value)
         {
-            var user = await _context.Users.FindAsync(value.UserId);
-            if (user == null) return BadRequest();
-
-            UserRole userRole = new UserRole 
+            
+            for (int i = 0; i < value.UsersId.Count; i++)
             {
-                UserId = value.UserId,
-                Role = value.Role,
-                ProjectId = value.ProjectId
-            };
+                var user = await _context.Users.FindAsync(value.UsersId[i]);
+                if (user == null) return BadRequest();
+                if (user.Role == Roles.Admin) return BadRequest("can not change Admin Role");
+                user.Role = value.Role;
 
-            var IsFound = _context.Projects.Find(value.ProjectId);
-            if (IsFound == null) return NotFound();
-            var NewRole = _context.UserRoles.Add(userRole);
-            IsFound.usersRolesId.Add(NewRole.Entity.Id);
+            }
+
             await _context.SaveChangesAsync();
 
-            return Ok(IsFound);
+            return Ok();
+
         }
 
-        [HttpDelete("delete/{id}")]
-        public async Task<IActionResult> DeleteUserRole([FromRoute] int id)
-        {
-            var userRole = await _context.UserRoles.FindAsync(id);
-            if (userRole == null) return NotFound();
-            _context.UserRoles.Remove(userRole);
-            await _context.SaveChangesAsync();
-            return Ok(userRole);
-        }
-
-
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateUserRole([FromBody] RoleReq value, [FromRoute] int id)
-        {
-            var userRole = await _context.UserRoles.FindAsync(id);
-            if (userRole == null) return NotFound();
-            userRole.UserId = value.UserId;
-            userRole.Role = value.Role;
-            userRole.ProjectId = value.ProjectId;
-            await _context.SaveChangesAsync();
-            return Ok(userRole);
-        }
+        //[HttpPut("{id}")]
+        //public async Task<IActionResult> UpdateUserRole([FromBody] RoleReq value, [FromRoute] int id)
+        //{
+        //    var userRole = await _context.UserRoles.FindAsync(id);
+        //    if (userRole == null) return NotFound();
+        //    userRole.UserId = value.UsersId;
+        //    userRole.Role = value.Role;
+        //    userRole.ProjectId = value.ProjectId;
+        //    await _context.SaveChangesAsync();
+        //    return Ok(userRole);
+        //}
     }
 }
