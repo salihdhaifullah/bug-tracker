@@ -30,9 +30,11 @@ namespace server.Controllers
                 Description = req.Description,
                 CreatedAt = DateTime.UtcNow,
             };
-            var NewProject = await _context.Projects.AddAsync(ProjectData);
+            await _context.Projects.AddAsync(ProjectData);
+            
             _context.SaveChanges();
-            return Ok(NewProject.Entity);
+            
+            return Ok("project create Success");
         }
 
 

@@ -41,16 +41,30 @@ export class SinginComponent  {
     lastName: this.lastNameFormControl
   });
 
+
+  ngOnInit() {
+    this.user$.subscribe((data: any) => {
+      console.log(data.user)
+    });
+  }
+
   HandelSubmit = async (event: Event) => {
     event.preventDefault();
+    this.store.dispatch(Actions.Logout());
+
     if (this.emailFormControl.valid && this.passwordFormControl.valid  && this.firstNameFormControl.valid && this.lastNameFormControl.valid) {
-      this.store.dispatch(Actions.postSingIn({SingIn: this.singinForm.value as ISinginFormData}));
+      const hello = this.store.dispatch(Actions.postSingIn({SingIn: this.singinForm.value as ISinginFormData}));
+      console.log(hello);
+      this.user$.subscribe((data: any) => { 
+        console.log(data.user)
+        if (data.user) {
+          sessionStorage.setItem('user', JSON.stringify(data.user));
+        }
+       });
     }
   }
 
   ngAfterViewInit() {
-    this.user$.subscribe((data: any) => { 
-      console.log(data.user)
-     });  
+  
   }
 }  

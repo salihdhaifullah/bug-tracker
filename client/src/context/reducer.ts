@@ -8,7 +8,8 @@ export const initialState: IAppState = {
     error: null,
     projects: [],
     tickets: [],
-    user: isFound ? JSON.parse(isFound) : null
+    user: isFound !== null ? JSON.parse(isFound) : null,
+    message: null
 }
 
 const userInitialState: any = {
@@ -21,6 +22,7 @@ const projectsInitialState: any = {
     isLoading: false,
     error: null,
     projects: [],
+    massage: null
 }
 
 const ticketsInitialState: any = {
@@ -36,7 +38,12 @@ export const userReducers = createReducer(userInitialState,
 
     on(Actions.postSingIn, state => ({ ...state, isLoading: true })),
     on(Actions.postSingInSuccess, (state, action) => ({ ...state, isLoading: false, user: action.user })),
-    on(Actions.postSingInFailure, (state, action) => ({ ...state, isLoading: false, error: action.error }))
+    on(Actions.postSingInFailure, (state, action) => ({ ...state, isLoading: false, error: action.error })),
+
+    on(Actions.Logout, state => {
+        sessionStorage.removeItem('user'),
+        ({ ...state, user: null })
+    }),
 );
 
 
@@ -45,6 +52,10 @@ export const projectsReducers = createReducer(projectsInitialState,
     on(Actions.getProjects, state => ({ ...state, isLoading: true })),
     on(Actions.getProjectsSuccess, (state, action) => ({ ...state, isLoading: false, projects: action.projects })),
     on(Actions.getProjectsFailure, (state, action) => ({ ...state, isLoading: false, error: action.error })),
+
+    on(Actions.postProject, state => ({ ...state, isLoading: true })),
+    on(Actions.postProjectSuccess, (state, action) => ({ ...state, isLoading: false, projects: action.massage })),
+    on(Actions.postProjectFailure, (state, action) => ({ ...state, isLoading: false, error: action.error })),
 )
 
 export const ticketsReducers = createReducer(ticketsInitialState,

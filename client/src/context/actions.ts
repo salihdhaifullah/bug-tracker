@@ -1,6 +1,6 @@
 import { createAction, props } from "@ngrx/store";
 import { ILoginFormData, ISinginFormData, User } from "src/types/User";
-import { IProject } from "../types/Projects";
+import { ICreateProject, IProject } from "../types/Projects";
 import { ITicket } from "../types/Tickets";
 
 
@@ -10,6 +10,11 @@ export const getProjectsSuccess = createAction("[Projects] Get Projects Success"
 
 export const getProjectsFailure = createAction("[Projects] Get Projects Failure", props<{ error: string }>()); 
 
+export const postProject = createAction("[Projects] post Project", props<{ project: ICreateProject }>()); 
+
+export const postProjectSuccess = createAction("[Projects] post Project Success", props<{ massage: string }>()); 
+
+export const postProjectFailure = createAction("[Projects] post Project Failure", props<{ error: string }>()); 
 
 
 export const getTickets = createAction("[Tickets] Get Tickets", props<{ProjectId: number}>()); 
@@ -31,3 +36,6 @@ export const postSingIn = createAction("[SingIn] Post SingIn", props<{SingIn: IS
 export const postSingInSuccess = createAction("[SingIn] Post SingIn Success", props<{ user: User }>()); 
 
 export const postSingInFailure = createAction("[SingIn] Post SingIn Failure", props<{ error: string }>()); 
+
+
+export const Logout = createAction("[Logout] Logout"); 

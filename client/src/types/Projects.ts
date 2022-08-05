@@ -7,3 +7,8 @@ export interface IProject {
     description: String
 }
 
+export interface ICreateProject {
+    name: String
+    title: String
+    description: String
+}

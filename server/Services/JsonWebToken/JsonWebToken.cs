@@ -27,7 +27,7 @@ namespace server.Services.JsonWebToken
 
             var token = new JwtSecurityToken(
                 claims: claims,
-                expires: DateTime.UtcNow.AddHours(10),
+                expires: DateTime.UtcNow.AddHours(24),
                 signingCredentials: creds
             );
             return new JwtSecurityTokenHandler().WriteToken(token);

@@ -1,7 +1,7 @@
 import { User } from './../types/User';
 import { AuthService } from 'src/services/api.service';
 import { ITicket } from '../types/Tickets';
-import { getProjects, getProjectsSuccess, getProjectsFailure, getTickets, getTicketsSuccess, getTicketsFailure, postLoginSuccess, postSingIn, postSingInFailure, postSingInSuccess, postLoginFailure, postLogin } from './actions';
+import { getProjects, getProjectsSuccess, getProjectsFailure, getTickets, getTicketsSuccess, getTicketsFailure, postLoginSuccess, postSingIn, postSingInFailure, postSingInSuccess, postLoginFailure, postLogin, postProject, postProjectSuccess, postProjectFailure } from './actions';
 import { Injectable } from "@angular/core";
 import { Actions, createEffect, ofType } from "@ngrx/effects";
 import { catchError, map, mergeMap, of } from "rxjs";
@@ -25,6 +25,18 @@ export class ProjectsEffects {
                 )
             })
         ));
+
+        createProject$ = createEffect(() =>
+            this.actions$.pipe(
+                ofType(postProject),
+                mergeMap((actions) => {
+                    return this.projectsService.CreateProject(actions.project).pipe(
+                        map(() => postProjectSuccess({ massage: "Project created" })),
+                        catchError(error => of(postProjectFailure({ error })))
+                    )
+                }
+                )
+            ));
 }
 
 @Injectable()
@@ -49,7 +61,7 @@ export class TicketsEffects {
 export class AuthEffects {
     constructor(private actions$: Actions, private authService: AuthService) { }
 
-    postLogin$ = createEffect(() =>
+    postLogin$ = createEffect(() => 
         this.actions$.pipe(
             ofType(postLogin),
             mergeMap((action) => {

@@ -9,4 +9,5 @@ export interface IAppState {
     projects: IProject[];
     tickets: ITicket[];
     user: User | null;
+    message: string | null;
 }

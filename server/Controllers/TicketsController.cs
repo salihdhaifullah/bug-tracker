@@ -23,9 +23,9 @@ namespace server.Controllers
             _token = token;
             _password = password;
         }
-        
+
         [HttpGet]
-        public IActionResult GetTickets([FromQuery]int ProjectId)
+        public IActionResult GetTickets([FromQuery] int ProjectId)
         {
             var Tickets = _context.Tickets.Where(ticket => ticket.ProjectId == ProjectId).Select(p => new
             {
@@ -39,20 +39,32 @@ namespace server.Controllers
                 p.UpdatedAt,
                 p.IsCompleted
             }).ToList();
-            
+
             return Ok(Tickets);
         }
 
         [HttpPost("Create"), Authorize(Roles = "Admin, Submitter, ProjectManger")]
         public async Task<IActionResult> CreateTicket(TicketReq req)
         {
-                    // Priority => Low, Medium, High
-                    // Status => New, In Progress, Resolved, Closed
-                    // Type => Feature, Bug
-                    
-                    if (req.Type != Types.Feature && req.Type !=  Types.Bug) return BadRequest();
-                    if (req.Priority != Priorates.Low && req.Priority != Priorates.Medium && req.Priority != Priorates.High) return BadRequest();
-                    if (req.Status != Statuses.New && req.Status != Statuses.Closed && req.Status != Statuses.InProgress) return BadRequest();
+            // Priority => Low, Medium, High
+            // Status => New, In Progress, Resolved, Closed
+            // Type => Feature, Bug
+
+            if (req.Type != Types.Feature && req.Type != Types.Bug) return BadRequest();
+            if (req.Priority != Priorates.Low && req.Priority != Priorates.Medium && req.Priority != Priorates.High) return BadRequest();
+            if (req.Status != Statuses.New && req.Status != Statuses.Closed && req.Status != Statuses.InProgress) return BadRequest();
+            string? header = Request.Headers.Authorization;
+
+            if (header != null)
+            {
+                string[] token = header.Split(' ');
+
+                Console.WriteLine(token);
+                
+                int? id = _token.VerifyToken(token[1]);
+
+                if (id != null) Console.WriteLine(id);
+            }
 
             Ticket TicketData = new()
             {
@@ -66,11 +78,11 @@ namespace server.Controllers
                 AssigneeToId = req.AssigneeToId,
                 SubmitterId = req.SubmitterId,
             };
-            
+
             var NewTicket = await _context.Tickets.AddAsync(TicketData);
             _context.SaveChanges();
             return Ok(NewTicket.Entity);
-        }  
+        }
 
         [HttpPut("Status/{id}"), Authorize(Roles = "Developer")]
         public IActionResult InProgress(TicketReq req)

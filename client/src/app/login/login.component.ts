@@ -4,16 +4,11 @@ import { Store, select } from '@ngrx/store';
 import { User } from './../../types/User';
 import { Observable } from 'rxjs';
 import { Component } from '@angular/core';
-import {FormControl, FormGroupDirective, FormGroup, NgForm, Validators} from '@angular/forms';
-import {ErrorStateMatcher} from '@angular/material/core';
+import {FormControl, FormGroup, Validators} from '@angular/forms';
 import { ILoginFormData} from 'src/model/FormData';
 import * as Actions from 'src/context/actions';
-export class MyErrorStateMatcher implements ErrorStateMatcher {
-  isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
-    const isSubmitted = form && form.submitted;
-    return !!(control && control.invalid && (control.dirty || control.touched || isSubmitted));
-  }
-}
+import { MyErrorStateMatcher } from '../MyErrorStateMatcher';
+
 
 @Component({
   selector: 'app-login',
@@ -31,8 +26,8 @@ export class LoginComponent  {
     this.user$ = this.store.pipe(select(userSelector))
   }
 
-  emailFormControl = new FormControl('', [Validators.required]); // , Validators.email
-  passwordFormControl = new FormControl('', [Validators.required, Validators.minLength(6)]);
+  emailFormControl = new FormControl<string>('', [Validators.required, Validators.email]); //
+  passwordFormControl = new FormControl<string>('', [Validators.required, Validators.minLength(6)]);
 
   matcher = new MyErrorStateMatcher();
   hide = true;
@@ -41,20 +36,35 @@ export class LoginComponent  {
     email: this.emailFormControl,
     password: this.passwordFormControl
   });
+
+
+  ngOnInit() {
+    this.user$.subscribe((data: any) => {
+      console.log(data.user)
+    });
+  }
   
   HandelSubmit = (event: Event) => {
     event.preventDefault();
+    this.store.dispatch(Actions.Logout());
+
     if (this.emailFormControl.valid && this.passwordFormControl.valid) {
-      this.store.dispatch(Actions.postLogin({Login: this.loginForm.value as ILoginFormData}));
-    }
+      const login = {
+        Login: this.loginForm.value as ILoginFormData
+      }
+      this.store.dispatch(Actions.postLogin(login));
 
-
+      this.user$.subscribe((data: any) => { 
+        if (data.user) {
+          console.log(data.user);
+          sessionStorage.setItem('user', JSON.stringify(data.user));
+        }
+       });  
+    } 
   }
 
-  ngAfterViewInit() {
-    this.user$.subscribe((data: any) => { 
-      console.log(data.user)
-     });  
+  ngAfterViewInit() { 
+
   }
 
 }

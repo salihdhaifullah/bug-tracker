@@ -8,6 +8,7 @@ import { Store, select } from '@ngrx/store';
 import * as Actions from 'src/context/actions';
 import { IAppState } from 'src/context/app.state';
 import { MatSort } from '@angular/material/sort';
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-projects',
@@ -20,13 +21,15 @@ export class ProjectsComponent implements OnInit {
   isLoading$: Observable<Boolean>;
   error$: Observable<string | null>; 
   projects$: Observable<IProject[]>;
-
+  _moment: any;
   constructor(private store: Store<IAppState>) {
     this.isLoading$ = this.store.pipe(select(isLoadingSelector));
     this.error$ = this.store.pipe(select(errorSelector))
     this.projects$ = this.store.pipe(select(projectsSelector));
+    this._moment = moment;
   }
 
+  
 
   @ViewChild(MatSort, { static: true }) sort!: MatSort;
 
