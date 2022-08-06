@@ -6,6 +6,7 @@ using server.Models.db;
 using server.Services.JsonWebToken;
 using server.Services.PasswordServices;
 using System.Collections;
+using System.Linq;
 
 namespace server.Controllers
 {
@@ -52,7 +53,7 @@ namespace server.Controllers
 
             if (req.Type != Types.Feature && req.Type != Types.Bug) return BadRequest();
             if (req.Priority != Priorates.Low && req.Priority != Priorates.Medium && req.Priority != Priorates.High) return BadRequest();
-            if (req.Status != Statuses.New && req.Status != Statuses.Closed && req.Status != Statuses.InProgress) return BadRequest();
+
             string? header = Request.Headers.Authorization;
 
             if (header != null)
@@ -61,27 +62,43 @@ namespace server.Controllers
 
                 Console.WriteLine(token);
                 
-                int? id = _token.VerifyToken(token[1]);
+                var id = _token.VerifyToken(token[1]);
 
-                if (id != null) Console.WriteLine(id);
+                if (id != null)
+                {
+                    int id1 = id.Value;
+
+                    var IsAssigneeToFound = _context.Users.Any(u => u.Id == req.AssigneeToId);
+                    var project = _context.Projects.Any(p => p.Id == req.ProjectId);
+
+
+                    if (IsAssigneeToFound && project)
+                    {
+
+                        Ticket TicketData = new()
+                        {
+                            Name = req.Name,
+                            Description = req.Description,
+                            CreatedAt = DateTime.UtcNow,
+                            ProjectId = req.ProjectId,
+                            Type = req.Type,
+                            Status = Statuses.New,
+                            Priority = req.Priority,
+                            AssigneeToId = req.AssigneeToId,
+                            SubmitterId = id1,
+                        };
+
+                        var NewTicket = await _context.Tickets.AddAsync(TicketData);
+                        _context.SaveChanges();
+                        return Ok(NewTicket.Entity);
+
+                    } else return NotFound();
+                }
+
+                else return Unauthorized();
             }
+            else return Unauthorized();
 
-            Ticket TicketData = new()
-            {
-                Name = req.Name,
-                Description = req.Description,
-                CreatedAt = DateTime.UtcNow,
-                ProjectId = req.ProjectId,
-                Type = req.Type,
-                Status = req.Status,
-                Priority = req.Priority,
-                AssigneeToId = req.AssigneeToId,
-                SubmitterId = req.SubmitterId,
-            };
-
-            var NewTicket = await _context.Tickets.AddAsync(TicketData);
-            _context.SaveChanges();
-            return Ok(NewTicket.Entity);
         }
 
         [HttpPut("Status/{id}"), Authorize(Roles = "Developer")]

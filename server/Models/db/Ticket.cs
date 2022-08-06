@@ -6,6 +6,7 @@ namespace server.Models.db
     public class Ticket
     {
 #pragma warning disable CS8618
+
         public int Id { get; set; } 
         public string Priority { get; set; } = Priorates.Medium; // Low, Medium, High
         public string Status { get; set; } = Statuses.New; // New, In Progress, Resolved, Closed

@@ -19,6 +19,10 @@ export class AuthService {
   public Login(data: ILoginFormData): Observable<any> {
     return this.http.post(this.Auth + "/" + "login", data);
   }
+
+  public GetUsers(): Observable<any> {
+    return this.http.get(this.Auth + "/" + "users");
+  }
 }
 
 

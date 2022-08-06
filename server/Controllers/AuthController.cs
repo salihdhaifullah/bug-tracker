@@ -118,5 +118,16 @@ namespace server.Controllers
                 throw err;
             }
         }
+        [HttpGet("users"), Authorize]
+        public IActionResult GetUsers()
+        {
+            var users = _context.Users.Select(user => new
+            {
+                user.Id,
+                user.FirstName,
+                user.LastName,
+            });
+            return Ok(users);
+        }
     }
 }

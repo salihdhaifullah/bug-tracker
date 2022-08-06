@@ -14,8 +14,8 @@
         internal static readonly string Medium = "Medium";
         internal static readonly string High = "High";
 
-    }
-    public class Statuses
+    } 
+    public class Statuses  
     {
         internal static readonly string New = "New";
         internal static readonly string InProgress = "In Progress";

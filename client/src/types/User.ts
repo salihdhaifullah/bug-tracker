@@ -16,3 +16,10 @@ export interface ILoginFormData {
     email: string
     password: string
 }
+
+
+export interface Users {
+    id: number;
+    lastName: string;
+    firstName: string;
+}

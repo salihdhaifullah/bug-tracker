@@ -1,1 +1,84 @@
-<p>new-ticket works!</p>
+<div class="contanier w-full h-full bg-gray-100">
+    <div class="flex justify-center h-full w-full items-center ">
+        <form (submit)="HandelSubmit($event)"
+            class="example-form justify-center flex flex-col rounded-md bg-white shadow-lg  py-10 px-20">
+            <div class="flex items-center justify-center w-full flex-col">
+                <mat-icon aria-hidden="false" fontIcon="create"
+                    class="w-auto h-auto text-3xl material-icons-outlined  flex text-[#0b4ea5]"></mat-icon>
+                <h2 class="text-2xl text-center text-[#0b4ea5]">
+                    Create New Ticket
+                </h2>
+            </div>
+
+
+
+            <div class="inline-flex">
+
+                <mat-form-field class="example-full-width mr-2" appearance="fill">
+                    <mat-label>Name</mat-label>
+                    <input type="text" matInput [formControl]="NameFormControl">
+                    <mat-error *ngIf="NameFormControl.hasError('minLength') && !NameFormControl.hasError('required')">
+                        Please enter at least 4 characters
+                    </mat-error>
+                    <mat-error *ngIf="NameFormControl.hasError('required')">
+                        Name is <strong>required</strong>
+                    </mat-error>
+                </mat-form-field>
+
+
+                <mat-form-field class="ml-2" appearance="fill">
+                    <mat-label>Assignee To</mat-label>
+                    <mat-select [formControl]="AssigneeToIdFormControl">
+                        <mat-option *ngFor="let user of UsersList" [value]="user.id">{{user.firstName + user.lastName}}
+                        </mat-option>
+                    </mat-select>
+                    <mat-error *ngIf="AssigneeToIdFormControl.hasError('required')">
+                        Assignee To Field is <strong>required</strong>
+                    </mat-error>
+                </mat-form-field>
+
+            </div>
+
+
+            <div class="inline-flex">
+
+                <mat-form-field class="mr-2" appearance="fill">
+                    <mat-label>Priority</mat-label>
+                    <mat-select [formControl]="PriorityFormControl">
+                        <mat-option *ngFor="let Priority of Priorates" [value]="Priority">{{Priority}}</mat-option>
+                    </mat-select>
+                    <mat-error *ngIf="PriorityFormControl.hasError('required')">
+                        Priority is <strong>required</strong>
+                    </mat-error>
+                </mat-form-field>
+
+                <mat-form-field class="ml-2" appearance="fill">
+                    <mat-label>Type</mat-label>
+                    <mat-select [formControl]="TypeFormControl">
+                        <mat-option *ngFor="let type of Types" [value]="type">{{type}}</mat-option>
+                    </mat-select>
+                    <mat-error *ngIf="TypeFormControl.hasError('required')">
+                        Type is <strong>required</strong>
+                    </mat-error>
+                </mat-form-field>
+
+            </div>
+
+            <mat-form-field appearance="fill">
+                <mat-label>Description</mat-label>
+                <textarea matInput cdkTextareaAutosize #autosize="cdkTextareaAutosize" cdkAutosizeMinRows="1"
+                    cdkAutosizeMaxRows="5" [formControl]="DescriptionFormControl"></textarea>
+                <mat-error
+                    *ngIf="DescriptionFormControl.hasError('minLength') && !DescriptionFormControl.hasError('required')">
+                    Please enter at least 16 characters
+                </mat-error>
+                <mat-error *ngIf="DescriptionFormControl.hasError('required')">
+                    Description is <strong>required</strong>
+                </mat-error>
+            </mat-form-field>
+
+
+            <button mat-raised-button class="mr-auto mt-4" color="primary">Submit</button>
+        </form>
+    </div>
+</div>
