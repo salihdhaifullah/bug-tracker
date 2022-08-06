@@ -9,6 +9,7 @@ export class ProjectComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
+    console.log("i am ass hole")
   }
 
 }
