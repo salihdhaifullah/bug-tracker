@@ -1,6 +1,7 @@
-import { User } from './../types/User';
-import { ITicket } from './../types/Tickets';
-import { IProject } from './../types/Projects';
+import { UsersRole } from 'src/types/Roles';
+import { User } from 'src/types/User';
+import { ITicket } from 'src/types/Tickets';
+import { IProject } from 'src/types/Projects';
 
 
 export interface IAppState {
@@ -10,4 +11,5 @@ export interface IAppState {
     tickets: ITicket[];
     user: User | null;
     message: string | null;
+    roles: UsersRole[];
 }

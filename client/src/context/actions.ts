@@ -1,3 +1,4 @@
+import { UsersRole } from 'src/types/Roles';
 import { createAction, props } from "@ngrx/store";
 import { ILoginFormData, ISinginFormData, User } from "src/types/User";
 import { ICreateProject, IProject } from "../types/Projects";
@@ -36,6 +37,13 @@ export const postSingIn = createAction("[SingIn] Post SingIn", props<{SingIn: IS
 export const postSingInSuccess = createAction("[SingIn] Post SingIn Success", props<{ user: User }>()); 
 
 export const postSingInFailure = createAction("[SingIn] Post SingIn Failure", props<{ error: string }>()); 
+
+
+export const getRoles = createAction("[Roles] Get Roles"); 
+
+export const getRolesSuccess = createAction("[Roles] Get Roles Success", props<{ roles: UsersRole[] }>()); 
+
+export const getRolesFailure = createAction("[Roles] Get Roles Failure", props<{ error: string }>()); 
 
 
 export const Logout = createAction("[Logout] Logout"); 

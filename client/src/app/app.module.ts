@@ -1,5 +1,5 @@
-import { projectsReducers, ticketsReducers, userReducers } from './../context/reducer';
-import { AuthService } from './../services/api.service';
+import { projectsReducers, ticketsReducers, userReducers, rolesReducers } from './../context/reducer';
+import { AuthService, RolesService } from 'src/services/api.service';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { NgModule, Component } from '@angular/core';
@@ -38,7 +38,7 @@ import {TicketsComponent} from './components/tickets/tickets.component';
 import { ProjectsComponent } from './components/projects/projects.component';
 
 import { EffectsModule, EffectsRootModule } from '@ngrx/effects';
-import { AuthEffects, ProjectsEffects, TicketsEffects } from 'src/context/effects';
+import { AuthEffects, ProjectsEffects, RolesEffects, TicketsEffects } from 'src/context/effects';
 import { ProjectsService, TicketsService } from 'src/services/api.service';
 import { BearerService } from 'src/services/bearer.service';
 import { AssigneUserComponent } from './components/assigne-user/assigne-user.component';
@@ -87,12 +87,13 @@ import { AssigneUserComponent } from './components/assigne-user/assigne-user.com
     StoreModule.forFeature('projects', projectsReducers),
     StoreModule.forFeature('tickets', ticketsReducers),
     StoreModule.forFeature('user', userReducers),
-    EffectsModule.forFeature([ProjectsEffects, TicketsEffects, AuthEffects]),
+    StoreModule.forFeature('roles', rolesReducers),
+    EffectsModule.forFeature([ProjectsEffects, TicketsEffects, AuthEffects, RolesEffects]),
     EffectsModule.forRoot([]),
     EffectsRootModule,
     StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: environment.production, autoPause: true }),
   ],
-  providers: [ProjectsService, TicketsService, AuthService, {provide: HTTP_INTERCEPTORS, useClass: BearerService, multi: true}],
+  providers: [ProjectsService, RolesService, TicketsService, AuthService, {provide: HTTP_INTERCEPTORS, useClass: BearerService, multi: true}],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

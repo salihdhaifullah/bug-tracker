@@ -1,3 +1,4 @@
+import { EmploysComponent } from './components/employs/employs.component';
 import { NewTicketComponent } from './components/new-ticket/new-ticket.component';
 import { NewProjectComponent } from './components/new-project/new-project.component';
 import { TicketComponent } from './components/ticket/ticket.component';
@@ -12,14 +13,17 @@ const routes: Routes = [
   { path: 'singin', component: SinginComponent },
   { path: 'login', component: LoginComponent },
   { path: 'dashboard', component: DashboardComponent },
-  { path: 'project', component: ProjectComponent},
-  { path: 'ticket', component: TicketComponent},
-  { path: 'new-project', component: NewProjectComponent},
-  { path: 'new-ticket', component: NewTicketComponent}
+  { path: 'project', component: ProjectComponent },
+  { path: 'ticket', component: TicketComponent },
+  { path: 'new-project', component: NewProjectComponent },
+  { path: 'new-ticket', component: NewTicketComponent },
+  // { path: '', redirectTo: 'login', pathMatch: 'full' },
+  { path: "roles", component: EmploysComponent }
+
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)], 
+  imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule]
 })
 

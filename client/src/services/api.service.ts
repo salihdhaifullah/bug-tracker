@@ -23,6 +23,8 @@ export class AuthService {
   public GetUsers(): Observable<any> {
     return this.http.get(this.Auth + "/" + "users");
   }
+
+
 }
 
 
@@ -60,4 +62,12 @@ export class ProjectsService {
 
 
 
-  
+@Injectable()
+export class RolesService {
+  constructor(private http: HttpClient) {}
+    private Role = environment.apiUrl + '/' + "Roles";
+
+    public GetUsersRoles(): Observable<any> {
+      return this.http.get(this.Role);
+    }
+}
