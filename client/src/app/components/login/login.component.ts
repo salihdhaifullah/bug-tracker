@@ -1,13 +1,13 @@
 import { isLoadingSelector, errorSelector, userSelector } from 'src/context/selectors';
 import { IAppState } from 'src/context/app.state';
 import { Store, select } from '@ngrx/store';
-import { User } from './../../types/User';
+import { User } from 'src/types/User';
 import { Observable } from 'rxjs';
 import { Component } from '@angular/core';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
 import { ILoginFormData} from 'src/model/FormData';
 import * as Actions from 'src/context/actions';
-import { MyErrorStateMatcher } from '../MyErrorStateMatcher';
+import { MyErrorStateMatcher } from '../../MyErrorStateMatcher';
 
 
 @Component({

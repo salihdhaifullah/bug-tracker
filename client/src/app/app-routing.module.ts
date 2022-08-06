@@ -1,12 +1,12 @@
-import { NewTicketComponent } from './new-ticket/new-ticket.component';
-import { NewProjectComponent } from './new-project/new-project.component';
-import { TicketComponent } from './ticket/ticket.component';
-import { ProjectComponent } from './project/project.component';
-import { DashboardComponent } from './dashboard/dashboard.component';
+import { NewTicketComponent } from './components/new-ticket/new-ticket.component';
+import { NewProjectComponent } from './components/new-project/new-project.component';
+import { TicketComponent } from './components/ticket/ticket.component';
+import { ProjectComponent } from './components/project/project.component';
+import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { SinginComponent } from './singin/singin.component';
-import { LoginComponent } from './login/login.component';
+import { SinginComponent } from './components/singin/singin.component';
+import { LoginComponent } from './components/login/login.component';
 
 const routes: Routes = [
   { path: 'singin', component: SinginComponent },
@@ -22,4 +22,5 @@ const routes: Routes = [
   imports: [RouterModule.forRoot(routes)], 
   exports: [RouterModule]
 })
+
 export class AppRoutingModule { }

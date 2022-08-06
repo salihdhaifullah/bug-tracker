@@ -2,7 +2,7 @@ import { projectsReducers, ticketsReducers, userReducers } from './../context/re
 import { AuthService } from './../services/api.service';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { NgModule } from '@angular/core';
+import { NgModule, Component } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
@@ -22,26 +22,26 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { StoreModule } from '@ngrx/store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 
-import { LoginComponent } from './login/login.component';
-import { SinginComponent } from './singin/singin.component';
-import { NavbarComponent } from './navbar/navbar.component';
-import { DefaultComponent } from './default/default.component';
-import { DashboardComponent } from './dashboard/dashboard.component';
-import { EmploysComponent } from './employs/employs.component';
-import { ProjectComponent } from './project/project.component';
-import { TicketComponent } from './ticket/ticket.component';
-import { NewProjectComponent } from './new-project/new-project.component';
-import { NewTicketComponent } from './new-ticket/new-ticket.component';
-import { BarChartComponent } from './bar-chart/bar-chart.component';
-import { LineChartComponent } from './line-chart/line-chart.component';
-import {TicketsComponent} from './tickets/tickets.component';
-import { ProjectsComponent } from './projects/projects.component';
+import { LoginComponent } from './components/login/login.component';
+import { SinginComponent } from './components/singin/singin.component';
+import { NavbarComponent } from './components/navbar/navbar.component';
+import { DefaultComponent } from './components/default/default.component';
+import { DashboardComponent } from './components/dashboard/dashboard.component';
+import { EmploysComponent } from './components/employs/employs.component';
+import { ProjectComponent } from './components/project/project.component';
+import { TicketComponent } from './components/ticket/ticket.component';
+import { NewProjectComponent } from './components/new-project/new-project.component';
+import { NewTicketComponent } from './components/new-ticket/new-ticket.component';
+import { BarChartComponent } from './components/bar-chart/bar-chart.component';
+import { LineChartComponent } from './components/line-chart/line-chart.component';
+import {TicketsComponent} from './components/tickets/tickets.component';
+import { ProjectsComponent } from './components/projects/projects.component';
 
 import { EffectsModule, EffectsRootModule } from '@ngrx/effects';
 import { AuthEffects, ProjectsEffects, TicketsEffects } from 'src/context/effects';
 import { ProjectsService, TicketsService } from 'src/services/api.service';
 import { BearerService } from 'src/services/bearer.service';
-import { AssigneUserComponent } from './assigne-user/assigne-user.component';
+import { AssigneUserComponent } from './components/assigne-user/assigne-user.component';
 
 
 

@@ -3,6 +3,8 @@ import { createReducer, on } from '@ngrx/store';
 import * as Actions from './actions';
 
 const isFound = sessionStorage.getItem('user');
+
+
 export const initialState: IAppState = {
     isLoading: false,
     error: null,
@@ -40,10 +42,7 @@ export const userReducers = createReducer(userInitialState,
     on(Actions.postSingInSuccess, (state, action) => ({ ...state, isLoading: false, user: action.user })),
     on(Actions.postSingInFailure, (state, action) => ({ ...state, isLoading: false, error: action.error })),
 
-    on(Actions.Logout, state => {
-        sessionStorage.removeItem('user'),
-        ({ ...state, user: null })
-    }),
+    on(Actions.Logout, state => { sessionStorage.removeItem('user'), ({ ...state, user: null }) }),
 );
 
 
@@ -54,7 +53,7 @@ export const projectsReducers = createReducer(projectsInitialState,
     on(Actions.getProjectsFailure, (state, action) => ({ ...state, isLoading: false, error: action.error })),
 
     on(Actions.postProject, state => ({ ...state, isLoading: true })),
-    on(Actions.postProjectSuccess, (state, action) => ({ ...state, isLoading: false, projects: action.massage })),
+    on(Actions.postProjectSuccess, (state, action) => ({ ...state, isLoading: false, massage: action.massage })),
     on(Actions.postProjectFailure, (state, action) => ({ ...state, isLoading: false, error: action.error })),
 )
 

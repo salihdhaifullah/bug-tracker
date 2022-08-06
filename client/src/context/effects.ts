@@ -31,7 +31,7 @@ export class ProjectsEffects {
                 ofType(postProject),
                 mergeMap((actions) => {
                     return this.projectsService.CreateProject(actions.project).pipe(
-                        map(() => postProjectSuccess({ massage: "Project created" })),
+                        map(() => postProjectSuccess({ massage: "Project created" })  ),
                         catchError(error => of(postProjectFailure({ error })))
                     )
                 }
