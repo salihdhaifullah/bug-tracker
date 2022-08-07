@@ -24,7 +24,7 @@ export class NewProjectComponent  {
   error$: Observable<string | null>; 
   message$: Observable<string | null>;
 
-  constructor(private Http: HttpClient,private store: Store<IAppState>, private projectService: ProjectsService) {
+  constructor(private store: Store<IAppState>, private projectService: ProjectsService) {
     this.isLoading$ = this.store.pipe(select(isLoadingSelector));
     this.error$ = this.store.pipe(select(errorSelector))
     this.message$ = this.store.pipe(select(messageSelector));

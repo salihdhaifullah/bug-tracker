@@ -121,11 +121,12 @@ namespace server.Controllers
         [HttpGet("users"), Authorize]
         public IActionResult GetUsers()
         {
-            var users = _context.Users.Select(user => new
+            var users = _context.Users.Where(user => user.Role != Roles.Admin).Select(user => new
             {
                 user.Id,
                 user.FirstName,
                 user.LastName,
+                user.Role
             });
             return Ok(users);
         }

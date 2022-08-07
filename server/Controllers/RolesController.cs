@@ -53,11 +53,12 @@ namespace server.Controllers
             
             for (int i = 0; i < value.UsersId.Count; i++)
             {
+                if (value.Role == "Admin") return BadRequest("can not change Admin Role");
+                if (value.Role != Roles.Developer && value.Role != Roles.Submitter && value.Role != Roles.ProjectManger) return BadRequest("Role not found");
                 var user = await _context.Users.FindAsync(value.UsersId[i]);
                 if (user == null) return BadRequest();
                 if (user.Role == Roles.Admin) return BadRequest("can not change Admin Role");
                 user.Role = value.Role;
-
             }
 
             await _context.SaveChangesAsync();
@@ -65,17 +66,5 @@ namespace server.Controllers
             return Ok();
 
         }
-
-        //[HttpPut("{id}")]
-        //public async Task<IActionResult> UpdateUserRole([FromBody] RoleReq value, [FromRoute] int id)
-        //{
-        //    var userRole = await _context.UserRoles.FindAsync(id);
-        //    if (userRole == null) return NotFound();
-        //    userRole.UserId = value.UsersId;
-        //    userRole.Role = value.Role;
-        //    userRole.ProjectId = value.ProjectId;
-        //    await _context.SaveChangesAsync();
-        //    return Ok(userRole);
-        //}
     }
 }

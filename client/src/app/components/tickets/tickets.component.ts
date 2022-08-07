@@ -1,3 +1,4 @@
+import Swal from 'sweetalert2';
 import { MatSort } from '@angular/material/sort';
 import * as Actions from 'src/context/actions';
 import { isLoadingSelector, errorSelector, ticketsSelector } from 'src/context/selectors';
@@ -8,6 +9,7 @@ import { ITicket } from 'src/types/Tickets';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { Component, ViewChild, AfterViewInit } from '@angular/core';
+import { Static } from 'src/Static';
 
 @Component({
   selector: 'app-tickets',
@@ -32,35 +34,27 @@ export class TicketsComponent implements AfterViewInit {
 
   @ViewChild(MatPaginator, { static: true }) paginator!: MatPaginator;
 
+  projectId = Static.getIdParams(document.location.href)
+
   ngOnInit() {
 
-    const getIdParams = (url: string): number => {
 
-      // split ashe char in the url   
-      let array = url.split("");
-      // this is array of the results
-      let params: string[] = [];
-      // inverse for loop  in this case gonna be away more faster
-      for (let i = array.length - 1; i >= 0; i--) {
-        // if the char is a slash that mean the end of params
-        if (array[i] === "/") break;
-        // i make sher if the are any query in url if there are i empty the array
-        if (array[i] === "=") params = [];
-        // if the char is a number gonna be in params array
-        !isNaN(Number(array[i])) && params.push(array[i])
-      }
-      // return the id in the params url 
-      // i used reverse function cuz its inverse for loop
-      return Number(params.reverse().join(""))
-    }
 
-    console.log(getIdParams(document.location.href))
 
-    this.store.dispatch(Actions.getTickets({ ProjectId: 1 }));
+
+    this.store.dispatch(Actions.getTickets({ ProjectId: this.projectId }));
   }
 
   ngAfterViewInit() {
     this.tickets$.subscribe((data: any) => {
+      if (data.tickets.length === 0 && data.isLoading === false) {
+        Swal.fire(
+          'No Tickets Found',
+          '',
+          'error'
+        )
+        // document.location.href = `${document.location.origin}/projects` /// need work
+      }
       this.dataSource.data = data.tickets,
         this.dataSource.paginator = this.paginator,
         this.dataSource.sort = this.sort,

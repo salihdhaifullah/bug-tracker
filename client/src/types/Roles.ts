@@ -6,3 +6,9 @@ export interface UsersRole {
     role: string;
     createAt: string;
 }
+
+
+export interface IChangeRole {
+    usersId: number[];
+    role: string;
+}

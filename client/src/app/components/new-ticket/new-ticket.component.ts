@@ -1,9 +1,12 @@
+import { ICreateProject } from './../../../types/Projects';
+import Swal from 'sweetalert2';
 import { FormControl, Validators, FormGroup } from '@angular/forms';
-import { AuthService } from 'src/services/api.service';
+import { AuthService, TicketsService } from 'src/services/api.service';
 import { Component, OnInit } from '@angular/core';
 import { MyErrorStateMatcher } from 'src/app/MyErrorStateMatcher';
 import { Users } from 'src/types/User';
 import { Static } from 'src/Static';
+import { ICreateTicket } from 'src/types/Tickets';
 
 @Component({
   selector: 'app-new-ticket',
@@ -11,20 +14,20 @@ import { Static } from 'src/Static';
 })
 export class NewTicketComponent implements OnInit {
 
-  constructor(private authService: AuthService) { }
+  constructor(private authService: AuthService, private ticketsService: TicketsService) { }
   matcher = new MyErrorStateMatcher();
 
-  DescriptionFormControl = new FormControl('', [Validators.required, Validators.minLength(16)]);
+  DescriptionFormControl = new FormControl<string>('', [Validators.required, Validators.minLength(16)]);
   
-  NameFormControl = new FormControl('', [Validators.required, Validators.minLength(4)]);
+  NameFormControl = new FormControl<string>('', [Validators.required, Validators.minLength(4)]);
   
-  AssigneeToIdFormControl = new FormControl('', [Validators.required]);
+  AssigneeToIdFormControl = new FormControl<number>(0, [Validators.required]);
   
-  PriorityFormControl = new FormControl(Static.Priorates.Array[0], [Validators.required]);
+  PriorityFormControl = new FormControl<string>(Static.Priorates.Array[0], [Validators.required]);
 
-  TypeFormControl = new FormControl(Static.Types.Array[0], [Validators.required]); 
+  TypeFormControl = new FormControl<string>(Static.Types.Array[0], [Validators.required]); 
 
-  ProjectId = 1; // Test
+  ProjectId = Static.getIdParams(document.location.href); // production
 
   // Priority 
   Priorates = Static.Priorates.Array;
@@ -35,11 +38,11 @@ export class NewTicketComponent implements OnInit {
     // Priority Status Type Name Description AssigneeToId SubmitterId 
 
   TicketForm = new FormGroup({
-    Description: this.DescriptionFormControl,
-    Name: this.NameFormControl,
-    AssigneeToId: this.AssigneeToIdFormControl,
-    Priority: this.PriorityFormControl,
-    Type: this.TypeFormControl,
+    description: this.DescriptionFormControl,
+    name: this.NameFormControl,
+    assigneeToId: this.AssigneeToIdFormControl,
+    priority: this.PriorityFormControl,
+    type: this.TypeFormControl,
   });
 
 
@@ -52,7 +55,30 @@ export class NewTicketComponent implements OnInit {
 
   HandelSubmit = (event: Event) => {
     event.preventDefault();
+    if (this.TicketForm.valid) {
+      const form = { ...this.TicketForm.value, projectId: this.ProjectId };
+      this.ticketsService.CreateTicket(form as ICreateTicket).subscribe(m => {
+        console.log(m);
+      }
+        , err => {
+          Swal.fire({
+            title: 'Error',
+            text: err.error.message,
+            icon: 'error',
+            confirmButtonText: 'Ok'
+          })
+        }
+        , () => {
+          Swal.fire({
+            title: 'Success',
+            text: 'Ticket created',
+
+            icon: 'success',
+            confirmButtonText: 'Cool'
+          })
+        });
     console.log({ ...this.TicketForm.value, ProjectId: this.ProjectId});
   }
 
+}
 }

@@ -4,6 +4,5 @@
     {
         public string Role { get; set; } = Roles.Developer;
         public List<int> UsersId { get; set; }
-        public int ProjectId { get; set; }
     }
 }
