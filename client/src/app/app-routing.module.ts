@@ -1,3 +1,4 @@
+import { ProjectsComponent } from './components/projects/projects.component';
 import { EmploysComponent } from './components/employs/employs.component';
 import { NewTicketComponent } from './components/new-ticket/new-ticket.component';
 import { NewProjectComponent } from './components/new-project/new-project.component';
@@ -23,10 +24,10 @@ const routes: Routes = [
   //              ||
                 //  \\
   { path: 'ticket/:id', component: TicketComponent },
-  { path: 'new-project', component: NewProjectComponent },
+  { path: 'projects', component: ProjectsComponent },
   // { path: 'new-ticket', component: NewTicketComponent },
   // { path: '', redirectTo: 'login', pathMatch: 'full' },
-  { path: "roles", component: EmploysComponent }
+  { path: "manage-users", component: EmploysComponent }
 
 ];
 

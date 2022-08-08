@@ -46,7 +46,6 @@ export class ProjectComponent implements OnInit {
           '',
           'error'
         )
-        // document.location.href = `${document.location.origin}/projects` ///\\\ {{ need work }} ///\\\
       }
       this.count = data.tickets.length;
       this.Bugs = data.tickets.filter((t: ITicket) => t.type === "Bug").length;
@@ -62,9 +61,8 @@ export class ProjectComponent implements OnInit {
           '',
           'error'
         )
-        // document.location.href = `${document.location.origin}/projects` ///\\\ {{ need work }} ///\\\
       }
-      this.projectData = data.project[0]
+      this.projectData = data.project
       console.log(this.projectData)
     }
     );

@@ -22,7 +22,7 @@ import * as Actions from "src/context/actions"
   templateUrl: './employs.component.html'
 })
 export class EmploysComponent implements OnInit {
-  displayedColumns: string[] = ["id", 'email', 'name', 'role', 'createdAt'];
+  displayedColumns: string[] = ['email', 'name', 'role', 'createdAt'];
   dataSource = new MatTableDataSource<UsersRole>();
 
   isLoading$: Observable<Boolean>;

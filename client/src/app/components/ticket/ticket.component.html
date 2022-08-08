@@ -1,1 +1,42 @@
-<p>ticket works!</p>
+<div *ngIf="data" class="min-w-full h-auto min-h-[100vh]">
+    <div  class="w-full grid mt-10 gap-5 justify-evenly grid-cols-3 h-20 md:h-30 lg:h-40  items-center">
+
+        <div
+            class="flex w-full text-white font-semibold flex-col hover-animation-card bg-blue-400 items-center justify-center rounded-md shadow-md h-full text-center">
+            <h2>Type</h2>
+            <span class="text-lg">{{data.type}}</span>
+        </div>
+    
+        <div
+            class="flex w-full text-white font-semibold flex-col hover-animation-card bg-blue-400 items-center justify-center rounded-md shadow-md h-full text-center">
+            <h2>Priority</h2>
+            <span  class="text-lg">{{data.priority}}</span>
+        </div>
+    
+        <div
+            class="flex w-full text-white font-semibold flex-col hover-animation-card bg-blue-400 items-center justify-center rounded-md shadow-md h-full text-center">
+            <h2>Status</h2>
+            <span class="text-lg">{{data.status}}</span>
+        </div>
+    
+    
+    
+    
+    
+    </div>
+    
+    
+    <div class="my-16 min-w-full p-6 bg-white rounded-md shadow-md ">
+        <h1 class="mb-8 flex justify-between items-center w-full">
+            <span class="mr-10 underline-line text-2xl">{{data.name}}</span>
+            <span class="text-sm text-gray-700">Create At: {{_moment(data.createdAt).fromNow()}}</span>
+        </h1>
+
+        <div class="flex justify-evenly mb-8 items-center w-full">
+            <span class="text-base text-gray-700">Created By:  <span class="ml-1">{{data.submitter}}</span></span>
+            <span class="text-base text-gray-700">Assignee To: <span class="ml-1">{{data.devoloper}}</span></span>
+        </div>
+        <p class="text-md text-gray-500">{{data.description}} Lorem ipsum dolor sit amet consectetur adipisicing elit. Natus, quaerat?</p>
+    </div>
+</div>
+

@@ -13,7 +13,8 @@ export const initialState: IAppState = {
     user: isFound !== null ? JSON.parse(isFound) : null,
     message: null,
     roles: [],
-    project: null
+    project: null,
+    ticket: null
 }
 
 const userInitialState: any = {
@@ -45,6 +46,12 @@ const projectInitialState: any = {
     isLoading: false,
     error: null,
     project: null,
+}
+
+const ticketInitialState: any = {
+    isLoading: false,
+    error: null,
+    ticket: null,
 }
 
 export const userReducers = createReducer(userInitialState, 
@@ -88,4 +95,10 @@ export const projectReducers = createReducer(projectInitialState,
     on(Actions.getProjectById, state => ({ ...state, isLoading: true })),
     on(Actions.getProjectByIdSuccess, (state, action) => ({ ...state, isLoading: false, project: action.project })),
     on(Actions.getProjectByIdFailure, (state, action) => ({ ...state, isLoading: false, error: action.error })),
+)
+
+export const ticketReducers = createReducer(ticketInitialState,
+    on(Actions.getTicketById, state => ({ ...state, isLoading: true })),
+    on(Actions.getTicketByIdSuccess, (state, action) => ({ ...state, isLoading: false, ticket: action.ticket })),
+    on(Actions.getTicketByIdFailure, (state, action) => ({ ...state, isLoading: false, error: action.error })),
 )

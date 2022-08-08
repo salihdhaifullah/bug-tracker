@@ -33,6 +33,13 @@ export const getTicketsSuccess = createAction("[Tickets] Get Tickets Success", p
 
 export const getTicketsFailure = createAction("[Tickets] Get Tickets Failure", props<{ error: string }>()); 
 
+
+export const getTicketById = createAction("[Ticket] Get Ticket By Id", props<{id: number}>()); 
+
+export const getTicketByIdSuccess = createAction("[Ticket] Get Ticket By Id Success", props<{ ticket: ITicket }>()); 
+
+export const getTicketByIdFailure = createAction("[Ticket] Get Ticket By Id Failure", props<{ error: string }>()); 
+
 export const postLogin = createAction("[Login] Post Login", props<{Login: ILoginFormData}>()); 
 
 export const postLoginSuccess = createAction("[Login] Post Login Success", props<{ user: User }>()); 

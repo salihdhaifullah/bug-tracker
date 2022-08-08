@@ -1,8 +1,6 @@
-import { projectsReducers, ticketsReducers, userReducers, rolesReducers, projectReducers } from './../context/reducer';
-import { AuthService, RolesService } from 'src/services/api.service';
 import { AppRoutingModule } from './app-routing.module';
-import { AppComponent } from './app.component';
-import { NgModule, Component } from '@angular/core';
+
+import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
@@ -21,6 +19,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { StoreModule } from '@ngrx/store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+import { EffectsModule, EffectsRootModule } from '@ngrx/effects';
 
 import { LoginComponent } from './components/login/login.component';
 import { SinginComponent } from './components/singin/singin.component';
@@ -36,12 +35,14 @@ import { BarChartComponent } from './components/bar-chart/bar-chart.component';
 import { LineChartComponent } from './components/line-chart/line-chart.component';
 import {TicketsComponent} from './components/tickets/tickets.component';
 import { ProjectsComponent } from './components/projects/projects.component';
+import { AppComponent } from './app.component';
 
-import { EffectsModule, EffectsRootModule } from '@ngrx/effects';
+
 import { AuthEffects, ProjectsEffects, RolesEffects, TicketsEffects } from 'src/context/effects';
-import { ProjectsService, TicketsService } from 'src/services/api.service';
+import { projectsReducers, ticketsReducers, userReducers, rolesReducers, projectReducers, ticketReducers } from 'src/context/reducer';
+
+import { ProjectsService, TicketsService, AuthService, RolesService  } from 'src/services/api.service';
 import { BearerService } from 'src/services/bearer.service';
-import { AssigneUserComponent } from './components/assigne-user/assigne-user.component';
 
 
 
@@ -64,7 +65,6 @@ import { AssigneUserComponent } from './components/assigne-user/assigne-user.com
     LineChartComponent,
     TicketsComponent,
     ProjectsComponent,
-    AssigneUserComponent,
   ],
   imports: [ 
     BrowserModule,
@@ -88,7 +88,8 @@ import { AssigneUserComponent } from './components/assigne-user/assigne-user.com
     StoreModule.forFeature('tickets', ticketsReducers),
     StoreModule.forFeature('user', userReducers),
     StoreModule.forFeature('roles', rolesReducers), 
-    StoreModule.forFeature('project', projectReducers),  
+    StoreModule.forFeature('project', projectReducers),
+    StoreModule.forFeature('ticket', ticketReducers),
     EffectsModule.forFeature([ProjectsEffects, TicketsEffects, AuthEffects, RolesEffects]),
     EffectsModule.forRoot([]),
     EffectsRootModule,

@@ -1,4 +1,36 @@
-<div class="mat-elevation-z8">
+<div class="w-full grid mt-10 gap-5 justify-evenly grid-cols-3 h-20 md:h-30 lg:h-40  items-center">
+
+  <div
+      class="flex w-full text-white font-semibold flex-col hover-animation-card bg-blue-400 items-center justify-center rounded-md shadow-md h-full text-center">
+      <h2 *ngIf="Count">{{Count > 1 ? "Projects" : "Project"}}</h2>
+      <span *ngIf="Count" class="text-lg">{{Count}}</span>
+      <h3 *ngIf="!Count">Projects</h3>
+      <h3 *ngIf="!Count">None</h3>
+  </div>
+
+  <div
+      class="flex w-full text-white font-semibold flex-col hover-animation-card bg-blue-400 items-center justify-center rounded-md shadow-md h-full text-center">
+      <h2 *ngIf="Closed">{{Closed > 1 ? "Closed projects" : "Closed project"}}</h2>
+      <span *ngIf="Closed" class="text-lg">{{Closed}}</span>
+      <h3 *ngIf="!Closed">Closed projects</h3>
+      <h3 *ngIf="!Closed">None</h3>
+  </div>
+
+  <div
+      class="flex w-full text-white font-semibold flex-col hover-animation-card bg-blue-400 items-center justify-center rounded-md shadow-md h-full text-center">
+      <h2 *ngIf="Open">{{Open > 1 ? "Open Projects" : "open project"}}</h2>
+      <span *ngIf="Open" class="text-lg">{{Open}}</span>
+      <h2 *ngIf="!Open">Open projects</h2>
+      <h3 *ngIf="!Open">None</h3>
+  </div>
+
+</div>
+
+<div class="mt-20 mb-10 w-full flex items-center justify-center">
+  <h1 class="text-gray-800 text-3xl"><span class="underline-line">Projects</span></h1>
+</div>
+
+<div class="mat-elevation-z8 mb-20 mt-10">
     <table mat-table class="min-w-full" [dataSource]="dataSource">
   
       <!-- Position Column -->
@@ -31,13 +63,18 @@
       </ng-container>
 
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      <tr mat-row class="hover:bg-gray-200 transition-all ease-in-out duration-150" *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>
-
-    <h1 *ngIf="isLoading$ | async">loading........</h1>
   
     <mat-paginator [pageSizeOptions]="[5, 10, 20]"
                    showFirstLastButtons 
                    aria-label="Select page of periodic elements">
     </mat-paginator>
   </div>
+
+
+
+<div class="flex justify-evenly mb-20 flex-row items-center">
+    <h1> Create New Project ? </h1>
+    <app-new-project></app-new-project>
+</div>

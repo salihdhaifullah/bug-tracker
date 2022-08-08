@@ -46,6 +46,10 @@ export class TicketsService {
   public CreateTicket(ticket: ICreateTicket) : Observable<any> {
   return  this.http.post(this.Ticket + "/" + "Create", ticket);
   }
+
+  public GetTicketById(id: Number): Observable<ITicket>{
+    return this.http.get<ITicket>(this.Ticket + "/" + "ticket" + "/" + id)
+  }
 }
 
 

@@ -1,4 +1,4 @@
-<div class="contanier w-full h-full bg-gray-100">
+<div class="contanier w-full h-full  bg-gray-100">
     <div class="flex justify-center h-full w-full items-center ">
         <form (submit)="HandelSubmit($event)"
             class="example-form justify-center flex flex-col rounded-md bg-white shadow-lg  py-10 px-20">
@@ -10,45 +10,29 @@
                 </h2>
             </div>
 
+            <div class="inline-flex">
+                <mat-form-field class="example-full-width mr-2" appearance="fill">
+                    <mat-label>Title</mat-label>
+                    <input type="text" matInput [formControl]="TitleFormControl">
+                    <mat-error *ngIf="TitleFormControl.hasError('minLength') && !TitleFormControl.hasError('required')">
+                        Please enter at least 8 characters
+                    </mat-error>
+                    <mat-error *ngIf="TitleFormControl.hasError('required')">
+                        Title is <strong>required</strong>
+                    </mat-error>
+                </mat-form-field>
 
-
-
-<div class="inline-flex">
-    <mat-form-field class="example-full-width mr-2" appearance="fill">
-        <mat-label>Title</mat-label>
-        <input type="text" matInput [formControl]="TitleFormControl">
-        <mat-error *ngIf="TitleFormControl.hasError('minLength') && !TitleFormControl.hasError('required')">
-            Please enter at least 8 characters
-        </mat-error>
-        <mat-error *ngIf="TitleFormControl.hasError('required')">
-            Title is <strong>required</strong>
-        </mat-error>
-    </mat-form-field>
-
-    <mat-form-field class="example-full-width ml-2" appearance="fill">
-        <mat-label>Name</mat-label>
-        <input type="text" matInput [formControl]="NameFormControl">
-        <mat-error *ngIf="NameFormControl.hasError('minLength') && !NameFormControl.hasError('required')">
-            Please enter at least 4 characters
-        </mat-error>
-        <mat-error *ngIf="NameFormControl.hasError('required')">
-            Name is <strong>required</strong>
-        </mat-error>
-    </mat-form-field>
-</div>
-
-
-            <!-- <mat-form-field class="example-full-width" appearance="fill">
-                <mat-label>Description</mat-label>
-                <input type="text" matInput [formControl]="DescriptionFormControl">
-                <mat-error
-                    *ngIf="DescriptionFormControl.hasError('minLength') && !DescriptionFormControl.hasError('required')">
-                    Please enter at least 16 characters
-                </mat-error>
-                <mat-error *ngIf="DescriptionFormControl.hasError('required')">
-                    Description is <strong>required</strong>
-                </mat-error>
-            </mat-form-field> -->
+                <mat-form-field class="example-full-width ml-2" appearance="fill">
+                    <mat-label>Name</mat-label>
+                    <input type="text" matInput [formControl]="NameFormControl">
+                    <mat-error *ngIf="NameFormControl.hasError('minLength') && !NameFormControl.hasError('required')">
+                        Please enter at least 4 characters
+                    </mat-error>
+                    <mat-error *ngIf="NameFormControl.hasError('required')">
+                        Name is <strong>required</strong>
+                    </mat-error>
+                </mat-form-field>
+            </div>
 
             <mat-form-field appearance="fill">
                 <mat-label>Description</mat-label>
@@ -62,13 +46,6 @@
                     Description is <strong>required</strong>
                 </mat-error>
             </mat-form-field>
-
-            <!-- <mat-form-field appearance="fill">
-                <mat-label>Toppings</mat-label>
-                <mat-select [formControl]="toppingsFormControl" multiple>
-                  <mat-option *ngFor="let topping of toppingList" [value]="topping">{{topping}}</mat-option>
-                </mat-select>
-            </mat-form-field> -->
 
             <button mat-raised-button class="mr-auto mt-4" color="primary">Submit</button>
         </form>

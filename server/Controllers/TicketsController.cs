@@ -44,6 +44,30 @@ namespace server.Controllers
             return Ok(Tickets);
         }
 
+        [HttpGet("ticket/{id}"), Authorize]
+        public async Task<IActionResult> GetTicketById([FromRoute] int id)
+        {
+            var ticket = await  _context.Tickets.Where(t => t.Id == id).Select(p => new
+            {
+                devoloper = p.AssigneeTo.FirstName + " " + p.AssigneeTo.LastName,
+                Submitter = p.Submitter.FirstName + " " + p.Submitter.LastName,
+                p.Name,
+                p.Priority,
+                p.Status,
+                p.CreatedAt,
+                p.Type,
+                p.UpdatedAt,
+                p.IsCompleted,
+                p.Description,
+                
+            }).FirstOrDefaultAsync();
+
+
+            
+            return Ok(ticket);
+        }
+
+
         [HttpPost("Create"), Authorize(Roles = "Admin, Submitter, ProjectManger")]
         public async Task<IActionResult> CreateTicket(TicketReq req)
         {

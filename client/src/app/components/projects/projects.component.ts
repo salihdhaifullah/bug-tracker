@@ -29,6 +29,9 @@ export class ProjectsComponent implements OnInit {
     this._moment = moment;
   }
 
+  Closed: number | null = null; 
+  Open: number | null = null; 
+  Count: number | null = null; 
   
 
   @ViewChild(MatSort, { static: true }) sort!: MatSort;
@@ -43,6 +46,9 @@ export class ProjectsComponent implements OnInit {
   ngAfterViewInit() {
     this.projects$.subscribe((p: any) => { 
       this.dataSource.data = p.projects,
+      this.Closed = p.projects.filter((x: IProject) => x.isClosed === true).length,
+      this.Open = p.projects.filter((x: IProject) => x.isClosed === false).length,
+      this.Count = p.projects.length;
       this.dataSource.paginator = this.paginator,
       this.dataSource.sort = this.sort,
       console.log(p);

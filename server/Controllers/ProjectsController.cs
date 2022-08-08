@@ -48,9 +48,9 @@ namespace server.Controllers
 
 
     [HttpGet("{id}"), Authorize]
-    public IActionResult GetProject([FromRoute] int id)
+    public async Task<IActionResult> GetProject([FromRoute] int id)
     {
-        var Projects = _context.Projects.Where(p => p.Id == id)
+        var Projects = await  _context.Projects.Where(p => p.Id == id)
             .Select(p => new
             {
                 p.Description,
@@ -60,7 +60,7 @@ namespace server.Controllers
                 p.IsClosed,
                 p.Name,
                 p.Title
-            });
+            }).FirstOrDefaultAsync();
 
         return Ok(Projects);
     }

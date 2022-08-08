@@ -8,6 +8,7 @@ export interface ITicket {
     type: String
     updatedAt: String | null
     isCompleted: Boolean
+    description: String
 }
 
 
