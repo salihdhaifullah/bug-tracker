@@ -1,3 +1,51 @@
-<app-tickets></app-tickets>
-<app-new-ticket></app-new-ticket>
-<app-assigne-user></app-assigne-user>
+<div class="w-full flex flex-col min-h-[100vh]">
+    <div class="w-full grid mt-10 gap-5 justify-evenly grid-cols-3 h-20 md:h-30 lg:h-40  items-center">
+
+        <div
+            class="flex w-full text-white font-semibold flex-col hover-animation-card bg-blue-400 items-center justify-center rounded-md shadow-md h-full text-center">
+            <h2 *ngIf="count">{{count > 1 ? "Tickets" : "Ticket"}}</h2>
+            <span *ngIf="count" class="text-lg">{{count}}</span>
+            <h3 *ngIf="!count">None</h3>
+        </div>
+
+        <div
+            class="flex w-full text-white font-semibold flex-col hover-animation-card bg-blue-400 items-center justify-center rounded-md shadow-md h-full text-center">
+            <h2 *ngIf="Bugs">{{Bugs > 1 ? "Bugs" : "Bug"}}</h2>
+            <span *ngIf="Bugs" class="text-lg">{{Bugs}}</span>
+            <h3 *ngIf="!Bugs">None</h3>
+        </div>
+
+        <div
+            class="flex w-full text-white font-semibold flex-col hover-animation-card bg-blue-400 items-center justify-center rounded-md shadow-md h-full text-center">
+            <h2 *ngIf="Features">{{Features > 1 ? "Features" : "Feature"}}</h2>
+            <span *ngIf="Features" class="text-lg">{{Features}}</span>
+            <h3 *ngIf="!Features">None</h3>
+        </div>
+
+    </div>
+
+    <div *ngIf="projectData"
+        class="w-full flex bg-white shadow-md rounded-md px-10 py-8 flex-col mt-10 justify-center items-center">
+        <h1 class="underline-line mb-8 lg:mb-10">{{projectData.title}} gwguwiigg hello mom Love you</h1>
+
+<div class="flex flex-row min-w-full mb-8 lg:mb-10 justify-evenly items-center">
+    <h3 class="text-gray-700"><strong>Name:</strong> {{projectData.name}}</h3>
+    <h3 class="text-gray-700"><strong>State:</strong> {{projectData.isClosed ? "Closed" : "Open"}}</h3>
+
+    <span *ngIf="projectData.isClosed">Closed At: {{_moment(projectData.closedAt).fromNow()}}</span>
+    <span>Created At: {{_moment(projectData.createdAt).fromNow()}}</span>
+</div>
+
+
+        <p class="text-md text-gray-500">Lorem ipsum, dolor sit amet consectetur adipisicing elit. Hic,
+            {{projectData.description}}exercitationem mollitia itaque deleniti ea ut nostrum dolorum dolorem officia
+            ipsam!</p>
+    </div>
+    <div class="grid grid-rows-2 mt-10">
+        <app-tickets *ngIf="count" [tickets]="tickets"></app-tickets>
+        <div class="flex justify-evenly flex-row items-center">
+            <h1> Create New Ticket ? </h1>
+            <app-new-ticket></app-new-ticket>
+        </div>
+    </div>
+</div>

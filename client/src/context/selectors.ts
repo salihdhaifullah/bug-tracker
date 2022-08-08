@@ -11,3 +11,4 @@ export const ticketsSelector = createSelector(selectFeature, state => state.tick
 export const userSelector = createSelector(selectFeature, state => state.user);
 export const messageSelector = createSelector(selectFeature, state => state.message);
 export const rolesSelector = createSelector(selectFeature, state => state.roles);
+export const projectSelector = createSelector(selectFeature, state => state.project);

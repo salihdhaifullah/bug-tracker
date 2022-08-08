@@ -12,6 +12,14 @@ export const getProjectsSuccess = createAction("[Projects] Get Projects Success"
 
 export const getProjectsFailure = createAction("[Projects] Get Projects Failure", props<{ error: string }>()); 
 
+
+export const getProjectById = createAction("[Project] Get Project By Id", props<{id: number}>()); 
+
+export const getProjectByIdSuccess = createAction("[Project] Get Project By Id Success", props<{ project: IProject }>()); 
+
+export const getProjectByIdFailure = createAction("[Project] Get Project By Id Failure", props<{ error: string }>()); 
+
+
 export const postProject = createAction("[Projects] post Project", props<{ project: ICreateProject }>()); 
 
 export const postProjectSuccess = createAction("[Projects] post Project Success", props<{ massage: string }>()); 

@@ -12,4 +12,5 @@ export interface IAppState {
     user: User | null;
     message: string | null;
     roles: UsersRole[];
+    project: IProject | null;
 }

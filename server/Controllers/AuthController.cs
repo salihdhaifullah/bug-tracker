@@ -71,11 +71,12 @@ namespace server.Controllers
                 string token;
                     token = _token.GenerateToken(Convert.ToInt32(userData.Entity.Id), userData.Entity.Role);
 
-                var Res = new UserResponse()
+                var Res = new
                 {
                     token = token,
                     email = userData.Entity.Email,
-                    fullName =  userData.Entity.FirstName + " " + userData.Entity.LastName
+                    fullName =  userData.Entity.FirstName + " " + userData.Entity.LastName,
+                    role = user.Role
                 };
                 
 
@@ -104,18 +105,19 @@ namespace server.Controllers
                 
                 string token = _token.GenerateToken(Convert.ToInt32(user.Id), user.Role);
 
-                var Res = new UserResponse()
+                var Res = new 
                 {
                     token = token,
                     email = user.Email,
-                    fullName = user.FirstName + " " + user.LastName
+                    fullName = user.FirstName + " " + user.LastName,
+                    role = user.Role
                 };
                 
                 return Ok(Res);
             }
             catch (Exception err)
             {
-                throw err;
+                return BadRequest(err);
             }
         }
         [HttpGet("users"), Authorize]

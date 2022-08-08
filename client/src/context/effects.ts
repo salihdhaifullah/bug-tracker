@@ -2,7 +2,7 @@ import { RolesService } from './../services/api.service';
 import { User } from './../types/User';
 import { AuthService } from 'src/services/api.service';
 import { ITicket } from '../types/Tickets';
-import { getProjects, getProjectsSuccess, getProjectsFailure, getTickets, getTicketsSuccess, getTicketsFailure, postLoginSuccess, postSingIn, postSingInFailure, postSingInSuccess, postLoginFailure, postLogin, postProject, postProjectSuccess, postProjectFailure, getRolesSuccess, getRolesFailure, getRoles } from './actions';
+import { getProjects, getProjectsSuccess, getProjectsFailure, getTickets, getTicketsSuccess, getTicketsFailure, postLoginSuccess, postSingIn, postSingInFailure, postSingInSuccess, postLoginFailure, postLogin, postProject, postProjectSuccess, postProjectFailure, getRolesSuccess, getRolesFailure, getRoles, getProjectByIdSuccess, getProjectByIdFailure, getProjectById } from './actions';
 import { Injectable } from "@angular/core";
 import { Actions, createEffect, ofType } from "@ngrx/effects";
 import { catchError, map, mergeMap, of } from "rxjs";
@@ -40,6 +40,17 @@ export class ProjectsEffects {
             )
         ));
 
+        getProjectById$ = createEffect(() =>
+        this.actions$.pipe(
+            ofType(getProjectById),
+            mergeMap((actions) => {
+                return this.projectsService.GetProjectById(actions.id).pipe(
+                    map((project: IProject) => getProjectByIdSuccess({ project })),
+                    catchError(error => of(getProjectByIdFailure({ error })))
+                )
+            }
+            )
+        ));
 
 }
 

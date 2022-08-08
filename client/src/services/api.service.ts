@@ -64,6 +64,10 @@ export class ProjectsService {
   public GetProjects() : Observable<IProject[]> {
     return this.http.get<IProject[]>(this.Project);
   }
+
+  public GetProjectById(id: number) : Observable<IProject> {
+    return this.http.get<IProject>(this.Project + "/" + id)
+  }
 }
 
 

@@ -5,6 +5,7 @@ export interface IProject {
     isClosed: Boolean
     createdAt: String
     description: String
+    closedAt: String
 }
 
 export interface ICreateProject {

@@ -1,4 +1,4 @@
-import { projectsReducers, ticketsReducers, userReducers, rolesReducers } from './../context/reducer';
+import { projectsReducers, ticketsReducers, userReducers, rolesReducers, projectReducers } from './../context/reducer';
 import { AuthService, RolesService } from 'src/services/api.service';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -87,7 +87,8 @@ import { AssigneUserComponent } from './components/assigne-user/assigne-user.com
     StoreModule.forFeature('projects', projectsReducers),
     StoreModule.forFeature('tickets', ticketsReducers),
     StoreModule.forFeature('user', userReducers),
-    StoreModule.forFeature('roles', rolesReducers),
+    StoreModule.forFeature('roles', rolesReducers), 
+    StoreModule.forFeature('project', projectReducers),  
     EffectsModule.forFeature([ProjectsEffects, TicketsEffects, AuthEffects, RolesEffects]),
     EffectsModule.forRoot([]),
     EffectsRootModule,
