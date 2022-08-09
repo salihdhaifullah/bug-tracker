@@ -72,6 +72,10 @@ export class ProjectsService {
   public GetProjectById(id: number) : Observable<IProject> {
     return this.http.get<IProject>(this.Project + "/" + id)
   }
+
+  public UpdateProject(data: ICreateProject, id: Number) : Observable<any> {
+    return this.http.patch(this.Project + "/" + id, data);
+  }
 }
 
 

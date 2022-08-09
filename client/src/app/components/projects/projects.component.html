@@ -1,27 +1,27 @@
 <div class="w-full grid mt-10 gap-5 justify-evenly grid-cols-3 h-20 md:h-30 lg:h-40  items-center">
 
   <div
-      class="flex w-full text-white font-semibold flex-col hover-animation-card bg-blue-400 items-center justify-center rounded-md shadow-md h-full text-center">
-      <h2 *ngIf="Count">{{Count > 1 ? "Projects" : "Project"}}</h2>
-      <span *ngIf="Count" class="text-lg">{{Count}}</span>
-      <h3 *ngIf="!Count">Projects</h3>
-      <h3 *ngIf="!Count">None</h3>
+    class="flex w-full text-white font-semibold flex-col hover-animation-card bg-blue-400 items-center justify-center rounded-md shadow-md h-full text-center">
+    <h2 *ngIf="Count">{{Count > 1 ? "Projects" : "Project"}}</h2>
+    <span *ngIf="Count" class="text-lg">{{Count}}</span>
+    <h3 *ngIf="!Count">Projects</h3>
+    <h3 *ngIf="!Count">None</h3>
   </div>
 
   <div
-      class="flex w-full text-white font-semibold flex-col hover-animation-card bg-blue-400 items-center justify-center rounded-md shadow-md h-full text-center">
-      <h2 *ngIf="Closed">{{Closed > 1 ? "Closed projects" : "Closed project"}}</h2>
-      <span *ngIf="Closed" class="text-lg">{{Closed}}</span>
-      <h3 *ngIf="!Closed">Closed projects</h3>
-      <h3 *ngIf="!Closed">None</h3>
+    class="flex w-full text-white font-semibold flex-col hover-animation-card bg-blue-400 items-center justify-center rounded-md shadow-md h-full text-center">
+    <h2 *ngIf="Closed">{{Closed > 1 ? "Closed projects" : "Closed project"}}</h2>
+    <span *ngIf="Closed" class="text-lg">{{Closed}}</span>
+    <h3 *ngIf="!Closed">Closed projects</h3>
+    <h3 *ngIf="!Closed">None</h3>
   </div>
 
   <div
-      class="flex w-full text-white font-semibold flex-col hover-animation-card bg-blue-400 items-center justify-center rounded-md shadow-md h-full text-center">
-      <h2 *ngIf="Open">{{Open > 1 ? "Open Projects" : "open project"}}</h2>
-      <span *ngIf="Open" class="text-lg">{{Open}}</span>
-      <h2 *ngIf="!Open">Open projects</h2>
-      <h3 *ngIf="!Open">None</h3>
+    class="flex w-full text-white font-semibold flex-col hover-animation-card bg-blue-400 items-center justify-center rounded-md shadow-md h-full text-center">
+    <h2 *ngIf="Open">{{Open > 1 ? "Open Projects" : "open project"}}</h2>
+    <span *ngIf="Open" class="text-lg">{{Open}}</span>
+    <h2 *ngIf="!Open">Open projects</h2>
+    <h3 *ngIf="!Open">None</h3>
   </div>
 
 </div>
@@ -31,50 +31,59 @@
 </div>
 
 <div class="mat-elevation-z8 mb-20 mt-10">
-    <table mat-table class="min-w-full" [dataSource]="dataSource">
-  
-      <!-- Position Column -->
-      <ng-container matColumnDef="id">
-        <th mat-header-cell *matHeaderCellDef> Id </th>
-        <td mat-cell *matCellDef="let element"> {{element.id}} </td>
-      </ng-container>
-  
-      <!-- Name Column -->
-      <ng-container matColumnDef="name">
-        <th mat-header-cell *matHeaderCellDef> Name </th>
-        <td mat-cell *matCellDef="let element"> {{element.name}} </td>
-      </ng-container>
-  
-      <!-- Weight Column -->
-      <ng-container matColumnDef="title">
-        <th mat-header-cell *matHeaderCellDef> title </th>
-        <td mat-cell *matCellDef="let element"> {{element.title}} </td>
-      </ng-container>
-  
-      <!-- Symbol Column -->
-      <ng-container matColumnDef="projectState">
-        <th mat-header-cell *matHeaderCellDef> project state </th>
-        <td mat-cell *matCellDef="let element"> {{element.isClosed ? "closed" : "open"}} </td>
-      </ng-container>
-  
-      <ng-container matColumnDef="createdAt">
-        <th mat-header-cell *matHeaderCellDef> created At </th>
-        <td mat-cell *matCellDef="let element"> {{_moment(element.createdAt).fromNow()}} </td>
-      </ng-container>
+  <table mat-table class="min-w-full" [dataSource]="dataSource">
 
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row class="hover:bg-gray-200 transition-all ease-in-out duration-150" *matRowDef="let row; columns: displayedColumns;"></tr>
-    </table>
-  
-    <mat-paginator [pageSizeOptions]="[5, 10, 20]"
-                   showFirstLastButtons 
-                   aria-label="Select page of periodic elements">
-    </mat-paginator>
-  </div>
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef> Name </th>
+      <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="title">
+      <th mat-header-cell *matHeaderCellDef> title </th>
+      <td mat-cell *matCellDef="let element"> {{element.title}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="projectState">
+      <th mat-header-cell *matHeaderCellDef> project state </th>
+      <td mat-cell *matCellDef="let element"> {{element.isClosed ? "closed" : "open"}} </td>
+    </ng-container>
+
+
+    <ng-container matColumnDef="createdAt">
+      <th mat-header-cell *matHeaderCellDef> created At </th>
+      <td mat-cell *matCellDef="let element"> {{_moment(element.createdAt).fromNow()}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="update">
+      <th mat-header-cell *matHeaderCellDef> Update Project </th>
+      <td mat-cell (click)="handelUpdateProject(element.id)"
+        class="hover:underline cursor-pointer text-blue-400 hover:text-blue-600" *matCellDef="let element"> Update </td>
+    </ng-container>
+
+
+
+    <ng-container matColumnDef="close">
+      <th mat-header-cell *matHeaderCellDef> Close Project </th>
+      <td mat-cell (click)="handelCloseProject(element.id)"
+        class="hover:underline cursor-pointer text-orange-400 hover:text-orange-600" *matCellDef="let element">Close
+      </td>
+    </ng-container>
+
+
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row class="hover:bg-gray-200 transition-all ease-in-out duration-150"
+      *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+
+  <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons aria-label="Select page of periodic elements">
+  </mat-paginator>
+</div>
 
 
 
 <div class="flex justify-evenly mb-20 flex-row items-center">
-    <h1> Create New Project ? </h1>
-    <app-new-project></app-new-project>
+  <h1 *ngIf="!updateProject"> Create New Project ? </h1>
+  <h1 *ngIf="updateProject"> Update Project ? </h1>
+  <app-new-project [updateProject]="updateProject"></app-new-project>
 </div>

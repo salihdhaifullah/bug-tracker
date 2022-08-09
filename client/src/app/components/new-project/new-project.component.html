@@ -3,10 +3,15 @@
         <form (submit)="HandelSubmit($event)"
             class="example-form justify-center flex flex-col rounded-md bg-white shadow-lg  py-10 px-20">
             <div class="flex items-center justify-center w-full flex-col">
-                <mat-icon aria-hidden="false" fontIcon="create"
+                <mat-icon *ngIf="updateProject" aria-hidden="false" fontIcon="update"
                     class="w-auto h-auto text-3xl material-icons-outlined  flex text-[#0b4ea5]"></mat-icon>
-                <h2 class="text-2xl text-center text-[#0b4ea5]">
+                <mat-icon *ngIf="!updateProject" aria-hidden="false" fontIcon="create"
+                    class="w-auto h-auto text-3xl material-icons-outlined  flex text-[#0b4ea5]"></mat-icon>
+                <h2 *ngIf="!updateProject" class="text-2xl text-center text-[#0b4ea5]">
                     Create New Project
+                </h2>
+                <h2 *ngIf="updateProject" class="text-2xl text-center text-[#0b4ea5]">
+                    Update Project
                 </h2>
             </div>
 

@@ -15,7 +15,7 @@ import * as moment from 'moment';
   templateUrl: './projects.component.html'
 })
 export class ProjectsComponent implements OnInit {
-  displayedColumns: string[] = [ "id",'title', 'name', 'projectState', 'createdAt'];
+  displayedColumns: string[] = ['title', 'name', 'projectState', 'createdAt', 'update', "close"];
   dataSource = new MatTableDataSource<IProject>();
 
   isLoading$: Observable<Boolean>;
@@ -33,7 +33,20 @@ export class ProjectsComponent implements OnInit {
   Open: number | null = null; 
   Count: number | null = null; 
   
+  updateProject: IProject | undefined = undefined;
 
+handelUpdateProject(id: Number) {
+  console.log("update" + id)
+  this.updateProject = this.dataSource.data.find(x => x.id === id); 
+  if (this.updateProject) {
+    console.log(this.updateProject);
+    
+  }
+}
+
+handelCloseProject(id: Number) {
+  console.log("close" + id)
+}
   @ViewChild(MatSort, { static: true }) sort!: MatSort;
 
   @ViewChild(MatPaginator, { static: true }) paginator! : MatPaginator;

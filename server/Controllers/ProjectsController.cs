@@ -24,76 +24,92 @@ namespace server.Controllers
         public async Task<IActionResult> CreateProject(ProjectReq req)
         {
             var IsSameName = _context.Projects.Any(project => project.Name == req.Name);
-            
+
             if (IsSameName)
             {
-                var res1 = new { message = "Project Name Already Exist try another one"};
+                var res1 = new { message = "Project Name Already Exist try another one" };
                 return Ok(res1);
             };
 
-        Project ProjectData = new()
-        {
-            Name = req.Name,
-            Title = req.Title,
-            Description = req.Description,
-            CreatedAt = DateTime.UtcNow,
-        };
-        var project = await _context.Projects.AddAsync(ProjectData);
+            Project ProjectData = new()
+            {
+                Name = req.Name,
+                Title = req.Title,
+                Description = req.Description,
+                CreatedAt = DateTime.UtcNow,
+            };
+            var project = await _context.Projects.AddAsync(ProjectData);
 
-        _context.SaveChanges();
+            _context.SaveChanges();
 
             var res = new { message = "Project Created Successfully" };
             return Ok(res);
-    }
+        }
 
 
-    [HttpGet("{id}"), Authorize]
-    public async Task<IActionResult> GetProject([FromRoute] int id)
-    {
-        var Projects = await  _context.Projects.Where(p => p.Id == id)
-            .Select(p => new
-            {
-                p.Description,
-                p.ClosedAt,
-                p.CreatedAt,
-                p.Id,
-                p.IsClosed,
-                p.Name,
-                p.Title
-            }).FirstOrDefaultAsync();
-
-        return Ok(Projects);
-    }
-
-
-    [HttpGet, Authorize]
-    public IActionResult GetProjects()
-    {
-        var Projects = _context.Projects.Select(p => new
+        [HttpGet("{id}"), Authorize]
+        public async Task<IActionResult> GetProject([FromRoute] int id)
         {
-            p.Name,
-            p.Id,
-            p.Title,
-            p.IsClosed,
-            p.CreatedAt,
-            p.Description,
-        }).ToList();
-        return Ok(Projects);
+            var Projects = await _context.Projects.Where(p => p.Id == id)
+                .Select(p => new
+                {
+                    p.Description,
+                    p.ClosedAt,
+                    p.CreatedAt,
+                    p.Id,
+                    p.IsClosed,
+                    p.Name,
+                    p.Title
+                }).FirstOrDefaultAsync();
+
+            return Ok(Projects);
+        }
+
+
+        [HttpGet, Authorize]
+        public IActionResult GetProjects()
+        {
+            var Projects = _context.Projects.Select(p => new
+            {
+                p.Name,
+                p.Id,
+                p.Title,
+                p.IsClosed,
+                p.CreatedAt,
+                p.Description,
+            }).ToList();
+            return Ok(Projects);
+        }
+
+        [HttpPatch("{id}"), Authorize(Roles = "Admin")]
+        public IActionResult UpdateProject([FromRoute] int id, [FromBody] ProjectReq req)
+        {
+            var isFound = _context.Projects.Find(id);
+            if (isFound == null) return NotFound("Project Not Found");
+            isFound.Name = req.Name;
+            isFound.Title = req.Title;
+            isFound.Description = req.Description;
+            isFound.UpdatedAt = DateTime.UtcNow;
+            _context.SaveChanges();
+            return Ok(isFound);
+        }
+
+        [HttpPut("{id}"), Authorize(Roles = "Admin")]
+        public async Task<IActionResult> CloseProject([FromRoute] int id)
+        {
+            var isFound = await _context.Projects.FindAsync(id);
+
+            if (isFound == null) return NotFound("Project Not Found");
+
+            isFound.ClosedAt = DateTime.UtcNow;
+            isFound.IsClosed = true;
+            await _context.SaveChangesAsync();
+
+            var message = new { message = "Project Closed Successfully" };
+            
+            return Ok(message);
+        }
+
+
     }
-
-
-    [HttpPut("Update/{id}"), Authorize(Roles = "Admin")]
-    public IActionResult UpdateProject([FromRoute] int id, [FromBody] ProjectReq req)
-    {
-        var ProjectData = _context.Projects.Find(id);
-        if (ProjectData == null) return NotFound();
-        ProjectData.Name = req.Name;
-        ProjectData.Title = req.Title;
-        ProjectData.Description = req.Description;
-        ProjectData.UpdatedAt = DateTime.UtcNow;
-        _context.SaveChanges();
-        return Ok(ProjectData);
-    }
-
-}
 }

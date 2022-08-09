@@ -93,11 +93,12 @@ namespace server.Controllers
                     int id1 = id.Value;
 
                     var IsAssigneeToFound = _context.Users.Any(u => u.Id == req.AssigneeToId);
-                    var project = _context.Projects.Any(p => p.Id == req.ProjectId);
+                    var project = await _context.Projects.FindAsync(req.ProjectId);
 
 
-                    if (IsAssigneeToFound && project)
+                    if (IsAssigneeToFound && project != null)
                     {
+                        if (project.IsClosed) return BadRequest("Can Not Create Ticket in Closed Project");
 
                         Ticket TicketData = new()
                         {

@@ -1,15 +1,15 @@
 export interface IProject {
-    name: String
-    id: Number
-    title: String
-    isClosed: Boolean
-    createdAt: String
-    description: String
-    closedAt: String
+    name: string
+    id: number
+    title: string
+    isClosed: boolean
+    createdAt: string
+    description: string
+    closedAt: string
 }
 
 export interface ICreateProject {
-    name: String
-    title: String
-    description: String
+    name: string
+    title: string
+    description: string
 }
