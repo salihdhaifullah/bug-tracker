@@ -35,3 +35,7 @@ body {
     @apply after:content-[""] relative after:absolute after:-bottom-1
     after:left-0 after:w-full after:h-[2px] after:rounded-md after:bg-blue-600;
 }
+
+.link {
+    @apply cursor-pointer hover:text-blue-600 text-blue-400 hover:underline;
+}

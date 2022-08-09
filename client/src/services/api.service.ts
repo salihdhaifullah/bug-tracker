@@ -76,6 +76,15 @@ export class ProjectsService {
   public UpdateProject(data: ICreateProject, id: Number) : Observable<any> {
     return this.http.patch(this.Project + "/" + id, data);
   }
+
+  public CloseProject(id: Number) : Observable<any> {
+    return this.http.put(this.Project + "/" + id, {});
+  }
+  
+
+  public OpenProject(id: Number) : Observable<any> {
+    return this.http.put(this.Project + "/" + "open" + "/" + id, {});
+  }
 }
 
 

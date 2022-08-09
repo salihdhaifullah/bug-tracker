@@ -111,5 +111,22 @@ namespace server.Controllers
         }
 
 
+        [HttpPut("open/{id}"), Authorize(Roles = "Admin")]
+        public async Task<IActionResult> OpenProject([FromRoute] int id)
+        {
+            var isFound = await _context.Projects.FindAsync(id);
+
+            if (isFound == null) return NotFound("Project Not Found");
+
+            isFound.ClosedAt = DateTime.UtcNow;
+            isFound.IsClosed = false;
+            await _context.SaveChangesAsync();
+
+            var message = new { message = "Project Opened Successfully" };
+
+            return Ok(message);
+        }
+
+
     }
 }
