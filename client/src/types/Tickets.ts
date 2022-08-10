@@ -1,21 +1,22 @@
 export interface ITicket {
-    devoloper: String
-    submitter: String
+    devoloper: string
+    submitter: string
     name: string
-    priority: String
-    status: String
-    createdAt: String
-    type: String
-    updatedAt: String | null
-    isCompleted: Boolean
-    description: String
+    priority: string
+    status: string
+    createdAt: string
+    type: string
+    updatedAt: string | null
+    isCompleted: boolean
+    id: number
+    description: string
 }
 
 
 
 export interface ICreateTicket {
-    priority: String // Select Form
-    type: String // Select Form
+    priority: string // Select Form
+    type: string // Select Form
     name: string // Text Form
     description: string // Text Array Form
     assigneeToId: number // Select Form

@@ -50,6 +50,10 @@ export class TicketsService {
   public GetTicketById(id: Number): Observable<ITicket>{
     return this.http.get<ITicket>(this.Ticket + "/" + "ticket" + "/" + id)
   }
+
+  public UpdateTicket(ticket: ICreateTicket, id: number): Observable<any> {
+    return this.http.patch(this.Ticket + "/" + id, ticket);
+  }
 }
 
 

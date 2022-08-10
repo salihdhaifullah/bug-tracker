@@ -2,7 +2,7 @@ import { Static } from 'src/Static';
 import { Observable } from 'rxjs';
 import { Store, select } from '@ngrx/store';
 import { IAppState } from 'src/context/app.state';
-import { Component, OnInit, SimpleChanges } from '@angular/core';
+import { Component, Input, OnInit, SimpleChanges } from '@angular/core';
 import { ITicket } from 'src/types/Tickets';
 import { projectSelector, ticketsSelector } from 'src/context/selectors';
 import * as Actions from 'src/context/actions';
@@ -24,6 +24,12 @@ export class ProjectComponent implements OnInit {
   count: number | null = null;
   Bugs: number | null = null;
   Features: number | null =  null;
+
+  ticketToUpdate: ITicket | null | undefined = null;
+  HandelUpdate = (id: any) => {
+    this.ticketToUpdate = this.tickets.find(x => x.id === id);
+  }
+
 
   _moment: any = moment;
 

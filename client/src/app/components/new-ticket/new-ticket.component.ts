@@ -2,11 +2,11 @@ import { ICreateProject } from './../../../types/Projects';
 import Swal from 'sweetalert2';
 import { FormControl, Validators, FormGroup } from '@angular/forms';
 import { AuthService, TicketsService } from 'src/services/api.service';
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit, SimpleChanges } from '@angular/core';
 import { MyErrorStateMatcher } from 'src/app/MyErrorStateMatcher';
 import { Users } from 'src/types/User';
 import { Static } from 'src/Static';
-import { ICreateTicket } from 'src/types/Tickets';
+import { ICreateTicket, ITicket } from 'src/types/Tickets';
 
 @Component({
   selector: 'app-new-ticket',
@@ -17,25 +17,42 @@ export class NewTicketComponent implements OnInit {
   constructor(private authService: AuthService, private ticketsService: TicketsService) { }
   matcher = new MyErrorStateMatcher();
 
-  DescriptionFormControl = new FormControl<string>('', [Validators.required, Validators.minLength(16)]);
-  
-  NameFormControl = new FormControl<string>('', [Validators.required, Validators.minLength(4)]);
-  
-  AssigneeToIdFormControl = new FormControl<number>(0, [Validators.required]);
-  
-  PriorityFormControl = new FormControl<string>(Static.Priorates.Array[0], [Validators.required]);
+  @Input() ticketToUpdate: ITicket | null | undefined = null;
+  isUpdateTicket: boolean = false;
+  ticketIdToUpdate: number | null = null;
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes["ticketToUpdate"].currentValue) {
+      const Change = changes["ticketToUpdate"].currentValue;
+      console.log(Change)
+      this.ticketIdToUpdate = Change.id;
+      this.isUpdateTicket = true;
+      this.TicketForm.setValue({
+        name: Change.name,
+        description: "  ",
+        type: Change.type,
+        priority: Change.priority,
+        assigneeToId: Math.floor((Math.random() * this.UsersList.length) + 1),
+      });
+    }
+  }
 
-  TypeFormControl = new FormControl<string>(Static.Types.Array[0], [Validators.required]); 
+  DescriptionFormControl = new FormControl('', [Validators.required, Validators.minLength(16)]);
 
-  ProjectId = Static.getIdParams(document.location.href); // production
+  NameFormControl = new FormControl('', [Validators.required, Validators.minLength(4)]);
 
-  // Priority 
+  AssigneeToIdFormControl = new FormControl(0, [Validators.required]);
+
+  PriorityFormControl = new FormControl(Static.Priorates.Array[0], [Validators.required]);
+
+  TypeFormControl = new FormControl(Static.Types.Array[0], [Validators.required]);
+
+  ProjectId = Static.getIdParams(document.location.href);
+
   Priorates = Static.Priorates.Array;
-  // Type 
+
   Types = Static.Types.Array;
 
   UsersList: Users[] = [];
-    // Priority Status Type Name Description AssigneeToId SubmitterId 
 
   TicketForm = new FormGroup({
     description: this.DescriptionFormControl,
@@ -57,28 +74,51 @@ export class NewTicketComponent implements OnInit {
     event.preventDefault();
     if (this.TicketForm.valid) {
       const form = { ...this.TicketForm.value, projectId: this.ProjectId };
-      this.ticketsService.CreateTicket(form as ICreateTicket).subscribe(m => {
-        console.log(m);
-      }
-        , err => {
-          Swal.fire({
-            title: 'Error',
-            text: err.error.message,
-            icon: 'error',
-            confirmButtonText: 'Ok'
-          })
+      if (this.isUpdateTicket && this.ticketIdToUpdate) {
+        this.ticketsService.UpdateTicket(form as ICreateTicket, this.ticketIdToUpdate).subscribe(m => {
+          console.log(m);
         }
-        , () => {
-          Swal.fire({
-            title: 'Success',
-            text: 'Ticket created',
+          , err => {
+            Swal.fire({
+              title: 'Error',
+              text: err.error.message,
+              icon: 'error',
+              confirmButtonText: 'Ok'
+            })
+          }
+          , () => {
+            Swal.fire({
+              title: 'Success',
+              text: 'Ticket Updated',
 
-            icon: 'success',
-            confirmButtonText: 'Cool'
-          })
-        });
-    console.log({ ...this.TicketForm.value, ProjectId: this.ProjectId});
+              icon: 'success',
+              confirmButtonText: 'Cool'
+            })
+          });
+      } 
+      else {
+        this.ticketsService.CreateTicket(form as ICreateTicket).subscribe(m => {
+          console.log(m);
+        }
+          , err => {
+            Swal.fire({
+              title: 'Error',
+              text: err.error.message,
+              icon: 'error',
+              confirmButtonText: 'Ok'
+            })
+          }
+          , () => {
+            Swal.fire({
+              title: 'Success',
+              text: 'Ticket created',
+
+              icon: 'success',
+              confirmButtonText: 'Cool'
+            })
+          });
+        console.log({ ...this.TicketForm.value, ProjectId: this.ProjectId });
+      }
+    }
   }
-
-}
 }

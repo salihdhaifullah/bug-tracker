@@ -38,7 +38,8 @@ namespace server.Controllers
                 p.CreatedAt,
                 p.Type,
                 p.UpdatedAt,
-                p.IsCompleted
+                p.IsCompleted,
+                p.Id
             }).ToList();
 
             return Ok(Tickets);
@@ -47,7 +48,7 @@ namespace server.Controllers
         [HttpGet("ticket/{id}"), Authorize]
         public async Task<IActionResult> GetTicketById([FromRoute] int id)
         {
-            var ticket = await  _context.Tickets.Where(t => t.Id == id).Select(p => new
+            var ticket = await _context.Tickets.Where(t => t.Id == id).Select(p => new
             {
                 devoloper = p.AssigneeTo.FirstName + " " + p.AssigneeTo.LastName,
                 Submitter = p.Submitter.FirstName + " " + p.Submitter.LastName,
@@ -59,11 +60,12 @@ namespace server.Controllers
                 p.UpdatedAt,
                 p.IsCompleted,
                 p.Description,
-                
+                p.Id
+
             }).FirstOrDefaultAsync();
 
 
-            
+
             return Ok(ticket);
         }
 
@@ -85,7 +87,7 @@ namespace server.Controllers
                 string[] token = header.Split(' ');
 
                 Console.WriteLine(token);
-                
+
                 var id = _token.VerifyToken(token[1]);
 
                 if (id != null)
@@ -137,5 +139,43 @@ namespace server.Controllers
             // _context.SaveChanges();
             return Ok(hello);
         }
+
+
+        [HttpPatch("{id}"), Authorize(Roles = "Admin, Submitter, ProjectManger")]
+        public async Task<IActionResult> UpdateTicket([FromRoute] int id, [FromBody] TicketReq req)
+        {
+            var Ticket = await _context.Tickets.FindAsync(id);
+            if (Ticket == null) return NotFound();
+            string? header = Request.Headers.Authorization;
+            if (header != null)
+            {
+                string[] token = header.Split(' ');
+                var id1 = _token.VerifyToken(token[1]);
+                if (id1 != null)
+                {
+                    var user = await _context.Users.FindAsync(id1);
+                    if (user == null) return Unauthorized();
+                        
+
+                    
+                        Ticket.AssigneeToId = req.AssigneeToId;
+                        Ticket.Description = req.Description;
+                        Ticket.Name = req.Name;
+                        Ticket.UpdatedAt = DateTime.UtcNow;
+                        Ticket.Type = req.Type;
+                        Ticket.Priority = req.Priority;
+                        Ticket.SubmitterId = (int)id1;
+
+
+                    
+                    _context.SaveChanges();
+                        return Ok(Ticket);
+                    
+                }
+                else return Unauthorized();
+            }
+            else return Unauthorized();
+        }
+
     }
 }
