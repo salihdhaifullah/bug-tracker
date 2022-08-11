@@ -1,8 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace server.Models.api
+﻿namespace server.Models.api
 {
-    public class ProjectReq
+    public class ProjectDto
     {
         public string Title { get; set; } = String.Empty;
         public string Name { get; set; } = String.Empty;

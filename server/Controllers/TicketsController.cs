@@ -71,7 +71,7 @@ namespace server.Controllers
 
 
         [HttpPost("Create"), Authorize(Roles = "Admin, Submitter, ProjectManger")]
-        public async Task<IActionResult> CreateTicket(TicketReq req)
+        public async Task<IActionResult> CreateTicket(TicketDto req)
         {
             // Priority => Low, Medium, High
             // Status => New, In Progress, Resolved, Closed
@@ -129,7 +129,7 @@ namespace server.Controllers
         }
 
         [HttpPut("Status/{id}"), Authorize(Roles = "Developer")]
-        public IActionResult InProgress(TicketReq req)
+        public IActionResult InProgress(TicketDto req)
         {
             var hello = Request.Headers.Authorization;
 
@@ -142,7 +142,7 @@ namespace server.Controllers
 
 
         [HttpPatch("{id}"), Authorize(Roles = "Admin, Submitter, ProjectManger")]
-        public async Task<IActionResult> UpdateTicket([FromRoute] int id, [FromBody] TicketReq req)
+        public async Task<IActionResult> UpdateTicket([FromRoute] int id, [FromBody] TicketDto req)
         {
             var Ticket = await _context.Tickets.FindAsync(id);
             if (Ticket == null) return NotFound();

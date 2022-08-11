@@ -29,7 +29,7 @@ namespace server.Controllers
 
 
         [HttpPost("Singin"), AllowAnonymous]
-        public async Task<IActionResult> SingIn(UserSinginReq req)
+        public async Task<IActionResult> SingIn(UserSinginDto req)
         {
             try
             {
@@ -92,7 +92,7 @@ namespace server.Controllers
         }
 
         [HttpPost("login"), AllowAnonymous]
-        public async Task<IActionResult> Login(UserLoginReq req)
+        public async Task<IActionResult> Login(UserLoginDto req)
         {
             try
             {

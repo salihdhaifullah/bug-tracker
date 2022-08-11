@@ -21,7 +21,7 @@ namespace server.Controllers
         }
 
         [HttpPost("Create"), Authorize(Roles = "Admin")]
-        public async Task<IActionResult> CreateProject(ProjectReq req)
+        public async Task<IActionResult> CreateProject(ProjectDto req)
         {
             var IsSameName = _context.Projects.Any(project => project.Name == req.Name);
 
@@ -82,7 +82,7 @@ namespace server.Controllers
         }
 
         [HttpPatch("{id}"), Authorize(Roles = "Admin")]
-        public IActionResult UpdateProject([FromRoute] int id, [FromBody] ProjectReq req)
+        public IActionResult UpdateProject([FromRoute] int id, [FromBody] ProjectDto req)
         {
             var isFound = _context.Projects.Find(id);
             if (isFound == null) return NotFound("Project Not Found");

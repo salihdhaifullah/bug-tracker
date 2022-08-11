@@ -48,7 +48,7 @@ namespace server.Controllers
 
 
         [HttpPatch, Authorize(Roles = "Admin")]
-        public async Task<IActionResult> CreateUserRole([FromBody] RoleReq value)
+        public async Task<IActionResult> CreateUserRole([FromBody] RoleDto value)
         {
             
             for (int i = 0; i < value.UsersId.Count; i++)

@@ -3,6 +3,7 @@ using Firebase.Storage;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using server.Data;
+using server.Models.api;
 using server.Models.db;
 using server.Services.JsonWebToken;
 
@@ -27,7 +28,7 @@ namespace server.Controllers
 
 
         [HttpPost("{ticketId}"), Authorize]
-        public async Task<IActionResult> UploadFile(IFormFile file, int ticketId, string Description)
+        public async Task<IActionResult> UploadFile(IFormFile file, int ticketId, FilleDto req)
         {
             string uuid = Guid.NewGuid().ToString();
             string[] array = file.FileName.Split('.');
@@ -75,7 +76,7 @@ namespace server.Controllers
                 {
                     type = type == "png" || type == "svg" || type == "image" || type == "jpeg" || type == "jpg" ? "Image" : "Document",
                     name = fileNameForShaft,
-                    Description = Description,
+                    Description = req.Description,
                     TicketId = ticketId,
                     CreatorId = (int)id,
                     Url = $"https://firebasestorage.googleapis.com/v0/b/{_configuration.GetSection("FireBase:storageBucket").Value}/o/images%2F{fileNameForShaft}?alt=media",
@@ -112,7 +113,7 @@ namespace server.Controllers
 
 
         [HttpPatch("{id}"), Authorize]
-        public async Task<IActionResult> UpdateFile([FromRoute] int id, [FromBody] string Description)
+        public async Task<IActionResult> UpdateFile([FromRoute] int id, [FromBody] FilleDto req)
         {
             var file = await _context.Filles.FirstOrDefaultAsync(file => file.Id == id);
 
@@ -128,7 +129,7 @@ namespace server.Controllers
 
             if (file.CreatorId != (int)UserId) return Unauthorized();
 
-            file.Description = Description;
+            file.Description = req.Description;
 
             await _context.SaveChangesAsync();
             return Ok(file);
@@ -182,16 +183,6 @@ namespace server.Controllers
             _context.Filles.Remove(file);
             await _context.SaveChangesAsync();
             return Ok("deleted");
-        }
-
-        [HttpGet("{id}"), Authorize]
-        public async Task<IActionResult> GetFile([FromRoute] int id)
-        {
-            var file = await _context.Filles.FirstOrDefaultAsync(file => file.Id == id);
-
-            if (file == null) return NotFound();
-
-            return Ok(file);
         }
 
         [HttpGet("Ticket/{TicketId}"), Authorize]

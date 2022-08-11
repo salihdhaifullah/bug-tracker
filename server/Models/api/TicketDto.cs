@@ -2,7 +2,7 @@
 
 namespace server.Models.api
 {
-    public class TicketReq
+    public class TicketDto
     {
         public string Name { get; set; } = String.Empty;
         public string Description { get; set; } = String.Empty;
