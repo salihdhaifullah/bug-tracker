@@ -1,10 +1,11 @@
-﻿using System.Net.Http.Headers;
-using Firebase.Auth;
+﻿using Firebase.Auth;
 using Firebase.Storage;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using server.Data;
-using HttpServerUtility = System.Web.HttpUtility;
+using server.Models.db;
+using server.Services.JsonWebToken;
+
 namespace server.Controllers
 {
     [Route("api/[controller]")]
@@ -14,64 +15,123 @@ namespace server.Controllers
         private readonly Context _context;
 
         private readonly IConfiguration _configuration;
-        private readonly IHostEnvironment _env;
+        private readonly IJsonWebToken _token;
 
-        public FilesController(IConfiguration configuration, Context context, IHostEnvironment env)
+        public FilesController(IConfiguration configuration, Context context, IJsonWebToken token)
         {
             _context = context;
-            _env = env;
+            _token = token;
             _configuration = configuration;
         }
 
 
 
-        [HttpPost, Authorize]
-        public async Task<IActionResult> UploadFile(IFormFile file)
+        [HttpPost("{ticketId}"), Authorize]
+        public async Task<IActionResult> UploadFile(IFormFile file, int ticketId, string Description)
         {
+            string uuid = Guid.NewGuid().ToString();
+            string[] array = file.FileName.Split('.');
+            string type = array[array.Length - 1];
 
+            string fileNameForShaft = uuid + "." + type;
             if (file.Length > 0)
             {
 
-                    var stream = file.OpenReadStream();
-                        
-                    var API = new FirebaseAuthProvider(new FirebaseConfig(_configuration.GetSection("FireBase:apiKay").Value));
+                var stream = file.OpenReadStream();
 
-                    var user = await API.SignInWithEmailAndPasswordAsync(_configuration.GetSection("Admin:Email").Value,
-                    _configuration.GetSection("Admin:Password").Value);
+                var API = new FirebaseAuthProvider(new FirebaseConfig(_configuration.GetSection("FireBase:apiKay").Value));
 
-                    var cancellation = new CancellationTokenSource();
+                var user = await API.SignInWithEmailAndPasswordAsync(
+                _configuration.GetSection("Admin:Email").Value,
+                _configuration.GetSection("Admin:Password").Value
+                );
 
-                    var UploadFile = new FirebaseStorage(
-                        _configuration.GetSection("FireBase:storageBucket").Value,
-                        new FirebaseStorageOptions
-                        {
-                            AuthTokenAsyncFactory = () => Task.FromResult(user.FirebaseToken),
-                            ThrowOnCancel = true
-                        }
-                    ).Child("images").Child($"{file.FileName}")
-                    .PutAsync(stream, cancellation.Token);
+                var cancellation = new CancellationTokenSource();
 
-
-                    try
+                var UploadFile = new FirebaseStorage(
+                    _configuration.GetSection("FireBase:storageBucket").Value,
+                    new FirebaseStorageOptions
                     {
-                        await UploadFile;
-                        return Ok();
+                        AuthTokenAsyncFactory = () => Task.FromResult(user.FirebaseToken),
+                        ThrowOnCancel = true
                     }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine(e.Message);
-                        return BadRequest();
-                    }
-                    finally
-                    {
-                        stream.Close();
-                    }
+                ).Child("images").Child($"{fileNameForShaft}")
+                .PutAsync(stream, cancellation.Token);
+
+
+
+
+
+
+                string? header = Request.Headers.Authorization;
+
+                string[] token = header.Split(' ');
+
+                var id = _token.VerifyToken(token[1]);
+
+                if (id == null) return Unauthorized();
+
+                var newFille = new Fille
+                {
+                    type = type == "png" || type == "svg" || type == "image" || type == "jpeg" || type == "jpg" ? "Image" : "Document",
+                    name = file.FileName,
+                    Description = Description,
+                    TicketId = ticketId,
+                    CreatorId = (int)id,
+                    Url = $"https://firebasestorage.googleapis.com/v0/b/{_configuration.GetSection("FireBase:storageBucket").Value}/o/images%2F{fileNameForShaft}?alt=media",
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                var NewFile = _context.Filles.Add(newFille);
+
+
+                try
+                {
+
+                    await UploadFile;
+                    await _context.SaveChangesAsync();
+                    return Ok(newFille);
+
                 }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                    return BadRequest("sorry something went wrong 😥");
+                }
+                finally
+                {
+                    stream.Close();
+                }
+            }
             else
             {
                 return Content("file not selected");
             }
 
+        }
+
+
+        [HttpPatch("{id}"), Authorize]
+        public async Task<IActionResult> UpdateFile([FromRoute] int id, [FromBody] string Description)
+        {
+            var file = await _context.Filles.FirstOrDefaultAsync(file => file.Id == id);
+
+            if (file == null) return NotFound();
+
+            string? header = Request.Headers.Authorization;
+
+            string[] token = header.Split(' ');
+
+            var UserId = _token.VerifyToken(token[1]);
+
+            if (UserId == null) return Unauthorized();
+
+            if (file.CreatorId != (int)UserId) return Unauthorized();
+
+            file.Description = Description;
+
+            await _context.SaveChangesAsync();
+            return Ok();
         }
     }
 }
