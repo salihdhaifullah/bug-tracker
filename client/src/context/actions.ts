@@ -4,6 +4,8 @@ import { createAction, props } from "@ngrx/store";
 import { ILoginFormData, ISinginFormData, User } from "src/types/User";
 import { ICreateProject, IProject } from "../types/Projects";
 import { ITicket } from "../types/Tickets";
+import { Comments } from 'src/types/Comments';
+import { IFilles } from 'src/types/Filles';
 
 
 export const getProjects = createAction("[Projects] Get Projects"); 
@@ -59,6 +61,22 @@ export const getRoles = createAction("[Roles] Get Roles");
 export const getRolesSuccess = createAction("[Roles] Get Roles Success", props<{ roles: UsersRole[] }>()); 
 
 export const getRolesFailure = createAction("[Roles] Get Roles Failure", props<{ error: string }>()); 
+
+
+
+export const getComments = createAction("[Comments] Get Comments", props<{TicketId: number}>()); 
+
+export const getCommentsSuccess = createAction("[Comments] Get Comments Success", props<{ comments: Comments[] }>()); 
+
+export const getCommentsFailure = createAction("[Comments] Get Comments Failure", props<{ error: string }>()); 
+
+
+
+export const getFiles = createAction("[Files] Get Files", props<{TicketId: number}>()); 
+
+export const getFilesSuccess = createAction("[Files] Get Files Success", props<{ files: IFilles[] }>()); 
+
+export const getFilesFailure = createAction("[Files] Get Files Failure", props<{ error: string }>()); 
 
 
 export const Logout = createAction("[Logout] Logout"); 

@@ -55,7 +55,13 @@ namespace server.Controllers
         [HttpGet("{ticketId}"), Authorize]
         public async Task<IActionResult> GetComments([FromRoute] int ticketId)
         {
-            var comments = await _context.Comments.Where(c => c.TicketId == ticketId).ToListAsync();
+            var comments = await _context.Comments.Where(c => c.TicketId == ticketId).Select(C => new  {
+                
+                C.Content,
+                C.Id,
+                C.CreatedAt,
+                UserName = C.User.FirstName + " " + C.User.LastName
+            }).ToListAsync();
             return Ok(comments);
         }
 

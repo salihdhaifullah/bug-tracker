@@ -14,7 +14,9 @@ export const initialState: IAppState = {
     message: null,
     roles: [],
     project: null,
-    ticket: null
+    ticket: null,
+    comments: [],
+    files: []
 }
 
 const userInitialState: any = {
@@ -53,6 +55,19 @@ const ticketInitialState: any = {
     error: null,
     ticket: null,
 }
+
+const filesInitialState: any = {
+    isLoading: false,
+    error: null,
+    files: [],
+}
+
+const commentsInitialState: any = {
+    isLoading: false,
+    error: null,
+    comments: [],
+}
+
 
 export const userReducers = createReducer(userInitialState, 
     on(Actions.postLogin, state => ({ ...state, isLoading: true })),
@@ -101,4 +116,18 @@ export const ticketReducers = createReducer(ticketInitialState,
     on(Actions.getTicketById, state => ({ ...state, isLoading: true })),
     on(Actions.getTicketByIdSuccess, (state, action) => ({ ...state, isLoading: false, ticket: action.ticket })),
     on(Actions.getTicketByIdFailure, (state, action) => ({ ...state, isLoading: false, error: action.error })),
+)
+
+
+
+export const filesReducers = createReducer(filesInitialState,
+    on(Actions.getFiles, state => ({ ...state, isLoading: true })),
+    on(Actions.getFilesSuccess, (state, action) => ({ ...state, isLoading: false, files: action.files })),
+    on(Actions.getFilesFailure, (state, action) => ({ ...state, isLoading: false, error: action.error })),
+)
+
+export const commentsReducers = createReducer(commentsInitialState,
+    on(Actions.getComments, state => ({ ...state, isLoading: true })),
+    on(Actions.getCommentsSuccess, (state, action) => ({ ...state, isLoading: false, comments: action.comments })),
+    on(Actions.getCommentsFailure, (state, action) => ({ ...state, isLoading: false, error: action.error })),
 )

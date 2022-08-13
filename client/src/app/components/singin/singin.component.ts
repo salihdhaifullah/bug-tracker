@@ -8,6 +8,7 @@ import {FormControl, FormGroup,  Validators} from '@angular/forms';
 import * as Actions from 'src/context/actions';
 import { isLoadingSelector, userSelector, errorSelector } from 'src/context/selectors';
 import { MyErrorStateMatcher } from '../../MyErrorStateMatcher';
+import Swal from 'sweetalert2';
 
 
 @Component({
@@ -59,12 +60,22 @@ export class SinginComponent  {
         console.log(data.user)
         if (data.user) {
           sessionStorage.setItem('user', JSON.stringify(data.user));
+          Swal.fire({
+            title: 'Success',
+            text: 'You have been registered',
+            icon: 'success',
+            confirmButtonText: 'OK',
+          })
         }
-       });
+       }, (error: any) => {
+        Swal.fire({
+          title: 'Error',
+          text: error.error.message,
+          icon: 'error',
+          confirmButtonText: 'OK',
+          });
+      });
     }
   }
 
-  ngAfterViewInit() {
-  
-  }
 }  

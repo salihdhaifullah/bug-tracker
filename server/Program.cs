@@ -36,14 +36,15 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
-    options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
-    {
-        Description = "Hello World",
-        In = ParameterLocation.Header,
-        Name = "Authorization",
-        Type = SecuritySchemeType.ApiKey
-    });
-    options.OperationFilter<SecurityRequirementsOperationFilter>();
+options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+{
+    Description = "Hello World",
+    In = ParameterLocation.Header,
+    Name = "Authorization",
+    Type = SecuritySchemeType.ApiKey
+});
+options.OperationFilter<SecurityRequirementsOperationFilter>();
+
 });
 
 builder.Services.AddCors(options => options.AddPolicy("Policy", policy => 

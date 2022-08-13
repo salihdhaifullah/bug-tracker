@@ -1,0 +1,35 @@
+<div class="w-full grid mt-10 gap-5 justify-evenly grid-cols-3 h-20 md:h-30 lg:h-40  items-center">
+
+  
+  <div class="mat-elevation-z8 mb-20 mt-10">
+    <table mat-table class="min-w-full" [dataSource]="dataSource">
+  
+  
+      <ng-container matColumnDef="type">
+        <th mat-header-cell *matHeaderCellDef> type </th>
+        <td mat-cell *matCellDef="let element" class="link">
+        <a [href]="element.url" target="_blank">
+            {{element.type}}
+        </a>  </td>
+      </ng-container>
+  
+      <ng-container matColumnDef="Description">
+        <th mat-header-cell *matHeaderCellDef> Description </th>
+        <td mat-cell *matCellDef="let element"> {{element.description}} </td>
+      </ng-container>
+  
+  
+      <ng-container matColumnDef="CreatedAt">
+        <th mat-header-cell *matHeaderCellDef> created At </th>
+        <td mat-cell *matCellDef="let element"> {{_moment(element.createdAt).fromNow()}} </td>
+      </ng-container>
+
+  
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row class="hover:bg-gray-200 transition-all ease-in-out duration-150"
+        *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+  
+    <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons aria-label="Select page of periodic elements">
+    </mat-paginator>
+  </div>

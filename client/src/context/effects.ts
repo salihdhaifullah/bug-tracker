@@ -1,14 +1,16 @@
-import { RolesService } from './../services/api.service';
+import { RolesService, CommentsService, FilesService } from './../services/api.service';
 import { User } from './../types/User';
 import { AuthService } from 'src/services/api.service';
 import { ITicket } from '../types/Tickets';
-import { getProjects, getProjectsSuccess, getProjectsFailure, getTickets, getTicketsSuccess, getTicketsFailure, postLoginSuccess, postSingIn, postSingInFailure, postSingInSuccess, postLoginFailure, postLogin, postProject, postProjectSuccess, postProjectFailure, getRolesSuccess, getRolesFailure, getRoles, getProjectByIdSuccess, getProjectByIdFailure, getProjectById, getTicketById, getTicketByIdFailure, getTicketByIdSuccess } from './actions';
+import { getProjects, getProjectsSuccess, getProjectsFailure, getTickets, getTicketsSuccess, getTicketsFailure, postLoginSuccess, postSingIn, postSingInFailure, postSingInSuccess, postLoginFailure, postLogin, postProject, postProjectSuccess, postProjectFailure, getRolesSuccess, getRolesFailure, getRoles, getProjectByIdSuccess, getProjectByIdFailure, getProjectById, getTicketById, getTicketByIdFailure, getTicketByIdSuccess, getComments, getCommentsFailure, getCommentsSuccess, getFiles, getFilesSuccess, getFilesFailure } from './actions';
 import { Injectable } from "@angular/core";
 import { Actions, createEffect, ofType } from "@ngrx/effects";
 import { catchError, map, mergeMap, of } from "rxjs";
 import { TicketsService, ProjectsService } from "../services/api.service";
 import { IProject } from '../types/Projects';
 import { UsersRole } from 'src/types/Roles';
+import { Comments } from 'src/types/Comments';
+import { IFilles } from 'src/types/Filles';
 
 
 @Injectable()
@@ -127,3 +129,39 @@ export class RolesEffects {
             })
         ));
 }
+
+
+
+@Injectable()
+export class CommentsEffects {
+    constructor(private actions$: Actions, private commentsService: CommentsService) { }
+
+    getComments$ = createEffect(() =>
+        this.actions$.pipe(
+            ofType(getComments),
+            mergeMap((action) => {
+                return this.commentsService.GetComments(action.TicketId).pipe(
+                    map((comments: Comments[]) => getCommentsSuccess({ comments })),
+                    catchError(error => of(getCommentsFailure({ error })))
+                )
+            })
+        ));
+}
+
+
+@Injectable()
+export class FilesEffects {
+    constructor(private actions$: Actions, private filesService: FilesService) { }
+
+    getFiles$ = createEffect(() =>
+        this.actions$.pipe(
+            ofType(getFiles),
+            mergeMap((action) => {
+                return this.filesService.GetFiles(action.TicketId).pipe(
+                    map((files: IFilles[]) => getFilesSuccess({ files })),
+                    catchError(error => of(getFilesFailure({ error })))
+                )
+            })
+        ));
+}
+

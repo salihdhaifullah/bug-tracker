@@ -1,0 +1,42 @@
+<div class="contanier w-full h-full  bg-gray-100">
+    <div class="flex justify-center h-full w-full items-center ">
+        <form (submit)="HandelSubmit($event)"
+            class="example-form justify-center flex flex-col rounded-md bg-white shadow-lg  py-10 px-20">
+            <div class="flex items-center justify-center w-full flex-col">
+                <mat-icon *ngIf="updateFile" aria-hidden="false" fontIcon="update"
+                    class="w-auto h-auto text-3xl material-icons-outlined  flex text-[#0b4ea5]"></mat-icon>
+                <mat-icon *ngIf="!updateFile" aria-hidden="false" fontIcon="create"
+                    class="w-auto h-auto text-3xl material-icons-outlined  flex text-[#0b4ea5]"></mat-icon>
+                <h2 *ngIf="!updateFile" class="text-2xl text-center text-[#0b4ea5]">
+                    Upload New File
+                </h2>
+                <h2 *ngIf="updateFile" class="text-2xl text-center text-[#0b4ea5]">
+                    Update File Description
+                </h2>
+            </div>
+
+            <!-- <mat-form-field class="example-full-width ml-2" appearance="fill"> -->
+            <label for="input-file-id" class="md-button md-raised md-primary">Choose Files</label>
+            <input type="file" #FileInput (change)="HandelSetFile($event)" class="ng-hide" id="input-file-id">
+            <mat-error *ngIf="FileError">
+                File is <strong>required</strong>
+            </mat-error>
+            <!-- </mat-form-field> -->
+
+            <mat-form-field appearance="fill">
+                <mat-label>Description</mat-label>
+                <textarea matInput cdkTextareaAutosize #autosize="cdkTextareaAutosize" cdkAutosizeMinRows="1"
+                    cdkAutosizeMaxRows="5" [formControl]="DescriptionFormControl"></textarea>
+                <mat-error
+                    *ngIf="DescriptionFormControl.hasError('minLength') && !DescriptionFormControl.hasError('required')">
+                    Please enter at least 16 characters
+                </mat-error>
+                <mat-error *ngIf="DescriptionFormControl.hasError('required')">
+                    Description is <strong>required</strong>
+                </mat-error>
+            </mat-form-field>
+
+            <button mat-raised-button type="submit" class="mr-auto mt-4" color="primary">Submit</button>
+        </form>
+    </div>
+</div>

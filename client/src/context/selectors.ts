@@ -20,3 +20,7 @@ export const rolesSelector = createSelector(selectFeature, state => state.roles)
 export const projectSelector = createSelector(selectFeature, state => state.project);
 
 export const ticketSelector = createSelector(selectFeature, state => state.ticket);
+
+export const commentsSelector = createSelector(selectFeature, state => state.comments);
+
+export const filesSelector = createSelector(selectFeature, state => state.files);

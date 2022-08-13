@@ -28,7 +28,7 @@ namespace server.Controllers
 
 
         [HttpPost("{ticketId}"), Authorize]
-        public async Task<IActionResult> UploadFile(IFormFile file, int ticketId, FilleDto req)
+        public async Task<IActionResult> UploadFile(int ticketId, IFormFile file, string Description)
         {
             string uuid = Guid.NewGuid().ToString();
             string[] array = file.FileName.Split('.');
@@ -76,7 +76,7 @@ namespace server.Controllers
                 {
                     type = type == "png" || type == "svg" || type == "image" || type == "jpeg" || type == "jpg" ? "Image" : "Document",
                     name = fileNameForShaft,
-                    Description = req.Description,
+                    Description = Description,
                     TicketId = ticketId,
                     CreatorId = (int)id,
                     Url = $"https://firebasestorage.googleapis.com/v0/b/{_configuration.GetSection("FireBase:storageBucket").Value}/o/images%2F{fileNameForShaft}?alt=media",
@@ -185,10 +185,17 @@ namespace server.Controllers
             return Ok("deleted");
         }
 
-        [HttpGet("Ticket/{TicketId}"), Authorize]
-        public async Task<IActionResult> GetFiles([FromRoute] int TicketId)
+        [HttpGet("{TicketId}"), Authorize]
+        public async Task<IActionResult> GetFiles(int TicketId)
         {
-            var files = await _context.Filles.Where(files => files.TicketId == TicketId).ToListAsync();
+            var files = await _context.Filles.Where(files => files.TicketId == TicketId)
+            .Select(f => new {
+                f.Id,
+                f.type,
+                f.Description,
+                f.Url,
+                f.CreatedAt
+            }).ToListAsync();
 
             return Ok(files);
         }

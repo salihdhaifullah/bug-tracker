@@ -7,13 +7,15 @@ import { environment } from 'src/environments/environment';
 import { ICreateProject, IProject } from '.././types/Projects';
 import { ITicket } from '.././types/Tickets';
 import { IChangeRole } from 'src/types/Roles';
+import { IFilles, IUpdateFille } from 'src/types/Filles';
+import { Comments, ICreateComment } from 'src/types/Comments';
 
 @Injectable()
 
 export class AuthService {
   constructor(private http: HttpClient) { }
   private Auth = environment.apiUrl + "/" + "Auth";
-  
+
   public Singin(data: ISinginFormData): Observable<any> {
     return this.http.post(this.Auth + "/" + "Singin", data);
   }
@@ -35,19 +37,19 @@ export class AuthService {
 @Injectable()
 export class TicketsService {
 
-  constructor(private http: HttpClient) {}
-  
+  constructor(private http: HttpClient) { }
+
   private Ticket = environment.apiUrl + '/' + "Tickets";
 
-  public GetTickets(ProjectId: number) : Observable<ITicket[]> {
+  public GetTickets(ProjectId: number): Observable<ITicket[]> {
     return this.http.get<ITicket[]>(this.Ticket + `?ProjectId=${ProjectId}`);
-  }  
-
-  public CreateTicket(ticket: ICreateTicket) : Observable<any> {
-  return  this.http.post(this.Ticket + "/" + "Create", ticket);
   }
 
-  public GetTicketById(id: Number): Observable<ITicket>{
+  public CreateTicket(ticket: ICreateTicket): Observable<any> {
+    return this.http.post(this.Ticket + "/" + "Create", ticket);
+  }
+
+  public GetTicketById(id: Number): Observable<ITicket> {
     return this.http.get<ITicket>(this.Ticket + "/" + "ticket" + "/" + id)
   }
 
@@ -61,32 +63,32 @@ export class TicketsService {
 
 @Injectable()
 export class ProjectsService {
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   private Project = environment.apiUrl + '/' + "Projects";
 
-  public CreateProject(data: ICreateProject) : Observable<any> {
+  public CreateProject(data: ICreateProject): Observable<any> {
     return this.http.post(this.Project + "/" + "Create", data);
   }
 
-  public GetProjects() : Observable<IProject[]> {
+  public GetProjects(): Observable<IProject[]> {
     return this.http.get<IProject[]>(this.Project);
   }
 
-  public GetProjectById(id: number) : Observable<IProject> {
+  public GetProjectById(id: number): Observable<IProject> {
     return this.http.get<IProject>(this.Project + "/" + id)
   }
 
-  public UpdateProject(data: ICreateProject, id: Number) : Observable<any> {
+  public UpdateProject(data: ICreateProject, id: Number): Observable<any> {
     return this.http.patch(this.Project + "/" + id, data);
   }
 
-  public CloseProject(id: Number) : Observable<any> {
+  public CloseProject(id: Number): Observable<any> {
     return this.http.put(this.Project + "/" + id, {});
   }
-  
 
-  public OpenProject(id: Number) : Observable<any> {
+
+  public OpenProject(id: Number): Observable<any> {
     return this.http.put(this.Project + "/" + "open" + "/" + id, {});
   }
 }
@@ -95,14 +97,63 @@ export class ProjectsService {
 
 @Injectable()
 export class RolesService {
-  constructor(private http: HttpClient) {}
-    private Role = environment.apiUrl + '/' + "Roles";
+  constructor(private http: HttpClient) { }
+  private Role = environment.apiUrl + '/' + "Roles";
 
-    public GetUsersRoles(): Observable<any> {
-      return this.http.get(this.Role);
-    }
+  public GetUsersRoles(): Observable<any> {
+    return this.http.get(this.Role);
+  }
 
-    public ChangeRoles(data: IChangeRole): Observable<any> {
-      return this.http.patch(this.Role, data);
-    }
+  public ChangeRoles(data: IChangeRole): Observable<any> {
+    return this.http.patch(this.Role, data);
+  }
+}
+
+@Injectable()
+export class FilesService {
+  constructor(private http: HttpClient) { }
+
+  private File = environment.apiUrl + '/' + "Files";
+
+  public GetFiles(ticketId: number): Observable<IFilles[]> {
+    return this.http.get<IFilles[]>(this.File + "/" + ticketId);
+  }
+
+  public UploadFile(formData: any, Description: string, id: number): Observable<any> {
+    console.log(formData);
+    return this.http.post(this.File + "/" + id + `?Description=${Description}`, formData);
+  }
+
+  public DeleteFile(id: number): Observable<any> {
+    return this.http.delete(this.File + "/" + id);
+  }
+
+  public UpdateFile(data: IUpdateFille, id: number): Observable<any> {
+    return this.http.patch(this.File + "/" + id, data);
+  }
+
+}
+
+
+@Injectable()
+export class CommentsService {
+  constructor(private http: HttpClient) { }
+  private Comment = environment.apiUrl + '/' + "Comments";
+
+  public GetComments(ticketId: number): Observable<Comments[]> {
+    return this.http.get<Comments[]>(this.Comment + "/" + ticketId);
+  }
+
+  public CreateComment(data: ICreateComment, ticketId: number): Observable<any> {
+    return this.http.post(this.Comment + "/" + ticketId, data);
+  }
+
+  public DeleteComment(id: number): Observable<any> {
+    return this.http.delete(this.Comment + "/" + id);
+  }
+
+  public UpdateComment(data: ICreateComment, id: number): Observable<any> {
+    return this.http.patch(this.Comment + "/" + id, data);
+  }
+
 }

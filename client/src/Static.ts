@@ -71,8 +71,8 @@ export const Static = {
         const currentDate = Date.now();
         
         // if the expiration date is less than the date now return true else false
-        if (currentDate > expireDate) return false;
-                                    else return true;
+        if ((currentDate - 1000 * 60 * 10) >= expireDate) return true;
+                                    else return false;
     }
 
 }

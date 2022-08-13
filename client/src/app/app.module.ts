@@ -20,6 +20,7 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { StoreModule } from '@ngrx/store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { EffectsModule, EffectsRootModule } from '@ngrx/effects';
+import {MatProgressBarModule} from '@angular/material/progress-bar';
 
 import { LoginComponent } from './components/login/login.component';
 import { SinginComponent } from './components/singin/singin.component';
@@ -38,11 +39,15 @@ import { ProjectsComponent } from './components/projects/projects.component';
 import { AppComponent } from './app.component';
 
 
-import { AuthEffects, ProjectsEffects, RolesEffects, TicketsEffects } from 'src/context/effects';
-import { projectsReducers, ticketsReducers, userReducers, rolesReducers, projectReducers, ticketReducers } from 'src/context/reducer';
+import { AuthEffects, CommentsEffects, FilesEffects, ProjectsEffects, RolesEffects, TicketsEffects } from 'src/context/effects';
+import { projectsReducers, ticketsReducers, userReducers, rolesReducers, projectReducers, ticketReducers, commentsReducers, filesReducers } from 'src/context/reducer';
 
-import { ProjectsService, TicketsService, AuthService, RolesService  } from 'src/services/api.service';
+import { ProjectsService, TicketsService, AuthService, RolesService, CommentsService, FilesService  } from 'src/services/api.service';
 import { BearerService } from 'src/services/bearer.service';
+import { CommentsComponent } from './components/comments/comments.component';
+import { FilesComponent } from './components/files/files.component';
+import { UploadFileComponent } from './components/upload-file/upload-file.component';
+import { CommentFormComponent } from './components/comment-form/comment-form.component';
 
 
 
@@ -65,6 +70,10 @@ import { BearerService } from 'src/services/bearer.service';
     LineChartComponent,
     TicketsComponent,
     ProjectsComponent,
+    CommentsComponent,
+    FilesComponent,
+    UploadFileComponent,
+    CommentFormComponent,
   ],
   imports: [ 
     BrowserModule,
@@ -73,6 +82,7 @@ import { BearerService } from 'src/services/bearer.service';
     BrowserAnimationsModule,
     ReactiveFormsModule,
     MatFormFieldModule,
+    MatProgressBarModule,
     MatInputModule,
     MatIconModule,
     MatButtonModule,
@@ -90,12 +100,14 @@ import { BearerService } from 'src/services/bearer.service';
     StoreModule.forFeature('roles', rolesReducers), 
     StoreModule.forFeature('project', projectReducers),
     StoreModule.forFeature('ticket', ticketReducers),
-    EffectsModule.forFeature([ProjectsEffects, TicketsEffects, AuthEffects, RolesEffects]),
+    StoreModule.forFeature('comments', commentsReducers),
+    StoreModule.forFeature('files', filesReducers),
+    EffectsModule.forFeature([CommentsEffects, FilesEffects, ProjectsEffects, TicketsEffects, AuthEffects, RolesEffects]),
     EffectsModule.forRoot([]),
     EffectsRootModule,
     StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: environment.production, autoPause: true }),
   ],
-  providers: [ProjectsService, RolesService, TicketsService, AuthService, {provide: HTTP_INTERCEPTORS, useClass: BearerService, multi: true}],
+  providers: [FilesService, CommentsService, ProjectsService, RolesService, TicketsService, AuthService, {provide: HTTP_INTERCEPTORS, useClass: BearerService, multi: true}],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

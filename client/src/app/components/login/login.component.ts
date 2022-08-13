@@ -1,3 +1,4 @@
+import Swal  from 'sweetalert2';
 import { isLoadingSelector, errorSelector, userSelector } from 'src/context/selectors';
 import { IAppState } from 'src/context/app.state';
 import { Store, select } from '@ngrx/store';
@@ -58,8 +59,23 @@ export class LoginComponent  {
         if (data.user) {
           console.log(data.user);
           sessionStorage.setItem('user', JSON.stringify(data.user));
+          Swal.fire({
+            title: 'Login Successful',
+            text: 'Welcome ' + data.user.fullName,
+            icon: 'success',
+            confirmButtonText: 'OK',
+          })
         }
-       });  
+       }, (error: any) => {
+        Swal.fire({
+          title: 'Error',
+          text: error.error.message,
+          icon: 'error',  
+          confirmButtonText: 'OK',
+        });  
+
+    });
+
     } 
   }
 
