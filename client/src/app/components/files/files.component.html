@@ -1,4 +1,4 @@
-<div class="w-full grid mt-10 gap-5 justify-evenly grid-cols-3 h-20 md:h-30 lg:h-40  items-center">
+<div class="w-full">
 
   
   <div class="mat-elevation-z8 mb-20 mt-10">
@@ -16,6 +16,11 @@
       <ng-container matColumnDef="Description">
         <th mat-header-cell *matHeaderCellDef> Description </th>
         <td mat-cell *matCellDef="let element"> {{element.description}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="Creator Name">
+        <th mat-header-cell *matHeaderCellDef> Creator Name </th>
+        <td mat-cell *matCellDef="let element"> {{element.fullName}} </td>
       </ng-container>
   
   

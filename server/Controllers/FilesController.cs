@@ -88,11 +88,9 @@ namespace server.Controllers
 
                 try
                 {
-
                     await UploadFile;
                     await _context.SaveChangesAsync();
                     return Ok(newFille);
-
                 }
                 catch (Exception e)
                 {
@@ -189,15 +187,143 @@ namespace server.Controllers
         public async Task<IActionResult> GetFiles(int TicketId)
         {
             var files = await _context.Filles.Where(files => files.TicketId == TicketId)
-            .Select(f => new {
+            .Select(f => new
+            {
                 f.Id,
                 f.type,
                 f.Description,
+                f.CreatorId,
+                fullName = f.Creator.FirstName + " " + f.Creator.LastName,
                 f.Url,
                 f.CreatedAt
             }).ToListAsync();
 
             return Ok(files);
         }
+
+
+
+        [HttpPatch("avatar"), Authorize]
+        public async Task<IActionResult> UpdateAvatar(IFormFile file)
+        {
+            try
+            {
+                string? header = Request.Headers.Authorization;
+
+                string[] token = header.Split(' ');
+
+                var UserId = _token.VerifyToken(token[1]);
+
+                if (UserId == null) return Unauthorized();
+
+                var user = await _context.Users.FirstOrDefaultAsync(user => user.Id == UserId);
+
+                if (user == null) return BadRequest("User Not Found");
+
+                if (UserId != user.Id) return Unauthorized();
+
+                if (file == null) return BadRequest("File is Null");
+
+                var stream = file.OpenReadStream();
+
+                var API = new FirebaseAuthProvider(new FirebaseConfig(_configuration.GetSection("FireBase:apiKay").Value));
+
+                var auth = await API.SignInWithEmailAndPasswordAsync(
+                _configuration.GetSection("Admin:Email").Value,
+                _configuration.GetSection("Admin:Password").Value
+                );
+
+                var cancellation = new CancellationTokenSource();
+
+                string uuid = Guid.NewGuid().ToString();
+                string[] array = file.FileName.Split('.');
+                string type = array[array.Length - 1];
+
+                string fileNameForShaft = uuid + "." + type;
+
+                if (type == "png" || type == "svg" || type == "image" || type == "jpeg" || type == "jpg")
+                {
+                    if (user.AvatarUrl != "")
+                    {
+
+                        var DeleteFile = new FirebaseStorage(
+                        _configuration.GetSection("FireBase:storageBucket").Value,
+                        new FirebaseStorageOptions
+                        {
+                            AuthTokenAsyncFactory = () => Task.FromResult(auth.FirebaseToken),
+                            ThrowOnCancel = true
+                        }
+                        ).Child("avatars")
+                        .Child($"{user.AvatarName}").DeleteAsync();
+
+                        var UploadFile = new FirebaseStorage(
+                            _configuration.GetSection("FireBase:storageBucket").Value,
+                            new FirebaseStorageOptions
+                            {
+                                AuthTokenAsyncFactory = () => Task.FromResult(auth.FirebaseToken),
+                                ThrowOnCancel = true
+                            }
+                        ).Child("avatars").Child($"{fileNameForShaft}").PutAsync(stream, cancellation.Token);
+
+                        string Url = $"https://firebasestorage.googleapis.com/v0/b/{_configuration.GetSection("FireBase:storageBucket").Value}/o/avatars%2F{fileNameForShaft}?alt=media";
+
+                        try
+                        {
+                            user.AvatarName = fileNameForShaft;
+                            user.AvatarUrl = Url;
+                            await UploadFile;
+                            await DeleteFile;
+                            await _context.SaveChangesAsync();
+                            return Ok(user);
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine(e.Message);
+                            return BadRequest("sorry something went wrong 😥");
+                        }
+                        finally { stream.Close(); }
+
+                    }
+                    else
+                    {
+                        var UploadFile = new FirebaseStorage(
+                        _configuration.GetSection("FireBase:storageBucket").Value,
+                        new FirebaseStorageOptions
+                        {
+                            AuthTokenAsyncFactory = () => Task.FromResult(auth.FirebaseToken),
+                            ThrowOnCancel = true
+                        }
+                        ).Child("avatars").Child($"{fileNameForShaft}").PutAsync(stream, cancellation.Token);
+
+                        string Url = $"https://firebasestorage.googleapis.com/v0/b/{_configuration.GetSection("FireBase:storageBucket").Value}/o/avatars%2F{fileNameForShaft}?alt=media";
+
+                        try
+                        {
+                            user.AvatarName = fileNameForShaft;
+                            user.AvatarUrl = Url;
+                            await UploadFile;
+                            await _context.SaveChangesAsync();
+                            return Ok(user);
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine(e.Message);
+                            return BadRequest("sorry something went wrong 😥");
+                        }
+                        finally { stream.Close(); }
+
+                    }
+                }
+                else return BadRequest("File is not an image");
+
+
+            }
+            catch (Exception err)
+            {
+                return BadRequest(err);
+            }
+
+        }
+
     }
 }

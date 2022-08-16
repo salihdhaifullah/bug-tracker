@@ -19,7 +19,7 @@ import * as moment from 'moment';
 })
 export class FilesComponent {
   files$: Observable<IFilles[]>;
-  displayedColumns: string[] = ['type', 'Description', 'CreatedAt'];
+  displayedColumns: string[] = ['type', 'Description', 'CreatedAt', 'Creator Name'];
   dataSource = new MatTableDataSource<IFilles>();
 
   constructor(private store: Store<IAppState>, private filesService: FilesService) {

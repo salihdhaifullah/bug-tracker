@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using server.Models.db;
+﻿using server.Models.db;
 
 namespace server.Data
 {
@@ -7,7 +6,13 @@ namespace server.Data
     {
         #pragma warning disable CS8618
         public Context(DbContextOptions<Context> options) : base(options) {}
-        protected override void OnModelCreating(ModelBuilder modelBuilder) { modelBuilder.UseSerialColumns(); }
+        protected override void OnModelCreating(ModelBuilder modelBuilder) { modelBuilder.UseSerialColumns();
+        
+        // modelBuilder.Entity<User>()
+        //     .HasOne(a => a.Avatar)
+        //     .WithOne(a => a.Creator)
+        //     .HasForeignKey<Fille>(c => c.CreatorId);
+        }
         
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Project> Projects { get; set; }

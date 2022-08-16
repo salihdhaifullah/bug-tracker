@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit } from '@angular/core';
+import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-navbar',
@@ -8,7 +8,8 @@ export class NavbarComponent {
 
   constructor() { }
 
-  AfterViewInit(): void {
+  HandelUploadAvatar() {
+
   }
 
 }

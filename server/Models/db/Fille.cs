@@ -11,7 +11,7 @@ namespace server.Models.db
         public string name { get; set; } = String.Empty;
         public string Url { get; set; } = String.Empty;
         public string Description { get; set; } = String.Empty;
-        [Required, ForeignKey("TicketId")]
+        [ForeignKey("TicketId")]
         public int TicketId { get; set; }
         public virtual Ticket Ticket { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

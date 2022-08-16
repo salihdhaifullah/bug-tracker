@@ -1,4 +1,6 @@
-﻿namespace server.Models.db
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace server.Models.db
 {
     public class User
     {
@@ -10,5 +12,7 @@
         public string PasswordSalt { get; set; } = String.Empty;
         public DateTime CreateAt { get; set; } = DateTime.UtcNow;
         public string Role { get; set; } = Roles.Developer;
+        public string AvatarUrl { get; set; } = String.Empty;
+        public string AvatarName { get; set; } = String.Empty;
     }
 }

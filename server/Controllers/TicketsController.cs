@@ -77,8 +77,8 @@ namespace server.Controllers
             // Status => New, In Progress, Resolved, Closed
             // Type => Feature, Bug
 
-            if (req.Type != Types.Feature && req.Type != Types.Bug) return BadRequest();
-            if (req.Priority != Priorates.Low && req.Priority != Priorates.Medium && req.Priority != Priorates.High) return BadRequest();
+            if (req.Type != Types.Feature && req.Type != Types.Bug) return BadRequest("Type must be Feature or Bug");
+            if (req.Priority != Priorates.Low && req.Priority != Priorates.Medium && req.Priority != Priorates.High) return BadRequest("Priority must be Low, Medium, High");
 
             string? header = Request.Headers.Authorization;
 

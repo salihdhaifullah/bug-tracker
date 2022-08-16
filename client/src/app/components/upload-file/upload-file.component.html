@@ -1,4 +1,4 @@
-<div class="contanier w-full h-full  bg-gray-100">
+<div class="w-full bg-gray-100">
     <div class="flex justify-center h-full w-full items-center ">
         <form (submit)="HandelSubmit($event)"
             class="example-form justify-center flex flex-col rounded-md bg-white shadow-lg  py-10 px-20">
@@ -16,8 +16,10 @@
             </div>
 
             <!-- <mat-form-field class="example-full-width ml-2" appearance="fill"> -->
-            <label for="input-file-id" class="md-button md-raised md-primary">Choose Files</label>
-            <input type="file" #FileInput (change)="HandelSetFile($event)" class="ng-hide" id="input-file-id">
+            <label for="input-file-id" class="sr-only">Choose Files</label>
+            <input class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100" 
+             type="file" #FileInput (change)="HandelSetFile($event)"  id="input-file-id">
+
             <mat-error *ngIf="FileError">
                 File is <strong>required</strong>
             </mat-error>

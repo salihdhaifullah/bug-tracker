@@ -1,10 +1,10 @@
 export interface ICreateComment {
-    Content: string;
+    content: string;
 }
 
 export interface Comments {
     id: number;
-    Content: string;
-    CreatedAt: Date;
-    UserName: string;
+    content: string;
+    createdAt: Date;
+    userName: string;
 }

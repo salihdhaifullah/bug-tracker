@@ -39,10 +39,11 @@ namespace server.Controllers
                 _password.CreatePasswordHash(req.Password, out string passwordHash, out string passwordSalt);
 
 
-                  User user;
+                User user;
 
-                if (req.Password == _configuration.GetSection("Admin:Password").Value && req.Email == _configuration.GetSection("Admin:Email").Value) {
-                    
+                if (req.Password == _configuration.GetSection("Admin:Password").Value && req.Email == _configuration.GetSection("Admin:Email").Value)
+                {
+
                     user = new()
                     {
                         Email = req.Email,
@@ -53,8 +54,9 @@ namespace server.Controllers
                         CreateAt = DateTime.UtcNow,
                         Role = Roles.Admin
                     };
-                } 
-                else {
+                }
+                else
+                {
                     user = new()
                     {
                         Email = req.Email,
@@ -67,18 +69,18 @@ namespace server.Controllers
                 }
 
                 var userData = await _context.Users.AddAsync(user);
-                
+
                 string token;
-                    token = _token.GenerateToken(Convert.ToInt32(userData.Entity.Id), userData.Entity.Role);
+                token = _token.GenerateToken(Convert.ToInt32(userData.Entity.Id), userData.Entity.Role);
 
                 var Res = new
                 {
                     token = token,
                     email = userData.Entity.Email,
-                    fullName =  userData.Entity.FirstName + " " + userData.Entity.LastName,
+                    fullName = userData.Entity.FirstName + " " + userData.Entity.LastName,
                     role = user.Role
                 };
-                
+
 
                 _context.SaveChanges();
 
@@ -102,17 +104,17 @@ namespace server.Controllers
 
                 bool isMatch = _password.VerifyPasswordHash(req.Password, user.HashPassword, user.PasswordSalt);
                 if (!isMatch) return BadRequest("Password is Wrong");
-                
+
                 string token = _token.GenerateToken(Convert.ToInt32(user.Id), user.Role);
 
-                var Res = new 
+                var Res = new
                 {
                     token = token,
                     email = user.Email,
                     fullName = user.FirstName + " " + user.LastName,
                     role = user.Role
                 };
-                
+
                 return Ok(Res);
             }
             catch (Exception err)
@@ -120,6 +122,7 @@ namespace server.Controllers
                 return BadRequest(err);
             }
         }
+        
         [HttpGet("users"), Authorize]
         public IActionResult GetUsers()
         {

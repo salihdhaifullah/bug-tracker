@@ -3,7 +3,14 @@
       <mat-icon class="text-[#8997ac] text-center" [inline]='true'>notifications_none</mat-icon>
   </div>
   <div class="text-center font-[800] mb-[50px]">
-      <img class="mt-4 font-[800] mb-[50px]" src="https://theartistgsm.com/wp-content/uploads/2020/08/admin-settings-male.png" alt="">
+        <div class="flex relative justify-center items-center">
+            <img class="mt-4 rounded-full max-w-[70%] font-[800] mb-[50px]" src="../../../../assets/images/User_Placeholder.png" alt="">
+            <span (click)="HandelUploadAvatar()" class="absolute flex justify-center items-center right-6 cursor-pointer bg-white h-6 p-3.5 hover:p-[18px] hover:bg-gray-200 text-gray-700 hover:text-gray-900 shadow-md transition-all rounded-3xl ">
+                <mat-icon class="absolute">
+                    create
+                </mat-icon>
+            </span>
+        </div>
       <h4 class="text-white">admin</h4>
       <p class="-mt-[10px] text-[#697d95]">admin@gmail.com</p>
   </div>

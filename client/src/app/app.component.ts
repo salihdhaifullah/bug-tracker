@@ -30,7 +30,7 @@ export class AppComponent {
 
     setTimeout(() => {
       this.isExpired = this.user?.token && Static.checkExpirationDateJwt(this.user?.token);
-      if (this.isExpired || this.user?.token === null) {
+      if (this.isExpired || this.user === null) {
         this.user && this.store.dispatch(Logout());
         this.user && sessionStorage.removeItem('user');
         this.user = null;
@@ -50,7 +50,7 @@ export class AppComponent {
     this.id = setInterval(() => {
 
       this.isExpired = this.user?.token && Static.checkExpirationDateJwt(this.user?.token);
-      if (this.isExpired || this.user?.token === null) {
+      if (this.isExpired || this.user === null) {
 
         this.user && this.store.dispatch(Logout());
         this.user && sessionStorage.removeItem('user');
