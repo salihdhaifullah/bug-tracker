@@ -1,0 +1,30 @@
+<div *ngIf="comment">
+    <div class="mb-2 flex">
+
+        <span class="relative" *ngIf="userId === comment.creatorId">
+            <mat-icon class="cursor-pointer" (click)="HandelMore()">more_vert</mat-icon>
+            <div *ngIf="visibleMenu" class="absolute flex flex-col rounded-md bg-white transition-all shadow-md p-4">
+                <span (click)="HandelDelete(comment.id)"
+                    class="cursor-pointer hover:bg-gray-200 px-3 py-[6px] text-base  mb-2">Delete</span>
+                <span (click)="HandelUpdate(comment.id)"
+                    class="cursor-pointer hover:bg-gray-200 px-3 py-[6px] text-base">Update</span>
+            </div>
+        </span>
+    
+        <span *ngIf="comment.avatarUrl">
+            <img class="object-fill max-w-8 max-h-8 sm:max-w-10 sm:max-h-10 lg:max-w-12 lg:max-h-12 rounded-full"
+                [src]="comment.avatarUrl" />
+        </span>
+    
+        <span *ngIf="!comment.avatarUrl">
+            <img class="object-fill max-w-8 max-h-8 sm:max-w-10 sm:max-h-10 lg:max-w-12 lg:max-h-12 rounded-full"
+                src="../../../assets/images/User_Placeholder.png" />
+        </span>
+    
+        <span class="text-base text-gray-700 mr-2 flex-1 ml-6">By {{comment.userName}}</span>
+        <span class="text-sm text-gray-500">{{_moment(comment.createdAt).fromNow()}}</span>
+    </div>
+    <hr class="mb-3" />
+    
+    <span class="text-base text-gray-700">{{comment.content}}</span>
+</div>

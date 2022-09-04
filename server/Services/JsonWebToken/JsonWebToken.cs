@@ -1,6 +1,7 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace server.Services.JsonWebToken
@@ -13,13 +14,12 @@ namespace server.Services.JsonWebToken
         {
             _configuration = configuration;
         }
-        
+
         public string GenerateToken(int id, string? role)
         {
             var claims = new List<Claim>
             {
-                new Claim("id", id.ToString()), 
-                new Claim(ClaimTypes.Role, role != null ? role : "Developer"), 
+                new Claim("id", id.ToString())
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetSection("secretToken").Value));
@@ -32,7 +32,7 @@ namespace server.Services.JsonWebToken
             );
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
-        
+
         public int? VerifyToken(string token)
         {
             if (token == null)
@@ -52,7 +52,7 @@ namespace server.Services.JsonWebToken
                 }, out SecurityToken validatedToken);
 
                 var jwtToken = (JwtSecurityToken)validatedToken;
-                var userId = int.Parse(jwtToken.Claims.First(x => x.Type == "id").Value);
+                int userId = int.Parse(jwtToken.Claims.First(x => x.Type == "id").Value);
                 return userId;
             }
             catch
@@ -61,6 +61,25 @@ namespace server.Services.JsonWebToken
             }
         }
 
-        
+
+        public string GenerateRefreshToken(int id)
+        {
+            var claims = new List<Claim> {
+                new Claim("id", id.ToString()),
+                new Claim("refresh-token", "refresh-token-Secret"),
+            };
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetSection("secretToken").Value));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            var refreshToken = new JwtSecurityToken(
+                claims: claims,
+                expires: DateTime.UtcNow.AddHours(4320), // or 6 months
+                signingCredentials: creds
+            );
+            return new JwtSecurityTokenHandler().WriteToken(refreshToken);
+        }
+
+
     }
 }

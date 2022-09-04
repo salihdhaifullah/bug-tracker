@@ -1,3 +1,4 @@
+import { Router } from '@angular/router';
 import Swal  from 'sweetalert2';
 import { isLoadingSelector, errorSelector, userSelector } from 'src/context/selectors';
 import { IAppState } from 'src/context/app.state';
@@ -21,7 +22,7 @@ export class LoginComponent  {
   error$: Observable<string | null>; 
   user$: Observable<User | null>; 
 
-  constructor(private store: Store<IAppState>) {
+  constructor(private store: Store<IAppState>, private router: Router) {
     this.isLoading$ = this.store.pipe(select(isLoadingSelector))
     this.error$ = this.store.pipe(select(errorSelector))
     this.user$ = this.store.pipe(select(userSelector))
@@ -44,6 +45,8 @@ export class LoginComponent  {
       console.log(data.user)
     });
   }
+
+  HandelRedirect() { this.router.navigate(["singin"]) };
   
   HandelSubmit = (event: Event) => {
     event.preventDefault();
@@ -65,6 +68,7 @@ export class LoginComponent  {
             icon: 'success',
             confirmButtonText: 'OK',
           })
+          this.router.navigate([""])
         }
        }, (error: any) => {
         Swal.fire({

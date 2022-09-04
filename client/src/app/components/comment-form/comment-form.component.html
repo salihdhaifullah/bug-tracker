@@ -1,1 +1,21 @@
-<p>comment-form works!</p>
+<div class="min-w-full rounded-lg shadow-lg bg-white p-6">
+      <div class="mb-2">
+        <label for="comment" class="text-lg text-gray-600">Add a comment</label>
+        <textarea
+          #comment
+          id="comment"
+          class="min-h-[10rem] min-w-full p-2 border rounded focus:outline-none focus:ring-gray-300 focus:ring-1"
+          name="comment"
+          placeholder=""></textarea>
+      </div>
+      <div class="justify-evenly flex items-center">
+        <button (click)="HandelComment()" class="px-3 py-2 hover:text-blue-600 hover:border-blue-600 hover:border hover:bg-white text-sm text-white bg-blue-600 rounded">
+          Comment
+        </button>
+        <button
+        (click)="HandelCancel()"
+          class="px-3 py-2 text-sm hover:text-white hover:bg-blue-600 text-blue-600 border border-blue-500 rounded">
+          Cancel
+        </button>
+      </div>
+  </div>

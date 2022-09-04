@@ -2,11 +2,8 @@ import { FilesService } from './../../../services/api.service';
 import { Component, Input } from '@angular/core';
 import { MyErrorStateMatcher } from 'src/app/MyErrorStateMatcher';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { ICreateFille } from 'src/types/Filles';
 import { Static } from 'src/Static';
 import Swal from 'sweetalert2';
-import { Subscription } from 'rxjs/internal/Subscription';
-import { HttpEventType } from '@angular/common/http';
 
 @Component({
   selector: 'app-upload-file',

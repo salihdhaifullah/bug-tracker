@@ -60,7 +60,9 @@ namespace server.Controllers
                 C.Content,
                 C.Id,
                 C.CreatedAt,
-                UserName = C.User.FirstName + " " + C.User.LastName
+                UserName = C.User.FirstName + " " + C.User.LastName,
+                CreatorId = C.UserId,
+                avatarUrl = C.User.AvatarUrl
             }).ToListAsync();
             return Ok(comments);
         }

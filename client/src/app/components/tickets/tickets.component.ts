@@ -12,7 +12,7 @@ import { Component, ViewChild, Input, SimpleChanges, OnInit, Output, EventEmitte
   templateUrl: './tickets.component.html'
 })
 export class TicketsComponent implements OnInit {
-  displayedColumns: string[] = ['devoloper', 'submitter', 'priority', "createdAt", "type", "completed", "update"];
+  displayedColumns: string[] = ['devoloper', 'name', 'priority', "createdAt", "type", "completed", "update"];
   dataSource = new MatTableDataSource<ITicket>();
 
   @Input() tickets: ITicket[] | undefined | null;
@@ -55,7 +55,6 @@ export class TicketsComponent implements OnInit {
         this.dataSource.data = this.tickets;
         this.dataSource.paginator = this.paginator;
         this.dataSource.sort = this.sort;
-        console.log("qgw");
         console.log(this.tickets)
       }
     }

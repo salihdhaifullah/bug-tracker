@@ -4,6 +4,7 @@
         <div
             class="flex w-full text-white font-semibold flex-col hover-animation-card bg-blue-400 items-center justify-center rounded-md shadow-md h-full text-center">
             <h2 *ngIf="count">{{count > 1 ? "Tickets" : "Ticket"}}</h2>
+            <h2 *ngIf="!count">Ticket</h2>
             <span *ngIf="count" class="text-lg">{{count}}</span>
             <h3 *ngIf="!count">None</h3>
         </div>
@@ -11,6 +12,7 @@
         <div
             class="flex w-full text-white font-semibold flex-col hover-animation-card bg-blue-400 items-center justify-center rounded-md shadow-md h-full text-center">
             <h2 *ngIf="Bugs">{{Bugs > 1 ? "Bugs" : "Bug"}}</h2>
+            <h2 *ngIf="!Bugs">Bug</h2>
             <span *ngIf="Bugs" class="text-lg">{{Bugs}}</span>
             <h3 *ngIf="!Bugs">None</h3>
         </div>
@@ -18,6 +20,7 @@
         <div
             class="flex w-full text-white font-semibold flex-col hover-animation-card bg-blue-400 items-center justify-center rounded-md shadow-md h-full text-center">
             <h2 *ngIf="Features">{{Features > 1 ? "Features" : "Feature"}}</h2>
+            <h2 *ngIf="!Features">Feature</h2>
             <span *ngIf="Features" class="text-lg">{{Features}}</span>
             <h3 *ngIf="!Features">None</h3>
         </div>

@@ -1,4 +1,3 @@
-import { ICreateTicket } from './../types/Tickets';
 import { UsersRole } from 'src/types/Roles';
 import { createAction, props } from "@ngrx/store";
 import { ILoginFormData, ISinginFormData, User } from "src/types/User";
@@ -77,6 +76,5 @@ export const getFiles = createAction("[Files] Get Files", props<{TicketId: numbe
 export const getFilesSuccess = createAction("[Files] Get Files Success", props<{ files: IFilles[] }>()); 
 
 export const getFilesFailure = createAction("[Files] Get Files Failure", props<{ error: string }>()); 
-
 
 export const Logout = createAction("[Logout] Logout"); 

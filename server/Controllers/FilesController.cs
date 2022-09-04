@@ -208,6 +208,8 @@ namespace server.Controllers
         {
             try
             {
+                if (file == null) return BadRequest("File is Null");
+
                 string? header = Request.Headers.Authorization;
 
                 string[] token = header.Split(' ');
@@ -219,10 +221,6 @@ namespace server.Controllers
                 var user = await _context.Users.FirstOrDefaultAsync(user => user.Id == UserId);
 
                 if (user == null) return BadRequest("User Not Found");
-
-                if (UserId != user.Id) return Unauthorized();
-
-                if (file == null) return BadRequest("File is Null");
 
                 var stream = file.OpenReadStream();
 
@@ -274,7 +272,7 @@ namespace server.Controllers
                             await UploadFile;
                             await DeleteFile;
                             await _context.SaveChangesAsync();
-                            return Ok(user);
+                            return Ok(user.AvatarUrl);
                         }
                         catch (Exception e)
                         {
@@ -303,7 +301,7 @@ namespace server.Controllers
                             user.AvatarUrl = Url;
                             await UploadFile;
                             await _context.SaveChangesAsync();
-                            return Ok(user);
+                            return Ok(user.AvatarUrl);
                         }
                         catch (Exception e)
                         {

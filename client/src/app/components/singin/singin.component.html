@@ -1,4 +1,4 @@
-<div class="contanier w-full h-full bg-gray-100">
+<div class="mt-20 w-full h-full bg-gray-100">
     <div class="flex justify-center h-full w-full items-center ">
         <form (submit)="HandelSubmit($event)" class="example-form justify-center flex flex-col rounded-md bg-white shadow-lg  py-10 px-20">
             <div class="flex items-center justify-center w-full flex-col">
@@ -60,6 +60,13 @@
             </mat-form-field>
 
             <button mat-raised-button type="submit" class="mr-auto" color="primary">Submit</button>
+
+            <p class="mt-4">
+                Already Have An Account 
+                <span (click)="HandelRedirect()" class="text-blue-700 hover:text-blue-500 transition-all hover:underline cursor-pointer">
+                    Login
+                </span>
+            </p>
         </form>
     </div>
 </div>

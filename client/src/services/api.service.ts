@@ -8,7 +8,7 @@ import { ICreateProject, IProject } from '.././types/Projects';
 import { ITicket } from '.././types/Tickets';
 import { IChangeRole } from 'src/types/Roles';
 import { IFilles, IUpdateFille } from 'src/types/Filles';
-import { Comments, ICreateComment } from 'src/types/Comments';
+import { Comments } from 'src/types/Comments';
 
 @Injectable()
 
@@ -132,6 +132,10 @@ export class FilesService {
     return this.http.patch(this.File + "/" + id, data);
   }
 
+  public UploadAvatar(formData: any): Observable<any> {
+    return this.http.patch(this.File + "/" + "avatar", formData);
+  }
+
 }
 
 
@@ -144,16 +148,16 @@ export class CommentsService {
     return this.http.get<Comments[]>(this.Comment + "/" + ticketId);
   }
 
-  public CreateComment(data: ICreateComment, ticketId: number): Observable<any> {
-    return this.http.post(this.Comment + "/" + ticketId, data);
+  public CreateComment(comment: string, ticketId: number): Observable<any> {
+    return this.http.post(this.Comment + "/" + ticketId, {Content: comment});
   }
 
   public DeleteComment(id: number): Observable<any> {
     return this.http.delete(this.Comment + "/" + id);
   }
 
-  public UpdateComment(data: ICreateComment, id: number): Observable<any> {
-    return this.http.patch(this.Comment + "/" + id, data);
+  public UpdateComment(comment: string, id: number): Observable<any> {
+    return this.http.patch(this.Comment + "/" + id, {Content: comment});
   }
 
 }

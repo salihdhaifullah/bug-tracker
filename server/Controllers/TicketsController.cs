@@ -5,8 +5,6 @@ using server.Models.api;
 using server.Models.db;
 using server.Services.JsonWebToken;
 using server.Services.PasswordServices;
-using System.Collections;
-using System.Linq;
 
 namespace server.Controllers
 {
@@ -31,13 +29,11 @@ namespace server.Controllers
             var Tickets = _context.Tickets.Where(ticket => ticket.ProjectId == ProjectId).Select(p => new
             {
                 devoloper = p.AssigneeTo.FirstName + " " + p.AssigneeTo.LastName,
-                Submitter = p.Submitter.FirstName + " " + p.Submitter.LastName,
                 p.Name,
                 p.Priority,
                 p.Status,
                 p.CreatedAt,
                 p.Type,
-                p.UpdatedAt,
                 p.IsCompleted,
                 p.Id
             }).ToList();
@@ -119,25 +115,14 @@ namespace server.Controllers
                         _context.SaveChanges();
                         return Ok(NewTicket.Entity);
 
-                    } else return NotFound();
+                    }
+                    else return NotFound();
                 }
 
                 else return Unauthorized();
             }
             else return Unauthorized();
 
-        }
-
-        [HttpPut("Status/{id}"), Authorize(Roles = "Developer")]
-        public IActionResult InProgress(TicketDto req)
-        {
-            var hello = Request.Headers.Authorization;
-
-            var Ticket = _context.Tickets.FirstOrDefault(ticket => ticket.Id == 1);
-            if (Ticket == null) return BadRequest("Ticket Not Found");
-            // Ticket.Status = Statuses.InProgress;
-            // _context.SaveChanges();
-            return Ok(hello);
         }
 
 
@@ -155,27 +140,83 @@ namespace server.Controllers
                 {
                     var user = await _context.Users.FindAsync(id1);
                     if (user == null) return Unauthorized();
-                        
-
-                    
-                        Ticket.AssigneeToId = req.AssigneeToId;
-                        Ticket.Description = req.Description;
-                        Ticket.Name = req.Name;
-                        Ticket.UpdatedAt = DateTime.UtcNow;
-                        Ticket.Type = req.Type;
-                        Ticket.Priority = req.Priority;
-                        Ticket.SubmitterId = (int)id1;
 
 
-                    
+
+                    Ticket.AssigneeToId = req.AssigneeToId;
+                    Ticket.Description = req.Description;
+                    Ticket.Name = req.Name;
+                    Ticket.UpdatedAt = DateTime.UtcNow;
+                    Ticket.Type = req.Type;
+                    Ticket.Priority = req.Priority;
+                    Ticket.SubmitterId = (int)id1;
+
+
+
                     _context.SaveChanges();
-                        return Ok(Ticket);
-                    
+                    return Ok(Ticket);
+
                 }
                 else return Unauthorized();
             }
             else return Unauthorized();
         }
 
+        [HttpGet("ticket-assigned"), Authorize(Roles = "Developer")]
+        public async Task<IActionResult> GetTicketsAssignedToMe()
+        {
+            string? header = Request.Headers.Authorization;
+            if (header == null) return Unauthorized();
+
+            string[] token = header.Split(' ');
+            var id = _token.VerifyToken(token[1]);
+            if (id == null) return Unauthorized();
+            var user = await _context.Users.FindAsync(id);
+
+            if (user == null) return Unauthorized();
+
+            var Tickets = _context.Tickets.Where(ticket => ticket.AssigneeToId == id).Select(p => new
+            {
+                p.Name,
+                p.Priority,
+                p.Status,
+                p.Id
+            }).ToList();
+
+            return Ok(Tickets);
+
+
+        }
+
+
+        [HttpPut("ticket-assigned/{id}"), Authorize(Roles = "Developer")]
+        public async Task<IActionResult> AssignTicketToMe([FromRoute] int id, [FromQuery] string Status)
+        {
+            
+            var Ticket = await _context.Tickets.FindAsync(id);
+            if (Ticket == null) return NotFound();
+            string? header = Request.Headers.Authorization;
+            if (header == null) return Unauthorized();
+
+            string[] token = header.Split(' ');
+            var id1 = _token.VerifyToken(token[1]);
+            if (id1 == null) return Unauthorized();
+
+            if (Ticket.AssigneeToId != id1) return Unauthorized();
+
+            if (Status != Statuses.New && Status != Statuses.InProgress && Status != Statuses.Closed) return BadRequest("Status must be New, InProgress, Closed");
+
+
+            if (Status == Statuses.Closed)
+            {
+                Ticket.Status = Status;
+                Ticket.IsCompleted = true;
+            } 
+            else Ticket.Status = Status;
+            
+            
+            await _context.SaveChangesAsync();
+            return Ok(Ticket);
+        }
     }
 }

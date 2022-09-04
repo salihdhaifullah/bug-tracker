@@ -44,7 +44,7 @@ export const Static = {
             !isNaN(Number(array[i])) && params.push(array[i])
         }
         // return the id in the params url 
-        // i used reverse function cuz its inverse for loop
+        // i used reverse function cuz its an inverse for loop
         return Number(params.reverse().join(""))
     },
 
@@ -73,6 +73,25 @@ export const Static = {
         // if the expiration date is less than the date now return true else false
         if ((currentDate - 1000 * 60 * 10) >= expireDate) return true;
                                     else return false;
+    },
+
+
+    getIdFromJwtToken: (token: string): number => {
+        // get the object part that content the expiration Date from token
+        const base64Url = token.split('.')[1]
+
+        // get the payload from the object part 
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
+        
+        // decode the payload
+        const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(c => {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+        }).join(''))
+
+        // parse the json object 
+        const objToken = JSON.parse(jsonPayload);
+
+        return Number(objToken.id);
     }
 
 }

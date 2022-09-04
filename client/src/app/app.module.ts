@@ -21,6 +21,7 @@ import { StoreModule } from '@ngrx/store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { EffectsModule, EffectsRootModule } from '@ngrx/effects';
 import {MatProgressBarModule} from '@angular/material/progress-bar';
+import {DragDropModule} from '@angular/cdk/drag-drop';
 
 import { LoginComponent } from './components/login/login.component';
 import { SinginComponent } from './components/singin/singin.component';
@@ -48,8 +49,9 @@ import { CommentsComponent } from './components/comments/comments.component';
 import { FilesComponent } from './components/files/files.component';
 import { UploadFileComponent } from './components/upload-file/upload-file.component';
 import { CommentFormComponent } from './components/comment-form/comment-form.component';
-
-
+import { UserTicketComponent } from './components/user-ticket/user-ticket.component';
+import { NotFoundComponent } from './components/not-found/not-found.component';
+import { CommentComponent } from './components/comment/comment.component';
 
 
 
@@ -74,6 +76,9 @@ import { CommentFormComponent } from './components/comment-form/comment-form.com
     FilesComponent,
     UploadFileComponent,
     CommentFormComponent,
+    UserTicketComponent,
+    NotFoundComponent,
+    CommentComponent,
   ],
   imports: [ 
     BrowserModule,
@@ -84,6 +89,7 @@ import { CommentFormComponent } from './components/comment-form/comment-form.com
     MatFormFieldModule,
     MatProgressBarModule,
     MatInputModule,
+    DragDropModule,
     MatIconModule,
     MatButtonModule,
     HttpClientModule,

@@ -6,11 +6,12 @@
         <div class="content ">
             <div class="toolbar">
                 <mat-toolbar class="justify-between bg-blue-200">
-                    <mat-icon class="ml-[15px] text-[#6D8299]" (click)="sidebar.toggle()">menu</mat-icon>
+                    <mat-icon class="ml-[15px] text-[#6D8299] cursor-pointer hover:text-gray-700 transition-all" (click)="handelClick()">{{isClosed ? "menu" : "close"}}</mat-icon>
                     <div class="mt-[15px]">
-                        <mat-icon class="ml-[15px] text-[#6D8299]">search</mat-icon>
-                        <mat-icon class="ml-[15px] text-[#6D8299]">bookmark_border</mat-icon>
-                        <mat-icon class="ml-[15px] text-[#6D8299]">mail_outline</mat-icon>
+                        <mat-icon class="ml-[15px] text-[#6D8299] cursor-pointer hover:text-gray-700 transition-all">search</mat-icon>
+                        <mat-icon class="ml-[15px] text-[#6D8299] cursor-pointer hover:text-gray-700 transition-all">bookmark_border</mat-icon>
+                        <mat-icon class="ml-[15px] text-[#6D8299] cursor-pointer hover:text-gray-700 transition-all">mail_outline</mat-icon>
+                        <mat-icon id="logout" class="ml-[15px] text-[#6D8299] cursor-pointer hover:text-gray-700 transition-all" (click)="HandelLogout()">logout</mat-icon>
                     </div>
                 </mat-toolbar>
             </div>

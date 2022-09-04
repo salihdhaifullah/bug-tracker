@@ -1,44 +1,53 @@
 <div class="navbar">
-  <div class="mt-3 p-2 ml-40 text-[30px]">
-      <mat-icon class="text-[#8997ac] text-center" [inline]='true'>notifications_none</mat-icon>
-  </div>
-  <div class="text-center font-[800] mb-[50px]">
+    <div class="mt-3 p-2 ml-40 text-[30px]">
+        <mat-icon class="text-[#8997ac] text-center" [inline]='true'>notifications_none</mat-icon>
+    </div>
+    <div class="text-center font-[800] mb-[50px]">
         <div class="flex relative justify-center items-center">
-            <img class="mt-4 rounded-full max-w-[70%] font-[800] mb-[50px]" src="../../../../assets/images/User_Placeholder.png" alt="">
-            <span (click)="HandelUploadAvatar()" class="absolute flex justify-center items-center right-6 cursor-pointer bg-white h-6 p-3.5 hover:p-[18px] hover:bg-gray-200 text-gray-700 hover:text-gray-900 shadow-md transition-all rounded-3xl ">
-                <mat-icon class="absolute">
-                    create
-                </mat-icon>
+            <img class="mt-4 rounded-full max-w-[70%] font-[800] mb-[50px]"
+                [src]='user.avatarUrl ? user.avatarUrl : "../../../../assets/images/User_Placeholder.png"' alt="">
+                <label for="file">
+            <span 
+                class="absolute flex justify-center items-center right-6 cursor-pointer bg-white h-6 p-3.5 hover:p-[18px] hover:bg-gray-200 text-gray-700 hover:text-gray-900 shadow-md transition-all rounded-3xl ">
+
+                    <mat-icon class="absolute">
+                        create
+                    </mat-icon>
+
             </span>
+        </label>
+            <input (change)="HandelUploadAvatar($event)" class="hidden w-0 h-0" type="file" id="file">
         </div>
-      <h4 class="text-white">admin</h4>
-      <p class="-mt-[10px] text-[#697d95]">admin@gmail.com</p>
-  </div>
-  <div class="menu">
-      <div class="text-[#466be0] uppercase font-[800] mb-[20px] ml-[40px]">
-          <span>dashboard</span>
-      </div>
-      <div class="mx-[10px]">
-          <button mat-button class="w-full relative flex pl-[40px] hover:bg-[#2c3344] focus:bg-[#2c3344] mb-[10px]" [routerLink]="['/dashboard']">
-              <mat-icon class="text-[#8997ac] text-center">dashboard</mat-icon>
-              <span class="ml-[15px] text-white">Home</span>
-          </button>
-          <button mat-button class="w-full relative flex pl-[40px] hover:bg-[#2c3344] focus:bg-[#2c3344] mb-[10px]" [routerLink]="['/posts']">
-              <mat-icon class="text-[#8997ac] text-center">message</mat-icon>
-              <span class="ml-[15px] text-white">Posts</span>
-          </button>
-          <button mat-button class="w-full relative flex pl-[40px] hover:bg-[#2c3344] focus:bg-[#2c3344] mb-[10px]">
-              <mat-icon class="text-[#8997ac] text-center">comment</mat-icon>
-              <span class="ml-[15px] text-white">Comments</span>
-          </button>
-          <button mat-button class="w-full relative flex pl-[40px] hover:bg-[#2c3344] focus:bg-[#2c3344] mb-[10px]">
-              <mat-icon class="text-[#8997ac] text-center">pages</mat-icon>
-              <span class="ml-[15px] text-white">Pages</span>
-          </button>
-          <button mat-button class="w-full relative flex pl-[40px] hover:bg-[#2c3344] focus:bg-[#2c3344] mb-[10px]">
-              <mat-icon class="text-[#8997ac] text-center">settings</mat-icon>
-              <span class="ml-[15px] text-white">Settings</span>
-          </button>
-      </div>
-  </div>
+        <h4 class="text-white">{{user.role}}</h4>
+        <p class="-mt-[10px] text-[#697d95]">{{user.email}}</p>
+    </div>
+    <div class="menu">
+        <div class="text-[#466be0] uppercase font-[800] mb-[20px] ml-[40px]">
+            <span>dashboard</span>
+        </div>
+        <div class="mx-[10px]">
+            <button mat-button class="w-full relative flex pl-[40px] hover:bg-[#2c3344] focus:bg-[#2c3344] mb-[10px]"
+                [routerLink]="['/dashboard']">
+                <mat-icon class="text-[#8997ac] text-center">dashboard</mat-icon>
+                <span class="ml-[15px] text-white">Home</span>
+            </button>
+            <button mat-button class="w-full relative flex pl-[40px] hover:bg-[#2c3344] focus:bg-[#2c3344] mb-[10px]"
+                [routerLink]="['/posts']">
+                <mat-icon class="text-[#8997ac] text-center">message</mat-icon>
+                <span class="ml-[15px] text-white">Posts</span>
+            </button>
+            <button mat-button class="w-full relative flex pl-[40px] hover:bg-[#2c3344] focus:bg-[#2c3344] mb-[10px]">
+                <mat-icon class="text-[#8997ac] text-center">comment</mat-icon>
+                <span class="ml-[15px] text-white">Comments</span>
+            </button>
+            <button mat-button class="w-full relative flex pl-[40px] hover:bg-[#2c3344] focus:bg-[#2c3344] mb-[10px]">
+                <mat-icon class="text-[#8997ac] text-center">pages</mat-icon>
+                <span class="ml-[15px] text-white">Pages</span>
+            </button>
+            <button mat-button class="w-full relative flex pl-[40px] hover:bg-[#2c3344] focus:bg-[#2c3344] mb-[10px]">
+                <mat-icon class="text-[#8997ac] text-center">settings</mat-icon>
+                <span class="ml-[15px] text-white">Settings</span>
+            </button>
+        </div>
+    </div>
 </div>

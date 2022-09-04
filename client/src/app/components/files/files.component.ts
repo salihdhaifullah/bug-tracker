@@ -32,6 +32,7 @@ export class FilesComponent {
 
   _moment: any = moment;
 
+  isHaveData: boolean | null = null;
   ngOnInit(): void {
     console.log("it now fucking work");
     this.store.dispatch(Actions.getFiles({ TicketId: Static.getIdParams(document.location.href) }));
@@ -44,6 +45,8 @@ export class FilesComponent {
           icon: 'error'
         })
       } else {
+        if (f.files.length >= 1) this.isHaveData = true;
+        else this.isHaveData = false;
         this.dataSource.data = f.files,
         this.dataSource.paginator = this.paginator,
         this.dataSource.sort = this.sort

@@ -1,3 +1,4 @@
+import { Router } from '@angular/router';
 import { ISinginFormData } from 'src/types/User';
 import { IAppState } from 'src/context/app.state';
 import { Store, select } from '@ngrx/store';
@@ -21,7 +22,7 @@ export class SinginComponent  {
   error$: Observable<string | null>; 
   user$: Observable<User | null>; 
 
-  constructor(private store: Store<IAppState>) {
+  constructor(private store: Store<IAppState>, private router: Router) {
     this.isLoading$ = this.store.pipe(select(isLoadingSelector))
     this.error$ = this.store.pipe(select(errorSelector))
     this.user$ = this.store.pipe(select(userSelector))
@@ -48,6 +49,7 @@ export class SinginComponent  {
       console.log(data.user)
     });
   }
+  HandelRedirect() { this.router.navigate(["login"]) };
 
   HandelSubmit = async (event: Event) => {
     event.preventDefault();
@@ -66,6 +68,7 @@ export class SinginComponent  {
             icon: 'success',
             confirmButtonText: 'OK',
           })
+          this.router.navigate([""])
         }
        }, (error: any) => {
         Swal.fire({
