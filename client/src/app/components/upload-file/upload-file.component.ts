@@ -20,6 +20,7 @@ export class UploadFileComponent {
 
   FileError: string | undefined;
   FileHimSelf: File | undefined;
+  isLoading: boolean = false;
   
   constructor(private store: Store<IAppState>, private filesService: FilesService) { }
 
@@ -35,7 +36,6 @@ export class UploadFileComponent {
       console.log(this.FileFormControl.value);
     } else {
       this.FileError = "no file selected";
-      console.log("no file selected");
     }
 
   }
@@ -51,6 +51,7 @@ export class UploadFileComponent {
     
     event.preventDefault();
     if (this.fileForm.valid) {
+      this.isLoading = true;
       const formData = new FormData();
       if (this.FileHimSelf) {
         formData.append("file", this.FileHimSelf, this.FileHimSelf.name);
@@ -58,13 +59,10 @@ export class UploadFileComponent {
         this.filesService.UploadFile(formData, this.fileForm.get("Description")?.value as string,  Static.getIdParams(document.location.href))
           .subscribe(res => {}, 
           error => {
-            Swal.fire({
-              title: 'Error',
-              text: 'Something went wrong',
-              icon: 'error'
-            });
+            Swal.fire('Error','<h2>Something went wrong</h2>','error');
           }, () => {
             this.fileForm.reset()
+            this.isLoading = false;
             this.store.dispatch(Actions.getFiles({TicketId: Static.getIdParams(document.location.href) }));
           });
       };

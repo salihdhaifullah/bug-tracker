@@ -1,17 +1,18 @@
-<div *ngIf="isHaveData" class="w-full">
+<div class="w-full">
 
   <div class="mat-elevation-z8 mb-20 mt-10">
     <table mat-table class="min-w-full" [dataSource]="dataSource">
-  
-  
+
+
       <ng-container matColumnDef="type">
         <th mat-header-cell *matHeaderCellDef> type </th>
         <td mat-cell *matCellDef="let element" class="link">
-        <a [href]="element.url" target="_blank">
+          <a [href]="element.url" target="_blank">
             {{element.type}}
-        </a>  </td>
+          </a>
+        </td>
       </ng-container>
-  
+
       <ng-container matColumnDef="Description">
         <th mat-header-cell *matHeaderCellDef> Description </th>
         <td mat-cell *matCellDef="let element"> {{element.description}} </td>
@@ -21,19 +22,33 @@
         <th mat-header-cell *matHeaderCellDef> Creator Name </th>
         <td mat-cell *matCellDef="let element"> {{element.fullName}} </td>
       </ng-container>
-  
-  
+
+
       <ng-container matColumnDef="CreatedAt">
         <th mat-header-cell *matHeaderCellDef> created At </th>
         <td mat-cell *matCellDef="let element"> {{_moment(element.createdAt).fromNow()}} </td>
       </ng-container>
 
-  
+      <ng-container matColumnDef="edit">
+        <th mat-header-cell *matHeaderCellDef>edit</th>
+        <td mat-cell *matCellDef="let element">
+          <mat-icon (click)="handelUpdateFile(element.id)" class="text-lg cursor-pointer hover:text-blue-600 text-blue-500" *ngIf="userId && userId === element.creatorId">edit</mat-icon>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="delete">
+        <th mat-header-cell *matHeaderCellDef>delete</th>
+        <td mat-cell *matCellDef="let element">
+          <mat-icon (click)="handelDeleteFile(element.id)" class="text-lg cursor-pointer hover:text-red-600 text-red-500" *ngIf="userId && userId === element.creatorId">backspace</mat-icon>
+        </td>
+      </ng-container>
+
+
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr mat-row class="hover:bg-gray-200 transition-all ease-in-out duration-150"
         *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>
-  
+
     <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons aria-label="Select page of periodic elements">
     </mat-paginator>
   </div>

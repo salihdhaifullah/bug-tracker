@@ -38,7 +38,7 @@
                 </mat-error>
             </mat-form-field>
 
-            <button mat-raised-button type="submit" class="mr-auto mt-4" color="primary">Submit</button>
+            <button mat-raised-button [disabled]="isLoading" type="submit" class="mr-auto mt-4" color="primary">Submit</button>
         </form>
     </div>
 </div>

@@ -111,7 +111,7 @@ namespace server.Controllers
 
 
         [HttpPatch("{id}"), Authorize]
-        public async Task<IActionResult> UpdateFile([FromRoute] int id, [FromBody] FilleDto req)
+        public async Task<IActionResult> UpdateFile([FromRoute] int id, [FromBody] FileUpdateDto req)
         {
             var file = await _context.Filles.FirstOrDefaultAsync(file => file.Id == id);
 
@@ -180,7 +180,7 @@ namespace server.Controllers
 
             _context.Filles.Remove(file);
             await _context.SaveChangesAsync();
-            return Ok("deleted");
+            return Ok(new { massage = "deleted" });
         }
 
         [HttpGet("{TicketId}"), Authorize]

@@ -29,7 +29,7 @@ export class CommentComponent {
   user: User = this.isFoundUser && JSON.parse(this.isFoundUser)
   userId: number | null = Static.getIdFromJwtToken(this.user.token)
   visibleMenu: boolean = false;
-  isLoading: boolean = false;
+
 
   HandelMore() {
     this.visibleMenu = !this.visibleMenu
@@ -48,23 +48,33 @@ export class CommentComponent {
       cancelButtonColor: '#d33',
     }).then((result) => {
       if (result.value) {
-        this.isLoading = true;
-        this.commentsService.DeleteComment(id).subscribe((res) => {
-
-        }, err => {
-          console.log(err)
-          if (err) Swal.fire('Something went wrong', "", "error")
-        }, () => {
+        this.commentsService.DeleteComment(id).subscribe((res) => { }, err => Swal.fire('Something went wrong', "", "error"), () => {
+          this.HandelMore();
           this.store.dispatch(Actions.getComments({ TicketId: Static.getIdParams(document.location.href) }))
-          this.isLoading = false;
-        })
-
+        });
       }
-    })
+    });
 
   }
 
-  HandelUpdate(id: number) {
+  async HandelUpdate(id: number) {
+    const { value: text } = await Swal.fire({
+      input: 'textarea',
+      inputLabel: 'comment',
+      inputPlaceholder: 'Type your comment here...',
+      inputAttributes: {
+        'aria-label': 'Type your comment here'
+      },
+      showCancelButton: true
+    })
+
+    if (text) {
+      this.commentsService.UpdateComment(text, id).subscribe(m => { }, err => Swal.fire('error', 'Something went wrong', 'error'), () => {
+        this.HandelMore();
+        Swal.fire('Success', undefined, 'success')
+        this.store.dispatch(Actions.getComments({ TicketId: Static.getIdParams(document.location.href) }))
+      })
+    }
   }
 
 

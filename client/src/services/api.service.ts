@@ -128,7 +128,6 @@ export class FilesService {
   }
 
   public UploadFile(formData: any, Description: string, id: number): Observable<any> {
-    console.log(formData);
     return this.http.post(this.File + "/" + id + `?Description=${Description}`, formData);
   }
 

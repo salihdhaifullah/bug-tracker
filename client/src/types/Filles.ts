@@ -4,6 +4,8 @@ export interface IFilles {
     Description: string;
     CreatedAt: Date;
     Url: string;
+    CreatorId: number;
+    fullName: number;
 }
 
 export interface ICreateFille {

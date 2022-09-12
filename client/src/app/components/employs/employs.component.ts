@@ -61,67 +61,39 @@ export class EmploysComponent implements OnInit {
   ngOnInit(): void {
     this.store.dispatch(Actions.getRoles());
 
-    this.authService.GetUsers().subscribe(data => {
-      console.log(data);
-      this.toppingList = data;
-    });
+    this.authService.GetUsers().subscribe(data => this.toppingList = data);
 
     this.roles$.subscribe((data: any) => {
-      this.dataSource.data = data.roles,
-        this.dataSource.paginator = this.paginator,
-        this.dataSource.sort = this.sort,
-        console.log(data);
+      this.dataSource.data = data.roles;
+      this.dataSource.paginator = this.paginator;
+      this.dataSource.sort = this.sort;
     });
 
-    this.isLoading$.subscribe((data: any) => {
-      console.log(data);
-    }
-    );
   }
 
   HandelSubmit = (event: Event) => {
     event.preventDefault();
     if (this.usersRole.valid) {
-      Swal.fire(
-        {
-
-          title: 'Are you sure?',
-          text: "You won't be able to revert this!",
-          icon: 'warning',
-          showCancelButton: true,
-          confirmButtonColor: '#3085d6',
-          cancelButtonColor: '#d33',
-          confirmButtonText: 'Yes, change it!'
-        }).then((result) => {
-          if (result.value) {
-            this.rolesService.ChangeRoles(this.usersRole.value as IChangeRole).subscribe(m => {
-              console.log(m);
-            }, (err) => {
-              console.log(err);
-              Swal.fire({
-                title: 'Error',
-                text: 'Something went wrong',
-                icon: 'error',
-                confirmButtonText: 'Ok'
-              }).then(() => {
-              })
-            }
-            , () => {
-
-              Swal.fire({
-                title: 'Success',
-                text: 'Role changed',
-                icon: 'success',
-                confirmButtonText: 'Ok'
-              })
-            });
-          }
-        })
-
-      console.log(this.usersRole.value);
+      Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, change it!'
+      }).then((result) => {
+        if (result.value) {
+          this.rolesService.ChangeRoles(this.usersRole.value as IChangeRole).subscribe(m => {
+          }, (err) => {
+           if (err)  Swal.fire('Error', '<h2>Something went wrong</h2>', 'error');
+          }, () => {
+            Swal.fire('Success', 'Role changed', 'success')
+          });
+        }
+      })
     }
   }
-
 
 }
 

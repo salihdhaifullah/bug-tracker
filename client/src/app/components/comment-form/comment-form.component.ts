@@ -14,6 +14,7 @@ import * as Actions from 'src/context/actions'
   templateUrl: './comment-form.component.html'
 })
 export class CommentFormComponent implements OnInit {
+
   commentInput: HTMLTextAreaElement | null;
   comments$: Observable<Comments[]>;
   
@@ -28,22 +29,20 @@ export class CommentFormComponent implements OnInit {
   }
 
   HandelComment() {
-    if (this.commentInput && this.commentInput.value) 
+    if (this.commentInput && this.commentInput.value) {
       this.CommentsService.CreateComment(this.commentInput.value, Static.getIdParams(document.location.href)).subscribe(res => {
         
       }, err => {
-        Swal.fire({
-          title: 'Something went wrong',
-          icon: 'error'
-        })
+        if (err) Swal.fire('Something went wrong', "", 'error');
       } , () => {
-        console.log('disptsh action to get latest comments')
-        this.store.dispatch(Actions.getComments({ TicketId: Static.getIdParams(document.location.href) }))
-
+        this.store.dispatch(Actions.getComments({ TicketId: Static.getIdParams(document.location.href) }))        
       });
+      this.HandelCancel()
+    }
   }
 
   HandelCancel() {
     if (this.commentInput) this.commentInput.value = "";
   }
+
 }

@@ -8,6 +8,11 @@ namespace server.Models.api
         public string Description { get; set; } = String.Empty;
         [Required]
         public IFormFile file { get; set; } = null;
-        public IFormFile fileTwo { get; set; } = null;
     }
+
+    public class FileUpdateDto {
+        [Required]
+        public string Description { get; set; } = String.Empty;
+    }
+
 }
