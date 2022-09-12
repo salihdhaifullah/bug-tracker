@@ -1,8 +1,7 @@
 import { Static } from 'src/Static';
 import { select, Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { FilesService } from 'src/services/api.service';
+import { Component, ViewChild } from '@angular/core';
 import { IFilles } from 'src/types/Filles';
 import { IAppState } from 'src/context/app.state';
 import { filesSelector } from 'src/context/selectors';
@@ -22,7 +21,7 @@ export class FilesComponent {
   displayedColumns: string[] = ['type', 'Description', 'CreatedAt', 'Creator Name'];
   dataSource = new MatTableDataSource<IFilles>();
 
-  constructor(private store: Store<IAppState>, private filesService: FilesService) {
+  constructor(private store: Store<IAppState>) {
     this.files$ = this.store.pipe(select(filesSelector));
   }
 
@@ -31,33 +30,24 @@ export class FilesComponent {
   @ViewChild(MatPaginator, { static: true }) paginator!: MatPaginator;
 
   _moment: any = moment;
-
   isHaveData: boolean | null = null;
+
   ngOnInit(): void {
-    console.log("it now fucking work");
     this.store.dispatch(Actions.getFiles({ TicketId: Static.getIdParams(document.location.href) }));
     this.files$.subscribe((f: any) => {
-      console.log(f)
-      if (typeof (f.files) === undefined && f.isLoading === false) {
-        Swal.fire({
-          title: 'No Files Found',
-          text: '',
-          icon: 'error'
-        })
-      } else {
-        if (f.files.length >= 1) this.isHaveData = true;
-        else this.isHaveData = false;
-        this.dataSource.data = f.files,
-        this.dataSource.paginator = this.paginator,
+      if (typeof (f.files) === undefined && f.isLoading === false) return;
+      else {
+        
+        if (f.files.length >= 1) this.isHaveData = true
+        else { this.isHaveData = false };
+
+        this.dataSource.data = f.files
+        this.dataSource.paginator = this.paginator
         this.dataSource.sort = this.sort
       }
     }, err => {
-      Swal.fire({
-        title: 'Error',
-        text: "Something went wrong",
-        icon: 'error'
-      })
+      if (err) Swal.fire('Error', '<h3>Something went wrong</h3>', 'error')
     });
+
   }
-    
 }

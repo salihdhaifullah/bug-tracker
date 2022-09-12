@@ -1,4 +1,5 @@
-import { ICreateProject } from './../../../types/Projects';
+import * as Actions from 'src/context/actions';
+import { Store } from '@ngrx/store';
 import Swal from 'sweetalert2';
 import { FormControl, Validators, FormGroup } from '@angular/forms';
 import { AuthService, TicketsService } from 'src/services/api.service';
@@ -7,6 +8,7 @@ import { MyErrorStateMatcher } from 'src/app/MyErrorStateMatcher';
 import { Users } from 'src/types/User';
 import { Static } from 'src/Static';
 import { ICreateTicket, ITicket } from 'src/types/Tickets';
+import { IAppState } from 'src/context/app.state';
 
 @Component({
   selector: 'app-new-ticket',
@@ -14,24 +16,26 @@ import { ICreateTicket, ITicket } from 'src/types/Tickets';
 })
 export class NewTicketComponent implements OnInit {
 
-  constructor(private authService: AuthService, private ticketsService: TicketsService) { }
+  constructor(private store: Store<IAppState>, private authService: AuthService, private ticketsService: TicketsService) { }
   matcher = new MyErrorStateMatcher();
 
   @Input() ticketToUpdate: ITicket | null | undefined = null;
   isUpdateTicket: boolean = false;
   ticketIdToUpdate: number | null = null;
+
   ngOnChanges(changes: SimpleChanges): void {
     if (changes["ticketToUpdate"].currentValue) {
       const Change = changes["ticketToUpdate"].currentValue;
-      console.log(Change)
+
       this.ticketIdToUpdate = Change.id;
       this.isUpdateTicket = true;
+
       this.TicketForm.setValue({
         name: Change.name,
         description: "  ",
         type: Change.type,
         priority: Change.priority,
-        assigneeToId: Math.floor((Math.random() * this.UsersList.length) + 1),
+        assigneeToId: Math.floor(Math.random() * this.UsersList.length),
       });
     }
   }
@@ -64,10 +68,7 @@ export class NewTicketComponent implements OnInit {
 
 
   ngOnInit(): void {
-    this.authService.GetUsers().subscribe(data => {
-      console.log(data);
-      this.UsersList = data;
-    });
+    this.authService.GetUsers().subscribe(data => this.UsersList = data);
   }
 
   HandelSubmit = (event: Event) => {
@@ -76,48 +77,37 @@ export class NewTicketComponent implements OnInit {
       const form = { ...this.TicketForm.value, projectId: this.ProjectId };
       if (this.isUpdateTicket && this.ticketIdToUpdate) {
         this.ticketsService.UpdateTicket(form as ICreateTicket, this.ticketIdToUpdate).subscribe(m => {
-          console.log(m);
-        }
-          , err => {
-            Swal.fire({
-              title: 'Error',
-              text: err.error.message,
-              icon: 'error',
-              confirmButtonText: 'Ok'
-            })
-          }
-          , () => {
-            Swal.fire({
-              title: 'Success',
-              text: 'Ticket Updated',
-
-              icon: 'success',
-              confirmButtonText: 'Cool'
-            })
-          });
-      } 
+        }, err => {
+          Swal.fire({
+            title: 'Error',
+            text: err.error.message,
+            icon: 'error',
+            confirmButtonText: 'Ok'
+          })
+        }, () => {
+          this.store.dispatch(Actions.getTickets({ ProjectId: Static.getIdParams(document.location.href) }));
+          Swal.fire({
+            title: 'Success',
+            text: 'Ticket Updated',
+            icon: 'success',
+            confirmButtonText: 'Cool'
+          })
+        });
+        this.TicketForm.reset();
+      }
       else {
         this.ticketsService.CreateTicket(form as ICreateTicket).subscribe(m => {
-          console.log(m);
-        }
-          , err => {
-            Swal.fire({
-              title: 'Error',
-              text: err.error.message,
-              icon: 'error',
-              confirmButtonText: 'Ok'
-            })
-          }
-          , () => {
-            Swal.fire({
-              title: 'Success',
-              text: 'Ticket created',
-
-              icon: 'success',
-              confirmButtonText: 'Cool'
-            })
-          });
-        console.log({ ...this.TicketForm.value, ProjectId: this.ProjectId });
+        }, err => {
+          Swal.fire({
+            title: 'Error',
+            text: err.error.message,
+            icon: 'error',
+            confirmButtonText: 'Ok'
+          })
+        }, () => {
+          this.store.dispatch(Actions.getTickets({ ProjectId: Static.getIdParams(document.location.href) }));
+        });
+        this.TicketForm.reset();
       }
     }
   }

@@ -6,6 +6,7 @@ import { IAppState } from 'src/context/app.state';
 import * as Actions from 'src/context/actions';
 import {Router} from "@angular/router"
 import Swal from 'sweetalert2';
+import { AuthService } from 'src/services/api.service';
 
 @Component({
   selector: 'app-default',
@@ -15,10 +16,11 @@ export class DefaultComponent implements AfterViewInit {
   @ViewChild(MatSidenav) sidenav! : MatSidenav;
  
 
-  constructor(private observer : BreakpointObserver, private store: Store<IAppState>, private router: Router) { }
+  constructor(private authService: AuthService, private observer : BreakpointObserver, private store: Store<IAppState>, private router: Router) { }
 
 
   HandelLogout(): void {
+    
     Swal.fire({
       title: 'Logout',
       text: 'do You want to logout',
@@ -27,8 +29,9 @@ export class DefaultComponent implements AfterViewInit {
       showCancelButton: true,
     }).then((result) => {
       if (result.value) {
-        this.store.dispatch(Actions.Logout());
-        this.router.navigate(['/login']);
+          localStorage.clear();
+          this.store.dispatch(Actions.Logout());
+          this.router.navigate(['/login']);
       }
     }
   )

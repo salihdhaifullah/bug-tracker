@@ -6,7 +6,7 @@ import { HttpRequest, HttpHandler, HttpEvent, HttpInterceptor } from '@angular/c
 export class BearerService implements HttpInterceptor {
 
   intercept( request: HttpRequest<any>, next: HttpHandler ): Observable<HttpEvent<any>> {
-    const isUserFound = sessionStorage.getItem('user');
+    const isUserFound = localStorage.getItem('user');
     const token: String  = isUserFound ? JSON.parse(isUserFound).token : '';
 
     if (token !== '') {

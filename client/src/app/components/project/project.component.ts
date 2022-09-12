@@ -42,8 +42,8 @@ export class ProjectComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.store.dispatch(Actions.getTickets({ ProjectId: this.projectId }));
     this.store.dispatch(Actions.getProjectById({ id: this.projectId }));
+    this.store.dispatch(Actions.getTickets({ ProjectId: this.projectId }));
 
     this.tickets$.subscribe((data: any) => {
       if (typeof (data.tickets) === undefined && data.isLoading === false) {

@@ -47,11 +47,10 @@ export class ProjectsComponent implements OnInit {
   }
 
   handelCloseOrOpenProject(id: Number) {
-    console.log("close" + id)
 
     const iSCloseOrOpenProject: IProject | undefined = this.dataSource.data.find(x => x.id === id);
     if (iSCloseOrOpenProject) {
-      if (iSCloseOrOpenProject.isClosed ) {
+      if (iSCloseOrOpenProject.isClosed) {
         Swal.fire({
           title: 'Are you sure?',
           text: 'You want to open this project',
@@ -66,78 +65,65 @@ export class ProjectsComponent implements OnInit {
             this.projectService.OpenProject(id).subscribe(() => {
 
             }, err => {
-              Swal.fire(
-                'Error',
-                err.error.message,
-                'error'
-              )
+              Swal.fire('Error', err.error.message, 'error')
             }, () => {
-              Swal.fire(
-                'Opened!',
-                'Your project has been opened.',
-                'success'
-              )
+              Swal.fire('Opened!', 'Your project has been opened.', 'success')
               this.store.dispatch(Actions.getProjects());
             })
           }
         })
       } else {
 
-    Swal.fire( {
-      title: 'Are you sure?',
-      text: 'You want to close this project',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Yes, close it!'
-    }).then((result) => {
-      if (result.value) {
+        Swal.fire({
+          title: 'Are you sure?',
+          text: 'You want to close this project',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Yes, close it!'
+        }).then((result) => {
+          if (result.value) {
 
-        this.projectService.CloseProject(id).subscribe((p: any) => {
+            this.projectService.CloseProject(id).subscribe((p: any) => {
 
-        }, err => {
-          Swal.fire(
-            'Error',
-            err.error.message,
-            'error'
-          )
-        }, () => {
-          this.store.dispatch(Actions.getProjects());
-          Swal.fire({
-            title: 'Project Closed',
-            text: 'Project has been closed',
-            icon: 'success',
-            confirmButtonText: 'Ok'
-          })
+            }, err => {
+              Swal.fire('Error', err.error.message, 'error')
+            }, () => {
+              this.store.dispatch(Actions.getProjects());
+              Swal.fire({
+                title: 'Project Closed',
+                text: 'Project has been closed',
+                icon: 'success',
+                confirmButtonText: 'Ok'
+              })
+            })
+          }
         })
       }
     }
-    
-    )}
-  }
-  }
+}
+
   @ViewChild(MatSort, { static: true }) sort!: MatSort;
 
   @ViewChild(MatPaginator, { static: true }) paginator!: MatPaginator;
 
   ngOnInit() {
     this.store.dispatch(Actions.getProjects());
-
+    this.getProject()
   }
 
-  ngAfterViewInit() {
+
+  getProject() {
     this.projects$.subscribe((p: any) => {
-      this.dataSource.data = p.projects,
-        this.Closed = p.projects.filter((x: IProject) => x.isClosed === true).length,
-        this.Open = p.projects.filter((x: IProject) => x.isClosed === false).length,
-        this.Count = p.projects.length;
-      this.dataSource.paginator = this.paginator,
-        this.dataSource.sort = this.sort,
-        console.log(p);
+      this.dataSource.data = p.projects
+      this.Closed = p.projects.filter((x: IProject) => x.isClosed === true).length
+      this.Open = p.projects.filter((x: IProject) => x.isClosed === false).length
+      this.Count = p.projects.length
+      this.dataSource.paginator = this.paginator
+      this.dataSource.sort = this.sort
     });
   }
-
 
 }
 

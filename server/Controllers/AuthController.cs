@@ -74,10 +74,12 @@ namespace server.Controllers
                 string token;
                 token = _token.GenerateToken(Convert.ToInt32(userData.Entity.Id), userData.Entity.Role);
 
+                string refreshToken = _token.GenerateRefreshToken(Convert.ToInt32(userData.Entity.Id));
 
                 var Res = new
                 {
                     token = token,
+                    refreshToken = refreshToken,
                     email = userData.Entity.Email,
                     fullName = userData.Entity.FirstName + " " + userData.Entity.LastName,
                     role = user.Role,
@@ -87,10 +89,7 @@ namespace server.Controllers
 
                 _context.SaveChanges();
 
-                string refreshToken = _token.GenerateRefreshToken(Convert.ToInt32(userData.Entity.Id));
 
-                CookieOptions cookieOptions = new CookieOptions { Secure = true, HttpOnly = true, SameSite = SameSiteMode.Lax, Expires = DateTimeOffset.UtcNow.AddHours(4320) };
-                Response.Cookies.Append("refresh-token", refreshToken, cookieOptions);
 
                 return Ok(Res);
             }
@@ -114,20 +113,18 @@ namespace server.Controllers
                 if (!isMatch) return BadRequest("Password is Wrong");
 
                 string token = _token.GenerateToken(Convert.ToInt32(user.Id), user.Role);
+                string refreshToken = _token.GenerateRefreshToken(Convert.ToInt32(user.Id));
 
                 var Res = new
                 {
                     token = token,
+                    refreshToken = refreshToken,
                     email = user.Email,
                     fullName = user.FirstName + " " + user.LastName,
                     role = user.Role,
                     avatarUrl = user.AvatarUrl
                 };
 
-                string refreshToken = _token.GenerateRefreshToken(Convert.ToInt32(user.Id));
-
-                CookieOptions cookieOptions = new CookieOptions { Secure = true, HttpOnly = true, SameSite = SameSiteMode.Lax, Expires = DateTimeOffset.UtcNow.AddHours(4320) };
-                Response.Cookies.Append("refresh-token", refreshToken, cookieOptions);
 
                 return Ok(Res);
             }
@@ -153,7 +150,8 @@ namespace server.Controllers
         [HttpGet("refresh-token")]
         public async Task<IActionResult> GetToken()
         {
-            string? refreshToken = Request.Headers.Cookie.FirstOrDefault()?.Split('=')[1];
+            string? refreshToken = Request.Headers.WWWAuthenticate;
+            Console.WriteLine(refreshToken);
 
             if (refreshToken is null) return BadRequest("you need to login");
 
@@ -166,8 +164,11 @@ namespace server.Controllers
             if (user is null) return BadRequest("user not found");
 
             string token = _token.GenerateToken((int)userId, user.Role);
+            var Res = new { token };
 
-            return Ok(token);
+            return Ok(Res);
         }
+
+
     }
 }

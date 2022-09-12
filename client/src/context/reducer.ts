@@ -2,7 +2,7 @@ import { IAppState } from 'src/context/app.state';
 import { createReducer, on } from '@ngrx/store';
 import * as Actions from './actions';
 
-const isFound = sessionStorage.getItem('user');
+const isFound = localStorage.getItem('user');
 
 
 export const initialState: IAppState = {
@@ -78,7 +78,7 @@ export const userReducers = createReducer(userInitialState,
     on(Actions.postSingInSuccess, (state, action) => ({ ...state, isLoading: false, user: action.user })),
     on(Actions.postSingInFailure, (state, action) => ({ ...state, isLoading: false, error: action.error })),
 
-    on(Actions.Logout, state => { sessionStorage.removeItem('user'), ({ ...state, user: null }) }),
+    on(Actions.Logout, state => ({ ...state, user: null })),
 );
 
 

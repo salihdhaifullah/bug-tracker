@@ -11,7 +11,7 @@ export class NavbarComponent {
 
   constructor(private filesService : FilesService) { }
 
-  isUser = sessionStorage.getItem("user");
+  isUser = localStorage.getItem("user");
   user: User = this.isUser && JSON.parse(this.isUser);
 
   HandelUploadAvatar(event: any) {
@@ -27,7 +27,7 @@ export class NavbarComponent {
 
         if(this.user && res.avatarUrl) {
           this.user.avatarUrl = res.avatarUrl;
-          sessionStorage.setItem("user", JSON.stringify(this.user));
+          localStorage.setItem("user", JSON.stringify(this.user));
         }
         Swal.fire({
           title: 'Success',

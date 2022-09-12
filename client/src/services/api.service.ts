@@ -16,6 +16,7 @@ export class AuthService {
   constructor(private http: HttpClient) { }
   private Auth = environment.apiUrl + "/" + "Auth";
 
+
   public Singin(data: ISinginFormData): Observable<any> {
     return this.http.post(this.Auth + "/" + "Singin", data);
   }
@@ -28,6 +29,13 @@ export class AuthService {
     return this.http.get(this.Auth + "/" + "users");
   }
 
+  public GetToken(refreshToken: string): Observable<any> {
+    return this.http.get(this.Auth + "/" + "refresh-token", {
+      headers: {
+        'www-authenticate': refreshToken
+      }
+    });
+  }
 
 }
 

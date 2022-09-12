@@ -113,7 +113,7 @@ namespace server.Controllers
 
             await _context.SaveChangesAsync();
 
-            return Ok("Deleted");
+            return Ok(new { massage = "Deleted" });
         }
     }
 }

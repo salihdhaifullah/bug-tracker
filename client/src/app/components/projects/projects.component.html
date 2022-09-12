@@ -86,7 +86,5 @@
 
 
 <div class="flex justify-evenly mb-20 flex-row items-center">
-  <h1 *ngIf="!updateProject"> Create New Project ? </h1>
-  <h1 *ngIf="updateProject"> Update Project ? </h1>
   <app-new-project [updateProject]="updateProject"></app-new-project>
 </div>

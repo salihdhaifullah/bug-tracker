@@ -1,6 +1,7 @@
 export interface User {
     email: string;
     token: string;
+    refreshToken: string;
     fullName: string;
     role: string;
     avatarUrl: string | null;

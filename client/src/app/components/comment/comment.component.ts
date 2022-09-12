@@ -25,10 +25,11 @@ export class CommentComponent {
     this.comments$ = this.store.pipe(select(commentsSelector));
   }
 
-  isFoundUser = sessionStorage.getItem('user');
+  isFoundUser = localStorage.getItem('user');
   user: User = this.isFoundUser && JSON.parse(this.isFoundUser)
-  userId: number = Static.getIdFromJwtToken(this.user.token)
+  userId: number | null = Static.getIdFromJwtToken(this.user.token)
   visibleMenu: boolean = false;
+  isLoading: boolean = false;
 
   HandelMore() {
     this.visibleMenu = !this.visibleMenu
@@ -47,16 +48,15 @@ export class CommentComponent {
       cancelButtonColor: '#d33',
     }).then((result) => {
       if (result.value) {
-
+        this.isLoading = true;
         this.commentsService.DeleteComment(id).subscribe((res) => {
 
         }, err => {
-          if (Boolean(err)) Swal.fire({
-            title: 'Something went wrong',
-            icon: "error"
-          })
+          console.log(err)
+          if (err) Swal.fire('Something went wrong', "", "error")
         }, () => {
           this.store.dispatch(Actions.getComments({ TicketId: Static.getIdParams(document.location.href) }))
+          this.isLoading = false;
         })
 
       }

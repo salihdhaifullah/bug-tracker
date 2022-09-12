@@ -61,7 +61,7 @@ export class LoginComponent  {
       this.user$.subscribe((data: any) => { 
         if (data.user) {
           console.log(data.user);
-          sessionStorage.setItem('user', JSON.stringify(data.user));
+          localStorage.setItem('user', JSON.stringify(data.user));
           Swal.fire({
             title: 'Login Successful',
             text: 'Welcome ' + data.user.fullName,
@@ -81,10 +81,6 @@ export class LoginComponent  {
     });
 
     } 
-  }
-
-  ngAfterViewInit() { 
-
   }
 
 }

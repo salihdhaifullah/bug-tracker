@@ -27,8 +27,8 @@ namespace server.Controllers
 
             if (IsSameName)
             {
-                var res1 = new { message = "Project Name Already Exist try another one" };
-                return Ok(res1);
+                var message = new { message = "Project Name Already Exist try another one" };
+                return Ok(message);
             };
 
             Project ProjectData = new()

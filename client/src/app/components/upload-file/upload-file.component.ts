@@ -4,6 +4,9 @@ import { MyErrorStateMatcher } from 'src/app/MyErrorStateMatcher';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Static } from 'src/Static';
 import Swal from 'sweetalert2';
+import { Store } from '@ngrx/store';
+import { IAppState } from 'src/context/app.state';
+import * as Actions from 'src/context/actions';
 
 @Component({
   selector: 'app-upload-file',
@@ -14,11 +17,15 @@ export class UploadFileComponent {
   matcher = new MyErrorStateMatcher();
 
   @Input() updateFile: string | undefined;
-  DescriptionFormControl = new FormControl(``, [Validators.required, Validators.minLength(16)]);
-  FileFormControl = new FormControl<File | null>(null, [Validators.required]);
 
   FileError: string | undefined;
   FileHimSelf: File | undefined;
+  
+  constructor(private store: Store<IAppState>, private filesService: FilesService) { }
+
+  DescriptionFormControl = new FormControl(``, [Validators.required, Validators.minLength(16)]);
+  FileFormControl = new FormControl<File | null>(null, [Validators.required]);
+
 
   HandelSetFile(event: any) {
     if (event?.target?.files[0]) {
@@ -38,43 +45,29 @@ export class UploadFileComponent {
     file: this.FileFormControl
   });
 
-  constructor(private filesService: FilesService) { }
 
 
   HandelSubmit(event: Event) {
+    
     event.preventDefault();
     if (this.fileForm.valid) {
       const formData = new FormData();
       if (this.FileHimSelf) {
-
-
         formData.append("file", this.FileHimSelf, this.FileHimSelf.name);
 
-
-
-
         this.filesService.UploadFile(formData, this.fileForm.get("Description")?.value as string,  Static.getIdParams(document.location.href))
-          .subscribe(res => {
-            console.log(res);
-            Swal.fire({
-              title: 'Success',
-              text: 'File Uploaded Successfully',
-              icon: 'success'
-            }).then(() => {
-              this.fileForm.reset();
-            })
-          }, error => {
-            console.log(error);
+          .subscribe(res => {}, 
+          error => {
             Swal.fire({
               title: 'Error',
               text: 'Something went wrong',
               icon: 'error'
             });
-
+          }, () => {
+            this.fileForm.reset()
+            this.store.dispatch(Actions.getFiles({TicketId: Static.getIdParams(document.location.href) }));
           });
-
-      }
+      };
     }
   }
-
 }

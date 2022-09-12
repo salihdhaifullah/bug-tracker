@@ -61,7 +61,7 @@ export class SinginComponent  {
       this.user$.subscribe((data: any) => { 
         console.log(data.user)
         if (data.user) {
-          sessionStorage.setItem('user', JSON.stringify(data.user));
+          localStorage.setItem('user', JSON.stringify(data.user));
           Swal.fire({
             title: 'Success',
             text: 'You have been registered',

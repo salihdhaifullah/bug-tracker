@@ -1,7 +1,7 @@
 <div *ngIf="comment">
     <div class="mb-2 flex">
 
-        <span class="relative" *ngIf="userId === comment.creatorId">
+        <span class="relative" *ngIf="userId && userId === comment.creatorId">
             <mat-icon class="cursor-pointer" (click)="HandelMore()">more_vert</mat-icon>
             <div *ngIf="visibleMenu" class="absolute flex flex-col rounded-md bg-white transition-all shadow-md p-4">
                 <span (click)="HandelDelete(comment.id)"
