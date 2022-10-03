@@ -28,14 +28,15 @@ namespace server.Controllers
         {
             var Tickets = _context.Tickets.Where(ticket => ticket.ProjectId == ProjectId).Select(p => new
             {
-                devoloper = p.AssigneeTo.FirstName + " " + p.AssigneeTo.LastName,
+                devoloper = p.AssigneeTo.LastName,
                 p.Name,
                 p.Priority,
                 p.Status,
                 p.CreatedAt,
                 p.Type,
                 p.IsCompleted,
-                p.Id
+                p.Id,
+                p.Description,
             }).ToList();
 
             return Ok(Tickets);

@@ -2,7 +2,7 @@ import { Static } from 'src/Static';
 import { Observable } from 'rxjs';
 import { Store, select } from '@ngrx/store';
 import { IAppState } from 'src/context/app.state';
-import { Component, Input, OnInit, SimpleChanges } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ITicket } from 'src/types/Tickets';
 import { projectSelector, ticketsSelector } from 'src/context/selectors';
 import * as Actions from 'src/context/actions';
@@ -26,10 +26,11 @@ export class ProjectComponent implements OnInit {
   Features: number | null =  null;
 
   ticketToUpdate: ITicket | null | undefined = null;
+
+
   HandelUpdate = (id: any) => {
     this.ticketToUpdate = this.tickets.find(x => x.id === id);
   }
-
 
   _moment: any = moment;
 
@@ -46,7 +47,7 @@ export class ProjectComponent implements OnInit {
     this.store.dispatch(Actions.getTickets({ ProjectId: this.projectId }));
 
     this.tickets$.subscribe((data: any) => {
-      if (typeof (data.tickets) === undefined && data.isLoading === false) {
+      if (data.tickets === undefined && data.isLoading === false) {
         Swal.fire(
           'No Tickets Found',
           '',
@@ -61,7 +62,7 @@ export class ProjectComponent implements OnInit {
     });
 
     this.project$.subscribe((data: any) => {
-      if (typeof (data.project) === undefined && data.isLoading === false) {
+      if (data.project === undefined && data.isLoading === false) {
         Swal.fire(
           'No Project Found',
           '',

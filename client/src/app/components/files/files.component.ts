@@ -13,7 +13,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import * as moment from 'moment';
 import { User } from 'src/types/User';
 import { FilesService } from 'src/services/api.service';
-import { LodingSpinnerComponent } from 'src/app/loding-spinner/loding-spinner.component';
+import { LodingSpinnerComponent } from 'src/app/components/loding-spinner/loding-spinner.component';
 
 @Component({
   selector: 'app-files',

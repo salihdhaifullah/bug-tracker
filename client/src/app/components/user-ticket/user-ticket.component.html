@@ -1,34 +1,43 @@
-<div cdkDropListGroup class="min-h-[100vh] items-center justify-center flex mr-4">
+<div class="relative">
+  <div *ngIf="isChanged" class="example-button-container fixed bottom-10 right-10">
+    <button mat-mini-fab color="primary" (click)="HandleSave()" aria-label="Example icon button with a menu icon">
+      <mat-icon>save</mat-icon>
+    </button>
+  </div>
 
-    <div class="grid grid-cols-1 gap-2 px-6 py-2  sm:grid-cols-2 md:grid-cols-3 w-full bg-white rounded-md shadow-md border">
-      
+  <div cdkDropListGroup class="min-h-[100vh] items-center justify-center flex mr-4">
+
+    <div
+      class="grid grid-cols-1 gap-2 px-6 py-2  sm:grid-cols-2 md:grid-cols-3 w-full bg-white rounded-md shadow-md border">
+
 
       <div class="example-container">
-      <h2 class="text-center">New</h2>
+        <h2 class="text-center">New</h2>
 
-      <div cdkDropList [cdkDropListData]="New" class="example-list" (cdkDropListDropped)="drop($event)">
-        <div class="example-box" *ngFor="let item of New" cdkDrag>{{item}}</div>
+        <div cdkDropList [cdkDropListData]="New" class="example-list" (cdkDropListDropped)="drop($event)">
+          <div class="example-box" *ngFor="let item of New" cdkDrag>{{item}}</div>
+        </div>
       </div>
-    </div>
 
 
-    <div class="example-container">
-      <h2 class="text-center">In Progress</h2>
+      <div class="example-container">
+        <h2 class="text-center">In Progress</h2>
 
-      <div cdkDropList [cdkDropListData]="Progress" class="example-list" (cdkDropListDropped)="drop($event)">
-        <div class="example-box" *ngFor="let item of Progress" cdkDrag>{{item}}</div>
+        <div cdkDropList [cdkDropListData]="Progress" class="example-list" (cdkDropListDropped)="drop($event)">
+          <div class="example-box" *ngFor="let item of Progress" cdkDrag>{{item}}</div>
+        </div>
       </div>
-    </div>
 
 
-    <div class="example-container">
-      <h2 class="text-center">Done</h2>
+      <div class="example-container">
+        <h2 class="text-center">Done</h2>
 
-      <div cdkDropList [cdkDropListData]="Done" class="example-list" (cdkDropListDropped)="drop($event)">
-        <div class="example-box" *ngFor="let item of Done" cdkDrag>{{item}}</div>
+        <div cdkDropList [cdkDropListData]="Done" class="example-list" (cdkDropListDropped)="drop($event)">
+          <div class="example-box" *ngFor="let item of Done" cdkDrag>{{item}}</div>
+        </div>
       </div>
+
     </div>
 
   </div>
-
 </div>

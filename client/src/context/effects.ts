@@ -2,7 +2,7 @@ import { RolesService, CommentsService, FilesService } from './../services/api.s
 import { User } from './../types/User';
 import { AuthService } from 'src/services/api.service';
 import { ITicket } from '../types/Tickets';
-import { getProjects, getProjectsSuccess, getProjectsFailure, getTickets, getTicketsSuccess, getTicketsFailure, postLoginSuccess, postSingIn, postSingInFailure, postSingInSuccess, postLoginFailure, postLogin, postProject, postProjectSuccess, postProjectFailure, getRolesSuccess, getRolesFailure, getRoles, getProjectByIdSuccess, getProjectByIdFailure, getProjectById, getTicketById, getTicketByIdFailure, getTicketByIdSuccess, getComments, getCommentsFailure, getCommentsSuccess, getFiles, getFilesSuccess, getFilesFailure } from './actions';
+import { getProjects, getProjectsSuccess, getProjectsFailure, getTickets, getTicketsSuccess, getTicketsFailure, postLoginSuccess, postSingIn, postSingInFailure, postSingInSuccess, postLoginFailure, postLogin, postProject, postProjectSuccess, postProjectFailure, getRolesSuccess, getRolesFailure, getRoles, getProjectByIdSuccess, getProjectByIdFailure, getProjectById, getTicketById, getTicketByIdFailure, getTicketByIdSuccess, getComments, getCommentsFailure, getCommentsSuccess, getFiles, getFilesSuccess, getFilesFailure, getDevTickets, getDevTicketsSuccess, getDevTicketsFailure } from './actions';
 import { Injectable } from "@angular/core";
 import { Actions, createEffect, ofType } from "@ngrx/effects";
 import { catchError, map, mergeMap, of } from "rxjs";
@@ -82,6 +82,17 @@ export class TicketsEffects {
                 )
             })
         ));
+
+    getDevTickets$ = createEffect(() => 
+    this.actions$.pipe(
+        ofType(getDevTickets),
+        mergeMap(() => {
+            return this.ticketsService.GetDevTickets().pipe(
+                map((tickets: ITicket[]) => getDevTicketsSuccess({ tickets })),
+                catchError(error => of(getDevTicketsFailure({ error })))
+            )
+        })
+    ))
 
 }
 

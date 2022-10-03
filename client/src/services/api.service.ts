@@ -64,6 +64,10 @@ export class TicketsService {
   public UpdateTicket(ticket: ICreateTicket, id: number): Observable<any> {
     return this.http.patch(this.Ticket + "/" + id, ticket);
   }
+
+  public GetDevTickets(): Observable<ITicket[]> {
+    return this.http.get<ITicket[]>(this.Ticket + "/" + "ticket-assigned");
+  }
 }
 
 

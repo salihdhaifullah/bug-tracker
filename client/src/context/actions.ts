@@ -34,6 +34,12 @@ export const getTicketsSuccess = createAction("[Tickets] Get Tickets Success", p
 
 export const getTicketsFailure = createAction("[Tickets] Get Tickets Failure", props<{ error: string }>()); 
 
+export const getDevTickets = createAction("[DevTickets] Get Dev Tickets"); 
+
+export const getDevTicketsSuccess = createAction("[DevTickets] Get Dev Tickets Success", props<{ tickets: ITicket[] }>()); 
+
+export const getDevTicketsFailure = createAction("[DevTickets] Get Dev Tickets Failure", props<{ error: string }>()); 
+
 
 export const getTicketById = createAction("[Ticket] Get Ticket By Id", props<{id: number}>()); 
 

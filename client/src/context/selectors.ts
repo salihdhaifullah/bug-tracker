@@ -9,7 +9,11 @@ export const isLoadingSelector = createSelector(selectFeature, state => state.is
 
 export const projectsSelector = createSelector(selectFeature, state => state.projects);
 
-export const ticketsSelector = createSelector(selectFeature, state => state.tickets);
+export const ticketsSelector = createSelector(selectFeature, state => {
+    console.log("from selectores");
+    console.log(state.tickets);
+    return state.tickets;
+});
 
 export const userSelector = createSelector(selectFeature, state => state.user);
 
@@ -24,3 +28,5 @@ export const ticketSelector = createSelector(selectFeature, state => state.ticke
 export const commentsSelector = createSelector(selectFeature, state => state.comments);
 
 export const filesSelector = createSelector(selectFeature, state => state.files);
+
+export const devTicketSelector = createSelector(selectFeature, state => state.tickets);

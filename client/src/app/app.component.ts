@@ -21,7 +21,7 @@ export class AppComponent implements AfterViewInit {
 
   SwalError() {
     Swal.fire({
-      title: "you need To login if statement",
+      title: "you need To login",
       text: 'Please login again',
       icon: 'error',
       confirmButtonText: 'OK',

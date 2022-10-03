@@ -32,10 +32,10 @@ export class NewTicketComponent implements OnInit {
 
       this.TicketForm.setValue({
         name: Change.name,
-        description: "  ",
+        description: Change.description,
         type: Change.type,
         priority: Change.priority,
-        assigneeToId: Math.floor(Math.random() * this.UsersList.length),
+        assigneeToId: 1,
       });
     }
   }

@@ -52,7 +52,7 @@ import { CommentFormComponent } from './components/comment-form/comment-form.com
 import { UserTicketComponent } from './components/user-ticket/user-ticket.component';
 import { NotFoundComponent } from './components/not-found/not-found.component';
 import { CommentComponent } from './components/comment/comment.component';
-import { LodingSpinnerComponent } from './loding-spinner/loding-spinner.component';
+import { LodingSpinnerComponent } from './components/loding-spinner/loding-spinner.component';
 
 
 

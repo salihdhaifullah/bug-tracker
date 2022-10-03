@@ -16,7 +16,7 @@ export const initialState: IAppState = {
     project: null,
     ticket: null,
     comments: [],
-    files: []
+    files: [],
 }
 
 const userInitialState: any = {
@@ -97,6 +97,10 @@ export const ticketsReducers = createReducer(ticketsInitialState,
     on(Actions.getTickets, state => ({ ...state, isLoading: true })),
     on(Actions.getTicketsSuccess, (state, action) => ({ ...state, isLoading: false, tickets: action.tickets })),
     on(Actions.getTicketsFailure, (state, action) => ({ ...state, isLoading: false, error: action.error })),
+
+    on(Actions.getDevTickets, state => ({ ...state, isLoading: true })),
+    on(Actions.getDevTicketsSuccess, (state, action) => ({ ...state, isLoading: false, devTickets: action.tickets })),
+    on(Actions.getDevTicketsFailure, (state, action) => ({ ...state, isLoading: false, error: action.error })),
 )
 
 export const rolesReducers = createReducer(rolesInitialState,
