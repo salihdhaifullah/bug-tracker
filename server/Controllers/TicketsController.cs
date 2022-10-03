@@ -190,34 +190,31 @@ namespace server.Controllers
         }
 
 
-        [HttpPut("ticket-assigned/{id}"), Authorize(Roles = "Developer")]
-        public async Task<IActionResult> AssignTicketToMe([FromRoute] int id, [FromQuery] string Status)
+        [HttpPatch("ticket-assigned"), Authorize(Roles = "Developer")]
+        public async Task<IActionResult> AssignTicketToMe([FromBody] List<DevTicketToUpdateDto> data)
         {
-            
-            var Ticket = await _context.Tickets.FindAsync(id);
-            if (Ticket == null) return NotFound();
             string? header = Request.Headers.Authorization;
             if (header == null) return Unauthorized();
 
             string[] token = header.Split(' ');
-            var id1 = _token.VerifyToken(token[1]);
-            if (id1 == null) return Unauthorized();
+            var userId = _token.VerifyToken(token[1]);
+            if (userId == null) return Unauthorized();
 
-            if (Ticket.AssigneeToId != id1) return Unauthorized();
-
-            if (Status != Statuses.New && Status != Statuses.InProgress && Status != Statuses.Closed) return BadRequest("Status must be New, InProgress, Closed");
-
-
-            if (Status == Statuses.Closed)
-            {
-                Ticket.Status = Status;
-                Ticket.IsCompleted = true;
-            } 
-            else Ticket.Status = Status;
-            
+            foreach (DevTicketToUpdateDto item in data) {
+                if (item.status != Statuses.New && item.status != Statuses.InProgress && item.status != Statuses.Closed) return BadRequest(new {message = "Status must be New, InProgress, Closed"});
+                var ticket = await _context.Tickets.FindAsync(item.id);
+                if (ticket == null) return NotFound(new {message = "ticket Not found"});
+                if (ticket.AssigneeToId != userId) return Unauthorized();
+                if (item.status == Statuses.Closed) {
+                    ticket.IsCompleted = true;
+                    ticket.Status = item.status;
+                } else {
+                    ticket.Status = item.status;
+                }
+            };
             
             await _context.SaveChangesAsync();
-            return Ok(Ticket);
+            return Ok(new { massage = "Successfully Updated"});
         }
     }
 }

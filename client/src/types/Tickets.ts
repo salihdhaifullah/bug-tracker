@@ -22,3 +22,11 @@ export interface ICreateTicket {
     assigneeToId: number // Select Form
     projectId: number // From Query Url
 }
+
+
+
+export interface ITicketToUpdate {
+    id: number;
+    status: string;
+  }
+  

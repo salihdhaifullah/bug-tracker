@@ -1,4 +1,4 @@
-import { ICreateTicket } from './../types/Tickets';
+import { ICreateTicket, ITicketToUpdate } from './../types/Tickets';
 import { ISinginFormData, ILoginFormData } from '../model/FormData';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
@@ -67,6 +67,10 @@ export class TicketsService {
 
   public GetDevTickets(): Observable<ITicket[]> {
     return this.http.get<ITicket[]>(this.Ticket + "/" + "ticket-assigned");
+  }
+
+  public UpdateDevTickets(items: ITicketToUpdate[]): Observable<any> {
+    return this.http.patch(this.Ticket + "/" + "ticket-assigned", items)
   }
 }
 

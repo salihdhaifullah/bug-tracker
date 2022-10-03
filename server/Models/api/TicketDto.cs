@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace server.Models.api
+﻿namespace server.Models.api
 {
     public class TicketDto
     {
@@ -11,5 +9,11 @@ namespace server.Models.api
         public string Type { get; set; } = "Feature"; // Feature, Bug
         public int AssigneeToId { get; set; } 
         public int SubmitterId { get; set; }
+    }
+
+    public class DevTicketToUpdateDto
+    {
+        public int id { get; set;}
+        public string status { get; set; } = String.Empty; 
     }
 }
