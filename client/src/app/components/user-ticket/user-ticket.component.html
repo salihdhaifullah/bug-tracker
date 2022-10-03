@@ -15,7 +15,7 @@
         <h2 class="text-center">New</h2>
 
         <div cdkDropList [cdkDropListData]="New" class="example-list" (cdkDropListDropped)="drop($event)">
-          <div class="example-box" *ngFor="let item of New" cdkDrag>{{item}}</div>
+          <div class="example-box" *ngFor="let item of New" cdkDrag><a [href]="'ticket/' + item.id" class="hover:text-blue-500 text-blue-600 text-base cursor-pointer hover:underline ">{{item.name}}</a></div>
         </div>
       </div>
 
@@ -24,7 +24,7 @@
         <h2 class="text-center">In Progress</h2>
 
         <div cdkDropList [cdkDropListData]="Progress" class="example-list" (cdkDropListDropped)="drop($event)">
-          <div class="example-box" *ngFor="let item of Progress" cdkDrag>{{item}}</div>
+          <div class="example-box" *ngFor="let item of Progress" cdkDrag><a [href]="'ticket/' + item.id" class="hover:text-blue-500 text-blue-600 text-base cursor-pointer hover:underline ">{{item.name}}</a></div>
         </div>
       </div>
 
@@ -33,7 +33,7 @@
         <h2 class="text-center">Done</h2>
 
         <div cdkDropList [cdkDropListData]="Done" class="example-list" (cdkDropListDropped)="drop($event)">
-          <div class="example-box" *ngFor="let item of Done" cdkDrag>{{item}}</div>
+          <div class="example-box" *ngFor="let item of Done" cdkDrag><a [href]="'ticket/' + item.id" class="hover:text-blue-500 text-blue-600 text-base cursor-pointer hover:underline ">{{item.name}}</a></div>
         </div>
       </div>
 
