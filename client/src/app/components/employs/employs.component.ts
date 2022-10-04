@@ -7,7 +7,7 @@ import { IAppState } from 'src/context/app.state';
 import { Store, select } from '@ngrx/store';
 import { MatTableDataSource } from '@angular/material/table';
 import { IChangeRole, UsersRole } from 'src/types/Roles';
-import { Users } from 'src/types/User';
+import { User, Users } from 'src/types/User';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MyErrorStateMatcher } from 'src/app/MyErrorStateMatcher';
 import { AuthService, RolesService } from 'src/services/api.service';
@@ -24,11 +24,16 @@ import * as Actions from "src/context/actions"
 export class EmploysComponent implements OnInit {
   displayedColumns: string[] = ['email', 'name', 'role', 'createdAt'];
   dataSource = new MatTableDataSource<UsersRole>();
-
+  isFound = localStorage.getItem('user')
+  user: User | null = this.isFound ? JSON.parse(this.isFound) : null;
+  
   isLoading$: Observable<Boolean>;
   error$: Observable<string | null>;
   roles$: Observable<UsersRole[]>;
   _moment: any;
+  developersCount: number = 0;
+  SubmitterCount: number = 0;
+  ProjectMangersCount: number = 0;
 
   constructor(private store: Store<IAppState>, private authService: AuthService, private rolesService: RolesService) {
     this.isLoading$ = this.store.pipe(select(isLoadingSelector));
@@ -52,23 +57,33 @@ export class EmploysComponent implements OnInit {
 
   @ViewChild(MatPaginator, { static: true }) paginator!: MatPaginator;
 
-  Roles = Static.Roles.Array;
+  Roles = Static.Roles.Array.filter((roll) => roll !== Static.Roles.Admin);
   isValid: boolean = this.usersRole.valid;
 
   ngOnChanges() {
     this.isValid = this.usersRole.valid;
   }
+
   ngOnInit(): void {
     this.store.dispatch(Actions.getRoles());
 
     this.authService.GetUsers().subscribe(data => this.toppingList = data);
 
     this.roles$.subscribe((data: any) => {
+      const Rolls: UsersRole[] = data.roles; 
+      if (Rolls.length) {
+        for(let roll of Rolls) {
+          if (roll.role === Static.Roles.Developer) this.developersCount++;
+          else if (roll.role === Static.Roles.Submitter) this.SubmitterCount++;
+          else if (roll.role === Static.Roles.ProjectManger) this.ProjectMangersCount++;
+          else if (roll.role === Static.Roles.Admin) null;
+          else throw new Error("unValid data");
+        }
+      }
       this.dataSource.data = data.roles;
       this.dataSource.paginator = this.paginator;
       this.dataSource.sort = this.sort;
     });
-
   }
 
   HandelSubmit = (event: Event) => {

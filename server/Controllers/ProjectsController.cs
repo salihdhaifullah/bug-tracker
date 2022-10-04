@@ -20,7 +20,7 @@ namespace server.Controllers
             _context = context;
         }
 
-        [HttpPost("Create"), Authorize(Roles = "Admin")]
+        [HttpPost("Create"), Authorize(Roles = "Admin, ProjectManger")]
         public async Task<IActionResult> CreateProject(ProjectDto req)
         {
             var IsSameName = _context.Projects.Any(project => project.Name == req.Name);
@@ -81,7 +81,7 @@ namespace server.Controllers
             return Ok(Projects);
         }
 
-        [HttpPatch("{id}"), Authorize(Roles = "Admin")]
+        [HttpPatch("{id}"), Authorize(Roles = "Admin, ProjectManger")]
         public IActionResult UpdateProject([FromRoute] int id, [FromBody] ProjectDto req)
         {
             var isFound = _context.Projects.Find(id);
@@ -94,7 +94,7 @@ namespace server.Controllers
             return Ok(isFound);
         }
 
-        [HttpPut("{id}"), Authorize(Roles = "Admin")]
+        [HttpPut("{id}"), Authorize(Roles = "Admin, ProjectManger")]
         public async Task<IActionResult> CloseProject([FromRoute] int id)
         {
             var isFound = await _context.Projects.FindAsync(id);
@@ -111,7 +111,7 @@ namespace server.Controllers
         }
 
 
-        [HttpPut("open/{id}"), Authorize(Roles = "Admin")]
+        [HttpPut("open/{id}"), Authorize(Roles = "Admin, ProjectManger")]
         public async Task<IActionResult> OpenProject([FromRoute] int id)
         {
             var isFound = await _context.Projects.FindAsync(id);

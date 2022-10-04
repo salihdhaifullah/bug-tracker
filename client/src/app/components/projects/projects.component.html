@@ -33,37 +33,37 @@
 <div class="mat-elevation-z8 mb-20 mt-10">
   <table mat-table class="min-w-full" [dataSource]="dataSource">
 
-    <ng-container matColumnDef="name">
-      <th mat-header-cell *matHeaderCellDef> Name </th>
+    <ng-container matColumnDef="Name">
+      <th mat-header-cell *matHeaderCellDef>Name</th>
       <td mat-cell class="link" routerLink="/project/{{element.id}}" *matCellDef="let element"> {{element.name}} </td>
     </ng-container>
 
-    <ng-container matColumnDef="title">
-      <th mat-header-cell *matHeaderCellDef> title </th>
+    <ng-container matColumnDef="Title">
+      <th mat-header-cell *matHeaderCellDef>Title</th>
       <td mat-cell *matCellDef="let element"> {{element.title}} </td>
     </ng-container>
 
-    <ng-container matColumnDef="projectState">
-      <th mat-header-cell *matHeaderCellDef> project state </th>
+    <ng-container matColumnDef="State">
+      <th mat-header-cell *matHeaderCellDef>State</th>
       <td mat-cell *matCellDef="let element"> {{element.isClosed ? "closed" : "open"}} </td>
     </ng-container>
 
 
-    <ng-container matColumnDef="createdAt">
-      <th mat-header-cell *matHeaderCellDef> created At </th>
+    <ng-container matColumnDef="CreatedAt">
+      <th mat-header-cell *matHeaderCellDef>Created At</th>
       <td mat-cell *matCellDef="let element"> {{_moment(element.createdAt).fromNow()}} </td>
     </ng-container>
 
-    <ng-container matColumnDef="update">
-      <th mat-header-cell *matHeaderCellDef> Update Project </th>
+    <ng-container *ngIf="isAdminOrProjectManger" matColumnDef="Update">
+      <th mat-header-cell *matHeaderCellDef>Update</th>
       <td mat-cell (click)="handelUpdateProject(element.id)"
-        class="link" *matCellDef="let element"> Update </td>
+        class="link" *matCellDef="let element">Update</td>
     </ng-container>
 
 
 
-    <ng-container matColumnDef="close">
-      <th mat-header-cell *matHeaderCellDef> </th>
+    <ng-container *ngIf="isAdminOrProjectManger" matColumnDef="Close">
+      <th mat-header-cell *matHeaderCellDef>Close</th>
 
       <td mat-cell  (click)="handelCloseOrOpenProject(element.id)"
         class='hover:underline cursor-pointer {{!element.isClosed ? "text-orange-400 hover:text-orange-600" : "text-green-400 hover:text-green-600"}}'
@@ -85,6 +85,6 @@
 
 
 
-<div class="flex justify-evenly mb-20 flex-row items-center">
+<div *ngIf="isAdminOrProjectManger" class="flex justify-evenly mb-20 flex-row items-center">
   <app-new-project [updateProject]="updateProject"></app-new-project>
 </div>

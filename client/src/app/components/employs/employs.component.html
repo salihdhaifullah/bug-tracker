@@ -1,32 +1,38 @@
 <div class="w-full h-full bg-gray-100 mt-20">
 
-    <div  class="w-full mb-20 grid mt-10 gap-5 justify-evenly grid-cols-3 h-20 md:h-30 lg:h-40  items-center">
+    <div class="w-full mb-20 grid mt-10 gap-5 justify-evenly grid-cols-3 h-20 md:h-30 lg:h-40  items-center">
 
         <div
             class="flex w-full text-white font-semibold flex-col hover-animation-card bg-blue-400 items-center justify-center rounded-md shadow-md h-full text-center">
-            <h2>Developer</h2>
-            <span class="text-lg">{{54}}</span>
+            <h2 *ngIf="developersCount">{{developersCount > 1 ? "Developers" : "Developer"}}</h2>
+            <h2 *ngIf="!developersCount">Developer</h2>
+            <span *ngIf="developersCount" class="text-lg">{{developersCount}}</span>
+            <h3 *ngIf="!developersCount">None</h3>
         </div>
-    
+
         <div
             class="flex w-full text-white font-semibold flex-col hover-animation-card bg-blue-400 items-center justify-center rounded-md shadow-md h-full text-center">
-            <h2>Submitter</h2>
-            <span  class="text-lg">{{11}}</span>
+            <h2 *ngIf="SubmitterCount">{{SubmitterCount > 1 ? "Submitters" : "Submitter"}}</h2>
+            <h2 *ngIf="!SubmitterCount">Submitter</h2>
+            <span *ngIf="SubmitterCount" class="text-lg">{{SubmitterCount}}</span>
+            <h3 *ngIf="!SubmitterCount">None</h3>
         </div>
-    
+
         <div
             class="flex w-full text-white font-semibold flex-col hover-animation-card bg-blue-400 items-center justify-center rounded-md shadow-md h-full text-center">
-            <h2>Project Manger</h2>
-            <span class="text-lg">{{4}}</span>
+            <h2 *ngIf="developersCount">{{developersCount > 1 ? "Project Mangers" : "Project Manger"}}</h2>
+            <h2 *ngIf="!developersCount">Project Manger</h2>
+            <span *ngIf="developersCount" class="text-lg">{{developersCount}}</span>
+            <h3 *ngIf="!developersCount">None</h3>
         </div>
-    
+
     </div>
 
 
     <div class="mat-elevation-z8">
         <table mat-table class="min-w-full" [dataSource]="dataSource">
 
-            
+
 
             <!-- Name Column -->
             <ng-container matColumnDef="name">
@@ -52,7 +58,8 @@
             </ng-container>
 
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row class="hover:bg-gray-200 transition-all ease-in-out duration-150" *matRowDef="let row; columns: displayedColumns;"></tr>
+            <tr mat-row class="hover:bg-gray-200 transition-all ease-in-out duration-150"
+                *matRowDef="let row; columns: displayedColumns;"></tr>
         </table>
 
         <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons
@@ -63,7 +70,7 @@
 
 
 
-    <div class="flex justify-evenly h-full w-full items-center my-16">
+    <div *ngIf="user && user.role === 'Admin'" class="flex justify-evenly h-full w-full items-center my-16">
 
         <div>
             <h1 class="text-gray-800 text-3xl">
@@ -77,14 +84,15 @@
                 <mat-icon aria-hidden="false" fontIcon="group_add"
                     class="w-auto h-auto text-3xl material-icons-outlined  flex text-[#0b4ea5]"></mat-icon>
                 <h2 class="text-2xl text-center text-[#0b4ea5]">
-                    Manage Users 
+                    Manage Users
                 </h2>
             </div>
 
             <mat-form-field appearance="fill">
                 <mat-label>Users</mat-label>
                 <mat-select [formControl]="usersFormControl" multiple>
-                    <mat-option *ngFor="let topping of toppingList" [value]="topping.id">{{topping.firstName + " " + topping.lastName}} 
+                    <mat-option *ngFor="let topping of toppingList" [value]="topping.id">{{topping.firstName + " " +
+                        topping.lastName}}
                         (<span class="text-gray-500 text-xs">{{topping.role}}</span>)
                     </mat-option>
                 </mat-select>
@@ -93,7 +101,7 @@
                 </mat-error>
             </mat-form-field>
 
-            <mat-form-field  appearance="fill">
+            <mat-form-field appearance="fill">
                 <mat-label>Role</mat-label>
                 <mat-select [formControl]="userRoleFormControl">
                     <mat-option *ngFor="let role of Roles" [value]="role">{{role}}</mat-option>

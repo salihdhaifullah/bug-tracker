@@ -11,31 +11,53 @@ import { IAppState } from 'src/context/app.state';
 import { MatSort } from '@angular/material/sort';
 import * as moment from 'moment';
 import Swal from 'sweetalert2';
+import { User } from 'src/types/User';
+import { Static } from 'src/Static';
 
 @Component({
   selector: 'app-projects',
   templateUrl: './projects.component.html'
 })
 export class ProjectsComponent implements OnInit {
-  displayedColumns: string[] = ['title', 'name', 'projectState', 'createdAt', 'update', "close"];
+  displayedColumns: string[] = ['Title', 'Name', 'State', 'CreatedAt'];
   dataSource = new MatTableDataSource<IProject>();
 
   isLoading$: Observable<Boolean>;
   error$: Observable<string | null>;
   projects$: Observable<IProject[]>;
   _moment: any;
+
+  isFound = localStorage.getItem('user')
+  user: User | null = this.isFound ? JSON.parse(this.isFound) : null;
+  isAdminOrProjectManger: boolean;
+  
+  Closed: number | null = null;
+  Open: number | null = null;
+  Count: number | null = null;
+  updateProject: IProject | undefined = undefined;
+
+  @ViewChild(MatSort, { static: true }) sort!: MatSort;
+
+  @ViewChild(MatPaginator, { static: true }) paginator!: MatPaginator;
+
   constructor(private store: Store<IAppState>, private projectService: ProjectsService) {
     this.isLoading$ = this.store.pipe(select(isLoadingSelector));
     this.error$ = this.store.pipe(select(errorSelector))
     this.projects$ = this.store.pipe(select(projectsSelector));
     this._moment = moment;
+    if (this.user) this.isAdminOrProjectManger = (this.user.role === Static.Roles.Admin || this.user.role === Static.Roles.ProjectManger);
+    else this.isAdminOrProjectManger = false;
   }
 
-  Closed: number | null = null;
-  Open: number | null = null;
-  Count: number | null = null;
 
-  updateProject: IProject | undefined = undefined;
+  ngOnInit() {
+    if (this.isAdminOrProjectManger) {
+      this.displayedColumns.push("Close")
+      this.displayedColumns.push("Update")
+    }
+    this.store.dispatch(Actions.getProjects());
+    this.getProject()
+  }
 
   handelUpdateProject(id: Number) {
     console.log("update" + id)
@@ -102,17 +124,7 @@ export class ProjectsComponent implements OnInit {
         })
       }
     }
-}
-
-  @ViewChild(MatSort, { static: true }) sort!: MatSort;
-
-  @ViewChild(MatPaginator, { static: true }) paginator!: MatPaginator;
-
-  ngOnInit() {
-    this.store.dispatch(Actions.getProjects());
-    this.getProject()
-  }
-
+};
 
   getProject() {
     this.projects$.subscribe((p: any) => {
@@ -123,7 +135,7 @@ export class ProjectsComponent implements OnInit {
       this.dataSource.paginator = this.paginator
       this.dataSource.sort = this.sort
     });
-  }
+  };
 
 }
 

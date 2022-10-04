@@ -42,10 +42,13 @@
 
         <p class="text-md text-gray-500">{{projectData.description}}</p>
     </div>
-    <div class="grid grid-rows-2 mt-10">
+    <div *ngIf="user && (user.role === 'Admin' || user.role === 'ProjectManger' || user.role === 'Submitter')" class="grid grid-rows-2 mt-10">
         <app-tickets *ngIf="count" (newItemEvent)="HandelUpdate($event)" [tickets]="tickets"></app-tickets>
         <div class="flex justify-evenly flex-row items-center">
             <app-new-ticket [ticketToUpdate]="ticketToUpdate"></app-new-ticket>
         </div>
+    </div>
+    <div *ngIf="user && !(user.role === 'Admin' || user.role === 'ProjectManger' || user.role === 'Submitter')" class="mt-10">
+        <app-tickets *ngIf="count" (newItemEvent)="HandelUpdate($event)" [tickets]="tickets"></app-tickets>
     </div>
 </div>

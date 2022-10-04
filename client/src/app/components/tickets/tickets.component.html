@@ -35,7 +35,7 @@
         <td mat-cell *matCellDef="let element"> {{element.priority}} </td>
       </ng-container>
 
-      <ng-container matColumnDef="update">
+      <ng-container *ngIf="isAdminOrProjectMangerOrSubmitter" matColumnDef="update">
         <th mat-header-cell *matHeaderCellDef> Update Ticket </th>
         <td mat-cell *matCellDef="let element" (click)="HandelUpdate(element.id)" class="link"> Update </td>
       </ng-container>
