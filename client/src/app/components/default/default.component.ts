@@ -34,7 +34,6 @@ export class DefaultComponent implements OnInit {
     });
   };
 
-
   handelClick(): void {
     this.sidenav.toggle();
     this.isClosed = !this.isClosed;

@@ -1,6 +1,11 @@
 <div class="w-full">
 
-  <div class="mat-elevation-z8 mb-20 mt-10">
+  <mat-form-field appearance="standard" class="mt-10 ml-8">
+    <mat-label>Filter</mat-label>
+    <input matInput (keyup)="applyFilter($event)" placeholder="Ex. Mia" #input>
+  </mat-form-field>
+
+  <div class="mat-elevation-z8 mb-20">
     <table mat-table class="min-w-full" [dataSource]="dataSource">
 
 

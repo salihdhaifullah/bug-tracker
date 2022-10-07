@@ -1,6 +1,12 @@
 <div class="mt-20 mb-10 w-full flex items-center justify-center">
   <h1 class="text-gray-800 text-3xl"><span class="underline-line">Tickets</span></h1>
 </div>
+
+<mat-form-field appearance="standard" class="ml-8">
+  <mat-label>Filter</mat-label>
+  <input matInput (keyup)="applyFilter($event)" placeholder="Ex. Mia" #input>
+</mat-form-field>
+
 <div class="mat-elevation-z8 mb-20 min-w-full shadow-md bg-white">
     <table mat-table  [dataSource]="dataSource" class="min-w-full">
 

@@ -53,6 +53,7 @@ import { UserTicketComponent } from './components/user-ticket/user-ticket.compon
 import { NotFoundComponent } from './components/not-found/not-found.component';
 import { CommentComponent } from './components/comment/comment.component';
 import { LodingSpinnerComponent } from './components/loding-spinner/loding-spinner.component';
+import { ChartsPieComponent } from './components/charts-pie/charts-pie.component';
 
 
 
@@ -81,6 +82,7 @@ import { LodingSpinnerComponent } from './components/loding-spinner/loding-spinn
     NotFoundComponent,
     CommentComponent,
     LodingSpinnerComponent,
+    ChartsPieComponent,
   ],
   imports: [ 
     BrowserModule,

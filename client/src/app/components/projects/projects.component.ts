@@ -59,6 +59,16 @@ export class ProjectsComponent implements OnInit {
     this.getProject()
   }
 
+  applyFilter(event: Event) {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.dataSource.filter = filterValue.trim().toLowerCase();
+
+    if (this.dataSource.paginator) {
+      this.dataSource.paginator.firstPage();
+    }
+  }
+
+
   handelUpdateProject(id: Number) {
     console.log("update" + id)
     this.updateProject = this.dataSource.data.find(x => x.id === id);
