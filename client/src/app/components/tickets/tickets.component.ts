@@ -7,14 +7,23 @@ import { Component, ViewChild, Input, SimpleChanges, OnInit, Output, EventEmitte
 import { User } from 'src/types/User';
 import { Static } from 'src/Static';
 
+interface Ticket {
+  createdAt: string
+  completed: "Yas" | "No"
+  name: string
+  type: string
+  devoloper: string
+  priority: string
+  id: number
+}
 @Component({
   selector: 'app-tickets',
   templateUrl: './tickets.component.html'
 })
 export class TicketsComponent implements OnInit {
-  displayedColumns: string[] = ['devoloper', 'name', 'priority', "createdAt", "type", "completed"];
+  displayedColumns: string[] = ['name', 'devoloper', 'priority', "createdAt", "type", "completed"];
   
-  dataSource = new MatTableDataSource<ITicket>();
+  dataSource = new MatTableDataSource<Ticket>();
 
   @Input() tickets: ITicket[] | undefined | null;
 
@@ -50,10 +59,18 @@ export class TicketsComponent implements OnInit {
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['tickets'] && this.tickets) {
-        this.dataSource.data = this.tickets;
+        this.dataSource.data = this.resSetData(this.tickets);
         this.dataSource.paginator = this.paginator;
         this.dataSource.sort = this.sort;
     }
+  }
+
+  resSetData(List: ITicket[]): Ticket[] {
+    const data: Ticket[] = [];
+    for (let item of List) {
+      data.push({id: item.id, createdAt: this._moment(item.createdAt).format('ll'), completed: item.isCompleted ? "Yas" : "No", name: item.name, type: item.type, priority: item.priority, devoloper: item.devoloper})
+    }
+    return data;
   }
 
   applyFilter(event: Event) {

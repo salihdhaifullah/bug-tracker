@@ -7,43 +7,43 @@
   <input matInput (keyup)="applyFilter($event)" placeholder="Ex. Mia" #input>
 </mat-form-field>
 
-<div class="mat-elevation-z8 mb-20 min-w-full shadow-md bg-white">
+<div class="mat-elevation-z8 mb-20 overflow-auto" tabindex="0">
     <table mat-table  [dataSource]="dataSource" class="min-w-full">
 
+      <ng-container matColumnDef="name" sticky>
+        <th class="ml-2" mat-header-cell *matHeaderCellDef> Name </th>
+      <td mat-cell class="link pr-2" routerLink="/ticket/{{element.id}}" *matCellDef="let element"> {{element.name}} </td>
+      </ng-container>
+
       <ng-container matColumnDef="createdAt">
-        <th mat-header-cell *matHeaderCellDef> Created At </th>
-        <td mat-cell *matCellDef="let element"> {{_moment(element.createdAt).format('ll')}} </td>
+        <th mat-header-cell  class="pl-2 ml-2" *matHeaderCellDef> Created At </th>
+        <td mat-cell  class="pl-2 ml-2" *matCellDef="let element"> {{element.createdAt}} </td>
       </ng-container>
 
       <ng-container matColumnDef="type">
-        <th mat-header-cell *matHeaderCellDef> type </th>
-        <td mat-cell *matCellDef="let element"> {{element.type}} </td>
+        <th mat-header-cell  class="pl-2 ml-2" *matHeaderCellDef> type </th>
+        <td mat-cell  class="pl-2 ml-2" *matCellDef="let element"> {{element.type}} </td>
       </ng-container>
 
       <ng-container matColumnDef="completed">
-        <th mat-header-cell *matHeaderCellDef> Completed </th>
-        <td mat-cell *matCellDef="let element"> {{element.isCompleted ? "Yas" : "No"}} </td>
+        <th mat-header-cell  class="pl-2 ml-2" *matHeaderCellDef> Completed </th>
+        <td mat-cell  class="pl-2 ml-2" *matCellDef="let element"> {{element.completed}} </td>
       </ng-container>
 
 
       <ng-container matColumnDef="devoloper">
-        <th mat-header-cell *matHeaderCellDef> Assign To </th>
-        <td mat-cell *matCellDef="let element"> {{element.devoloper}} </td>
-      </ng-container>
-  
-      <ng-container matColumnDef="name">
-        <th mat-header-cell *matHeaderCellDef> Name </th>
-      <td mat-cell class="link" routerLink="/ticket/{{element.id}}" *matCellDef="let element"> {{element.name}} </td>
+        <th mat-header-cell  class="pl-2 ml-2" *matHeaderCellDef> Assign To </th>
+        <td mat-cell  class="pl-2 ml-2" *matCellDef="let element"> {{element.devoloper}} </td>
       </ng-container>
   
       <ng-container matColumnDef="priority">
-        <th mat-header-cell *matHeaderCellDef> Priority </th>
-        <td mat-cell *matCellDef="let element"> {{element.priority}} </td>
+        <th mat-header-cell  class="pl-2 ml-2" *matHeaderCellDef> Priority </th>
+        <td mat-cell  class="pl-2 ml-2" *matCellDef="let element"> {{element.priority}} </td>
       </ng-container>
 
       <ng-container *ngIf="isAdminOrProjectMangerOrSubmitter" matColumnDef="update">
-        <th mat-header-cell *matHeaderCellDef> Update Ticket </th>
-        <td mat-cell *matCellDef="let element" (click)="HandelUpdate(element.id)" class="link"> Update </td>
+        <th mat-header-cell  class="pl-2 ml-2" *matHeaderCellDef> Update Ticket </th>
+        <td mat-cell class="pl-2 ml-2"  *matCellDef="let element" (click)="HandelUpdate(element.id)" class="link"> Update </td>
       </ng-container>
   
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
