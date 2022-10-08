@@ -35,8 +35,8 @@
     <h3 class="text-gray-700"><strong>Name:</strong> {{projectData.name}}</h3>
     <h3 class="text-gray-700"><strong>State:</strong> {{projectData.isClosed ? "Closed" : "Open"}}</h3>
 
-    <span *ngIf="projectData.isClosed">Closed At: {{_moment(projectData.closedAt).fromNow()}}</span>
-    <span>Created At: {{_moment(projectData.createdAt).fromNow()}}</span>
+    <span *ngIf="projectData.isClosed">Closed At: {{_moment(projectData.createdAt).format('ll')}}</span>
+    <span>Created At: {{_moment(projectData.createdAt).format('ll')}}</span>
 </div>
 
 

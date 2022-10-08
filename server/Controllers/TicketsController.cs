@@ -216,5 +216,15 @@ namespace server.Controllers
             await _context.SaveChangesAsync();
             return Ok(new { massage = "Successfully Updated"});
         }
+
+        [HttpGet("dashboard/bar-chart"), Authorize]
+        public async Task<IActionResult> GetBarChartData() {
+            var tickets = await _context.Tickets.Select(t => new {
+                t.CreatedAt,
+                t.CompletedAt,
+                t.Priority
+            }).ToListAsync();
+            return Ok(tickets);
+        }
     }
 }

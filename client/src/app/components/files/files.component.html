@@ -31,7 +31,7 @@
 
       <ng-container matColumnDef="CreatedAt">
         <th mat-header-cell *matHeaderCellDef> created At </th>
-        <td mat-cell *matCellDef="let element"> {{_moment(element.createdAt).fromNow()}} </td>
+        <td mat-cell *matCellDef="let element"> {{_moment(element.createdAt).format('ll')}} </td>
       </ng-container>
 
       <ng-container matColumnDef="edit">

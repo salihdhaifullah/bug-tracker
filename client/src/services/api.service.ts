@@ -72,6 +72,10 @@ export class TicketsService {
   public UpdateDevTickets(items: ITicketToUpdate[]): Observable<any> {
     return this.http.patch(this.Ticket + "/" + "ticket-assigned", items)
   }
+
+  public GetBarChartData(): Observable<any> {
+    return this.http.get(this.Ticket + "/" + "dashboard/bar-chart")
+  }
 }
 
 

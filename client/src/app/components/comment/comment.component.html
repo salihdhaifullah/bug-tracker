@@ -22,7 +22,7 @@
         </span>
     
         <span class="text-base text-gray-700 mr-2 flex-1 ml-6">By {{comment.userName}}</span>
-        <span class="text-sm text-gray-500">{{_moment(comment.createdAt).fromNow()}}</span>
+        <span class="text-sm text-gray-500">{{_moment(comment.createdAt).format('ll')}}</span>
     </div>
     <hr class="mb-3" />
     
