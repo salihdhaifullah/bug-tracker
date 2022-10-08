@@ -1,39 +1,77 @@
+import { TicketsService } from 'src/services/api.service';
 import { Component, OnInit } from '@angular/core';
 import { ChartConfiguration, ChartOptions } from "chart.js";
+import { Static } from 'src/Static';
+import * as moment from 'moment';
+
+interface TicketData {
+  createdAt: Date
+  isCompleted: boolean
+}
 
 @Component({
   selector: 'app-line-chart',
   templateUrl: './line-chart.component.html'
 })
-export class LineChartComponent implements OnInit {
 
-  constructor() { }
+export class LineChartComponent implements OnInit {
+tickets: TicketData[] = [];
+ChartLabels: string[] = [];
+ChartData: number[] = [];
+lineChartData: any;
+lineChartOptions: any;
+lineChartLegend: any;
+isLoading: boolean = true;
+_moment = moment;
+  constructor(private ticketsService: TicketsService) { }
 
   ngOnInit(): void {
-  }
-  public lineChartData: ChartConfiguration<'line'>['data'] = {
-    labels: [
-      'January',
-      'February',
-      'March',
-      'April',
-      'May',
-      'June',
-      'July'
-    ],
-    datasets: [
-      {
-        data: [ 65, 59, 80, 81, 56, 55, 40 ],
-        label: 'Series A',
-        fill: true,
-        tension: 0.5,
-        borderColor: 'black',
-        backgroundColor: 'rgba(255,0,0,0.3)'
+    let biggestMonthIndex = 0;
+    let smallestMonthIndex = 0;
+    this.ticketsService.GetLineChartData().subscribe(data => {
+      this.tickets = data;
+      this.isLoading = true;
+    }, err => {}, () => {
+
+      for (let ticket of this.tickets) {
+        const month = this._moment(ticket.createdAt).format('MMMM')
+        if (month === Static.Months[biggestMonthIndex] || month === Static.Months[smallestMonthIndex]) { }
+        else if (Static.Months.indexOf(month) > biggestMonthIndex) {
+          biggestMonthIndex = Static.Months.indexOf(month)
+        }
+        else if (Static.Months.indexOf(month) > smallestMonthIndex) {
+          smallestMonthIndex = Static.Months.indexOf(month)
+        }
       }
-    ]
-  };
-  public lineChartOptions: ChartOptions<'line'> = {
-    responsive: false
-  };
-  public lineChartLegend = true;
+
+      this.ChartLabels = Static.Months.slice(smallestMonthIndex, ++biggestMonthIndex);
+
+      for (let ChartMonth of this.ChartLabels) {
+        const data = this.tickets.filter(item => item.isCompleted === true)
+        this.ChartData.push(data.filter(item => this._moment(item.createdAt).format('MMMM') === ChartMonth).length)
+      }
+
+      this.lineChartData = {
+        labels: this.ChartLabels,
+        datasets: [
+          {
+            data: this.ChartData,
+            label: 'Tickets Done',
+            fill: true,
+            tension: 0.5,
+            borderColor: 'black',
+            backgroundColor: 'rgba(59,128,246,0.5)'
+          }
+        ]
+      };
+    
+      this.lineChartOptions = { responsive: false };
+      this.lineChartLegend = true;
+
+      this.isLoading = false;
+    })
+  }
+
+
+
 }

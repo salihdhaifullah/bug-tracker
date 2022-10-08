@@ -28,6 +28,10 @@ export const Static = {
         Bug: "Bug",
     },
 
+    Months: ["January", "February", "March", "April", "May", "June", 
+    "July", "August", "September", "October", "November", "December"],
+
+
     getIdParams: (url: string): number => {
 
         // split ashe char in the url   
@@ -103,6 +107,7 @@ export const Static = {
         if (!objToken || !objToken.id) return null;
 
         return Number(objToken.id);
-    }
+    },
+
 
 }

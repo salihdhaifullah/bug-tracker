@@ -226,5 +226,14 @@ namespace server.Controllers
             }).ToListAsync();
             return Ok(tickets);
         }
+
+        [HttpGet("dashboard/line-chart"), Authorize]
+        public async Task<IActionResult> GetLineChartData() {
+            var tickets = await _context.Tickets.Select(t => new {
+                t.CreatedAt,
+                t.IsCompleted,
+            }).ToListAsync();
+            return Ok(tickets);
+        }
     }
 }

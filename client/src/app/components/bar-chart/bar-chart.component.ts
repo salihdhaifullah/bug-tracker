@@ -15,7 +15,6 @@ interface IChartData {
   label: string
 }
 
-const Months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
 @Component({
   selector: 'app-bar-chart',
@@ -32,9 +31,6 @@ export class BarChartComponent implements OnInit {
 
   constructor(private ticketsService: TicketsService) {}
 
-
-
-
   ngOnInit(): void {
     let biggestMonthIndex = 0;
     let smallestMonthIndex = 0;
@@ -46,19 +42,19 @@ export class BarChartComponent implements OnInit {
 
         const month = this._moment(ticket.createdAt).format('MMMM')
 
-        if (month === Months[biggestMonthIndex] || month === Months[smallestMonthIndex]) { }
-        else if (Months.indexOf(month) > biggestMonthIndex) {
-          biggestMonthIndex = Months.indexOf(month)
+        if (month === Static.Months[biggestMonthIndex] || month === Static.Months[smallestMonthIndex]) { }
+        else if (Static.Months.indexOf(month) > biggestMonthIndex) {
+          biggestMonthIndex = Static.Months.indexOf(month)
         }
-        else if (Months.indexOf(month) > smallestMonthIndex) {
-          smallestMonthIndex = Months.indexOf(month)
+        else if (Static.Months.indexOf(month) > smallestMonthIndex) {
+          smallestMonthIndex = Static.Months.indexOf(month)
         }
 
 
       }
 
 
-      this.ChartLabels = Months.slice(smallestMonthIndex, ++biggestMonthIndex);
+      this.ChartLabels = Static.Months.slice(smallestMonthIndex, ++biggestMonthIndex);
 
 
       const data1 = {
@@ -87,7 +83,6 @@ export class BarChartComponent implements OnInit {
 
       for (let ChartMonth of this.ChartLabels) {
         endData.push(data.filter(item => this._moment(item.createdAt).format('MMMM') === ChartMonth).length)
-        console.log(endData);
       }
       return endData;
     }

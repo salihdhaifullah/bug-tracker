@@ -76,6 +76,10 @@ export class TicketsService {
   public GetBarChartData(): Observable<any> {
     return this.http.get(this.Ticket + "/" + "dashboard/bar-chart")
   }
+  
+  public GetLineChartData(): Observable<any> {
+    return this.http.get(this.Ticket + "/" + "dashboard/line-chart")
+  }
 }
 
 

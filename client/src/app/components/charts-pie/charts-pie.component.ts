@@ -11,9 +11,9 @@ export class ChartsPieComponent implements OnInit {
     public pieChartOptions: ChartOptions<'pie'> = {
       responsive: false,
     };
-    public pieChartLabels = [ [ 'Download', 'Sales' ], [ 'In', 'Store', 'Sales' ], 'Mail Sales' ];
+    public pieChartLabels = [ 'Download Sales' , 'In Store Sales', 'Mail Sales' ];
     public pieChartDatasets = [ {
-      data: [ 300, 500, 100 ]
+      data: [ 500, 400, 100 ]
     } ];
     public pieChartLegend = true;
     public pieChartPlugins = [];
