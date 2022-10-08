@@ -169,6 +169,14 @@ namespace server.Controllers
             return Ok(Res);
         }
 
+        [HttpGet("dashboard/pie-chart"), Authorize]
+        public async Task<IActionResult> GetPieChartData() {
+            var usersRoles = await _context.Users.Where(u => u.Role != Roles.Admin).Select(u => new {
+                u.Role
+            }).ToListAsync();
+            return Ok(usersRoles);
+        }
+
 
     }
 }

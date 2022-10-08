@@ -25,15 +25,15 @@
     <div class="my-16 min-w-full p-6 bg-white rounded-md shadow-md ">
         <h1 class="mb-8 flex justify-between items-center w-full">
             <span class="mr-10 underline-line text-2xl">{{data.name}}</span>
-            <span class="text-sm text-gray-700">Create At: {{_moment(data.createdAt).format('ll')}}</span>
+            <span class="text-sm text-gray-700"><strong>Create At: </strong> {{_moment(data.createdAt).format('ll')}}</span>
         </h1>
 
         <div class="flex justify-evenly mb-8 items-center w-full">
-            <span class="text-base text-gray-700">Created By: <span class="ml-1">{{data.submitter}}</span></span>
-            <span class="text-base text-gray-700">Assignee To: <span class="ml-1">{{data.devoloper}}</span></span>
+            <span class="text-base text-gray-700"><strong>Created By: </strong> <span class="ml-1">{{data.submitter}}</span></span>
+            <span class="text-base text-gray-700"><strong>Assignee To: </strong> <span class="ml-1">{{data.devoloper}}</span></span>
         </div>
 
-
+        <strong>description: </strong>
         <p class="text-md text-gray-500">{{data.description}} </p>
     </div>
 

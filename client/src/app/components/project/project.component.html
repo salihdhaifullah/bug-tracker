@@ -1,4 +1,4 @@
-<div  class="w-full flex flex-col min-h-[100vh]">
+<div class="w-full flex flex-col min-h-[100vh]">
     <div class="w-full grid mt-10 gap-5 justify-evenly grid-cols-3 h-20 md:h-30 lg:h-40  items-center">
 
         <div
@@ -28,27 +28,32 @@
     </div>
 
     <div *ngIf="projectData"
-        class="w-full flex bg-white shadow-md rounded-md px-10 py-8 flex-col mt-10 justify-center items-center">
-        <h1 class="underline-line mb-8 lg:mb-10">{{projectData.title}} </h1>
-
-<div class="flex flex-row min-w-full mb-8 lg:mb-10 justify-evenly items-center">
-    <h3 class="text-gray-700"><strong>Name:</strong> {{projectData.name}}</h3>
-    <h3 class="text-gray-700"><strong>State:</strong> {{projectData.isClosed ? "Closed" : "Open"}}</h3>
-
-    <span *ngIf="projectData.isClosed">Closed At: {{_moment(projectData.createdAt).format('ll')}}</span>
-    <span>Created At: {{_moment(projectData.createdAt).format('ll')}}</span>
+        class="w-full flex bg-white shadow-md rounded-md px-10 py-8 flex-col mt-10 ">
+<div class="flex justify-between items-center">
+    <h1 class="underline-line mb-8 lg:mb-10">{{projectData.title}} </h1>
+    <span><strong>Created At: </strong> {{_moment(projectData.createdAt).format('ll')}}</span>
 </div>
+        <div class="flex flex-row min-w-full mb-8 lg:mb-10 justify-evenly items-center">
+            <h3 class="text-gray-700"><strong>Name: </strong> {{projectData.name}}</h3>
+            <h3 class="text-gray-700"><strong>State: </strong> {{projectData.isClosed ? "Closed" : "Open"}}</h3>
 
+            <span *ngIf="projectData.isClosed"><strong>Closed At: </strong>
+                {{_moment(projectData.createdAt).format('ll')}}</span>
 
-        <p class="text-md text-gray-500">{{projectData.description}}</p>
+        </div>
+
+        <strong>description: </strong>
+        <p class="text-md text-left text-gray-500">{{projectData.description}}</p>
     </div>
-    <div *ngIf="user && (user.role === 'Admin' || user.role === 'ProjectManger' || user.role === 'Submitter')" class="grid grid-rows-2 mt-10">
+    <div *ngIf="user && (user.role === 'Admin' || user.role === 'ProjectManger' || user.role === 'Submitter')"
+        class="grid grid-rows-2 mt-10">
         <app-tickets *ngIf="count" (newItemEvent)="HandelUpdate($event)" [tickets]="tickets"></app-tickets>
         <div class="flex justify-evenly flex-row items-center">
             <app-new-ticket [ticketToUpdate]="ticketToUpdate"></app-new-ticket>
         </div>
     </div>
-    <div *ngIf="user && !(user.role === 'Admin' || user.role === 'ProjectManger' || user.role === 'Submitter')" class="mt-10">
+    <div *ngIf="user && !(user.role === 'Admin' || user.role === 'ProjectManger' || user.role === 'Submitter')"
+        class="mt-10">
         <app-tickets *ngIf="count" (newItemEvent)="HandelUpdate($event)" [tickets]="tickets"></app-tickets>
     </div>
 </div>

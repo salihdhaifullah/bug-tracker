@@ -200,26 +200,32 @@ namespace server.Controllers
             var userId = _token.VerifyToken(token[1]);
             if (userId == null) return Unauthorized();
 
-            foreach (DevTicketToUpdateDto item in data) {
-                if (item.status != Statuses.New && item.status != Statuses.InProgress && item.status != Statuses.Closed) return BadRequest(new {message = "Status must be New, InProgress, Closed"});
+            foreach (DevTicketToUpdateDto item in data)
+            {
+                if (item.status != Statuses.New && item.status != Statuses.InProgress && item.status != Statuses.Closed) return BadRequest(new { message = "Status must be New, InProgress, Closed" });
                 var ticket = await _context.Tickets.FindAsync(item.id);
-                if (ticket == null) return NotFound(new {message = "ticket Not found"});
+                if (ticket == null) return NotFound(new { message = "ticket Not found" });
                 if (ticket.AssigneeToId != userId) return Unauthorized();
-                if (item.status == Statuses.Closed) {
+                if (item.status == Statuses.Closed)
+                {
                     ticket.IsCompleted = true;
                     ticket.Status = item.status;
-                } else {
+                }
+                else
+                {
                     ticket.Status = item.status;
                 }
             };
-            
+
             await _context.SaveChangesAsync();
-            return Ok(new { massage = "Successfully Updated"});
+            return Ok(new { massage = "Successfully Updated" });
         }
 
         [HttpGet("dashboard/bar-chart"), Authorize]
-        public async Task<IActionResult> GetBarChartData() {
-            var tickets = await _context.Tickets.Select(t => new {
+        public async Task<IActionResult> GetBarChartData()
+        {
+            var tickets = await _context.Tickets.Select(t => new
+            {
                 t.CreatedAt,
                 t.CompletedAt,
                 t.Priority
@@ -228,12 +234,26 @@ namespace server.Controllers
         }
 
         [HttpGet("dashboard/line-chart"), Authorize]
-        public async Task<IActionResult> GetLineChartData() {
-            var tickets = await _context.Tickets.Select(t => new {
+        public async Task<IActionResult> GetLineChartData()
+        {
+            var tickets = await _context.Tickets.Select(t => new
+            {
                 t.CreatedAt,
                 t.IsCompleted,
             }).ToListAsync();
             return Ok(tickets);
         }
+
+
+        [HttpGet("dashboard/pie-chart"), Authorize]
+        public async Task<IActionResult> GetPieChartData()
+        {
+            var tickets = await _context.Tickets.Select(t => new
+            {
+                t.Status,
+            }).ToListAsync();
+            return Ok(tickets);
+        }
+
     }
 }

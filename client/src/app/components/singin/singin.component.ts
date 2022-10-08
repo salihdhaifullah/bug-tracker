@@ -29,7 +29,7 @@ export class SinginComponent  {
   }
 
   emailFormControl = new FormControl<string>('', [Validators.required, Validators.email]);
-  passwordFormControl = new FormControl<string>('', [Validators.required, Validators.minLength(8)]);
+  passwordFormControl = new FormControl<string>('', [Validators.required, Validators.minLength(6)]);
   firstNameFormControl = new FormControl<string>('', [Validators.required, Validators.minLength(3)]);
   lastNameFormControl = new FormControl<string>('', [Validators.required, Validators.minLength(3)]);
 

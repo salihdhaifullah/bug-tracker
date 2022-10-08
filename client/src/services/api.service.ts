@@ -37,6 +37,10 @@ export class AuthService {
     });
   }
 
+  public GetPieChartData(): Observable<any> {
+    return this.http.get(this.Auth + "/" + "dashboard/pie-chart")
+  }
+
 }
 
 
@@ -79,6 +83,10 @@ export class TicketsService {
   
   public GetLineChartData(): Observable<any> {
     return this.http.get(this.Ticket + "/" + "dashboard/line-chart")
+  }
+
+  public GetPieChartData(): Observable<any> {
+    return this.http.get(this.Ticket + "/" + "dashboard/pie-chart")
   }
 }
 

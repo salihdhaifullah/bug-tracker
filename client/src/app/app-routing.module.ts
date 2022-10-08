@@ -1,3 +1,4 @@
+import { NewProjectComponent } from './components/new-project/new-project.component';
 import { ProjectsComponent } from './components/projects/projects.component';
 import { EmploysComponent } from './components/employs/employs.component';
 import { TicketComponent } from './components/ticket/ticket.component';
@@ -20,6 +21,7 @@ let routes: Routes =  [
     { path: 'user-ticket', component: UserTicketComponent },
     { path: "manage-users", component: EmploysComponent },
     { path: '**', pathMatch: "full", component: NotFoundComponent },
+    
   ];
 
 @NgModule({

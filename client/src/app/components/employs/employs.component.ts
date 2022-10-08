@@ -106,6 +106,7 @@ export class EmploysComponent implements OnInit {
             Swal.fire('Success', 'Role changed', 'success')
           });
         }
+        this.usersRole.reset();
       })
     }
   }

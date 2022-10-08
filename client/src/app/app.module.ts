@@ -54,6 +54,7 @@ import { NotFoundComponent } from './components/not-found/not-found.component';
 import { CommentComponent } from './components/comment/comment.component';
 import { LodingSpinnerComponent } from './components/loding-spinner/loding-spinner.component';
 import { ChartsPieComponent } from './components/charts-pie/charts-pie.component';
+import { UserRolsChartsPieComponent } from './components/user-rols-charts-pie/user-rols-charts-pie.component';
 
 
 
@@ -83,6 +84,7 @@ import { ChartsPieComponent } from './components/charts-pie/charts-pie.component
     CommentComponent,
     LodingSpinnerComponent,
     ChartsPieComponent,
+    UserRolsChartsPieComponent,
   ],
   imports: [ 
     BrowserModule,
