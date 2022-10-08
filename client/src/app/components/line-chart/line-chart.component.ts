@@ -65,7 +65,7 @@ _moment = moment;
         ]
       };
     
-      this.lineChartOptions = { responsive: false };
+      this.lineChartOptions = { responsive: true };
       this.lineChartLegend = true;
 
       this.isLoading = false;

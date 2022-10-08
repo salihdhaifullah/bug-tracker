@@ -32,46 +32,46 @@
   <input matInput (keyup)="applyFilter($event)" placeholder="Ex. Mia" #input>
 </mat-form-field>
 
-<div class="mat-elevation-z8 mb-20 ">
+<div class="mat-elevation-z8 mb-20 overflow-auto" tabindex="0">
   <table mat-table class="min-w-full" [dataSource]="dataSource">
 
-    <ng-container matColumnDef="Name">
-      <th mat-header-cell *matHeaderCellDef>Name</th>
-      <td mat-cell class="link" routerLink="/project/{{element.id}}" *matCellDef="let element"> {{element.name}} </td>
+    <ng-container matColumnDef="Name" sticky>
+      <th class="ml-2" mat-header-cell *matHeaderCellDef>Name</th>
+      <td mat-cell class="link pr-2" routerLink="/project/{{element.id}}" *matCellDef="let element"> {{element.name}} </td>
     </ng-container>
 
     <ng-container matColumnDef="Title">
-      <th mat-header-cell *matHeaderCellDef>Title</th>
-      <td mat-cell *matCellDef="let element"> {{element.title}} </td>
+      <th class="pl-2 ml-2" mat-header-cell *matHeaderCellDef>Title</th>
+      <td mat-cell class="pl-2 ml-2" *matCellDef="let element"> {{element.title}} </td>
     </ng-container>
 
     <ng-container matColumnDef="State">
-      <th mat-header-cell *matHeaderCellDef>State</th>
-      <td mat-cell *matCellDef="let element"> {{element.status}} </td>
+      <th class="pl-2 ml-2" mat-header-cell *matHeaderCellDef>State</th>
+      <td mat-cell class="pl-2 ml-2" *matCellDef="let element"> {{element.status}} </td>
     </ng-container>
 
     <ng-container matColumnDef="description">
-      <th mat-header-cell *matHeaderCellDef>description</th>
-      <td mat-cell *matCellDef="let element"> {{element.description}} </td>
+      <th class="pl-2 ml-2" mat-header-cell *matHeaderCellDef>description</th>
+      <td mat-cell class="pl-2 ml-2" *matCellDef="let element"> {{element.description}} </td>
     </ng-container>
 
     <ng-container matColumnDef="CreatedAt">
-      <th mat-header-cell *matHeaderCellDef>Created At</th>
-      <td mat-cell *matCellDef="let element"> {{element.createdAt}} </td>
+      <th class="px-4" mat-header-cell *matHeaderCellDef>Created At</th>
+      <td mat-cell class="px-4" *matCellDef="let element"> {{element.createdAt}} </td>
     </ng-container>
 
     <ng-container *ngIf="isAdminOrProjectManger" matColumnDef="Update">
-      <th mat-header-cell *matHeaderCellDef>Update</th>
-      <td mat-cell (click)="handelUpdateProject(element.id)"
+      <th class="pl-2 ml-2" mat-header-cell *matHeaderCellDef>Update</th>
+      <td mat-cell class="pl-2 ml-2" (click)="handelUpdateProject(element.id)"
         class="link" *matCellDef="let element">Update</td>
     </ng-container>
 
 
 
     <ng-container *ngIf="isAdminOrProjectManger" matColumnDef="Close">
-      <th mat-header-cell *matHeaderCellDef>Close</th>
+      <th class="pl-2 ml-2" mat-header-cell *matHeaderCellDef>Close</th>
 
-      <td mat-cell  (click)="handelCloseOrOpenProject(element.id)"
+      <td mat-cell class="pl-2 ml-2"  (click)="handelCloseOrOpenProject(element.id)"
         class='hover:underline cursor-pointer {{!(element.status === "closed") ? "text-orange-400 hover:text-orange-600" : "text-green-400 hover:text-green-600"}}'
         *matCellDef="let element">
         {{element.status}}
@@ -85,12 +85,12 @@
       *matRowDef="let row; columns: displayedColumns;"></tr>
   </table>
 
-  <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons aria-label="Select page of periodic elements">
+  <mat-paginator  [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons aria-label="Select page of periodic elements">
   </mat-paginator>
 </div>
 
 
 
-<div *ngIf="isAdminOrProjectManger" class="flex justify-evenly mb-20 flex-row items-center">
+<div *ngIf="isAdminOrProjectManger" class="flex justify-center max-w-[100vw] mb-20 flex-row items-center">
   <app-new-project [updateProject]="updateProject"></app-new-project>
 </div>

@@ -20,7 +20,7 @@ export class UserRolsChartsPieComponent implements OnInit {
     isLoading = true;
     constructor(private AuthService: AuthService) { }
   
-    pieChartOptions: ChartOptions<'pie'> = { responsive: false };
+    pieChartOptions: ChartOptions<'pie'> = { responsive: true };
     pieChartLabels = [Static.Roles.Developer, Static.Roles.Submitter, Static.Roles.ProjectManger];
   
     pieChartLegend = true;

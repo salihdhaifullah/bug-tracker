@@ -20,7 +20,7 @@ export class ChartsPieComponent implements OnInit {
   isLoading = true;
   constructor(private ticketsService: TicketsService) { }
 
-  pieChartOptions: ChartOptions<'pie'> = { responsive: false };
+  pieChartOptions: ChartOptions<'pie'> = { responsive: true };
   pieChartLabels = [Static.Statuses.Closed + " Tickets", Static.Statuses.InProgress + " Tickets", Static.Statuses.New + " Tickets"];
 
   pieChartLegend = true;

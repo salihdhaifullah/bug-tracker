@@ -28,7 +28,7 @@ interface Project {
   templateUrl: './projects.component.html'
 })
 export class ProjectsComponent implements OnInit {
-  displayedColumns: string[] = ['Title', 'Name', 'State', 'CreatedAt', 'description'];
+  displayedColumns: string[] = ['Name', 'Title', 'State', 'CreatedAt', 'description'];
   dataSource = new MatTableDataSource<Project>();
 
   isLoading$: Observable<Boolean>;
