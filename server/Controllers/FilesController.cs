@@ -272,7 +272,7 @@ namespace server.Controllers
                             await UploadFile;
                             await DeleteFile;
                             await _context.SaveChangesAsync();
-                            return Ok(user.AvatarUrl);
+                            return Ok(new {AvatarUrl = user.AvatarUrl} );
                         }
                         catch (Exception e)
                         {

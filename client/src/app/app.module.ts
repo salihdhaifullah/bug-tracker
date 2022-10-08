@@ -55,6 +55,7 @@ import { CommentComponent } from './components/comment/comment.component';
 import { LodingSpinnerComponent } from './components/loding-spinner/loding-spinner.component';
 import { ChartsPieComponent } from './components/charts-pie/charts-pie.component';
 import { UserRolsChartsPieComponent } from './components/user-rols-charts-pie/user-rols-charts-pie.component';
+import { UserChartPieComponent } from './components/user-chart-pie/user-chart-pie.component';
 
 
 
@@ -85,6 +86,7 @@ import { UserRolsChartsPieComponent } from './components/user-rols-charts-pie/us
     LodingSpinnerComponent,
     ChartsPieComponent,
     UserRolsChartsPieComponent,
+    UserChartPieComponent,
   ],
   imports: [ 
     BrowserModule,

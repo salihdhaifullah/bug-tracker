@@ -29,11 +29,11 @@
                 <span class="ml-[15px] text-white">Home</span>
             </button>
 
-            <button *ngIf="user.role === 'Developer'" [routerLink]="['/user-ticket']" mat-button
+            <button [routerLink]="['/user-ticket']" mat-button
                 class="w-full relative flex pl-[40px] hover:bg-[#2c3344] focus:bg-[#2c3344] mb-[10px]">
                 <mat-icon class="text-[#8997ac] text-center">build</mat-icon>
-                <span
-                    class="absolute w-[18px] h-[18px] text-sm text-center text-white left-14 bottom-4 bg-red-600 rounded-full">{{3}}</span>
+                <span *ngIf="data"
+                    class="absolute w-[18px] h-[18px] text-sm text-center text-white left-14 bottom-4 bg-red-600 rounded-full">{{data}}</span>
                 <span class="ml-[15px] text-white">Your Tickets</span>
             </button>
 

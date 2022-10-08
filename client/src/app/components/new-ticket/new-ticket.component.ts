@@ -68,7 +68,11 @@ export class NewTicketComponent implements OnInit {
 
 
   ngOnInit(): void {
-    this.authService.GetUsers().subscribe(data => this.UsersList = data);
+    this.authService.GetUsers().subscribe((data: Users[])  => this.UsersList = data, err => {}, () => {
+      this.UsersList.filter(u => u.role === "Admin")
+      console.log(this.UsersList);
+    });
+    
   }
 
   HandelSubmit = (event: Event) => {

@@ -163,7 +163,7 @@ namespace server.Controllers
             else return Unauthorized();
         }
 
-        [HttpGet("ticket-assigned"), Authorize(Roles = "Developer")]
+        [HttpGet("ticket-assigned"), Authorize]
         public async Task<IActionResult> GetTicketsAssignedToMe()
         {
             string? header = Request.Headers.Authorization;
@@ -176,7 +176,7 @@ namespace server.Controllers
 
             if (user == null) return Unauthorized();
 
-            var Tickets = _context.Tickets.Where(ticket => ticket.AssigneeToId == id).Select(p => new
+            var Tickets = _context.Tickets.Where(ticket => ticket.AssigneeToId == id && ticket.Status != Statuses.Closed).Select(p => new
             {
                 p.Name,
                 p.Priority,
@@ -190,7 +190,29 @@ namespace server.Controllers
         }
 
 
-        [HttpPatch("ticket-assigned"), Authorize(Roles = "Developer")]
+        [HttpGet("ticket-length"), Authorize]
+        public async Task<IActionResult> GetTicketsLengthThatAssignedToMe()
+        {
+            string? header = Request.Headers.Authorization;
+            if (header == null) return Unauthorized();
+
+            string[] token = header.Split(' ');
+            var id = _token.VerifyToken(token[1]);
+            if (id == null) return Unauthorized();
+            var user = await _context.Users.FindAsync(id);
+
+            if (user == null) return Unauthorized();
+
+            var Tickets = _context.Tickets.Where(ticket => ticket.AssigneeToId == id && ticket.Status != Statuses.Closed).Select(p => new
+            {
+                p.Id
+            }).ToList();
+
+            return Ok(new { count = Tickets.Count });
+        }
+
+
+        [HttpPatch("ticket-assigned"), Authorize]
         public async Task<IActionResult> AssignTicketToMe([FromBody] List<DevTicketToUpdateDto> data)
         {
             string? header = Request.Headers.Authorization;
@@ -209,6 +231,7 @@ namespace server.Controllers
                 if (item.status == Statuses.Closed)
                 {
                     ticket.IsCompleted = true;
+                    ticket.CompletedAt = DateTime.UtcNow;
                     ticket.Status = item.status;
                 }
                 else
@@ -238,7 +261,7 @@ namespace server.Controllers
         {
             var tickets = await _context.Tickets.Select(t => new
             {
-                t.CreatedAt,
+                createdAt = t.CompletedAt == null ? t.CreatedAt : t.CompletedAt,
                 t.IsCompleted,
             }).ToListAsync();
             return Ok(tickets);
@@ -249,6 +272,24 @@ namespace server.Controllers
         public async Task<IActionResult> GetPieChartData()
         {
             var tickets = await _context.Tickets.Select(t => new
+            {
+                t.Status,
+            }).ToListAsync();
+            return Ok(tickets);
+        }
+
+        [HttpGet("dashboard/user-pie-chart"), Authorize]
+        public async Task<IActionResult> GetUserPieChartData()
+        {
+
+            string? header = Request.Headers.Authorization;
+            if (header == null) return Unauthorized();
+
+            string[] token = header.Split(' ');
+            var userId = _token.VerifyToken(token[1]);
+            if (userId == null) return Unauthorized();
+
+            var tickets = await _context.Tickets.Where(t => t.AssigneeToId == userId).Select(t => new
             {
                 t.Status,
             }).ToListAsync();

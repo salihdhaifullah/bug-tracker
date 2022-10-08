@@ -1,5 +1,5 @@
-import { FilesService } from 'src/services/api.service';
-import { Component } from '@angular/core';
+import { FilesService, TicketsService } from 'src/services/api.service';
+import { Component, OnInit } from '@angular/core';
 import Swal from 'sweetalert2';
 import { User } from 'src/types/User';
 
@@ -7,12 +7,20 @@ import { User } from 'src/types/User';
   selector: 'app-navbar',
   templateUrl: './navbar.component.html'
 })
-export class NavbarComponent {
+export class NavbarComponent implements OnInit {
 
-  constructor(private filesService : FilesService) { }
-
+  constructor(private filesService : FilesService, private ticketsService: TicketsService) { }
+  data: number = 0;
   isUser = localStorage.getItem("user");
   user: User = this.isUser && JSON.parse(this.isUser);
+
+  ngOnInit(): void {
+  this.ticketsService.GetTicketLength().subscribe(data => {
+    this.data = data.count
+  }, err => {}, () => {
+    console.log(this.data);
+  });
+  }
 
   HandelUploadAvatar(event: any) {
     const file: File | undefined = event?.target?.files[0];    

@@ -1,7 +1,7 @@
 <div class="max-w-[80vw] h-full bg-gray-100 flex justify-center items-center">
     <div class="flex justify-center h-full w-full items-center ">
         <form (submit)="HandelSubmit($event)"
-            class="max-w-[80vw] justify-center flex flex-col rounded-md bg-white shadow-lg  py-10 px-20">
+            class="max-w-[80vw] justify-center flex flex-col rounded-md bg-white shadow-lg p-4 sm:py-10 sm:px-20">
             <div class="flex items-center justify-center w-full flex-col">
 
                     <mat-icon *ngIf="isUpdateTicket" aria-hidden="false" fontIcon="update"
@@ -18,7 +18,7 @@
 
             <div class="inline-flex flex-wrap">
 
-                <mat-form-field class="sm:mr-2" appearance="fill">
+                <mat-form-field class="sm:mr-2 w-full sm:w-auto" appearance="fill">
                     <mat-label>Name</mat-label>
                     <input type="text" matInput [formControl]="NameFormControl">
                     <mat-error *ngIf="NameFormControl.hasError('minLength') && !NameFormControl.hasError('required')">
@@ -30,10 +30,11 @@
                 </mat-form-field>
 
 
-                <mat-form-field class="sm:ml-2" appearance="fill">
+                <mat-form-field class="sm:ml-2 w-full sm:w-auto" appearance="fill">
                     <mat-label>Assignee To</mat-label>
                     <mat-select [formControl]="AssigneeToIdFormControl">
-                        <mat-option *ngFor="let user of UsersList" [value]="user.id">{{user.firstName + user.lastName}}
+                        <mat-option *ngFor="let user of UsersList" [value]="user.id">{{user.firstName + " " + user.lastName}}
+                            <span class="text-sm text-gray-500">{{ "(" + user.role + ")" }}</span>
                         </mat-option>
                     </mat-select>
                     <mat-error *ngIf="AssigneeToIdFormControl.hasError('required')">
@@ -46,7 +47,7 @@
 
             <div class="inline-flex flex-wrap">
 
-                <mat-form-field class="sm:mr-2" appearance="fill">
+                <mat-form-field class="sm:mr-2 w-full sm:w-auto" appearance="fill">
                     <mat-label>Priority</mat-label>
                     <mat-select [formControl]="PriorityFormControl">
                         <mat-option *ngFor="let Priority of Priorates" [value]="Priority">{{Priority}}</mat-option>
@@ -56,7 +57,7 @@
                     </mat-error>
                 </mat-form-field>
 
-                <mat-form-field class="sm:ml-2" appearance="fill">
+                <mat-form-field class="sm:ml-2 w-full sm:w-auto" appearance="fill">
                     <mat-label>Type</mat-label>
                     <mat-select [formControl]="TypeFormControl">
                         <mat-option *ngFor="let type of Types" [value]="type">{{type}}</mat-option>

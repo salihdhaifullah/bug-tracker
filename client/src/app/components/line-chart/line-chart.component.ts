@@ -45,7 +45,7 @@ _moment = moment;
       }
 
       this.ChartLabels = Static.Months.slice(smallestMonthIndex, ++biggestMonthIndex);
-
+      console.log(this.ChartLabels);
       for (let ChartMonth of this.ChartLabels) {
         const data = this.tickets.filter(item => item.isCompleted === true)
         this.ChartData.push(data.filter(item => this._moment(item.createdAt).format('MMMM') === ChartMonth).length)

@@ -1,0 +1,12 @@
+<div>
+    <h2 class="w-full text-center text-gray-800">Tickets Status</h2>
+    <canvas *ngIf="!isLoading" baseChart
+    [type]="'pie'"
+    [datasets]="pieChartDatasets"
+    [labels]="pieChartLabels"
+    [options]="pieChartOptions"
+    [plugins]="pieChartPlugins"
+    [legend]="pieChartLegend">
+  </canvas>
+  </div>
+  

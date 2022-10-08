@@ -69,6 +69,7 @@ export class SinginComponent  {
             confirmButtonText: 'OK',
           })
           this.router.navigate([""])
+          document.location.href = "/"
         }
        }, (error: any) => {
         Swal.fire({

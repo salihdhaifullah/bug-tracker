@@ -1,15 +1,15 @@
-<div class="mt-20 w-full h-full bg-gray-100">
+<div class="max-w-[80vw] mt-20 w-full h-full bg-gray-100">
     <div class="flex justify-center h-full w-full items-center ">
-        <form (submit)="HandelSubmit($event)" class="example-form justify-center flex flex-col rounded-md bg-white shadow-lg  py-10 px-20">
+        <form (submit)="HandelSubmit($event)" class="max-w-[80vw] justify-center flex flex-col rounded-md bg-white shadow-lg p-4 sm:py-10 sm:px-20">
             <div class="flex items-center justify-center w-full flex-col">
                 <mat-icon aria-hidden="false" aria-label="Example home icon" fontIcon="lock_open" class="w-auto h-auto text-3xl material-icons-outlined  flex text-[#0b4ea5]"></mat-icon>
-                <h2 class="text-2xl text-center text-[#0b4ea5]">
+                <h2 class="text-xl text-center text-[#0b4ea5]">
                     Sign In
                 </h2>
             </div>
 
-            <div class="flex flex-row justify-between">
-                <mat-form-field class="mr-2"  appearance="fill">
+            <div class="inline-flex flex-wrap">
+                <mat-form-field class="w-full sm:w-auto sm:mr-2"  appearance="fill">
                     <mat-label>First Name</mat-label>
                     <input matInput #input [formControl]="firstNameFormControl" placeholder="First Name">
                     <mat-error *ngIf="firstNameFormControl.hasError('minlength') && !firstNameFormControl.hasError('required')">
@@ -20,7 +20,7 @@
                     </mat-error>
                 </mat-form-field>
 
-                <mat-form-field class="ml-2"  appearance="fill">
+                <mat-form-field class="w-full sm:w-auto sm:ml-2"  appearance="fill">
                     <mat-label>Last Name</mat-label>
                     <input matInput #input  [formControl]="lastNameFormControl" placeholder="Last Name">
                     <mat-error *ngIf="lastNameFormControl.hasError('minlength') && !lastNameFormControl.hasError('required')">
@@ -32,7 +32,7 @@
                 </mat-form-field>
             </div>
 
-            <mat-form-field class="example-full-width" appearance="fill">
+            <mat-form-field  appearance="fill">
                 <mat-label>Email</mat-label>
                 <input type="email" matInput [formControl]="emailFormControl" [errorStateMatcher]="matcher"
                     placeholder="Ex. pat@example.com">

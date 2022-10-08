@@ -101,9 +101,11 @@ export class EmploysComponent implements OnInit {
         if (result.value) {
           this.rolesService.ChangeRoles(this.usersRole.value as IChangeRole).subscribe(m => {
           }, (err) => {
+            this.store.dispatch(Actions.getRoles());
            if (err)  Swal.fire('Error', '<h2>Something went wrong</h2>', 'error');
           }, () => {
             Swal.fire('Success', 'Role changed', 'success')
+            this.store.dispatch(Actions.getRoles());
           });
         }
         this.usersRole.reset();
