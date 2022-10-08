@@ -77,7 +77,7 @@ namespace server.Controllers
                 p.IsClosed,
                 p.CreatedAt,
                 p.Description,
-            }).ToList();
+            }).OrderBy(p => p.CreatedAt).ToList();
             return Ok(Projects);
         }
 

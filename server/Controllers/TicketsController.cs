@@ -23,7 +23,7 @@ namespace server.Controllers
             _password = password;
         }
 
-        [HttpGet]
+        [HttpGet, Authorize]
         public IActionResult GetTickets([FromQuery] int ProjectId)
         {
             var Tickets = _context.Tickets.Where(ticket => ticket.ProjectId == ProjectId).Select(p => new
@@ -37,7 +37,7 @@ namespace server.Controllers
                 p.IsCompleted,
                 p.Id,
                 p.Description,
-            }).ToList();
+            }).OrderBy(t => t.CreatedAt).ToList();
 
             return Ok(Tickets);
         }

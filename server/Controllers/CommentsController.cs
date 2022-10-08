@@ -63,7 +63,7 @@ namespace server.Controllers
                 UserName = C.User.FirstName + " " + C.User.LastName,
                 CreatorId = C.UserId,
                 avatarUrl = C.User.AvatarUrl
-            }).ToListAsync();
+            }).OrderBy(c => c.CreatedAt).ToListAsync();
             return Ok(comments);
         }
 

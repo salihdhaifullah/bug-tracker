@@ -36,7 +36,7 @@ namespace server.Controllers
                     u.CreateAt,
                     u.Id,
                     
-                }).ToListAsync();
+                }).OrderBy(r => r.CreateAt).ToListAsync();
 
                 return Ok(users);
             }

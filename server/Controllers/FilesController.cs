@@ -196,7 +196,7 @@ namespace server.Controllers
                 fullName = f.Creator.FirstName + " " + f.Creator.LastName,
                 f.Url,
                 f.CreatedAt
-            }).ToListAsync();
+            }).OrderBy(f => f.CreatedAt).ToListAsync();
 
             return Ok(files);
         }
