@@ -14,13 +14,22 @@ import Swal from 'sweetalert2';
 import { User } from 'src/types/User';
 import { Static } from 'src/Static';
 
+
+interface Project {
+  name: string
+  title: string
+  status: "closed" | "open"
+  createdAt: string
+  id: number
+  description: string
+}
 @Component({
   selector: 'app-projects',
   templateUrl: './projects.component.html'
 })
 export class ProjectsComponent implements OnInit {
-  displayedColumns: string[] = ['Title', 'Name', 'State', 'CreatedAt'];
-  dataSource = new MatTableDataSource<IProject>();
+  displayedColumns: string[] = ['Title', 'Name', 'State', 'CreatedAt', 'description'];
+  dataSource = new MatTableDataSource<Project>();
 
   isLoading$: Observable<Boolean>;
   error$: Observable<string | null>;
@@ -30,11 +39,11 @@ export class ProjectsComponent implements OnInit {
   isFound = localStorage.getItem('user')
   user: User | null = this.isFound ? JSON.parse(this.isFound) : null;
   isAdminOrProjectManger: boolean;
-  
+
   Closed: number | null = null;
   Open: number | null = null;
   Count: number | null = null;
-  updateProject: IProject | undefined = undefined;
+  updateProject: Project | undefined = undefined;
 
   @ViewChild(MatSort, { static: true }) sort!: MatSort;
 
@@ -80,9 +89,9 @@ export class ProjectsComponent implements OnInit {
 
   handelCloseOrOpenProject(id: Number) {
 
-    const iSCloseOrOpenProject: IProject | undefined = this.dataSource.data.find(x => x.id === id);
+    const iSCloseOrOpenProject: Project | undefined = this.dataSource.data.find(x => x.id === id);
     if (iSCloseOrOpenProject) {
-      if (iSCloseOrOpenProject.isClosed) {
+      if (iSCloseOrOpenProject.status === "closed") {
         Swal.fire({
           title: 'Are you sure?',
           text: 'You want to open this project',
@@ -134,11 +143,13 @@ export class ProjectsComponent implements OnInit {
         })
       }
     }
-};
+  };
 
   getProject() {
     this.projects$.subscribe((p: any) => {
-      this.dataSource.data = p.projects
+      for (let project of p.projects) {
+        this.dataSource.data.push({createdAt: this._moment(project.createdAt).format('ll'), name: project.name, description: `${project.description.slice(0, 11)}... ` , title: project.title, id: project.id, status: project.isClosed ? "closed" : "open" })
+      }
       this.Closed = p.projects.filter((x: IProject) => x.isClosed === true).length
       this.Open = p.projects.filter((x: IProject) => x.isClosed === false).length
       this.Count = p.projects.length

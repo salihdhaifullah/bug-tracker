@@ -10,13 +10,20 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MyErrorStateMatcher } from '../../MyErrorStateMatcher';
 import { ICreateProject, IProject } from 'src/types/Projects';
 import { ProjectsService } from 'src/services/api.service';
-
+interface Project {
+  name: string
+  title: string
+  status: "closed" | "open"
+  createdAt: string
+  id: number
+  description: string
+}
 @Component({
   selector: 'app-new-project',
   templateUrl: './new-project.component.html'
 })
 export class NewProjectComponent {
-  @Input() updateProject: IProject | undefined = undefined;
+  @Input() updateProject: Project | undefined = undefined;
 
   error$: Observable<string | null>;
   message$: Observable<string | null>;
@@ -69,7 +76,11 @@ export class NewProjectComponent {
 
       this.ProjectForm.reset()
     } else if (this.ProjectForm.valid && this.updateProject) {
-
+      this.ProjectForm.patchValue({
+        Description: this.updateProject.description,
+        Name: this.updateProject.name,
+        Title: this.updateProject.title
+      });
       this.projectService.UpdateProject(this.ProjectForm.value as ICreateProject, this.updateProject.id).subscribe(m => {
       }, err => {
 
