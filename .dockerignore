@@ -1,0 +1,15 @@
+# Ignore directories
+**/bin/
+**/obj/
+**/out/
+
+# Ignore files
+Dockerfile*
+**/*.trx
+**/*.md
+**/*.ps1
+**/*.cmd
+**/*.sh
+
+
+appsettings.Example.json
