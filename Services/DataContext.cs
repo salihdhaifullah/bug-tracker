@@ -1,22 +1,12 @@
-using bug_tracker.Models;
 using Microsoft.EntityFrameworkCore;
+using Buegee.Models;
 
-namespace bug_tracker.Services
+public class DataContext : DbContext
 {
-    public class DataContext : DbContext
+    public DataContext(DbContextOptions<DataContext> options) : base(options) {}
+    public DbSet<User> Users { get; set; } = null!;
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        protected readonly IConfiguration Configuration;
-
-        public DataContext(IConfiguration configuration) {
-             Configuration = configuration;
-        }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder options) {
-            options.UseNpgsql(Configuration.GetConnectionString("MainDatabase"));
-        }
-
-        public DbSet<User> Users { get; set; }
+        optionsBuilder.UseNpgsql("name=ConnectionStrings:DefaultConnection");
     }
 }
-
-

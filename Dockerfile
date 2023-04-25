@@ -1,23 +1,21 @@
-FROM node:16-alpine as client-build
+FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS base
 WORKDIR /app
-COPY ./client/package.json ./client/yarn.lock ./
-RUN yarn
-COPY ./client .
-RUN yarn build
-
-FROM mcr.microsoft.com/dotnet/sdk:6.0 as server-build
-WORKDIR /src
-COPY ./*.csproj ./
-RUN dotnet restore
-COPY . .
-RUN rm -r ./client
-RUN dotnet publish -c Release -o /app/publish
-
-FROM mcr.microsoft.com/dotnet/aspnet:6.0 as final
-WORKDIR /app
-COPY --from=server-build /app/publish ./
-COPY --from=client-build /app/dist ./dist
 ENV ASPNETCORE_ENVIRONMENT=Production
-ENV ASPNETCORE_URLS=http://+:5000
-EXPOSE 5000
-ENTRYPOINT ["dotnet", "./bug-tracker.dll"]
+ENV ASPNETCORE_URLS=http://+:5018
+EXPOSE 5018
+
+FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
+WORKDIR /src
+COPY ["Buegee.csproj", "."]
+RUN dotnet restore "./Buegee.csproj"
+COPY . .
+WORKDIR "/src/."
+RUN dotnet build "Buegee.csproj" -c Release -o /app/build
+
+FROM build AS publish
+RUN dotnet publish "Buegee.csproj" -c Release -o /app/publish /p:UseAppHost=false
+
+FROM base AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
+ENTRYPOINT ["dotnet", "Buegee.dll"]

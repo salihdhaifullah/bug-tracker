@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace bug_tracker.Models
+namespace Buegee.Models
 {
     public class Ticket
     {

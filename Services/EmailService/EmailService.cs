@@ -1,0 +1,73 @@
+using System.Net;
+using System.Net.Mail;
+using System.Text;
+
+namespace Buegee.Services.EmailService;
+
+public class EmailService : IEmailService
+{
+    private readonly string? AppEmail;
+    private readonly string? AppPassword;
+    private SmtpClient smtpClient;
+    private readonly string verificationEmailHtml;
+    private readonly string resetPasswordHtml;
+
+    public EmailService(IConfiguration config)
+    {
+        AppPassword = config.GetSection("EmailService").GetValue<string>("AppPassword");
+        AppEmail = config.GetSection("EmailService").GetValue<string>("AppEmail");
+
+        if (AppPassword is null || AppEmail is null)
+        {
+            throw new Exception("email service is not configured");
+        }
+
+        smtpClient = new SmtpClient("smtp.gmail.com", 587)
+        {
+            EnableSsl = true,
+            Credentials = new NetworkCredential(AppEmail, AppPassword)
+        };
+
+        verificationEmailHtml = File.ReadAllText("./wwwroot/asset/verification-email.html");
+        resetPasswordHtml = File.ReadAllText("./wwwroot/asset/reset-password.html");
+    }
+
+    public Task sendVerificationEmail(string to, string name, string code)
+    {
+        var BS = new StringBuilder(verificationEmailHtml);
+        BS.Replace("${name}", name);
+        BS.Replace("${code}", code);
+
+        var massage = new MailMessage(
+            from: "Team@Buegee.com",
+            to: to,
+            subject: "activate your account",
+            body: BS.ToString()
+        );
+
+        massage.IsBodyHtml = true;
+        massage.Priority = MailPriority.High;
+
+        return smtpClient.SendMailAsync(massage);
+    }
+
+    public Task resetPasswordEmail(string to, string name, string code)
+    {
+        var BS = new StringBuilder(resetPasswordHtml);
+
+        BS.Replace("${name}", name);
+        BS.Replace("${code}", code);
+
+        var massage = new MailMessage(
+            from: "Team@Buegee.com",
+            to: to,
+            subject: "reset your password",
+            body: BS.ToString()
+        );
+
+        massage.IsBodyHtml = true;
+        massage.Priority = MailPriority.High;
+
+        return smtpClient.SendMailAsync(massage);
+    }
+}

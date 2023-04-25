@@ -1,0 +1,60 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+    font-family: 'Lato';
+    src: url('../fonts/Lato-Italic.ttf') format('truetype');
+    font-weight: normal;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Lato';
+    src: url('../fonts/Lato-Light.ttf') format('truetype');
+    font-weight: lighter;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Lato';
+    src: url('../fonts/Lato-Bold.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Lato';
+    src: url('../fonts/Lato-Regular.ttf') format('truetype');
+    font-weight: bolder;
+    font-style: normal;
+    font-display: swap;
+}
+
+* {
+    font-family: 'Lato', sans-serif;
+    box-sizing: border-box;
+}
+
+html, body {
+    @apply min-h-[100vh] w-[100vw] h-auto m-0 p-0
+}
+
+body {
+    @apply flex flex-col bg-indigo-200
+}
+
+main {
+    @apply p-3 flex flex-col max-w-[100vw] min-h-[85vh] mt-[8vh] mb-[6vh] h-auto justify-center items-center
+}
+
+header {
+    @apply flex flex-row fixed top-0 w-full min-h-[8vh] text-primary border-b-gray-600 bg-white p-2 shadow-xl
+}
+
+footer {
+    @apply flex flex-row fixed bottom-0 w-full min-h-[6vh] text-primary border-t-gray-600 bg-white p-2 shadow-xl
+}

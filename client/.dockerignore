@@ -1,8 +1,0 @@
-# Ignore directories
-node_modules/
-dist/
-
-# Ignore files
-Dockerfile*
-**/*.md
-**/*.log

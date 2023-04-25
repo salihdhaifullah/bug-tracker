@@ -1,0 +1,15 @@
+{
+  "name": "buegee",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "watch": "npx tailwindcss -i ./wwwroot/css/input.css -o ./wwwroot/css/site.css --watch",
+    "minify": "npx tailwindcss -i ./wwwroot/css/input.css -o ./wwwroot/css/site.css --minify"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "tailwindcss": "^3.3.1"
+  }
+}

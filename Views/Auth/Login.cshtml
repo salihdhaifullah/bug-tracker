@@ -1,0 +1,84 @@
+@{
+    ViewData["Title"] = "Login";
+}
+
+@model Buegee.Dto.LoginDto
+
+<section class="flex flex-col justify-center items-center max-w-[100vw] h-auto">
+  <div class="rounded-xl bg-white flex flex-col gap-4 w-80 p-2 items-center justify-center shadow-xl">
+
+    <div class="flex relative w-full items-center justify-center h-auto">
+      <img src="/asset/logo.png" class="w-60 h-40 object-contain" alt="logo">
+    </div>
+
+
+      @if (!String.IsNullOrEmpty(ViewData["Error"]?.ToString()))
+      {
+        <p class="text-red-600 text-center text-base font-bold">@ViewData["Error"]</p>
+      }
+
+      <h1 class="text-primary font-bold text-2xl text-center">Login</h1>
+
+      <form class="flex-col flex w-full justify-center items-center" action="/auth/login" method="post">
+
+        <div class="flex flex-col justify-center items-center p-2 px-6 w-full gap-2">
+          <div class="flex flex-row gap-2  w-full justify-center items-center relative">
+            <label class="text-base absolute bottom-[20%] left-[20%] font-extralight text-gray-600 transition-all ease-in-out" for="Email">email</label>
+              <i class="fa-solid fa-envelope text-gray-600 text-base"></i>
+              <input class="p-2 border border-gray-400 h-fit hover:border-gray-900 focus:outline-secondary rounded-sm w-full" type="text" id="Email" value="@Model.Email" name="Email" />
+          </div>
+          @Html.ValidationMessageFor(model => model.Email, null, new {@class = "text-red-600 text-center text-base font-bold"})
+        </div>
+
+        <div class="flex flex-col justify-center items-center p-2 px-6 w-full gap-2">
+          <div class="flex flex-row gap-2  w-full justify-center items-center relative">
+            <label class="text-base absolute bottom-[20%] left-[20%] font-extralight text-gray-600 transition-all ease-in-out" for="Password">password</label>
+              <i class="fa-solid fa-key text-gray-600 text-base"></i>
+              <input class="p-2 border border-gray-400 h-fit hover:border-gray-900 focus:outline-secondary rounded-sm w-full" type="text" id="Password" value="@Model.Password" name="Password" />
+          </div>
+          @Html.ValidationMessageFor(model => model.Password, null, new {@class = "text-red-600 text-center text-base font-bold"})
+        </div>
+
+        <div class="flex justify-center">
+          <button type="submit" class="text-primary bg-secondary text-center p-2 rounded-md border-0 text-base font-bold
+           cursor-pointer transition-all  ease-in-out shadow-lg hover:shadow-xl hover:text-lg hover:border-gray-600 hover:text-white">
+           submit
+          </button>
+        </div>
+
+      </form>
+
+  </div>
+</section>
+
+
+<script defer>
+  const labels = document.querySelectorAll("label")
+  const LABEL_FOCUS = "bottom-[95%] left-[12%] text-sm text-secondary absolute font-extralight transition-all ease-in-out";
+  const LABEL = "text-base absolute bottom-[20%] left-[20%] font-extralight text-gray-600 transition-all ease-in-out";
+
+  labels.forEach(label => {
+    const input = document.getElementById(label.attributes.getNamedItem("for").value);
+
+    input.addEventListener("input", (e) => {
+      if (input.value.length) label.className = "sr-only"
+      else label.className = LABEL_FOCUS;
+    })
+
+    input.addEventListener("focus", (e) => {
+      if (input.value.length) {
+        label.className = "sr-only";
+        return;
+      }
+      label.className = LABEL_FOCUS;
+    });
+
+    input.addEventListener("focusout", (e) => {
+      if (input.value.length) {
+        label.className = "sr-only";
+        return;
+      }
+      label.className = LABEL;
+    });
+  });
+</script>

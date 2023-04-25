@@ -1,71 +1,24 @@
-using System.Text;
-using bug_tracker.Services;
-using bug_tracker.Services.HashCompar;
-using bug_tracker.Services.JsonWebToken;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Extensions.FileProviders;
-using Microsoft.IdentityModel.Tokens;
+using Buegee.Middlewares;
+using Buegee.Services.AuthService;
+using Buegee.Services.CryptoService;
+using Buegee.Services.JWTService;
+using Buegee.Services.RedisCacheService;
+using Buegee.Services.EmailService;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddControllers();
-builder.Services.AddSpaStaticFiles(config => config.RootPath = "dist");
-
-
-// builder.Services.AddCors(options =>
-// {
-//     options.AddPolicy("AllowAnyOrigin",
-//     builder =>
-//     {
-//         builder.SetIsOriginAllowed(origin => true)
-//                .AllowAnyHeader()
-//                .AllowAnyMethod()
-//                .AllowCredentials();
-//     });
-// });
-
+builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<DataContext>();
-builder.Services.AddScoped<IJsonWebToken, JsonWebToken>();
-builder.Services.AddScoped<IHashCompar, HashCompar>();
-
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
-{
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuer = false,
-        ValidateAudience = false,
-        ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration.GetValue<string>("SecretKey")))
-    };
-}
-);
+builder.Services.AddSingleton<IJWTService, JWTService>();
+builder.Services.AddSingleton<ICryptoService, CryptoService>();
+builder.Services.AddSingleton<IEmailService, EmailService>();
+builder.Services.AddSingleton<IRedisCacheService, RedisCacheService>();
+builder.Services.AddSingleton<IAuthService, AuthService>();
 
 var app = builder.Build();
 
-
+app.UseStaticFiles();
 app.UseRouting();
-app.MapControllers();
-app.UseEndpoints(endpoints => endpoints.MapDefaultControllerRoute());
-app.UseHttpsRedirection();
-app.UseAuthentication();
-app.UseAuthorization();
-
-if (app.Environment.IsDevelopment())
-{
-    // app.UseCors("AllowAnyOrigin");
-    app.UseSpa(builder =>
-    {
-       builder.UseProxyToSpaDevelopmentServer("http://localhost:5173/");
-    });
-}
-else
-{
-    app.UseSpaStaticFiles();
-    app.UseSpa(builder => {});
-}
-
-
-
+app.UseMiddleware<StatusCodeMiddleware>();
+app.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}");
 app.Run();

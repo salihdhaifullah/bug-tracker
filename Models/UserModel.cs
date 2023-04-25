@@ -1,34 +1,42 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
-namespace bug_tracker.Models
+namespace Buegee.Models;
+
+public enum Role
 {
-    [Index("Email", IsUnique = true)]
-    [Index("FirstName", "LastName", "Role")]
-    public class User
-    {
-        [Key]
-        public int Id { get; set; }
-        [Required]
-        public string FirstName { get; set; }
-        [Required]
-        public string LastName { get; set; }
-        [Required, EmailAddress]
-        public string Email { get; set; }
-        [Required]
-        public byte[] PasswordHash { get; set; }
-        public byte[] PasswordSalt { get; set; }
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
-        public string Role { get; set; } = "reporter"; // developer, projectManger, admin, reporter
-        /*
-            Developer: view the assigned issues, update their status, add comments, attach files, and mark them as resolved or closed.
-            Project Manager: reports bugs. create new tickets, assign them to developers, add details, and verify the fixes, prioritize the issues.
-            Admin: create and edit projects, users, roles, and reports.
-            Reporter: submit new issues, comment on existing issues.
-        */
-        public bool Verified { get; set; } = false;
-        public string? Bio { get; set; }
-        public byte[]? Image {get; set;}
-        // public List<Comment> Comments {get; set;}
-    }
+    ADMIN,
+    PROJECT_MANGER,
+    DEVELOPER,
+    REPORTER
 }
+
+
+[Table("users")]
+[Index(nameof(Email), IsUnique = true)]
+[Index(nameof(Role))]
+[Index(nameof(FirstName), nameof(LastName))]
+public class User
+{
+    [Key, Column("id"), DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public int Id { get; set; }
+    [Required, Column("first_name"), StringLength(50)]
+    public string FirstName { get; set; } = null!;
+    [Required, Column("last_name"), StringLength(50)]
+    public string LastName { get; set; } = null!;
+    [Required, Column("email"), StringLength(100), EmailAddress]
+    public string Email { get; set; } = null!;
+    [Required, Column("password_hash")]
+    public byte[] PasswordHash { get; set; } = null!;
+    [Required, Column("password_salt")]
+    public byte[] PasswordSalt { get; set; } = null!;
+    [Column("created_at"), DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    [Column("role"), EnumDataType(typeof(Role))]
+    public Role Role { get; set; } = Role.REPORTER;
+    [Column("image")]
+    public byte[]? Image { get; set; }
+}
+
+
