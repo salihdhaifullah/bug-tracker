@@ -27,5 +27,4 @@ RUN rm -rf package.json
 RUN rm -rf package-lock.json
 RUN rm -rf wwwroot/css/input.css
 ENV ASPNETCORE_ENVIRONMENT=Production
-ENV ASPNETCORE_URLS=http://+:5018
 ENTRYPOINT ["dotnet", "Buegee.dll"]
