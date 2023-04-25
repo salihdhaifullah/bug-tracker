@@ -8,6 +8,8 @@
 appsettings.json
 .vscode
 Migrations
+package-lock.json
+node_modules
 
 # User-specific files
 *.rsuser
