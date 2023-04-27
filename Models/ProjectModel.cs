@@ -9,9 +9,7 @@ namespace Buegee.Models
         public int Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
-
         public List<Ticket> Tickets {get; set;}
-
         [Required]
         [ForeignKey("ProjectMangerId")]
         public int ProjectMangerId { get; set; }
