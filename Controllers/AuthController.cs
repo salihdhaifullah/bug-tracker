@@ -1,14 +1,14 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Buegee.Dto;
+using Buegee.Models.VM;
 using Buegee.Services.RedisCacheService;
 using System.Text.Json;
 using System.Text;
 using StackExchange.Redis;
-using Buegee.Models;
 using Buegee.Services.EmailService;
 using Buegee.Services.CryptoService;
 using Buegee.Services.JWTService;
+using Buegee.Models.DB;
 
 namespace Buegee.Controllers;
 
@@ -32,7 +32,7 @@ public class AuthController : Controller
     }
 
     [HttpPost("sing-up")]
-    public async Task<IActionResult> SingUp([FromForm] SingUpDto Data)
+    public async Task<IActionResult> SingUp([FromForm] SingUpVM Data)
     {
         if (!ModelState.IsValid) return View(Data);
 
@@ -87,7 +87,7 @@ public class AuthController : Controller
 
 
     [HttpPost("account-verification")]
-    public async Task<IActionResult> AccountVerification([FromForm] AccountVerificationDto data)
+    public async Task<IActionResult> AccountVerification([FromForm] AccountVerificationVM data)
     {
 
         if (!ModelState.IsValid) return View(data);
@@ -130,7 +130,7 @@ public class AuthController : Controller
 
         var (hash, salt) = _hash.Hash(SessionData.Password);
 
-        var UserData = await _ctx.Users.AddAsync(new User
+        var UserData = await _ctx.Users.AddAsync(new UserDB
         {
             Email = SessionData.Email,
             FirstName = SessionData.FirstName,
@@ -148,7 +148,7 @@ public class AuthController : Controller
 
 
     [HttpPost("login")]
-    public async Task<IActionResult> Login([FromForm] LoginDto data)
+    public async Task<IActionResult> Login([FromForm] LoginVM data)
     {
         if (!ModelState.IsValid) return View(data);
 
@@ -180,7 +180,7 @@ public class AuthController : Controller
     }
 
     [HttpPost("forget-password")]
-    public async Task<IActionResult> ForgetPassword([FromForm] ForgetPasswordDto data)
+    public async Task<IActionResult> ForgetPassword([FromForm] ForgetPasswordVM data)
     {
         if (!ModelState.IsValid) return View(data);
         // first check if user email exist
@@ -243,7 +243,7 @@ public class AuthController : Controller
 
 
     [HttpPost("reset-password")]
-    public async Task<IActionResult> ResetPassword([FromForm] ResetPasswordDto data)
+    public async Task<IActionResult> ResetPassword([FromForm] ResetPasswordVM data)
     {
         if (!ModelState.IsValid) return View(data);
 
@@ -291,31 +291,31 @@ public class AuthController : Controller
     [HttpGet("forget-password")]
     public IActionResult ForgetPassword()
     {
-        return View(new ForgetPasswordDto());
+        return View(new ForgetPasswordVM());
     }
 
     [HttpGet("login")]
     public IActionResult Login()
     {
-        return View(new LoginDto());
+        return View(new LoginVM());
     }
 
     [HttpGet("sing-up")]
     public IActionResult SingUp()
     {
-        return View(new SingUpDto());
+        return View(new SingUpVM());
     }
 
     [HttpGet("account-verification")]
     public IActionResult AccountVerification()
     {
-        return View(new AccountVerificationDto());
+        return View(new AccountVerificationVM());
     }
 
     [HttpGet("reset-password")]
     public IActionResult ResetPassword()
     {
-        return View(new ResetPasswordDto());
+        return View(new ResetPasswordVM());
     }
 
     [HttpGet("logout")]
@@ -337,7 +337,7 @@ public class AuthController : Controller
     public IActionResult SessionExpiredResetPassword()
     {
         ViewData["Error"] = "session expired please try again";
-        return View("Auth/ForgetPassword", new ForgetPasswordDto());
+        return View("Auth/ForgetPassword", new ForgetPasswordVM());
     }
 
     public void SetAuthCookies(string Id, string Role)

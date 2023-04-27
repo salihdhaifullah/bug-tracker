@@ -2,9 +2,9 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
-namespace Buegee.Models;
+namespace Buegee.Models.DB;
 
-public enum Role
+public enum Roles
 {
     ADMIN, // can edit delete and create projects, users, roles, tickets
     PROJECT_MANGER, // can verify fixes, create and assign tasks, set priorities and deadlines, monitor progress and status, generate reports
@@ -17,7 +17,7 @@ public enum Role
 [Index(nameof(Email), IsUnique = true)]
 [Index(nameof(Role))]
 [Index(nameof(FirstName), nameof(LastName))]
-public class User
+public class UserDB
 {
     [Key, Column("id"), DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
@@ -33,8 +33,8 @@ public class User
     public byte[] PasswordSalt { get; set; } = null!;
     [Column("created_at"), DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-    [Column("role"), EnumDataType(typeof(Role))]
-    public Role Role { get; set; } = Role.REPORTER;
+    [Column("role"), EnumDataType(typeof(Roles))]
+    public Roles Role { get; set; } = Roles.REPORTER;
     [Column("image")]
     public byte[]? Image { get; set; }
 }

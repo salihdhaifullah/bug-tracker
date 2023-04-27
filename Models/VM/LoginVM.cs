@@ -1,8 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Buegee.Dto;
+namespace Buegee.Models.VM;
 
-public class LoginDto
+public class LoginVM
 {
     [EmailAddress, Required, MaxLength(100)]
     public string Email { get; set; } = "";

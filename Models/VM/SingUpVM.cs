@@ -1,8 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Buegee.Dto;
+namespace Buegee.Models.VM;
 
-public class SingUpDto
+public class SingUpVM
 {
     [Required, MinLength(2), MaxLength(50)]
     public string FirstName { get; set; } = "";

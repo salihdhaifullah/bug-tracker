@@ -1,4 +1,4 @@
-using Buegee.Models;
+using Buegee.Models.DB;
 using Buegee.Services.JWTService;
 
 namespace Buegee.Services.AuthService;
@@ -28,7 +28,7 @@ public class AuthService : IAuthService
         if (roleName is null
             || userIdClaim is null
             || !int.TryParse(userIdClaim, out var userId)
-            || !Enum.TryParse(roleName, out Role userRole)
+            || !Enum.TryParse(roleName, out Roles userRole)
             ) return result;
 
         result.Id = userId;
@@ -38,7 +38,7 @@ public class AuthService : IAuthService
         return result;
     }
 
-    public RoleAuthorizationResult GetAuthorizationResult(string jwtToken, Role[] requiredRoles)
+    public RoleAuthorizationResult GetAuthorizationResult(string jwtToken, Roles[] requiredRoles)
     {
         var result = new RoleAuthorizationResult();
 
@@ -54,7 +54,7 @@ public class AuthService : IAuthService
         if (roleName is null
             || userIdClaim is null
             || !int.TryParse(userIdClaim, out var userId)
-            || !Enum.TryParse(roleName, out Role userRole)
+            || !Enum.TryParse(roleName, out Roles userRole)
             ) return result;
 
         result.Id = userId;
@@ -73,7 +73,7 @@ public class AuthService : IAuthService
 
     public class AuthorizationResult
     {
-        public Role? Role { get; set; } = null;
+        public Roles? Role { get; set; } = null;
         public int? Id { get; set; } = null;
         public bool IsAuthorized { get; set; } = false;
     }
