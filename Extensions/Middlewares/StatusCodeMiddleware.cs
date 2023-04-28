@@ -1,4 +1,4 @@
-namespace Buegee.Middlewares;
+namespace Buegee.Extensions.Middlewares;
 
 public class StatusCodeMiddleware
 {

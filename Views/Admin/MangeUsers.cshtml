@@ -1,9 +1,25 @@
 @{
   ViewData["Title"] = "dash board";
 }
+
 @model MangeUsersVM;
 
 
 <section>
     <h1>Dash Board</h1>
+
+      <div class="flex flex-col gap-2">
+            @foreach (var item in Model.Users)
+    {
+        <div class="flex flex-row p-2 gap-4 border-4 border-purple-500 bg-white shadow-lg">
+          @if (@item?.Image is not null) {
+          @* <img src="data:image/jpg;base64,@Convert.ToBase64String(@item.Image)" alt=""> *@
+          <img src="data:image/jpg;base64,@Convert.ToBase64String(@item.Image)" alt="">
+          }
+                <p>Name: @item.FirstName  @item.LastName</p>
+      <p>Email: @item.Email</p>
+      <p>Role: @item.Role</p>
+        </div>
+    }
+      </div>
 </section>

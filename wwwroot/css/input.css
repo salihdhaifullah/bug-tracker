@@ -3,15 +3,13 @@
 @tailwind utilities;
 
 @layer utilities {
-    @variants responsive {
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
 
-        .no-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
+    .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
     }
 }
 
@@ -62,7 +60,7 @@ body {
 }
 
 main {
-    @apply p-3 flex flex-col max-w-[100vw] min-h-[85vh] mt-[8vh] mb-[6vh] h-auto justify-center items-center
+    @apply p-3 flex flex-col max-w-[100vw] min-h-[85vh] mt-[8vh] mb-[6vh] h-auto
 }
 
 header {

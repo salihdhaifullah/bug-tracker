@@ -4,11 +4,11 @@ using Buegee.Models.VM;
 using Buegee.Services.RedisCacheService;
 using System.Text.Json;
 using System.Text;
-using StackExchange.Redis;
 using Buegee.Services.EmailService;
 using Buegee.Services.CryptoService;
 using Buegee.Services.JWTService;
 using Buegee.Models.DB;
+using Buegee.Services;
 
 namespace Buegee.Controllers;
 
@@ -20,15 +20,26 @@ public class AuthController : Controller
     private readonly ICryptoService _hash;
     private readonly IJWTService _jwt;
     private readonly IEmailService _email;
-    private readonly IDatabase _cache;
+    private readonly IRedisCacheService _cache;
+    private readonly string _adminEmail;
 
-    public AuthController(DataContext ctx, ICryptoService hash, IJWTService jwt, IEmailService email, IRedisCacheService cache)
-    {
+    public AuthController(
+     DataContext ctx,
+     ICryptoService hash,
+     IJWTService jwt,
+     IEmailService email,
+     IRedisCacheService cache,
+     IConfiguration configuration){
         _ctx = ctx;
         _hash = hash;
         _jwt = jwt;
         _email = email;
-        _cache = cache.Redis;
+        _cache = cache;
+
+        string? adminEmail = configuration.GetSection("Admin").GetValue<string>("Email");
+        if (String.IsNullOrEmpty(adminEmail)) throw new Exception("Admin Email Are Not Configured");
+
+        _adminEmail = adminEmail;
     }
 
     [HttpPost("sing-up")]
@@ -77,7 +88,7 @@ public class AuthController : Controller
 
         string sessionData = JsonSerializer.Serialize(new SingUpSession(Code, Data.FirstName, Data.LastName, Data.Email, Data.Password));
 
-        await _cache.StringSetAsync(SessionId, sessionData, SessionTimeSpan);
+        await _cache.Redis.StringSetAsync(SessionId, sessionData, SessionTimeSpan);
 
         await _email.sendVerificationEmail(Data.Email, $"{Data.FirstName} {Data.LastName}", Code);
 
@@ -104,7 +115,7 @@ public class AuthController : Controller
             return View(data);
         }
 
-        string? JsonSession = await _cache.StringGetAsync(SessionId);
+        string? JsonSession = await _cache.Redis.StringGetAsync(SessionId);
 
         if (JsonSession is null)
         {
@@ -126,9 +137,10 @@ public class AuthController : Controller
             return View(data);
         }
 
-        await _cache.KeyDeleteAsync(SessionId);
+        await _cache.Redis.KeyDeleteAsync(SessionId);
 
         var (hash, salt) = _hash.Hash(SessionData.Password);
+
 
         var UserData = await _ctx.Users.AddAsync(new UserDB
         {
@@ -136,7 +148,10 @@ public class AuthController : Controller
             FirstName = SessionData.FirstName,
             LastName = SessionData.LastName,
             PasswordHash = hash,
-            PasswordSalt = salt
+            PasswordSalt = salt,
+            Role = SessionData.Email == _adminEmail
+                    ? Roles.ADMIN
+                    : Roles.REPORTER
         });
 
         await _ctx.SaveChangesAsync();
@@ -234,7 +249,7 @@ public class AuthController : Controller
 
         // third create session and store the code in redis
 
-        await _cache.StringSetAsync(SessionId, sessionData, SessionTimeSpan);
+        await _cache.Redis.StringSetAsync(SessionId, sessionData, SessionTimeSpan);
 
         await _email.resetPasswordEmail(isFound.Email, $"{isFound.FirstName} {isFound.LastName}", Code);
 
@@ -255,7 +270,7 @@ public class AuthController : Controller
 
         if (error is not null || String.IsNullOrEmpty(SessionId)) return SessionExpiredResetPassword();
 
-        string? JsonSession = await _cache.StringGetAsync(SessionId);
+        string? JsonSession = await _cache.Redis.StringGetAsync(SessionId);
 
         if (JsonSession is null) return SessionExpiredResetPassword();
 
@@ -277,7 +292,7 @@ public class AuthController : Controller
             return View(data);
         }
 
-        await _cache.KeyDeleteAsync(SessionId);
+        await _cache.Redis.KeyDeleteAsync(SessionId);
         var (hash, salt) = _hash.Hash(data.NewPassword);
 
         user.PasswordHash = hash;

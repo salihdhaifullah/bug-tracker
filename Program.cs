@@ -1,9 +1,11 @@
-using Buegee.Middlewares;
+using Buegee.Extensions.Middlewares;
 using Buegee.Services.AuthService;
 using Buegee.Services.CryptoService;
 using Buegee.Services.JWTService;
 using Buegee.Services.RedisCacheService;
 using Buegee.Services.EmailService;
+using Buegee.Services;
+using Buegee.Extensions.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +18,8 @@ builder.Services.AddSingleton<IRedisCacheService, RedisCacheService>();
 builder.Services.AddSingleton<IAuthService, AuthService>();
 
 var app = builder.Build();
+
+if (args.Contains("seed")) await new Seed((DataContext)app.Services.GetService(typeof(DataContext))!).SeedAsync();
 
 app.UseStaticFiles();
 app.UseRouting();

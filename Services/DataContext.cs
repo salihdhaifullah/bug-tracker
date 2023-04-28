@@ -1,12 +1,20 @@
 using Microsoft.EntityFrameworkCore;
 using Buegee.Models.DB;
 
+namespace Buegee.Services;
+
 public class DataContext : DbContext
 {
-    public DataContext(DbContextOptions<DataContext> options) : base(options) {}
+    private readonly IConfiguration _configuration;
+    public DataContext(IConfiguration configuration, DbContextOptions<DataContext> options) : base(options) {
+        _configuration = configuration;
+    }
+
     public DbSet<UserDB> Users { get; set; } = null!;
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.UseNpgsql("name=ConnectionStrings:DefaultConnection");
+        var isFound = _configuration.GetSection("ConnectionStrings").GetValue<string>("DefaultConnection");
+        if (isFound is null) throw new Exception("Default Connection String Are Not Configured");
+        optionsBuilder.UseNpgsql(isFound);
     }
 }
