@@ -5,8 +5,6 @@ using Buegee.Services.EmailService;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Buegee.Services.RedisCacheService;
-using System.Net;
-using System.Text;
 using System.Text.Json;
 using Buegee.Services.CryptoService;
 using Buegee.Services;
@@ -51,10 +49,15 @@ public class AdminController : Controller
         return View();
     }
 
-    [HttpGet("mange-users")]
-    public async Task<IActionResult> MangeUsers()
+
+    [HttpGet("mange-users/{page?}")]
+    public async Task<IActionResult> MangeUsers([FromRoute] int page)
     {
+        var usersCount = await _ctx.Users.Where(u => u.Role != Roles.ADMIN).CountAsync();
+        var pages = Math.Ceiling((decimal)usersCount / 10);
+
         var users = await _ctx.Users
+            .Where(u => u.Role != Roles.ADMIN)
             .Select(u => new MangeUsersVM.User
             {
                 Id = u.Id,
@@ -66,55 +69,9 @@ public class AdminController : Controller
             })
             .ToListAsync();
 
-        var data = new MangeUsersVM() { Users = users };
+        var data = new MangeUsersVM() { Users = users, Pages = pages };
         return View(data);
     }
 
-
-    [HttpGet("only-bytes")]
-    public async Task<string> OnlyBytes()
-    {
-        Response.Headers.Append("Access-Control-Allow-Origin", "*");
-        return $"data:image/jpg;base64,{Convert.ToBase64String(await System.IO.File.ReadAllBytesAsync("only-bytes"))}";
-    }
-
-    [HttpGet("seed-data")]
-    public async Task SeedData()
-    {
-        try
-        {
-            HttpClient client = new HttpClient();
-
-            string json = await System.IO.File.ReadAllTextAsync("data.json");
-            var people = JsonSerializer.Deserialize<List<UserData>>(json);
-            foreach (var item in people)
-            {
-                var isPared = Enum.TryParse(item.Role, out Roles userRole);
-                Roles Role  = isPared ? userRole : Roles.REPORTER;
-                var imageBytes = await client.GetByteArrayAsync(item.Image);
-
-                var (hash, salt) = _crypto.Hash(item.Email);
-
-               var data = new UserDB(){
-                    FirstName = item.FirstName,
-                    LastName = item.LastName,
-                    Email = item.Email,
-                    PasswordHash = hash,
-                    PasswordSalt = salt,
-                    Role = Role,
-                    Image = imageBytes
-                };
-
-                _ctx.Users.Add(data);
-            }
-            await _ctx.SaveChangesAsync();
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-        }
-    }
-
-    public record UserData(string Role, string FirstName, string LastName, string Email, string Image);
 
 }

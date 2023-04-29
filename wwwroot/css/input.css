@@ -52,7 +52,7 @@
 
 html,
 body {
-    @apply min-h-[100vh] w-[100vw] h-auto m-0 p-0
+    @apply min-h-[100vh] h-auto m-0 p-0
 }
 
 body {
@@ -60,7 +60,7 @@ body {
 }
 
 main {
-    @apply p-3 flex flex-col max-w-[100vw] min-h-[85vh] mt-[8vh] mb-[6vh] h-auto
+    @apply flex flex-col min-h-[85vh] mt-[8vh] mb-[6vh] h-auto
 }
 
 header {

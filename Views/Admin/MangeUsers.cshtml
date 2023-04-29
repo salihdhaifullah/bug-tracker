@@ -1,25 +1,60 @@
 @{
-  ViewData["Title"] = "dash board";
+ViewData["Title"] = "Mange Users";
 }
 
 @model MangeUsersVM;
 
 
-<section>
-    <h1>Dash Board</h1>
+<section class="w-full p-1 sm:p-6 flex flex-col gap-4 justify-center items-center">
+  <h1 class="text-2xl font-extrabold text-primary">Mange Users</h1>
 
-      <div class="flex flex-col gap-2">
-            @foreach (var item in Model.Users)
+  <div class="flex flex-col w-full gap-2">
+    @foreach (var item in Model.Users)
     {
-        <div class="flex flex-row p-2 gap-4 border-4 border-purple-500 bg-white shadow-lg">
-          @if (@item?.Image is not null) {
-          @* <img src="data:image/jpg;base64,@Convert.ToBase64String(@item.Image)" alt=""> *@
-          <img src="data:image/jpg;base64,@Convert.ToBase64String(@item.Image)" alt="">
-          }
-                <p>Name: @item.FirstName  @item.LastName</p>
-      <p>Email: @item.Email</p>
-      <p>Role: @item.Role</p>
+    <div class="flex flex-row w-full p-2 gap-4 border border-gray-400 bg-white rounded-md shadow-lg">
+            @if (@item?.Image is not null) {
+      <img class="w-20 h-20 object-contain rounded-full"
+        src="data:image/jpg;base64,@Convert.ToBase64String(@item.Image)" alt="avatar">
+      }
+
+      <div class="flex w-full flex-col break-words justify-center">
+        <div class="flex sm:flex-row flex-wrap flex-col-reverse sm:gap-2">
+          <p class="text-base text-gray-900 font-bold">@item.FirstName @item.LastName</p>
+          <p class="flex flex-row text-sm gap-1">
+            <span class="text-secondary">(</span>
+            <span class="text-primary">@item.Role</span>
+            <span class="text-secondary">)</span>
+          </p>
         </div>
-    }
+              <p class="text-sm sm:text-base break-all max-w-fit text-gray-800 font-[400]">@item.Email</p>
       </div>
+
+      <div class="flex flex-col break-keep items-end justify-center w-full">
+        <button class="border-0 bg-secondary hover:shadow-lg text-xs p-2 w-fit text-primary sm:text-ellipsis font-bold rounded-md shadow-md">Change Role</button>
+      </div>
+    </div>
+    }
+  </div>
+
+  <nav aria-label="Page navigation example">
+    <ul class="flex flex-row w-full justify-center items-center">
+      <li>
+        <a href="#"
+          class="px-3 py-2 ml-0 leading-tight text-gray-500 bg-white border border-gray-300 rounded-l-lg hover:bg-gray-100 hover:text-gray-700">Previous</a>
+      </li>
+
+
+      @for (decimal i = 1; i <= Model.Pages; i++) { <li>
+        <a href="#"
+          class="px-3 py-2 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700">@i</a>
+        </li>
+        }
+
+        <li>
+          <a href="#"
+            class="px-3 py-2 leading-tight text-gray-500 bg-white border border-gray-300 rounded-r-lg hover:bg-gray-100 hover:text-gray-700">Next</a>
+        </li>
+    </ul>
+  </nav>
+
 </section>
