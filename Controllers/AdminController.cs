@@ -51,11 +51,12 @@ public class AdminController : Controller
 
 
     [HttpGet("mange-users/{page?}")]
-    public async Task<IActionResult> MangeUsers([FromRoute] int page)
+    public async Task<IActionResult> MangeUsers([FromRoute] int page = 1)
     {
         var usersCount = await _ctx.Users.Where(u => u.Role != Roles.ADMIN).CountAsync();
-        var pages = Math.Ceiling((decimal)usersCount / 10);
-
+        var pages = Math.Ceiling((double)usersCount / 10);
+            var skip = (page - 1) * 10;
+        Console.WriteLine($"skip skip skip skip  skip skip : {skip}");
         var users = await _ctx.Users
             .Where(u => u.Role != Roles.ADMIN)
             .Select(u => new MangeUsersVM.User
@@ -67,9 +68,11 @@ public class AdminController : Controller
                 Role = u.Role,
                 Image = u.Image
             })
+            .Skip(skip)
+            .Take(10)
             .ToListAsync();
 
-        var data = new MangeUsersVM() { Users = users, Pages = pages };
+        var data = new MangeUsersVM() { Users = users, Pages = pages, CurrentPage = (double)page };
         return View(data);
     }
 

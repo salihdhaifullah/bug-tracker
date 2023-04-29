@@ -13,6 +13,8 @@ public class MangeUsersVM {
     }
 
     public List<User> Users { get; set; } = null!;
-    public decimal Pages { get; set; }
+    public double Pages { get; set; }
+    public double CurrentPage { get; set; }
+
 }
 
