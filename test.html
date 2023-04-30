@@ -1,14 +1,21 @@
-@{
-  ViewData["Title"] = "Create Project";
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Create Project - Buegee</title>
+    <link rel="stylesheet" href="/icons/all.min.css">
+    <link rel="stylesheet" href="/css/site.css">
+</head>
+
+<body>
+    <header> <a href="/">Buegee </a> </header>
+
+    <main role="main">
 
 <section class="flex flex-col justify-center items-center max-w-[100vw] h-auto">
   <div class="rounded-xl bg-white flex flex-col gap-4 w-80 p-2 items-center justify-center shadow-xl">
 
-    @if (!String.IsNullOrEmpty(ViewData["Error"]?.ToString()))
-    {
-    <p class="text-red-600 text-center text-base font-bold">@ViewData["Error"]</p>
-    }
 
     <h1 class="text-primary font-bold text-2xl text-center">Create Project</h1>
 
@@ -24,8 +31,6 @@
             class="p-2 border border-gray-400 h-fit hover:border-gray-900 focus:outline-secondary rounded-sm w-full"
             type="text" id="ProjectName" name="ProjectName" />
         </div>
-        @* @Html.ValidationMessageFor(model => model.ProjectName, null, new {@class = "text-red-600 text-center
-        text-base font-bold"}) *@
       </div>
 
       <div class="flex flex-col justify-center items-center p-2 px-6 w-full gap-2">
@@ -38,8 +43,6 @@
             class="p-2 border border-gray-400 h-fit hover:border-gray-900 focus:outline-secondary rounded-sm w-full"
             type="text" id="Description" name="Description" />
         </div>
-        @* @Html.ValidationMessageFor(model => model.Description, null, new {@class = "text-red-600 text-center
-        text-base font-bold"}) *@
       </div>
 
 
@@ -59,16 +62,16 @@
 
             <datalist id="browsers"
               class="absolute w-full shadow-lg max-h-40 top-[100%] bg-white no-scrollbar border rounded-md border-t-0 p-2 overflow-y-scroll">
-              @foreach (var item in (dynamic) ViewData["data"])
-              {
-                <option onclick="ChoseOption(this)" class="bg-white hover:bg-indigo-200 rounded-md hover:font-extrabold text-gray-600 p-1 mb-1 text-base cursor-pointer" value="@item">@item</option>
-              }
+                <option onclick="ChoseOption(this)" class="bg-white hover:bg-indigo-200 rounded-md hover:font-extrabold text-gray-600 p-1 mb-1 text-base cursor-pointer" value="you">you</option>
+                <option onclick="ChoseOption(this)" class="bg-white hover:bg-indigo-200 rounded-md hover:font-extrabold text-gray-600 p-1 mb-1 text-base cursor-pointer" value="Mom">Mom</option>
+                <option onclick="ChoseOption(this)" class="bg-white hover:bg-indigo-200 rounded-md hover:font-extrabold text-gray-600 p-1 mb-1 text-base cursor-pointer" value="Cat">Cat</option>
+                <option onclick="ChoseOption(this)" class="bg-white hover:bg-indigo-200 rounded-md hover:font-extrabold text-gray-600 p-1 mb-1 text-base cursor-pointer" value="Dog">Dog</option>
+                <option onclick="ChoseOption(this)" class="bg-white hover:bg-indigo-200 rounded-md hover:font-extrabold text-gray-600 p-1 mb-1 text-base cursor-pointer" value="Monkey">Monkey</option>
+                <option onclick="ChoseOption(this)" class="bg-white hover:bg-indigo-200 rounded-md hover:font-extrabold text-gray-600 p-1 mb-1 text-base cursor-pointer" value="Banana">Banana</option>
             </datalist>
           </div>
 
         </div>
-        @* @Html.ValidationMessageFor(model => model.Description, null, new {@class = "text-red-600 text-center
-        text-base font-bold"}) *@
       </div>
 
       <div class="flex justify-center">
@@ -84,7 +87,22 @@
 </section>
 </div>
 
-@section Scripts {
+
+
+
+
+    </main>
+
+    <footer>&copy; 2023 - Buegee</footer>
+</body>
+<script src="/_framework/aspnetcore-browser-refresh.js"></script></body>
+
 <script defer src="/js/input1.js"></script>
 <script defer src="/js/select1.js"></script>
-}
+
+
+  <h1>Hello Fucks</h1>
+  <h1>Hello Fucks</h1>
+  <h1>Hello Fucks</h1>
+
+</html>

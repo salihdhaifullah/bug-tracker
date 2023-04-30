@@ -30,16 +30,16 @@ ViewData["Title"] = "Mange Users";
       </div>
 
       <div class="flex flex-col break-keep  items-end justify-center w-full">
-        <button
+        <a href="/admin/change-role/@item.Id"
           class="border-2 bg-secondary border-secondary hover:bg-white hover:opacity-95 hover:shadow-lg text-xs p-2 w-fit text-primary sm:text-ellipsis font-bold rounded-md shadow-md">Change
-          Role</button>
+          Role</a>
       </div>
     </div>
     }
   </div>
 
   <nav aria-label="Page navigation example">
-    <ul class="flex flex-row w-full justify-center items-center">
+    <ul class="flex flex-row w-full  justify-center items-center">
       <li>
         @if (Model.CurrentPage != 1) {
         <a href="@(Model.CurrentPage - 1)"
@@ -51,10 +51,9 @@ ViewData["Title"] = "Mange Users";
 
       </li>
 
-
       @for (double i = 1; i <= Model.Pages; i++) { <li>
         <a href="/admin/mange-users/@i"
-          class="px-3 py-2 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700">@i</a>
+          class="px-3 py-2  leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700">@i</a>
         </li>
         }
 
@@ -63,10 +62,9 @@ ViewData["Title"] = "Mange Users";
           <a href="@(Model.CurrentPage + 1)"
             class="px-3 py-2 leading-tight text-gray-500 bg-white border border-gray-300 rounded-r-lg hover:bg-gray-100 hover:text-gray-700">Next</a>
           } else {
-          <div class="px-3 py-2 leading-tight text-gray-500 bg-white border border-gray-300 rounded-r-lg">Next</div>
+          <div class="px-3 py-2 leading-tight  text-gray-500 bg-white border border-gray-300 rounded-r-lg">Next</div>
           }
         </li>
     </ul>
   </nav>
-
 </section>

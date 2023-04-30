@@ -55,8 +55,7 @@ public class AdminController : Controller
     {
         var usersCount = await _ctx.Users.Where(u => u.Role != Roles.ADMIN).CountAsync();
         var pages = Math.Ceiling((double)usersCount / 10);
-            var skip = (page - 1) * 10;
-        Console.WriteLine($"skip skip skip skip  skip skip : {skip}");
+
         var users = await _ctx.Users
             .Where(u => u.Role != Roles.ADMIN)
             .Select(u => new MangeUsersVM.User
@@ -68,12 +67,67 @@ public class AdminController : Controller
                 Role = u.Role,
                 Image = u.Image
             })
-            .Skip(skip)
+            .Skip((page - 1) * 10)
             .Take(10)
             .ToListAsync();
 
         var data = new MangeUsersVM() { Users = users, Pages = pages, CurrentPage = (double)page };
         return View(data);
+    }
+
+    [HttpGet("change-role/{userId}")]
+    public async Task<IActionResult> ChangeRole([FromRoute] int userId)
+    {
+        var Data = await _ctx.Users.Where(u => u.Id == userId)
+            .Select(u => new ChangeRoleVM
+            {
+                Email = u.Email,
+                FirstName = u.FirstName,
+                LastName = u.LastName,
+                Role = u.Role,
+                Image = u.Image
+            })
+            .FirstOrDefaultAsync();
+
+        if (Data is null) return NotFound();
+
+        ViewBag.FirstName = Data.FirstName;
+        ViewBag.Email = Data.Email;
+        ViewBag.LastName = Data.LastName;
+        ViewBag.Image = Data.Image;
+        ViewBag.Role = Data.Role;
+        ViewBag.Id = userId;
+
+        return View(new ChangeRoleVM.ChangeRoleVMDto(){NewRole = ""});
+    }
+
+    [HttpPost("change-role/{userId}")]
+    public async Task<IActionResult> ChangeRole([FromRoute] int userId, [FromForm] ChangeRoleVM.ChangeRoleVMDto data)
+    {
+        var Data = await _ctx.Users.Where(u => u.Id == userId)
+            .Select(u => new ChangeRoleVM
+            {
+                Email = u.Email,
+                FirstName = u.FirstName,
+                LastName = u.LastName,
+                Role = u.Role,
+                Image = u.Image
+            })
+            .FirstOrDefaultAsync();
+
+        if (Data is null) return NotFound();
+
+        ViewBag.FirstName = Data.FirstName;
+        ViewBag.Email = Data.Email;
+        ViewBag.LastName = Data.LastName;
+        ViewBag.Image = Data.Image;
+        ViewBag.Role = Data.Role;
+        ViewBag.Id = userId;
+
+
+
+
+        return View(new ChangeRoleVM.ChangeRoleVMDto(){NewRole = ""});
     }
 
 
