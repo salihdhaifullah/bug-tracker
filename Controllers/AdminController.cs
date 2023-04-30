@@ -5,7 +5,6 @@ using Buegee.Services.EmailService;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Buegee.Services.RedisCacheService;
-using System.Text.Json;
 using Buegee.Services.CryptoService;
 using Buegee.Services;
 
@@ -98,13 +97,15 @@ public class AdminController : Controller
         ViewBag.Role = Data.Role;
         ViewBag.Id = userId;
 
-        return View(new ChangeRoleVM.ChangeRoleVMDto(){NewRole = ""});
+        return View(new ChangeRoleVM.ChangeRoleVMDto() { NewRole = "" });
     }
 
     [HttpPost("change-role/{userId}")]
     public async Task<IActionResult> ChangeRole([FromRoute] int userId, [FromForm] ChangeRoleVM.ChangeRoleVMDto data)
     {
-        var Data = await _ctx.Users.Where(u => u.Id == userId)
+        if (!ModelState.IsValid)
+        {
+            var Data = await _ctx.Users.Where(u => u.Id == userId)
             .Select(u => new ChangeRoleVM
             {
                 Email = u.Email,
@@ -112,22 +113,26 @@ public class AdminController : Controller
                 LastName = u.LastName,
                 Role = u.Role,
                 Image = u.Image
-            })
-            .FirstOrDefaultAsync();
+            }).FirstOrDefaultAsync();
 
-        if (Data is null) return NotFound();
+            if (Data is null) return NotFound();
 
-        ViewBag.FirstName = Data.FirstName;
-        ViewBag.Email = Data.Email;
-        ViewBag.LastName = Data.LastName;
-        ViewBag.Image = Data.Image;
-        ViewBag.Role = Data.Role;
-        ViewBag.Id = userId;
+            ViewBag.FirstName = Data.FirstName;
+            ViewBag.Email = Data.Email;
+            ViewBag.LastName = Data.LastName;
+            ViewBag.Image = Data.Image;
+            ViewBag.Role = Data.Role;
+            ViewBag.Id = userId;
 
+            return View(data);
+        }
 
-
-
-        return View(new ChangeRoleVM.ChangeRoleVMDto(){NewRole = ""});
+        var isFound = await _ctx.Users.FindAsync(userId);
+        if (isFound is null) return NotFound();
+        await _email.roleChangedEmail(isFound.Email, $"{isFound.FirstName} {isFound.LastName}", isFound.Role.ToString(), data.NewRole);
+        isFound.Role = Enum.Parse<Roles>(data.NewRole);
+        await _ctx.SaveChangesAsync();
+        return Redirect("/admin/mange-users");
     }
 
 
