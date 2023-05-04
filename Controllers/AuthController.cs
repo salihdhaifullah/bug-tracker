@@ -9,6 +9,8 @@ using Buegee.Services.CryptoService;
 using Buegee.Services.JWTService;
 using Buegee.Models.DB;
 using Buegee.Services;
+using Buegee.Extensions.Classes;
+using Buegee.Extensions.Enums;
 
 namespace Buegee.Controllers;
 
@@ -74,10 +76,10 @@ public class AuthController : Controller
         var SessionId = Guid.NewGuid().ToString();
 
         var claims = new List<Claim> {
-         new Claim {name = "sing-up-session", value = SessionId}
+         new Claim {Name = "sing-up-session", Value = SessionId}
         };
 
-        var SessionIdToken = _jwt.GenerateJwt((long)SessionTimeSpan.TotalMilliseconds, claims);
+        var SessionIdToken = _jwt.GenerateJwt(SessionTimeSpan, claims);
 
         Response.Cookies.Append("sing-up-session", SessionIdToken, cookieOptions);
 
@@ -107,11 +109,23 @@ public class AuthController : Controller
 
         Request.Cookies.TryGetValue("sing-up-session", out var SessionIdToken);
 
-        var (payload, error) = _jwt.VerifyJwt(SessionIdToken ?? "");
+        Dictionary<string, string> payload;
 
-        var SessionId = payload?["sing-up-session"]?.ToString();
+        try
+        {
+            payload = _jwt.VerifyJwt(SessionIdToken ?? "");
+        }
+        catch (Exception)
+        {
+            ViewData["Error"] = "session expired please try sign-up again";
+            return View(data);
+        }
 
-        if (error is not null || String.IsNullOrEmpty(SessionId))
+        var SessionId = payload["sing-up-session"]?.ToString();
+
+
+
+        if (String.IsNullOrEmpty(SessionId))
         {
             ViewData["Error"] = "session expired please try sign-up again";
             return View(data);
@@ -144,9 +158,11 @@ public class AuthController : Controller
         _crypto.Hash(SessionData.Password, out byte[] hash, out byte[] salt);
 
         var imageBytes = await _client.GetByteArrayAsync($"https://api.dicebear.com/6.x/identicon/svg?seed={SessionData.FirstName}-{SessionData.LastName}-{SessionData.Email}");
-        var image = new FileDB() {
-          ContentType = ContentTypes.SVG,
-          Data = imageBytes
+
+        var image = new FileDB()
+        {
+            ContentType = ContentTypes.SVG,
+            Data = imageBytes
         };
 
         var UserData = await _ctx.Users.AddAsync(new UserDB
@@ -242,19 +258,19 @@ public class AuthController : Controller
         var SessionId = Guid.NewGuid().ToString();
 
         var claims = new List<Claim> {
-         new Claim {name = "reset-password-session", value = SessionId}
+         new Claim {Name = "reset-password-session", Value = SessionId}
         };
 
-        var SessionIdToken = _jwt.GenerateJwt((long)SessionTimeSpan.TotalMilliseconds, claims);
+        var SessionIdToken = _jwt.GenerateJwt(SessionTimeSpan, claims);
 
         Response.Cookies.Append("reset-password-session", SessionIdToken, cookieOptions);
 
         Random random = new Random();
-        var CodeBS = new StringBuilder();
+        var CodeSB = new StringBuilder();
 
-        for (int i = 0; i < 6; i++) CodeBS.Append(random.Next(10));
+        for (int i = 0; i < 6; i++) CodeSB.Append(random.Next(10));
 
-        string Code = CodeBS.ToString();
+        string Code = CodeSB.ToString();
 
         string sessionData = JsonSerializer.Serialize(new ForgetPasswordSession(Code, isFound.Email));
 
@@ -275,11 +291,21 @@ public class AuthController : Controller
 
         Request.Cookies.TryGetValue("reset-password-session", out var SessionIdToken);
 
-        var (payload, error) = _jwt.VerifyJwt(SessionIdToken ?? "");
+        Dictionary<string, string> payload;
 
-        var SessionId = payload?["reset-password-session"]?.ToString();
+        try
+        {
+            payload = _jwt.VerifyJwt(SessionIdToken ?? "");
+        }
+        catch (Exception)
+        {
+            return SessionExpiredResetPassword();
+        }
 
-        if (error is not null || String.IsNullOrEmpty(SessionId)) return SessionExpiredResetPassword();
+
+        var SessionId = payload["reset-password-session"]?.ToString();
+
+        if (String.IsNullOrEmpty(SessionId)) return SessionExpiredResetPassword();
 
         string? JsonSession = await _cache.Redis.StringGetAsync(SessionId);
 
@@ -369,22 +395,23 @@ public class AuthController : Controller
 
     public void SetAuthCookies(string Id, string Role)
     {
+        var SessionTimeSpan = new TimeSpan(365, 0, 0, 0);
+
         var cookieOptions = new CookieOptions()
         {
             IsEssential = true,
             Secure = true,
             HttpOnly = true,
-            SameSite = SameSiteMode.Strict
+            SameSite = SameSiteMode.Strict,
+            MaxAge = SessionTimeSpan
         };
 
         var claims = new List<Claim> {
-            new Claim {name = "id", value = Id},
-            new Claim {name = "role", value = Role}
+            new Claim {Name = "id", Value = Id},
+            new Claim {Name = "role", Value = Role}
         };
 
-        var Token = _jwt.GenerateJwt(31536000000, claims);
-
-        cookieOptions.Expires = DateTime.Now.AddYears(1);
+        var Token = _jwt.GenerateJwt(SessionTimeSpan, claims);
 
         Response.Cookies.Append("token", Token, cookieOptions);
     }

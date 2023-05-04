@@ -1,16 +1,10 @@
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using Buegee.Extensions.Classes;
+using Buegee.Extensions.Utils;
 
 namespace Buegee.Services.JWTService;
-
-public enum VerifyJwtErrors { invalid_token, token_expired, invalid_signature }
-
-public class Claim
-{
-    public string name { get; set; } = null!;
-    public string value { get; set; } = null!;
-}
 
 public class JWTService : IJWTService
 {
@@ -20,26 +14,29 @@ public class JWTService : IJWTService
     public JWTService(IConfiguration config)
     {
         var isFoundSecretKey = config.GetSection("JWT").GetValue<string>("SecretKey");
-        if (String.IsNullOrEmpty(isFoundSecretKey)) throw new Exception("SecretKey Not Found");
+
+        if (String.IsNullOrEmpty(isFoundSecretKey)) throw new Exception("Secret Key Not Configured");
+
         SecretKey = isFoundSecretKey;
     }
 
-    public string GenerateJwt(long milleSecondes, List<Claim> claims)
+    public string GenerateJwt(TimeSpan Age, List<Claim> claims)
     {
         var header = new { alg = "HS256", typ = "JWT" };
         var payload = new Dictionary<string, string>();
 
         foreach (var claim in claims)
         {
-            payload[claim.name] = claim.value;
+            payload[claim.Name] = claim.Value;
         }
 
-        payload["exp"] = (DateTimeOffset.Now + TimeSpan.FromMilliseconds(milleSecondes)).ToUnixTimeSeconds().ToString();
+        payload["exp"] = (DateTimeOffset.Now + Age).ToUnixTimeSeconds().ToString();
 
-        StringBuilder tokenSB = new StringBuilder();
-        tokenSB.Append(base64urlEncode(JsonSerializer.Serialize(header)));
+        var tokenSB = new StringBuilder();
+
+        tokenSB.Append(Base64.UrlEncode(JsonSerializer.Serialize(header)));
         tokenSB.Append('.');
-        tokenSB.Append(base64urlEncode(JsonSerializer.Serialize(payload)));
+        tokenSB.Append(Base64.UrlEncode(JsonSerializer.Serialize(payload)));
 
         var token = tokenSB.ToString();
 
@@ -48,8 +45,8 @@ public class JWTService : IJWTService
                 .ComputeHash(Encoding.UTF8.GetBytes(token))
         );
 
-
         StringBuilder jwtSB = new StringBuilder();
+
         jwtSB.Append(token);
         jwtSB.Append('.');
         jwtSB.Append(signature);
@@ -57,47 +54,30 @@ public class JWTService : IJWTService
         return jwtSB.ToString();
     }
 
-    public (Dictionary<string, string>? payload, VerifyJwtErrors? error) VerifyJwt(string jwt)
+    public Dictionary<string, string> VerifyJwt(string jwt)
     {
-        try
-        {
-            var parts = jwt.Split('.');
-            if (parts.Length != 3) return (null, VerifyJwtErrors.invalid_token);
+        var parts = jwt.Split('.');
+        if (parts.Length != 3) throw new Exception("Invalid JWT");
 
-            var header = JsonSerializer.Deserialize<Dictionary<string, string>>(base64urlDecode(parts[0]));
-            var payload = JsonSerializer.Deserialize<Dictionary<string, string>>(base64urlDecode(parts[1]));
-            var signature = parts[2];
+        var header = JsonSerializer.Deserialize<Dictionary<string, string>>(Base64.UrlDecode(parts[0]));
+        var payload = JsonSerializer.Deserialize<Dictionary<string, string>>(Base64.UrlDecode(parts[1]));
+        var signature = parts[2];
 
-            if (header?["alg"]?.ToString() != "HS256" || header?["typ"]?.ToString() != "JWT") return (null, VerifyJwtErrors.invalid_token);
+        if (
+            header?["alg"]?.ToString() != "HS256"
+            || header?["typ"]?.ToString() != "JWT"
+            || payload?["exp"] is null
+            || long.Parse(payload["exp"]) < DateTimeOffset.Now.ToUnixTimeSeconds()
+            ) throw new Exception("Invalid JWT");
 
-            if (payload?["exp"] is not null && long.Parse(payload["exp"]) < DateTimeOffset.Now.ToUnixTimeSeconds())
-            {
-                return (null, VerifyJwtErrors.token_expired);
-            }
+        var expectedSignature = Convert.ToBase64String(
+            new HMACSHA256(Encoding.UTF8.GetBytes(SecretKey))
+            .ComputeHash(Encoding.UTF8.GetBytes(parts[0] + "." + parts[1]))
+            );
 
-            var expectedSignature = Convert.ToBase64String(new HMACSHA256(Encoding.UTF8.GetBytes(SecretKey)).ComputeHash(Encoding.UTF8.GetBytes(parts[0] + "." + parts[1])));
+        if (signature != expectedSignature) throw new Exception("Invalid JWT");
 
-            if (signature != expectedSignature)
-            {
-                return (null, VerifyJwtErrors.invalid_signature);
-            }
-
-            return (payload, null);
-        }
-        catch (Exception)
-        {
-            return (null, VerifyJwtErrors.invalid_token);
-        }
-    }
-
-    private static string base64urlEncode(string str)
-    {
-        return Convert.ToBase64String(Encoding.UTF8.GetBytes(str));
-    }
-
-    private static string base64urlDecode(string b64)
-    {
-        return Encoding.UTF8.GetString(Convert.FromBase64String(b64));
+        return payload;
     }
 
 }

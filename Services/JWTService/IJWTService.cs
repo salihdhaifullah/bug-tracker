@@ -1,8 +1,9 @@
-namespace Buegee.Services.JWTService
+using Buegee.Extensions.Classes;
+
+namespace Buegee.Services.JWTService;
+
+public interface IJWTService
 {
-    public interface IJWTService
-    {
-        public string GenerateJwt(long milleSecondes, List<Claim> claims);
-        public (Dictionary<string, string>? payload, VerifyJwtErrors? error) VerifyJwt(string jwt);
-    }
+    public string GenerateJwt(TimeSpan Age, List<Claim> claims);
+    public Dictionary<string, string> VerifyJwt(string jwt);
 }

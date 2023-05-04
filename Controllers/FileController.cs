@@ -1,4 +1,4 @@
-using Buegee.Models.DB;
+using Buegee.Extensions.Utils;
 using Buegee.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -28,6 +28,6 @@ public class FileController : Controller
 
         if (Image is null) return NotFound();
 
-        return File(Image.Data, Image.ContentType.GetStringValue());
+        return File(Image.Data, Image.ContentType.GetStringValue() ?? "text/plain");
     }
 }

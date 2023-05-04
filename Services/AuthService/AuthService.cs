@@ -1,7 +1,9 @@
-using Buegee.Models.DB;
+using Buegee.Extensions.Classes;
+using Buegee.Extensions.Enums;
 using Buegee.Services.JWTService;
 
 namespace Buegee.Services.AuthService;
+// TODO store user data in redis cache service and give them a hashed id to be stored in users cookies
 
 public class AuthService : IAuthService
 {
@@ -18,14 +20,22 @@ public class AuthService : IAuthService
 
         if (string.IsNullOrEmpty(jwtToken)) return result;
 
-        var (payload, error) = _jwt.VerifyJwt(jwtToken);
+        Dictionary<string, string> payload;
 
-        if (error is not null || payload is null) return result;
+        try
+        {
+            payload = _jwt.VerifyJwt(jwtToken);
+        }
+        catch (Exception)
+        {
+            return result;
+        }
 
         var roleName = payload["role"];
         var userIdClaim = payload["id"];
 
-        if (roleName is null
+        if (
+            roleName is null
             || userIdClaim is null
             || !int.TryParse(userIdClaim, out var userId)
             || !Enum.TryParse(roleName, out Roles userRole)
@@ -38,15 +48,22 @@ public class AuthService : IAuthService
         return result;
     }
 
-    public RoleAuthorizationResult GetAuthorizationResult(string jwtToken, Roles[] requiredRoles)
+    public AuthorizationResult GetAuthorizationResult(string jwtToken, Roles[] requiredRoles)
     {
-        var result = new RoleAuthorizationResult();
+        var result = new AuthorizationResult();
 
         if (string.IsNullOrEmpty(jwtToken)) return result;
 
-        var (payload, error) = _jwt.VerifyJwt(jwtToken);
+        Dictionary<string, string> payload;
 
-        if (error is not null || payload is null) return result;
+        try
+        {
+            payload = _jwt.VerifyJwt(jwtToken);
+        }
+        catch (Exception)
+        {
+            return result;
+        }
 
         var roleName = payload["role"];
         var userIdClaim = payload["id"];
@@ -71,14 +88,5 @@ public class AuthService : IAuthService
         return result;
     }
 
-    public class AuthorizationResult
-    {
-        public Roles? Role { get; set; } = null;
-        public int? Id { get; set; } = null;
-        public bool IsAuthorized { get; set; } = false;
-    }
 
-    public class RoleAuthorizationResult : AuthorizationResult {
-        public bool IsAuthorizedRole { get; set; } = false;
-    }
 }

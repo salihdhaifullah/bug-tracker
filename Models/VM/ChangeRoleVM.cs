@@ -1,5 +1,5 @@
 using System.ComponentModel.DataAnnotations;
-using Buegee.Models.DB;
+using Buegee.Extensions.Enums;
 
 namespace Buegee.Models.VM;
 

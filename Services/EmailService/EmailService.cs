@@ -3,7 +3,7 @@ using System.Net.Mail;
 using System.Text;
 
 namespace Buegee.Services.EmailService;
-
+// TODO use builder design pattern
 public class EmailService : IEmailService
 {
     private readonly string? AppEmail;

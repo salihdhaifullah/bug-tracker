@@ -1,5 +1,4 @@
 using Buegee.Models.VM;
-using Buegee.Models.DB;
 using Buegee.Services.AuthService;
 using Buegee.Services.EmailService;
 using Microsoft.AspNetCore.Mvc;
@@ -7,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Buegee.Services.RedisCacheService;
 using Buegee.Services.CryptoService;
 using Buegee.Services;
+using Buegee.Extensions.Enums;
 
 namespace Buegee.Controllers;
 

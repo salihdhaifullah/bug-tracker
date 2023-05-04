@@ -1,4 +1,4 @@
-using Buegee.Models.DB;
+using Buegee.Extensions.Enums;
 
 namespace Buegee.Models.VM;
 

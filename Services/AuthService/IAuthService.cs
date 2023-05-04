@@ -1,10 +1,10 @@
-using Buegee.Models.DB;
-using static Buegee.Services.AuthService.AuthService;
+using Buegee.Extensions.Classes;
+using Buegee.Extensions.Enums;
 
 namespace Buegee.Services.AuthService;
 
 public interface IAuthService
 {
-    public RoleAuthorizationResult GetAuthorizationResult(string jwtToken, Roles[] requiredRoles);
+    public AuthorizationResult GetAuthorizationResult(string jwtToken, Roles[] requiredRoles);
     public AuthorizationResult GetAuthorizationResult(string jwtToken);
 }

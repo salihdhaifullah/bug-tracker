@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Buegee.Extensions.Enums;
 using Buegee.Models.DB;
 using Buegee.Services;
 using Buegee.Services.CryptoService;
