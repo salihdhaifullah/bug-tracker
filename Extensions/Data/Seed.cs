@@ -10,22 +10,30 @@ public class Seed
 {
     private readonly DataContext _ctx;
     private readonly Data _data;
-    private readonly ICryptoService _crypto = new CryptoService();
-    private readonly HttpClient _client = new HttpClient();
+    private readonly ICryptoService _crypto;
+    private readonly HttpClient _client;
 
-    public Seed(DataContext ctx)
+    public Seed(DataContext ctx, ICryptoService crypto)
     {
-        Console.WriteLine("\n\n ************************************************************** \n\n");
+        Console.WriteLine("\n ************************************************************** \n");
+        Console.WriteLine("************************************************************** \n");
+        Console.WriteLine("************************************************************** \n");
         Console.WriteLine("\n\n\n\n\n\n  Seeding Data Safely To The Database \n\n\n\n\n\n");
-        Console.WriteLine("\n\n ************************************************************** \n\n");
+        Console.WriteLine("\n ************************************************************** \n");
+        Console.WriteLine("************************************************************** \n");
+        Console.WriteLine("************************************************************** \n");
 
         _ctx = ctx;
+        _crypto = crypto;
+
         var Json = File.ReadAllText("data.json");
         if (Json is null) throw new Exception("data.json is not found");
 
         var isData = JsonSerializer.Deserialize<Data>(Json);
         if (isData is not null) _data = isData;
         else _data = new Data(new List<User>());
+
+        _client = new HttpClient();
     }
 
     public async Task SeedAsync()
@@ -33,7 +41,7 @@ public class Seed
         await SeedUsersAsync();
     }
 
-    private record User(string Role, string FirstName, string LastName, string Email, string Image);
+    private record User(string Role, string FirstName, string LastName, string Email, string? Image);
     private record Data(List<User> Users);
 
     private async Task SeedUsersAsync()
@@ -44,13 +52,26 @@ public class Seed
 
             if (isFound) continue;
 
-            var (hash, salt) = _crypto.Hash(item.Email);
+            _crypto.Hash(item.Email, out byte[] hash, out byte[] salt);
 
             var isPared = Enum.TryParse(item.Role, out Roles userRole);
 
-            Roles Role = isPared ? userRole : Roles.REPORTER;
+            byte[] imageBytes;
+            var Type = ContentTypes.JPEG;
 
-            var imageBytes = await _client.GetByteArrayAsync(item.Image);
+            if (item.Image is not null) {
+                imageBytes = await _client.GetByteArrayAsync(item.Image);
+            } else {
+                imageBytes = await _client.GetByteArrayAsync($"https://api.dicebear.com/6.x/identicon/svg?seed={item.FirstName}-{item.LastName}-{item.Email}");
+                Type =  ContentTypes.SVG;
+            }
+
+            var image = new FileDB()
+            {
+                ContentType = Type,
+                Data = imageBytes,
+                IsPrivate = false
+            };
 
             var data = new UserDB()
             {
@@ -59,8 +80,9 @@ public class Seed
                 Email = item.Email,
                 PasswordHash = hash,
                 PasswordSalt = salt,
-                Role = Role,
-                Image = imageBytes
+                Role = isPared ? userRole : Roles.REPORTER,
+                ImageId = image.Id,
+                Image = image,
             };
 
             _ctx.Users.Add(data);

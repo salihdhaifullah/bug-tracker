@@ -19,7 +19,13 @@ builder.Services.AddSingleton<IAuthService, AuthService>();
 
 var app = builder.Build();
 
-if (args.Contains("seed")) await new Seed((DataContext)app.Services.GetService(typeof(DataContext))!).SeedAsync();
+if (args.Contains("seed"))
+{
+    await new Seed
+            ((DataContext)app.Services.GetService(typeof(DataContext))!,
+            (ICryptoService)app.Services.GetService(typeof(ICryptoService))!)
+            .SeedAsync();
+}
 
 app.UseStaticFiles();
 app.UseRouting();

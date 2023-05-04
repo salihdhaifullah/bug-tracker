@@ -4,8 +4,7 @@
             "Role": "ADMIN",
             "FirstName": "Salih",
             "LastName": "Hasan",
-            "Email": "salehwebdev2004@gmail.com",
-            "Image": "https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/313.jpg"
+            "Email": "salehwebdev2004@gmail.com"
         },
         {
             "Role": "DEVELOPER",
@@ -53,8 +52,7 @@
             "Role": "PROJECT_MANGER",
             "FirstName": "Rex",
             "LastName": "Kuphal",
-            "Email": "Tania_Orn@yahoo.com",
-            "Image": "https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/299.jpg"
+            "Email": "Tania_Orn@yahoo.com"
         },
         {
             "Role": "DEVELOPER",
@@ -74,8 +72,7 @@
             "Role": "REPORTER",
             "FirstName": "Vanessa",
             "LastName": "Gibson",
-            "Email": "Ransom24@yahoo.com",
-            "Image": "https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/693.jpg"
+            "Email": "Ransom24@yahoo.com"
         },
         {
             "Role": "DEVELOPER",

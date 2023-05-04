@@ -12,10 +12,8 @@ ViewData["Title"] = "Mange Users";
     @foreach (var item in Model.Users)
     {
     <div class="flex flex-row w-full p-2 gap-4 border border-gray-400 bg-white rounded-md shadow-lg">
-      @if (@item?.Image is not null) {
-      <img class="w-20 h-20 object-contain rounded-full"
-        src="data:image/jpg;base64,@Convert.ToBase64String(@item.Image)" alt="avatar">
-      }
+      <img class="w-20 h-20 object-contain rounded-full" src="/files/public/@item.ImageId" alt="avatar">
+
 
       <div class="flex w-full flex-col break-words justify-center">
         <div class="flex sm:flex-row flex-wrap flex-col-reverse sm:gap-2">
@@ -51,10 +49,17 @@ ViewData["Title"] = "Mange Users";
 
       </li>
 
-      @for (double i = 1; i <= Model.Pages; i++) { <li>
-        <a href="/admin/mange-users/@i"
-          class="px-3 py-2  leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700">@i</a>
+      @for (double i = 1; i <= Model.Pages; i++) {
+        @if (Model.CurrentPage == i) {
+        <li>
+          <div class="px-3 py-2 leading-tight border border-gray-300 bg-gray-100 text-gray-700">@i</div>
         </li>
+        } else {
+                  <li>
+          <a href="/admin/mange-users/@i"
+            class="px-3 py-2  leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700">@i</a>
+        </li>
+        }
         }
 
         <li>

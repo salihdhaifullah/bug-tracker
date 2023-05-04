@@ -1,0 +1,3 @@
+DROP TABLE "__EFMigrationsHistory" CASCADE;
+DROP TABLE "files" CASCADE;
+DROP TABLE "users" CASCADE;

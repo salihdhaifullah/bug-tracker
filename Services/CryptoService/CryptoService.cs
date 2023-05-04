@@ -5,16 +5,17 @@ namespace Buegee.Services.CryptoService;
 
 public class CryptoService : ICryptoService
 {
-    public (byte[] hash, byte[] salt) Hash(string source)
+    public void Hash(string source, out byte[] hash, out byte[] salt)
     {
         var hmac = new HMACSHA512();
-        return (hmac.ComputeHash(Encoding.UTF8.GetBytes(source)), hmac.Key);
+        hash = hmac.ComputeHash(Encoding.UTF8.GetBytes(source));
+        salt = hmac.Key;
     }
 
-    public bool Compar(string source, byte[] hash, byte[] salt)
+    public void Compar(string source, byte[] hash, byte[] salt, out bool IsMatch)
     {
         var hmac = new HMACSHA512(salt);
         byte[] ComputeHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(source));
-        return ComputeHash.SequenceEqual(hash);
+        IsMatch = ComputeHash.SequenceEqual(hash);
     }
 }

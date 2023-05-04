@@ -12,12 +12,12 @@ using Buegee.Services;
 
 namespace Buegee.Controllers;
 
-[Controller]
 [Route("auth")]
 public class AuthController : Controller
 {
     private readonly DataContext _ctx;
-    private readonly ICryptoService _hash;
+    private readonly HttpClient _client;
+    private readonly ICryptoService _crypto;
     private readonly IJWTService _jwt;
     private readonly IEmailService _email;
     private readonly IRedisCacheService _cache;
@@ -25,13 +25,15 @@ public class AuthController : Controller
 
     public AuthController(
      DataContext ctx,
-     ICryptoService hash,
+     ICryptoService crypto,
      IJWTService jwt,
      IEmailService email,
      IRedisCacheService cache,
-     IConfiguration configuration){
+     IConfiguration configuration)
+    {
         _ctx = ctx;
-        _hash = hash;
+        _client = new HttpClient();
+        _crypto = crypto;
         _jwt = jwt;
         _email = email;
         _cache = cache;
@@ -139,8 +141,13 @@ public class AuthController : Controller
 
         await _cache.Redis.KeyDeleteAsync(SessionId);
 
-        var (hash, salt) = _hash.Hash(SessionData.Password);
+        _crypto.Hash(SessionData.Password, out byte[] hash, out byte[] salt);
 
+        var imageBytes = await _client.GetByteArrayAsync($"https://api.dicebear.com/6.x/identicon/svg?seed={SessionData.FirstName}-{SessionData.LastName}-{SessionData.Email}");
+        var image = new FileDB() {
+          ContentType = ContentTypes.SVG,
+          Data = imageBytes
+        };
 
         var UserData = await _ctx.Users.AddAsync(new UserDB
         {
@@ -151,7 +158,9 @@ public class AuthController : Controller
             PasswordSalt = salt,
             Role = SessionData.Email == _adminEmail
                     ? Roles.ADMIN
-                    : Roles.REPORTER
+                    : Roles.REPORTER,
+            ImageId = image.Id,
+            Image = image,
         });
 
         await _ctx.SaveChangesAsync();
@@ -183,7 +192,9 @@ public class AuthController : Controller
             return View(data);
         }
 
-        if (!_hash.Compar(data.Password, isFound.PasswordHash, isFound.PasswordSalt))
+        _crypto.Compar(data.Password, isFound.PasswordHash, isFound.PasswordSalt, out bool IsMatch);
+
+        if (!IsMatch)
         {
             ViewData["Error"] = "password is incorrect";
             return View(data);
@@ -293,7 +304,8 @@ public class AuthController : Controller
         }
 
         await _cache.Redis.KeyDeleteAsync(SessionId);
-        var (hash, salt) = _hash.Hash(data.NewPassword);
+
+        _crypto.Hash(data.NewPassword, out byte[] hash, out byte[] salt);
 
         user.PasswordHash = hash;
         user.PasswordSalt = salt;

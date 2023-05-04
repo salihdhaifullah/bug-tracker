@@ -8,7 +8,7 @@ public class ChangeRoleVM {
         public string FirstName {get; set;} = null!;
         public string LastName {get; set;} = null!;
         public Roles Role {get; set;}
-        public byte[]? Image {get; set;}
+        public int ImageId {get; set;}
     public class ChangeRoleVMDto {
         [RegularExpression("PROJECT_MANGER|REPORTER|DEVELOPER", ErrorMessage = "Invalid role")]
         public string NewRole {get; set;} = null!;

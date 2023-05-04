@@ -52,11 +52,14 @@ public class AdminController : Controller
     [HttpGet("mange-users/{page?}")]
     public async Task<IActionResult> MangeUsers([FromRoute] int page = 1)
     {
-        var usersCount = await _ctx.Users.Where(u => u.Role != Roles.ADMIN).CountAsync();
+        try
+        {
+                   var usersCount = await _ctx.Users.Where(u => u.Role != Roles.ADMIN).CountAsync();
         var pages = Math.Ceiling((double)usersCount / 10);
 
         var users = await _ctx.Users
             .Where(u => u.Role != Roles.ADMIN)
+            .OrderBy(u => u.CreatedAt)
             .Select(u => new MangeUsersVM.User
             {
                 Id = u.Id,
@@ -64,7 +67,7 @@ public class AdminController : Controller
                 FirstName = u.FirstName,
                 LastName = u.LastName,
                 Role = u.Role,
-                Image = u.Image
+                ImageId = u.ImageId
             })
             .Skip((page - 1) * 10)
             .Take(10)
@@ -72,6 +75,13 @@ public class AdminController : Controller
 
         var data = new MangeUsersVM() { Users = users, Pages = pages, CurrentPage = (double)page };
         return View(data);
+        }
+        catch (System.Exception e)
+        {
+            Console.WriteLine(e);
+            return StatusCode(StatusCodes.Status500InternalServerError);
+        }
+
     }
 
     [HttpGet("change-role/{userId}")]
@@ -84,7 +94,7 @@ public class AdminController : Controller
                 FirstName = u.FirstName,
                 LastName = u.LastName,
                 Role = u.Role,
-                Image = u.Image
+                ImageId = u.ImageId
             })
             .FirstOrDefaultAsync();
 
@@ -93,7 +103,7 @@ public class AdminController : Controller
         ViewBag.FirstName = Data.FirstName;
         ViewBag.Email = Data.Email;
         ViewBag.LastName = Data.LastName;
-        ViewBag.Image = Data.Image;
+        ViewBag.ImageId = Data.ImageId;
         ViewBag.Role = Data.Role;
         ViewBag.Id = userId;
 
@@ -112,7 +122,7 @@ public class AdminController : Controller
                 FirstName = u.FirstName,
                 LastName = u.LastName,
                 Role = u.Role,
-                Image = u.Image
+                ImageId = u.ImageId
             }).FirstOrDefaultAsync();
 
             if (Data is null) return NotFound();
@@ -120,7 +130,7 @@ public class AdminController : Controller
             ViewBag.FirstName = Data.FirstName;
             ViewBag.Email = Data.Email;
             ViewBag.LastName = Data.LastName;
-            ViewBag.Image = Data.Image;
+            ViewBag.Image = Data.ImageId;
             ViewBag.Role = Data.Role;
             ViewBag.Id = userId;
 

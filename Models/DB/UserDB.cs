@@ -31,12 +31,11 @@ public class UserDB
     public byte[] PasswordHash { get; set; } = null!;
     [Required, Column("password_salt")]
     public byte[] PasswordSalt { get; set; } = null!;
-    [Column("created_at"), DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    [Column("created_at")]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     [Column("role"), EnumDataType(typeof(Roles))]
     public Roles Role { get; set; } = Roles.REPORTER;
-    [Column("image")]
-    public byte[]? Image { get; set; }
+    [ForeignKey("Image"), Column("image")]
+    public int ImageId { get; set; }
+    public FileDB Image { get; set; } = null!;
 }
-
-

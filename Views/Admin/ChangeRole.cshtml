@@ -9,10 +9,7 @@ ViewData["Title"] = "Change Role";
 
     <div class="flex flex-col w-full max-w-[500px] gap-4 border border-gray-400 bg-white rounded-md shadow-lg">
         <div class="flex flex-row w-full p-2 gap-4">
-            @if (@ViewBag?.Image is not null) {
-            <img class="w-20 h-20 object-contain rounded-full"
-                src="data:image/jpg;base64,@Convert.ToBase64String(@ViewBag.Image)" alt="avatar">
-            }
+            <img class="w-20 h-20 object-contain rounded-full" src="/files/public/@ViewBag.ImageId" alt="avatar">
 
             <div class="flex w-full flex-col break-words justify-center">
                 <div class="flex sm:flex-row flex-wrap flex-col-reverse sm:gap-2">

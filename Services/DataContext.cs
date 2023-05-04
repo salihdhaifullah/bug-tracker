@@ -11,6 +11,7 @@ public class DataContext : DbContext
     }
 
     public DbSet<UserDB> Users { get; set; } = null!;
+    public DbSet<FileDB> Files { get; set; } = null!;
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         var isFound = _configuration.GetSection("ConnectionStrings").GetValue<string>("DefaultConnection");

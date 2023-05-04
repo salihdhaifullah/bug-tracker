@@ -2,6 +2,6 @@ namespace Buegee.Services.CryptoService;
 
 public interface ICryptoService
 {
-    public (byte[] hash, byte[] salt) Hash(string source);
-    public bool Compar(string source, byte[] hash, byte[] salt);
+    public void Hash(string source, out byte[] hash, out byte[] salt);
+    public void Compar(string source, byte[] hash, byte[] salt, out bool IsMatch);
 }
