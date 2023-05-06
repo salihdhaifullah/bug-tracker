@@ -11,6 +11,7 @@ using Buegee.Models.DB;
 using Buegee.Services;
 using Buegee.Extensions.Classes;
 using Buegee.Extensions.Enums;
+using Buegee.Services.AuthService;
 
 namespace Buegee.Controllers;
 
@@ -23,6 +24,7 @@ public class AuthController : Controller
     private readonly IJWTService _jwt;
     private readonly IEmailService _email;
     private readonly IRedisCacheService _cache;
+    private readonly IAuthService _auth;
     private readonly string _adminEmail;
 
     public AuthController(
@@ -31,7 +33,8 @@ public class AuthController : Controller
      IJWTService jwt,
      IEmailService email,
      IRedisCacheService cache,
-     IConfiguration configuration)
+     IConfiguration configuration,
+     IAuthService auth)
     {
         _ctx = ctx;
         _client = new HttpClient();
@@ -39,6 +42,7 @@ public class AuthController : Controller
         _jwt = jwt;
         _email = email;
         _cache = cache;
+        _auth = auth;
 
         string? adminEmail = configuration.GetSection("Admin").GetValue<string>("Email");
         if (String.IsNullOrEmpty(adminEmail)) throw new Exception("Admin Email Are Not Configured");
@@ -75,11 +79,7 @@ public class AuthController : Controller
 
         var SessionId = Guid.NewGuid().ToString();
 
-        var claims = new List<Claim> {
-         new Claim {Name = "sing-up-session", Value = SessionId}
-        };
-
-        var SessionIdToken = _jwt.GenerateJwt(SessionTimeSpan, claims);
+        var SessionIdToken = _jwt.GenerateJwt(SessionTimeSpan, new List<Claim> { new Claim {Name = "sing-up-session", Value = SessionId} });
 
         Response.Cookies.Append("sing-up-session", SessionIdToken, cookieOptions);
 
@@ -181,7 +181,7 @@ public class AuthController : Controller
 
         await _ctx.SaveChangesAsync();
 
-        SetAuthCookies(UserData.Entity.Id.ToString(), UserData.Entity.Role.ToString());
+        await _auth.Authenticator(UserData.Entity.Id, HttpContext, UserData.Entity.Role);
         // TODO || redirect to dashboard
         return Redirect("/");
     }
@@ -216,7 +216,7 @@ public class AuthController : Controller
             return View(data);
         };
 
-        SetAuthCookies(isFound.Id.ToString(), isFound.Role.ToString());
+        await _auth.Authenticator(isFound.Id, HttpContext, isFound.Role);
         // TODO || redirect to dashboard
         return Redirect("/");
     }
@@ -391,28 +391,5 @@ public class AuthController : Controller
     {
         ViewData["Error"] = "session expired please try again";
         return View("Auth/ForgetPassword", new ForgetPasswordVM());
-    }
-
-    public void SetAuthCookies(string Id, string Role)
-    {
-        var SessionTimeSpan = new TimeSpan(365, 0, 0, 0);
-
-        var cookieOptions = new CookieOptions()
-        {
-            IsEssential = true,
-            Secure = true,
-            HttpOnly = true,
-            SameSite = SameSiteMode.Strict,
-            MaxAge = SessionTimeSpan
-        };
-
-        var claims = new List<Claim> {
-            new Claim {Name = "id", Value = Id},
-            new Claim {Name = "role", Value = Role}
-        };
-
-        var Token = _jwt.GenerateJwt(SessionTimeSpan, claims);
-
-        Response.Cookies.Append("token", Token, cookieOptions);
     }
 }

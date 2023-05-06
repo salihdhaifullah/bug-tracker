@@ -7,9 +7,16 @@ public static class EnumExtensions
 {
     public static string? GetStringValue(this Enum value)
     {
-        return value.GetType()
-                    .GetField(value.ToString())
-                    ?.GetCustomAttribute<StringValueAttribute>()
-                    ?.Value;
+        try
+        {
+            return value.GetType()
+            .GetField(value.ToString())
+            ?.GetCustomAttribute<StringValueAttribute>()
+            ?.Value;
+        }
+        catch (Exception)
+        {
+            return null;
+        }
     }
 }

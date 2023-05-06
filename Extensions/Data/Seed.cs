@@ -31,6 +31,7 @@ public class Seed
         if (Json is null) throw new Exception("data.json is not found");
 
         var isData = JsonSerializer.Deserialize<Data>(Json);
+
         if (isData is not null) _data = isData;
         else _data = new Data(new List<User>());
 
@@ -55,7 +56,7 @@ public class Seed
 
             _crypto.Hash(item.Email, out byte[] hash, out byte[] salt);
 
-            var isPared = Enum.TryParse(item.Role, out Roles userRole);
+            var isParsed = Enum.TryParse(item.Role, out Roles userRole);
 
             byte[] imageBytes;
             var Type = ContentTypes.JPEG;
@@ -81,7 +82,7 @@ public class Seed
                 Email = item.Email,
                 PasswordHash = hash,
                 PasswordSalt = salt,
-                Role = isPared ? userRole : Roles.REPORTER,
+                Role = isParsed ? userRole : Roles.REPORTER,
                 ImageId = image.Id,
                 Image = image,
             };
