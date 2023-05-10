@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Buegee.Controllers;
 
-[Route("files")]
+[ApiRoute("files")]
 public class FileController : Controller
 {
     private readonly DataContext _ctx;

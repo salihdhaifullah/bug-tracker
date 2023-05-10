@@ -1,4 +1,4 @@
-# Bug tracker .NET core 7 MVC web app
+# buegee is .NET core 7 and react project management web app
 
 ## to build
 ```sh

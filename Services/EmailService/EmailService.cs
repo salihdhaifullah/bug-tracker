@@ -29,9 +29,9 @@ public class EmailService : IEmailService
             Credentials = new NetworkCredential(AppEmail, AppPassword)
         };
 
-        verificationEmailHtml = File.ReadAllText("./wwwroot/asset/verification-email.html");
-        resetPasswordHtml = File.ReadAllText("./wwwroot/asset/reset-password.html");
-        RoleChangedHtml = File.ReadAllText("./wwwroot/asset/role-changed.html");
+        verificationEmailHtml = File.ReadAllText("./Emails/verification-email.html");
+        resetPasswordHtml = File.ReadAllText("./Emails/reset-password.html");
+        RoleChangedHtml = File.ReadAllText("./Emails/role-changed.html");
     }
 
     public Task sendVerificationEmail(string to, string name, string code)

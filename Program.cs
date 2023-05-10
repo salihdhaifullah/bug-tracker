@@ -1,15 +1,15 @@
-using Buegee.Extensions.Middlewares;
+using Buegee.Extensions.Data;
+using Buegee.Services;
 using Buegee.Services.AuthService;
 using Buegee.Services.CryptoService;
+using Buegee.Services.EmailService;
 using Buegee.Services.JWTService;
 using Buegee.Services.RedisCacheService;
-using Buegee.Services.EmailService;
-using Buegee.Services;
-using Buegee.Extensions.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllers();
+builder.Services.AddSpaStaticFiles(config => config.RootPath = "dist");
 builder.Services.AddDbContext<DataContext>();
 builder.Services.AddSingleton<IJWTService, JWTService>();
 builder.Services.AddSingleton<ICryptoService, CryptoService>();
@@ -19,7 +19,7 @@ builder.Services.AddSingleton<IAuthService, AuthService>();
 
 var app = builder.Build();
 
-if (args.Contains("seed"))
+if (app.Environment.IsDevelopment() && args.Contains("seed"))
 {
     await new Seed(
             (DataContext)app.Services.GetService(typeof(DataContext))!,
@@ -27,8 +27,19 @@ if (args.Contains("seed"))
             ).SeedAsync();
 }
 
-app.UseStaticFiles();
 app.UseRouting();
-app.UseMiddleware<StatusCodeMiddleware>();
-app.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}");
+#pragma warning disable ASP0014
+app.UseEndpoints(builder => builder.MapDefaultControllerRoute());
+app.MapControllers();
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSpa(builder => builder.UseProxyToSpaDevelopmentServer("http://localhost:5173/"));
+}
+else
+{
+    app.UseSpaStaticFiles();
+    app.UseSpa(_ => {});
+}
+
 app.Run();

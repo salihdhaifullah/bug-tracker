@@ -1,27 +1,68 @@
-﻿using System.Text;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
 using Buegee.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Buegee.Controllers;
 
+[ApiRoute]
 public class HomeController : Controller
 {
     private readonly DataContext _ctx;
-    public HomeController(DataContext ctx) {
+    public HomeController(DataContext ctx)
+    {
         _ctx = ctx;
     }
 
     [HttpGet]
-    public IActionResult Index()
+    public string Index()
     {
-        return View();
+        return "<h1>Hello World</h1>";
     }
 
-[HttpGet("test")]
-public async Task<IActionResult> Test()
-{
-    var client = new HttpClient();
-    var Image = await client.GetByteArrayAsync("https://api.dicebear.com/6.x/identicon/svg?seed=ewg");
-    return File(Image, "image/svg+xml");
+    [HttpGet("test")]
+    public IActionResult Test()
+    {
+
+        var User = new User();
+        User.Id = 1;
+        User.Role = "ADMIN";
+        User.Token = "UIBYTDKLGIUHOIOGLFDKTYKFYLGUOIHHOGULFKUT^";
+
+        var data = new HTTPCustomResult<User>();
+        data.Body = User;
+        data.Massage = "login successfuly";
+        data.Type = ResponseTypes.error.ToString();
+        var result = JsonSerializer.Serialize<HTTPCustomResult<User>>(data);
+        return Ok(result);
+    }
+
 }
+
+public class User
+{
+    [JsonPropertyName("token")]
+    public string? Token { get; set; }
+    [JsonPropertyName("role")]
+    public string? Role { get; set; }
+    [JsonPropertyName("id")]
+    public int Id { get; set; }
+}
+
+public class HTTPCustomResult<T>
+{
+    [JsonPropertyName("redirectTo")]
+    public string? RedirectTo { get; set; }
+    [JsonPropertyName("body")]
+    public T? Body { get; set; }
+    [JsonPropertyName("massage")]
+    public string? Massage { get; set; }
+    [JsonPropertyName("type")]
+    public string Type {get; set;} = ResponseTypes.ok.ToString();
+}
+
+public enum ResponseTypes {
+    ok,
+    error,
+    validationError
 }

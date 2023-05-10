@@ -15,7 +15,7 @@ using Buegee.Services.AuthService;
 
 namespace Buegee.Controllers;
 
-[Route("auth")]
+[ApiRoute("auth")]
 public class AuthController : Controller
 {
     private readonly DataContext _ctx;

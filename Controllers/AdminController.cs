@@ -10,8 +10,7 @@ using Buegee.Extensions.Enums;
 
 namespace Buegee.Controllers;
 
-[Controller]
-[Route("admin")]
+[ApiRoute("admin")]
 public class AdminController : Controller
 {
 
