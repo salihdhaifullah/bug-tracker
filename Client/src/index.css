@@ -70,3 +70,28 @@ header {
 footer {
     @apply flex flex-row fixed bottom-0 w-full min-h-[6vh] text-primary border-t-gray-600 bg-white p-2 shadow-xl
 }
+
+.notification-animation {
+    animation-name: notification;
+    animation-duration: 5s;
+    animation-timing-function: ease-in-out;
+    animation-fill-mode: none;
+}
+
+@keyframes notification {
+    0% {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+
+    20%,
+    80% {
+        opacity: 1;
+        transform: translateX(0%);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+}

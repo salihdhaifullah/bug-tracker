@@ -34,7 +34,6 @@ public class HomeController : Controller
         data.Body = User;
         data.Message = "login successfuly";
         data.Type = ResponseTypes.ok.ToString();
-        data.RedirectTo = "401";
         var result = JsonSerializer.Serialize<HTTPCustomResult<User>>(data);
         return Ok(result);
     }

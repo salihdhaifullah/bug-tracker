@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import useFetchApi from "../utils/hooks/useFetchApi";
 
 interface IResult {
@@ -8,11 +7,7 @@ token: string
 }
 
 const Home = () => {
-  const [payload, call] = useFetchApi<IResult>("GET", "test");
-
-  useEffect(() => {
-    console.log(payload.result?.id);
-  }, [payload])
+  const [_, call] = useFetchApi<IResult>("GET", "test");
 
   return (
     <div>
