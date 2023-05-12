@@ -7,6 +7,7 @@ using Buegee.Services.RedisCacheService;
 using Buegee.Services.CryptoService;
 using Buegee.Services;
 using Buegee.Extensions.Enums;
+using Buegee.Extensions.Attributes;
 
 namespace Buegee.Controllers;
 

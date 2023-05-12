@@ -1,13 +1,13 @@
-import { useTasks, useTasksDispatch } from "../../utils/context";
+import { INotification, useNotification, useNotificationDispatch } from "../../utils/context";
 
 const Nonfiction = () => {
 
-    const tasks = useTasks() as any;
+    const notifications = useNotification();
 
     return (
     <div className="flex flex-col gap-2 justify-center items-center fixed right-10 top-10">
-        {tasks.map((v: any) => (
-            <Item v={v} key={v.id}/>
+        {notifications.map((notification) => (
+            <Item v={notification} key={notification.id}/>
         ))}
     </div>
   )
@@ -15,22 +15,17 @@ const Nonfiction = () => {
 
 export default Nonfiction
 
-const Item = ({v}: any) => {
-    const dispatch = useTasksDispatch() as any;
+const Item = ({v}: {v: INotification}) => {
+    const dispatchNotification = useNotificationDispatch();
 
-    setTimeout(() => {
-        dispatch({
-            type: 'deleted',
-            id: v.id
-          });
-    }, 1500);
+    setTimeout(() => { dispatchNotification({ type: 'delete' , payload: v }) }, 3000);
 
     return (
         <div key={v.id} className="flex flex-col justify-center shadow-lg bg-white border">
-        {v.error ? (
-        <h1 className="text-red-600 text-bold">error {v.title}</h1>
+        {v.type === "error" ? (
+        <h1 className="text-red-600 text-bold">error {v.message}</h1>
         ) : (
-        <h1 className="text-green-600 text-bold">massage {v.title}</h1>
+        <h1 className="text-green-600 text-bold">massage {v.message}</h1>
         )}
     </div>
     )

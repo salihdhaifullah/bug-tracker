@@ -1,15 +1,22 @@
-import useApi from "../utils/hooks/useAPi";
+import { useEffect } from "react";
+import useFetchApi from "../utils/hooks/useFetchApi";
+
+interface IResult {
+id: number
+role: string
+token: string
+}
 
 const Home = () => {
-  const classback = useApi();
+  const [payload, call] = useFetchApi<IResult>("GET", "test");
 
-    const handel = () => {
-      classback("GET", "test");
-    }
+  useEffect(() => {
+    console.log(payload.result?.id);
+  }, [payload])
 
   return (
     <div>
-      <button onClick={handel}>click</button>
+      <button onClick={call}>click</button>
     </div>
   )
 }

@@ -1,49 +1,46 @@
-import { createContext, useContext, useReducer } from 'react';
+import { Dispatch, ReactElement, createContext, useContext, useReducer } from 'react';
 
-const TasksContext = createContext(null)as any;
+const NotificationContext = createContext<INotification[]>([]);
+const NotificationDispatchContext = createContext<Dispatch<IAction>>(() => null);
 
-const TasksDispatchContext = createContext(null)as any;
+export function NotificationProvider({ children }: { children: ReactElement[] }) {
 
-export function TasksProvider({ children }: any) {
-  const [tasks, dispatch] = useReducer(tasksReducer, initialTasks);
+  const [Notification, dispatchNotification] = useReducer(notificationReducer, []);
 
   return (
-    <TasksContext.Provider value={tasks}>
-      <TasksDispatchContext.Provider value={dispatch}>
+    <NotificationContext.Provider value={Notification}>
+      <NotificationDispatchContext.Provider value={dispatchNotification}>
         {children}
-      </TasksDispatchContext.Provider>
-    </TasksContext.Provider>
+      </NotificationDispatchContext.Provider>
+    </NotificationContext.Provider>
   );
 }
 
-export function useTasks() {
-  return useContext(TasksContext);
+export function useNotification() {
+  return useContext(NotificationContext);
 }
 
-export function useTasksDispatch() {
-  return useContext(TasksDispatchContext);
+export function useNotificationDispatch() {
+  return useContext(NotificationDispatchContext);
 }
 
-function tasksReducer(tasks: sac[], action: any) {
+type IAction = {
+  type: "add" | "delete";
+  payload?: INotification
+}
+
+function notificationReducer(notification: INotification[], action: IAction): INotification[] {
   switch (action.type) {
-    case 'added': {
-      return [...tasks, {
-        id: action.id,
-        title: action.title,
-        error: action.error
+    case 'add': {
+      if (!action.payload) return notification;
+      return [...notification, {
+        id: action.payload.id,
+        message: action.payload.message,
+        type: action.payload.type
       }];
     }
-    case 'changed': {
-      return tasks.map(t => {
-        if (t.id === action.task.id) {
-          return action.task;
-        } else {
-          return t;
-        }
-      });
-    }
-    case 'deleted': {
-      return tasks.filter(t => t.id !== action.id);
+    case 'delete': {
+      return notification.filter(t => t.id !== action.payload?.id);
     }
     default: {
       throw Error('Unknown action: ' + action.type);
@@ -51,14 +48,8 @@ function tasksReducer(tasks: sac[], action: any) {
   }
 }
 
-interface sac {
+export interface INotification {
   id: string;
-  title: string;
-  error: boolean;
+  message: string;
+  type: "error" | "ok";
 };
-
-const initialTasks: sac[] = [
-  { id: "0", title: 'Philosopher’s Path', error: true },
-  { id: "1", title: 'Visit the temple', error: false },
-  { id: "2", title: 'Drink matcha', error: false }
-];

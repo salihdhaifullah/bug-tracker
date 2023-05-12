@@ -10,13 +10,15 @@ import Home from "./pages/Home";
 import ResetPassword from "./pages/auth/ResetPassword";
 import ForgetPassword from "./pages/auth/ForgetPassword";
 import AccountVerification from "./pages/auth/AccountVerification";
+import InternalServerError from "./pages/errors/InternalServerError";
+import Forbidden from "./pages/errors/Forbidden";
+import Unauthorized from "./pages/errors/Unauthorized";
 
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <Root />,
-    // errorElement: <NotFound />,
     children: [
       {
         path: "/",
@@ -43,11 +45,23 @@ const router = createBrowserRouter([
         element: <AccountVerification />,
       },
       {
+        path: "500",
+        element: <InternalServerError />,
+      },
+      {
+        path: "403",
+        element: <Forbidden />,
+      },
+      {
+        path: "401",
+        element: <Unauthorized />,
+      },
+      {
         path: "*",
         element: <NotFound />,
-      },
-    ],
-  },
+      }
+    ]
+  }
 ]);
 
 

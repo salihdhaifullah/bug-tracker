@@ -2,6 +2,7 @@
 using System.Text.Json.Serialization;
 using Buegee.Services;
 using Microsoft.AspNetCore.Mvc;
+using Buegee.Extensions.Attributes;
 
 namespace Buegee.Controllers;
 
@@ -31,8 +32,9 @@ public class HomeController : Controller
 
         var data = new HTTPCustomResult<User>();
         data.Body = User;
-        data.Massage = "login successfuly";
-        data.Type = ResponseTypes.error.ToString();
+        data.Message = "login successfuly";
+        data.Type = ResponseTypes.ok.ToString();
+        data.RedirectTo = "401";
         var result = JsonSerializer.Serialize<HTTPCustomResult<User>>(data);
         return Ok(result);
     }
@@ -55,8 +57,8 @@ public class HTTPCustomResult<T>
     public string? RedirectTo { get; set; }
     [JsonPropertyName("body")]
     public T? Body { get; set; }
-    [JsonPropertyName("massage")]
-    public string? Massage { get; set; }
+    [JsonPropertyName("message")]
+    public string? Message { get; set; }
     [JsonPropertyName("type")]
     public string Type {get; set;} = ResponseTypes.ok.ToString();
 }

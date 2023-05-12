@@ -12,6 +12,7 @@ using Buegee.Services;
 using Buegee.Extensions.Classes;
 using Buegee.Extensions.Enums;
 using Buegee.Services.AuthService;
+using Buegee.Extensions.Attributes;
 
 namespace Buegee.Controllers;
 
