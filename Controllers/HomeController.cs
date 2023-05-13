@@ -30,12 +30,8 @@ public class HomeController : Controller
         User.Role = "ADMIN";
         User.Token = "UIBYTDKLGIUHOIOGLFDKTYKFYLGUOIHHOGULFKUT^";
 
-        var data = new HTTPCustomResult<User>();
-        data.Body = User;
-        data.Message = "login successfuly";
-        data.Type = ResponseTypes.ok.ToString();
-        var result = JsonSerializer.Serialize<HTTPCustomResult<User>>(data);
-        return Ok(result);
+        var data = new HTTPCustomResult<User>(ResponseTypes.ok, "login success", null, User);
+        return Ok(data.ToJson());
     }
 
 }
@@ -50,20 +46,37 @@ public class User
     public int Id { get; set; }
 }
 
+
 public class HTTPCustomResult<T>
 {
-    [JsonPropertyName("redirectTo")]
-    public string? RedirectTo { get; set; }
-    [JsonPropertyName("body")]
-    public T? Body { get; set; }
-    [JsonPropertyName("message")]
-    public string? Message { get; set; }
-    [JsonPropertyName("type")]
-    public string Type {get; set;} = ResponseTypes.ok.ToString();
+
+    private readonly T? _Body;
+    private readonly string? _RedirectTo;
+    private readonly string _Message;
+    private readonly string _Type;
+
+    public HTTPCustomResult(ResponseTypes Type, string Message, string? RedirectTo, T? Body)
+    {
+        _Type = Type.ToString();
+        _Message = Message;
+        _RedirectTo = RedirectTo;
+        _Body = Body;
+    }
+
+    public string ToJson()
+    {
+        return JsonSerializer.Serialize(new { body = _Body, redirectTo = _RedirectTo, message = _Message, type = _Type });
+    }
 }
 
-public enum ResponseTypes {
+public class HTTPCustomResult : HTTPCustomResult<object>
+{
+    public HTTPCustomResult(ResponseTypes Type, string Message, string? RedirectTo = null)
+    : base(Type, Message, RedirectTo, null) { }
+}
+
+public enum ResponseTypes
+{
     ok,
-    error,
-    validationError
+    error
 }

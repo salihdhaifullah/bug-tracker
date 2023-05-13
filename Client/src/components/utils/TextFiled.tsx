@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import { ElementType, ReactNode, useEffect, useRef, useState } from "react";
 import NewId from "../../utils/NewId";
 import { IconType } from "react-icons";
 
 const LABEL_FOCUS = "bottom-[95%] left-[12%] text-sm text-secondary";
 const LABEL = "text-base bottom-[20%] left-[20%] text-gray-600";
-const Id = NewId();
+
 
 export interface IValidate {
     validate: (str: string) => boolean;
@@ -19,11 +19,12 @@ interface TextFiledProps {
     type?: React.HTMLInputTypeAttribute
     validation?: IValidate[]
     icon?: IconType
+    InElement?: ReactNode
 }
 
 
 const TextFiled = (props: TextFiledProps) => {
-
+    const {current: Id} = useRef(NewId());
     const [isFocus, setIsFocus] = useState(false);
     const [isError, setIsError] = useState(false);
     const [changing, setChanging] = useState(false);
@@ -34,6 +35,7 @@ const TextFiled = (props: TextFiledProps) => {
         if (props.value) setLabelClassName("sr-only");
         else setLabelClassName(`absolute z-10 font-extralight transition-all ease-in-out  ${isFocus ? LABEL_FOCUS : LABEL}`);
     }, [isFocus, changing])
+
 
     const handelChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         props.onChange(e)
@@ -49,12 +51,14 @@ const TextFiled = (props: TextFiledProps) => {
             ) return;
 
         for (let i = 0; i < props?.validation.length; i++) {
-            const item = props?.validation[0];
+            const item = props?.validation[i];
             if (!item.validate(e.target.value)) {
                 setErrorMassage(item.massage)
                 setIsError(true)
-                break;
+                props.isValid.current = false;
+                continue;
             }
+            props.isValid.current = false;
         }
     }
 
@@ -67,6 +71,7 @@ const TextFiled = (props: TextFiledProps) => {
                     {props.label}
                 </label>
                 {!props?.icon ? null : <props.icon className="text-gray-600 text-xl font-bold"/>}
+                {!props?.InElement ? null : props.InElement}
                 <input
                     className={`p-2 border h-fit rounded-sm w-full ${isError ? "border-red-500 hover:border-red-700 focus:outline-red-600" : "border-gray-400 hover:border-gray-900 focus:outline-secondary"} `}
                     id={Id}

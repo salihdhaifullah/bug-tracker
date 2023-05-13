@@ -33,7 +33,7 @@ public class AdminController : Controller
     [HttpGet("create-project")]
     public async Task<IActionResult> CreateProject()
     {
-        var result = await _auth.Authorization(HttpContext, new List<Roles>{Roles.ADMIN});
+        var result = _auth.CheckPermissions(HttpContext, new List<Roles>{Roles.ADMIN}, out var ID);
         if(result is not null) return result;
 
         var projectMangers = await _ctx.Users
@@ -55,7 +55,7 @@ public class AdminController : Controller
     [HttpGet("mange-users/{page?}")]
     public async Task<IActionResult> MangeUsers([FromRoute] int page = 1)
     {
-        var result = await _auth.Authorization(HttpContext, new List<Roles>{Roles.ADMIN});
+        var result = _auth.CheckPermissions(HttpContext, new List<Roles>{Roles.ADMIN}, out var ID);
         if(result is not null) return result;
 
         try
@@ -93,7 +93,7 @@ public class AdminController : Controller
     [HttpGet("change-role/{userId}")]
     public async Task<IActionResult> ChangeRole([FromRoute] int userId)
     {
-        var result = await _auth.Authorization(HttpContext, new List<Roles>{Roles.ADMIN});
+        var result = _auth.CheckPermissions(HttpContext, new List<Roles>{Roles.ADMIN}, out var ID);
         if(result is not null) return result;
 
         var Data = await _ctx.Users.Where(u => u.Id == userId)
@@ -122,7 +122,7 @@ public class AdminController : Controller
     [HttpPost("change-role/{userId}")]
     public async Task<IActionResult> ChangeRole([FromRoute] int userId, [FromForm] ChangeRoleVM.ChangeRoleVMDto data)
     {
-        var result = await _auth.Authorization(HttpContext, new List<Roles>{Roles.ADMIN});
+        var result = _auth.CheckPermissions(HttpContext, new List<Roles>{Roles.ADMIN}, out var ID);
         if(result is not null) return result;
 
         if (!ModelState.IsValid)

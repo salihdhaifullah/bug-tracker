@@ -80,7 +80,7 @@ public class AuthController : Controller
 
         var SessionId = Guid.NewGuid().ToString();
 
-        var SessionIdToken = _jwt.GenerateJwt(SessionTimeSpan, new List<Claim> { new Claim {Name = "sing-up-session", Value = SessionId} });
+        var SessionIdToken = _jwt.GenerateJwt(SessionTimeSpan, new List<Claim> { new Claim { Name = "sing-up-session", Value = SessionId } });
 
         Response.Cookies.Append("sing-up-session", SessionIdToken, cookieOptions);
 
@@ -182,44 +182,52 @@ public class AuthController : Controller
 
         await _ctx.SaveChangesAsync();
 
-        await _auth.Authenticator(UserData.Entity.Id, HttpContext, UserData.Entity.Role);
+        _auth.LogIn(UserData.Entity.Id, HttpContext, UserData.Entity.Role);
         // TODO || redirect to dashboard
         return Redirect("/");
     }
 
 
     [HttpPost("login")]
-    public async Task<IActionResult> Login([FromForm] LoginVM data)
+    [Consumes("application/json")]
+    public async Task<IActionResult> Login([FromBody] LoginVM data)
     {
-        if (!ModelState.IsValid) return View(data);
 
-        var isFound = await _ctx.Users
-            .Where(u => u.Email == data.Email)
-            .Select(u => new
+        if (!ModelState.IsValid)
+        {
+            var ErrorMessage = ModelState.Values.SelectMany(v => v.Errors).FirstOrDefault()?.ErrorMessage;
+            if (!String.IsNullOrEmpty(ErrorMessage))
             {
+                return StatusCode(StatusCodes.Status400BadRequest, new HTTPCustomResult(ResponseTypes.error, ErrorMessage).ToJson());
+            }
+        }
+
+        var IsFound = await _ctx.Users
+            .Where(u => u.Email == data.Email)
+            .Select(u => new {
                 Id = u.Id,
                 PasswordHash = u.PasswordHash,
                 PasswordSalt = u.PasswordSalt,
                 Role = u.Role
-            }).FirstOrDefaultAsync();
+            })
+            .FirstOrDefaultAsync();
 
-        if (isFound is null)
+        if (IsFound is null)
         {
-            ViewData["Error"] = $"this {data.Email} email dose not exist try sing-up";
-            return View(data);
+            return StatusCode(StatusCodes.Status404NotFound, new HTTPCustomResult(ResponseTypes.error, $"this {data.Email} email dose not exist try sing-up", "auth/sing-up").ToJson());
         }
 
-        _crypto.Compar(data.Password, isFound.PasswordHash, isFound.PasswordSalt, out bool IsMatch);
+        _crypto.Compar(data.Password, IsFound.PasswordHash, IsFound.PasswordSalt, out bool IsMatch);
 
         if (!IsMatch)
         {
-            ViewData["Error"] = "password is incorrect";
-            return View(data);
+            return StatusCode(StatusCodes.Status400BadRequest, new HTTPCustomResult(ResponseTypes.error, $"wrong email or password").ToJson());
         };
 
-        await _auth.Authenticator(isFound.Id, HttpContext, isFound.Role);
-        // TODO || redirect to dashboard
-        return Redirect("/");
+        _auth.LogIn(IsFound.Id, HttpContext, IsFound.Role);
+
+        // // TODO || redirect to dashboard
+        return StatusCode(StatusCodes.Status200OK, new HTTPCustomResult(ResponseTypes.ok, "logged in successfully").ToJson());
     }
 
     [HttpPost("forget-password")]
@@ -340,36 +348,6 @@ public class AuthController : Controller
         await _ctx.SaveChangesAsync();
 
         return Redirect("/auth/login");
-    }
-
-    [HttpGet("forget-password")]
-    public IActionResult ForgetPassword()
-    {
-        return View(new ForgetPasswordVM());
-    }
-
-    [HttpGet("login")]
-    public IActionResult Login()
-    {
-        return View(new LoginVM());
-    }
-
-    [HttpGet("sing-up")]
-    public IActionResult SingUp()
-    {
-        return View(new SingUpVM());
-    }
-
-    [HttpGet("account-verification")]
-    public IActionResult AccountVerification()
-    {
-        return View(new AccountVerificationVM());
-    }
-
-    [HttpGet("reset-password")]
-    public IActionResult ResetPassword()
-    {
-        return View(new ResetPasswordVM());
     }
 
     [HttpGet("logout")]

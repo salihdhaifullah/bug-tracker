@@ -32,6 +32,7 @@ type IAction = {
 function notificationReducer(notification: INotification[], action: IAction): INotification[] {
   switch (action.type) {
     case 'add': {
+      console.log(action)
       if (!action.payload) return notification;
       return [...notification, {
         id: action.payload.id,

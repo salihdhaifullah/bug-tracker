@@ -5,6 +5,9 @@ import { FaTimes, FaCheck } from 'react-icons/fa';
 const Notifications = () => {
     const notifications = useNotification();
 
+    useEffect(() => {
+        console.log(notifications);
+    }, [notifications])
     return (
         <div className="flex flex-col ease-in-out transition-all gap-2 justify-center items-center fixed right-10 top-10">
             {notifications.map((notification) => (
@@ -32,12 +35,12 @@ const Notification = ({ notification }: { notification: INotification }) => {
     let intervalID: number;
 
     const startTimer = useCallback(() => {
-        intervalID = setInterval(() => setWidth((prev) => (prev + 1)), 20);
+        intervalID = setInterval(() => setWidth((prev) => (prev + 1)), 25);
     }, []);
 
     const stopTimer = useCallback(() => clearInterval(intervalID), []);
 
-    useEffect(() => { if (width === 100) stopTimer() }, [width])
+    useEffect(() => { if (width === 99) stopTimer() }, [width])
 
     useEffect(() => startTimer(), [])
 
