@@ -24,10 +24,9 @@ export default function useFetchApi<T>(method: "POST" | "PATCH" | "GET" | "DELET
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
 
+
     const callback = useCallback(async () => {
         setIsLoading(true);
-
-        console.log("RUNS")
 
         try {
 

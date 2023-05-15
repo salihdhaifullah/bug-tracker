@@ -5,9 +5,6 @@ import { FaTimes, FaCheck } from 'react-icons/fa';
 const Notifications = () => {
     const notifications = useNotification();
 
-    useEffect(() => {
-        console.log(notifications);
-    }, [notifications])
     return (
         <div className="flex flex-col ease-in-out transition-all gap-2 justify-center items-center fixed right-10 top-10">
             {notifications.map((notification) => (

@@ -41,7 +41,7 @@ public class AuthService : IAuthService
     {
         ID = null;
 
-        var Unauthorized = new ObjectResult(new HTTPCustomResult(ResponseTypes.error, $"you need to login to do this action", "auth/login").ToJson()) { StatusCode = StatusCodes.Status401Unauthorized };
+        var Unauthorized = new ObjectResult(new HTTPCustomResult(ResponseTypes.error, $"you need to login to do this action", "/auth/login").ToJson()) { StatusCode = StatusCodes.Status401Unauthorized };
 
         // is auth cookie found
         if (!ctx.Request.Cookies.TryGetValue("auth", out var Token) || String.IsNullOrEmpty(Token))
@@ -77,7 +77,7 @@ public class AuthService : IAuthService
             // check if user role match one of the list of roles allowed to do this action
             if (!roles.Contains(role))
             {
-                return new ObjectResult(new HTTPCustomResult(ResponseTypes.error, $"your not authorized to do this action", "403").ToJson()) { StatusCode = StatusCodes.Status403Forbidden }; ;
+                return new ObjectResult(new HTTPCustomResult(ResponseTypes.error, $"your not authorized to do this action", "/403").ToJson()) { StatusCode = StatusCodes.Status403Forbidden }; ;
             }
 
             // invalidated user token if user agent changed

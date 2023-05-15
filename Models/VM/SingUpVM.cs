@@ -1,15 +1,31 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace Buegee.Models.VM;
 
 public class SingUpVM
 {
-    [Required, MinLength(2), MaxLength(50)]
+    [JsonPropertyName("firstName")]
+    [Required(ErrorMessage = "first name is required"),
+    MaxLength(50, ErrorMessage = "maximum length of first name is 50 character")]
     public string FirstName { get; set; } = "";
-    [Required, MinLength(2), MaxLength(50)]
+
+
+    [JsonPropertyName("lastName")]
+    [Required(ErrorMessage = "last name is required"),
+      MaxLength(50, ErrorMessage = "maximum length of last name is 50 character")]
     public string LastName { get; set; } = "";
-    [EmailAddress, Required, MaxLength(100)]
+
+
+    [JsonPropertyName("email")]
+    [EmailAddress(ErrorMessage = "un-valid email address"),
+    Required(ErrorMessage = "email address is required"),
+    MaxLength(100, ErrorMessage = "maximum length of email address is 100 character")]
     public string Email { get; set; } = "";
-    [Required, MinLength(8)]
+
+
+    [JsonPropertyName("password")]
+    [Required(ErrorMessage = "password is required"),
+    MinLength(8, ErrorMessage = "minimum length of password is 8 character")]
     public string Password { get; set; } = "";
 }

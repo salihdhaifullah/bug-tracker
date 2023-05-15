@@ -1,4 +1,4 @@
-import { ElementType, ReactNode, useEffect, useRef, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import NewId from "../../utils/NewId";
 import { IconType } from "react-icons";
 
@@ -15,7 +15,7 @@ interface TextFiledProps {
     onChange: React.ChangeEventHandler<HTMLInputElement>;
     value: string
     label: string
-    isValid: React.MutableRefObject<boolean>
+    setIsValid: (bool: boolean) => void;
     type?: React.HTMLInputTypeAttribute
     validation?: IValidate[]
     icon?: IconType
@@ -55,10 +55,10 @@ const TextFiled = (props: TextFiledProps) => {
             if (!item.validate(e.target.value)) {
                 setErrorMassage(item.massage)
                 setIsError(true)
-                props.isValid.current = false;
+                props.setIsValid(false);
                 continue;
             }
-            props.isValid.current = false;
+            props.setIsValid(true);
         }
     }
 

@@ -13,10 +13,12 @@ using Buegee.Extensions.Classes;
 using Buegee.Extensions.Enums;
 using Buegee.Services.AuthService;
 using Buegee.Extensions.Attributes;
+using Buegee.Extensions.Utils;
 
 namespace Buegee.Controllers;
 
 [ApiRoute("auth")]
+[Consumes("application/json")]
 public class AuthController : Controller
 {
     private readonly DataContext _ctx;
@@ -51,10 +53,66 @@ public class AuthController : Controller
         _adminEmail = adminEmail;
     }
 
-    [HttpPost("sing-up")]
-    public async Task<IActionResult> SingUp([FromForm] SingUpVM Data)
+
+    [HttpPost("login")]
+    public async Task<IActionResult> Login([FromBody] LoginVM data)
     {
-        if (!ModelState.IsValid) return View(Data);
+
+        if (!ModelState.IsValid)
+        {
+            var ErrorMessage = ModelState.Values.SelectMany(v => v.Errors).FirstOrDefault()?.ErrorMessage;
+            if (!String.IsNullOrEmpty(ErrorMessage))
+            {
+                return StatusCode(StatusCodes.Status400BadRequest, new HTTPCustomResult(ResponseTypes.error, ErrorMessage).ToJson());
+            }
+        }
+
+        var IsFound = await _ctx.Users
+            .Where(u => u.Email == data.Email)
+            .Select(u => new
+            {
+                PasswordHash = u.PasswordHash,
+                PasswordSalt = u.PasswordSalt,
+                Id = u.Id,
+                Role = u.Role,
+                ImageId = u.ImageId,
+                Email = u.Email,
+                FullName = $"{u.FirstName}  {u.LastName}",
+            })
+            .FirstOrDefaultAsync();
+
+        if (IsFound is null)
+        {
+            return StatusCode(StatusCodes.Status404NotFound, new HTTPCustomResult(ResponseTypes.error, $"this {data.Email} email dose not exist try sing-up", "/auth/sing-up").ToJson());
+        }
+
+        _crypto.Compar(data.Password, IsFound.PasswordHash, IsFound.PasswordSalt, out bool IsMatch);
+
+        if (!IsMatch)
+        {
+            return StatusCode(StatusCodes.Status400BadRequest, new HTTPCustomResult(ResponseTypes.error, $"wrong email or password").ToJson());
+        };
+
+        _auth.LogIn(IsFound.Id, HttpContext, IsFound.Role);
+
+        // // TODO || redirect to dashboard
+        return StatusCode(StatusCodes.Status200OK, new HTTPCustomResult<UserResult>(ResponseTypes.ok, "logged in successfully", null, new UserResult(IsFound.Id, IsFound.Role.ToString(), IsFound.ImageId, IsFound.Email, IsFound.FullName)).ToJson());
+    }
+
+    [HttpPost("sing-up")]
+    public async Task<IActionResult> SingUp([FromBody] SingUpVM Data)
+    {
+        // check modelState and send error massage if there any errors
+        if (!ModelState.IsValid)
+        {
+            var ErrorMessage = ModelState.Values.SelectMany(v => v.Errors).FirstOrDefault()?.ErrorMessage;
+            if (!String.IsNullOrEmpty(ErrorMessage))
+            {
+                return StatusCode(StatusCodes.Status400BadRequest, new HTTPCustomResult(ResponseTypes.error, ErrorMessage).ToJson());
+            }
+        }
+
+        // if there a user with this email redirect to login page with error massage
 
         var IsFound = await _ctx.Users
             .Where(u => u.Email == Data.Email)
@@ -63,12 +121,15 @@ public class AuthController : Controller
 
         if (IsFound is not null)
         {
-            ViewData["Error"] = $"this account {Data.Email} is already exist try login";
-            return View(Data);
+            return StatusCode(StatusCodes.Status404NotFound, new HTTPCustomResult(ResponseTypes.error, $"this account {Data.Email} is already exist try login", "/auth/login").ToJson());
         }
 
+
+        // half an hour
         var SessionTimeSpan = new TimeSpan(0, 30, 0);
 
+        // cookie config
+        // TODO make global cookie config
         var cookieOptions = new CookieOptions()
         {
             IsEssential = true,
@@ -78,35 +139,40 @@ public class AuthController : Controller
             MaxAge = SessionTimeSpan
         };
 
+        // generate new guid
         var SessionId = Guid.NewGuid().ToString();
 
+        // generate jwt with the guid as value
         var SessionIdToken = _jwt.GenerateJwt(SessionTimeSpan, new List<Claim> { new Claim { Name = "sing-up-session", Value = SessionId } });
 
+        //  append the jwt in user cookies
         Response.Cookies.Append("sing-up-session", SessionIdToken, cookieOptions);
 
-        Random random = new Random();
-        var CodeBS = new StringBuilder();
+        // generate random 6 digits code
+        string Code = RandomCode.NewRandomCode();
 
-        for (int i = 0; i < 6; i++) CodeBS.Append(random.Next(10));
+        //  Serialize the user sended data to sing-up with the random code, it will be stored for half an hour in redis cache
+        await _cache.Redis.StringSetAsync(SessionId, JsonSerializer.Serialize(new SingUpSession(Code, Data.FirstName, Data.LastName, Data.Email, Data.Password)), SessionTimeSpan);
 
-        string Code = CodeBS.ToString();
-
-        string sessionData = JsonSerializer.Serialize(new SingUpSession(Code, Data.FirstName, Data.LastName, Data.Email, Data.Password));
-
-        await _cache.Redis.StringSetAsync(SessionId, sessionData, SessionTimeSpan);
-
+        // send the email
         await _email.sendVerificationEmail(Data.Email, $"{Data.FirstName} {Data.LastName}", Code);
 
-        return Redirect("/auth/account-verification");
+        return StatusCode(StatusCodes.Status201Created, new HTTPCustomResult(ResponseTypes.ok, $"we have send to a 6 digits verification code", "/auth/account-verification").ToJson());
     }
-
-
 
     [HttpPost("account-verification")]
     public async Task<IActionResult> AccountVerification([FromForm] AccountVerificationVM data)
     {
 
-        if (!ModelState.IsValid) return View(data);
+        // check modelState and send error massage if there any errors
+        if (!ModelState.IsValid)
+        {
+            var ErrorMessage = ModelState.Values.SelectMany(v => v.Errors).FirstOrDefault()?.ErrorMessage;
+            if (!String.IsNullOrEmpty(ErrorMessage))
+            {
+                return StatusCode(StatusCodes.Status400BadRequest, new HTTPCustomResult(ResponseTypes.error, ErrorMessage).ToJson());
+            }
+        }
 
         Request.Cookies.TryGetValue("sing-up-session", out var SessionIdToken);
 
@@ -188,47 +254,8 @@ public class AuthController : Controller
     }
 
 
-    [HttpPost("login")]
-    [Consumes("application/json")]
-    public async Task<IActionResult> Login([FromBody] LoginVM data)
-    {
 
-        if (!ModelState.IsValid)
-        {
-            var ErrorMessage = ModelState.Values.SelectMany(v => v.Errors).FirstOrDefault()?.ErrorMessage;
-            if (!String.IsNullOrEmpty(ErrorMessage))
-            {
-                return StatusCode(StatusCodes.Status400BadRequest, new HTTPCustomResult(ResponseTypes.error, ErrorMessage).ToJson());
-            }
-        }
-
-        var IsFound = await _ctx.Users
-            .Where(u => u.Email == data.Email)
-            .Select(u => new {
-                Id = u.Id,
-                PasswordHash = u.PasswordHash,
-                PasswordSalt = u.PasswordSalt,
-                Role = u.Role
-            })
-            .FirstOrDefaultAsync();
-
-        if (IsFound is null)
-        {
-            return StatusCode(StatusCodes.Status404NotFound, new HTTPCustomResult(ResponseTypes.error, $"this {data.Email} email dose not exist try sing-up", "auth/sing-up").ToJson());
-        }
-
-        _crypto.Compar(data.Password, IsFound.PasswordHash, IsFound.PasswordSalt, out bool IsMatch);
-
-        if (!IsMatch)
-        {
-            return StatusCode(StatusCodes.Status400BadRequest, new HTTPCustomResult(ResponseTypes.error, $"wrong email or password").ToJson());
-        };
-
-        _auth.LogIn(IsFound.Id, HttpContext, IsFound.Role);
-
-        // // TODO || redirect to dashboard
-        return StatusCode(StatusCodes.Status200OK, new HTTPCustomResult(ResponseTypes.ok, "logged in successfully").ToJson());
-    }
+    public record UserResult(int id, string role, int imageId, string email, string fullName);
 
     [HttpPost("forget-password")]
     public async Task<IActionResult> ForgetPassword([FromForm] ForgetPasswordVM data)
