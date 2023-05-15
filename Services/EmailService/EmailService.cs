@@ -39,17 +39,17 @@ public class EmailService : IEmailService
         stringBuilder.Replace("${name}", name);
         stringBuilder.Replace("${code}", code);
 
-        var massage = new MailMessage(
+        var message = new MailMessage(
             from: "Team@Buegee.com",
             to: to,
             subject: "activate your account",
             body: stringBuilder.ToString()
         );
 
-        massage.IsBodyHtml = true;
-        massage.Priority = MailPriority.High;
+        message.IsBodyHtml = true;
+        message.Priority = MailPriority.High;
 
-        return _smtpClient.SendMailAsync(massage);
+        return _smtpClient.SendMailAsync(message);
     }
 
     public Task resetPasswordEmail(string to, string name, string code)
@@ -59,17 +59,17 @@ public class EmailService : IEmailService
         stringBuilder.Replace("${name}", name);
         stringBuilder.Replace("${code}", code);
 
-        var massage = new MailMessage(
+        var message = new MailMessage(
             from: "Team@Buegee.com",
             to: to,
             subject: "reset your password",
             body: stringBuilder.ToString()
         );
 
-        massage.IsBodyHtml = true;
-        massage.Priority = MailPriority.High;
+        message.IsBodyHtml = true;
+        message.Priority = MailPriority.High;
 
-        return _smtpClient.SendMailAsync(massage);
+        return _smtpClient.SendMailAsync(message);
     }
 
     public Task roleChangedEmail(string to, string name, string role1, string role2)
@@ -80,16 +80,16 @@ public class EmailService : IEmailService
         stringBuilder.Replace("${role1}", role1);
         stringBuilder.Replace("${role2}", role2);
 
-        var massage = new MailMessage(
+        var message = new MailMessage(
             from: "Team@Buegee.com",
             to: to,
             subject: "your role changed",
             body: stringBuilder.ToString()
         );
 
-        massage.IsBodyHtml = true;
-        massage.Priority = MailPriority.High;
+        message.IsBodyHtml = true;
+        message.Priority = MailPriority.High;
 
-        return _smtpClient.SendMailAsync(massage);
+        return _smtpClient.SendMailAsync(message);
     }
 }

@@ -4,19 +4,21 @@ import PasswordEye from "../../components/utils/PasswordEye"
 import { FormEvent, useState } from "react";
 import CircleProgress from "../../components/utils/CircleProgress";
 import useFetchApi from "../../utils/hooks/useFetchApi";
+import { MdDomainVerification } from "react-icons/md";
 
 const ResetPassword = () => {
-    const [password, setPassword] = useState("");
+    const [newPassword, setNewPassword] = useState("");
     const [code, setCode] = useState("");
     const [passwordType, setPasswordType] = useState("password");
 
     const [isValidPassword, setIsValidPassword] = useState(false);
     const [isValidCode, setIsValidCode] = useState(false);
 
-    const [payload, call] = useFetchApi("POST", "auth/reset-password", [code, password], { code, password });
+    const [payload, call] = useFetchApi("POST", "auth/reset-password", [code, newPassword], { code, newPassword });
 
     const handelSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        call();
     }
 
     return (
@@ -29,25 +31,21 @@ const ResetPassword = () => {
 
                 <h1 className="text-primary font-bold text-2xl text-center">Reset Password</h1>
 
+                <p className="text-primary text-base text-center px-2">
+                    check your emails for the verification code, if you did not find it please check spam emails.
+                </p>
+
                 <form className="flex-col flex w-full justify-center items-center" onSubmit={handelSubmit}>
 
-                    <div className="flex flex-col justify-center items-center p-2 px-6 w-full gap-2">
-                        <div className="flex flex-row gap-2  w-full justify-center items-center relative">
-                            <label className="text-base absolute bottom-[20%] left-[20%] font-extralight text-gray-600 transition-all ease-in-out" htmlFor="Code">Verification Code</label>
-                            <i className="fa-solid fa-envelope text-gray-600 text-base"></i>
-                            <input className="p-2 border border-gray-400 h-fit hover:border-gray-900 focus:outline-secondary rounded-sm w-full" type="text" id="Code" value="@Model.Code" name="Code" />
-                        </div>
-                    </div>
 
                     <TextFiled
                         validation={[
-                            { validate: (str: string) => str.length < 6, massage: "min length of verification code is 6 character" },
-                            { validate: (str: string) => str.length > 6, massage: "max length of verification code is 6 character" },
+                            { validate: (str: string) => str.length >= 6, massage: "min length of verification code is 6 character" },
+                            { validate: (str: string) => str.length <= 6, massage: "max length of verification code is 6 character" },
                             { validate: (str: string) => /^[0-9]+$/.test(str), massage: "verification code should be numbers from 0-9" }
                         ]}
-                        icon={RiLockPasswordFill}
-                        value={password}
-
+                        icon={MdDomainVerification}
+                        value={code}
                         onChange={(e) => setCode(e.target.value)}
                         label="verification code"
                         setIsValid={setIsValidCode}
@@ -58,9 +56,9 @@ const ResetPassword = () => {
                             { validate: (str: string) => str.length > 8, massage: "min length of password is 8 character" }
                         ]}
                         icon={RiLockPasswordFill}
-                        value={password}
+                        value={newPassword}
                         type={passwordType}
-                        onChange={(e) => setPassword(e.target.value)}
+                        onChange={(e) => setNewPassword(e.target.value)}
                         label="new password"
                         InElement={<PasswordEye type={passwordType} setType={setPasswordType} />}
                         setIsValid={setIsValidPassword}

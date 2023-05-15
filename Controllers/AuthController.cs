@@ -79,7 +79,7 @@ public class AuthController : Controller
         {
             return new HttpResult()
                     .IsOk(false)
-                    .Massage($"this {data.Email} email dose not exist try sing-up")
+                    .Message($"this {data.Email} email dose not exist try sing-up")
                     .StatusCode(404)
                     .RedirectTo("/auth/sing-up")
                     .Get();
@@ -91,7 +91,7 @@ public class AuthController : Controller
         {
             return new HttpResult()
                     .IsOk(false)
-                    .Massage("wrong email or password")
+                    .Message("wrong email or password")
                     .StatusCode(400)
                     .Get();
         };
@@ -102,7 +102,7 @@ public class AuthController : Controller
         return new HttpResult()
                 .StatusCode(200)
                 .IsOk(true)
-                .Massage("logged in successfully")
+                .Message("logged in successfully")
                 .Body(new
                 {
                     id = isFound.Id,
@@ -117,10 +117,10 @@ public class AuthController : Controller
     [HttpPost("sing-up")]
     public async Task<IActionResult> SingUp([FromBody] SingUpVM data)
     {
-        // check modelState and send error massage if there any errors
+        // check modelState and send error message if there any errors
         if (Main.TryGetModelErrorResult(ModelState, out var result)) return result!;
 
-        // if there a user with this email redirect to login page with error massage
+        // if there a user with this email redirect to login page with error message
 
         var isFound = await _ctx.Users
             .Where(u => u.Email == data.Email)
@@ -131,7 +131,7 @@ public class AuthController : Controller
         {
             return new HttpResult()
                     .IsOk(false)
-                    .Massage($"this account {data.Email} is already exist try login")
+                    .Message($"this account {data.Email} is already exist try login")
                     .StatusCode(404)
                     .RedirectTo("/auth/login")
                     .Get();
@@ -153,7 +153,7 @@ public class AuthController : Controller
         return new HttpResult()
                 .StatusCode(200)
                 .IsOk(true)
-                .Massage("we have send to a 6 digits verification code")
+                .Message("we have send to a 6 digits verification code")
                 .RedirectTo("/auth/account-verification")
                 .Get();
     }
@@ -163,14 +163,14 @@ public class AuthController : Controller
     [HttpPost("account-verification")]
     public async Task<IActionResult> AccountVerification([FromBody] AccountVerificationVM data)
     {
-        // check modelState and send error massage if there any errors
+        // check modelState and send error message if there any errors
         if (Main.TryGetModelErrorResult(ModelState, out var result)) return result!;
 
         var session = await _auth.GetSessionAsync<SingUpSession>("sing-up-session", HttpContext);
 
         if (session is null) return new HttpResult()
                                 .IsOk(false)
-                                .Massage("session expired please try sign-up again")
+                                .Message("session expired please try sign-up again")
                                 .StatusCode(404)
                                 .RedirectTo("/auth/sing-up")
                                 .Get();
@@ -178,7 +178,7 @@ public class AuthController : Controller
 
         if (session.Code != data.Code) return new HttpResult()
                                 .IsOk(false)
-                                .Massage("incorrect verification code. please try again")
+                                .Message("incorrect verification code. please try again")
                                 .StatusCode(400)
                                 .Get();
 
@@ -191,7 +191,8 @@ public class AuthController : Controller
         var image = new FileDB()
         {
             ContentType = ContentTypes.SVG,
-            Data = imageBytes
+            Data = imageBytes,
+            IsPrivate = false,
         };
 
         var userData = await _ctx.Users.AddAsync(new UserDB
@@ -214,9 +215,9 @@ public class AuthController : Controller
 
         // TODO || redirect to dashboard
         return new HttpResult().IsOk(true)
-                                .Massage("successfully verified your account")
+                                .Message("successfully verified your account")
                                 .StatusCode(201)
-                                .RedirectTo("/")
+                                .RedirectTo("/auth/login")
                                 .Get();
     }
 
@@ -243,7 +244,7 @@ public class AuthController : Controller
 
         if (isFound is null) return new HttpResult()
                             .RedirectTo("/auth/sing-up")
-                            .Massage($"this {data.Email} email dose not exist try sing-up")
+                            .Message($"this {data.Email} email dose not exist try sing-up")
                             .IsOk(false)
                             .StatusCode(404)
                             .Get();
@@ -259,7 +260,7 @@ public class AuthController : Controller
         return new HttpResult()
                 .StatusCode(200)
                 .IsOk(true)
-                .Massage("we have send to a 6 digits verification code")
+                .Message("we have send to a 6 digits verification code")
                 .RedirectTo("/auth/reset-password")
                 .Get();
     }
@@ -275,7 +276,7 @@ public class AuthController : Controller
 
         if (session is null) return new HttpResult()
                                 .IsOk(false)
-                                .Massage("session expired please try again")
+                                .Message("session expired please try again")
                                 .StatusCode(404)
                                 .RedirectTo("/auth/forget-password")
                                 .Get();
@@ -283,7 +284,7 @@ public class AuthController : Controller
 
         if (session.Code != data.Code) return new HttpResult()
                                 .IsOk(false)
-                                .Massage("incorrect verification code. please try again")
+                                .Message("incorrect verification code. please try again")
                                 .StatusCode(400)
                                 .Get();
 
@@ -291,7 +292,7 @@ public class AuthController : Controller
 
         if (user is null) return new HttpResult()
                                 .IsOk(false)
-                                .Massage("this account dose not exist please try sing-up")
+                                .Message("this account dose not exist please try sing-up")
                                 .StatusCode(404)
                                 .RedirectTo("/auth/sing-up")
                                 .Get();
@@ -308,7 +309,7 @@ public class AuthController : Controller
 
         return new HttpResult()
                     .IsOk(true)
-                    .Massage("successfully changed your password")
+                    .Message("successfully changed your password")
                     .StatusCode(200)
                     .RedirectTo("/auth/login")
                     .Get();

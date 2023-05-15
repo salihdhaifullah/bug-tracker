@@ -40,7 +40,7 @@ public class AuthService : IAuthService
         var result = new HttpResult()
                         .IsOk(false)
                         .StatusCode(401)
-                        .Massage("you need to login to do this action");
+                        .Message("you need to login to do this action");
 
         // is auth cookie found
         if (!ctx.Request.Cookies.TryGetValue("auth", out var token) || String.IsNullOrEmpty(token)) return result.Get();
@@ -60,7 +60,7 @@ public class AuthService : IAuthService
             if (!data.TryGetValue("role", out var roleStr) || !Enum.TryParse(roleStr, out Roles role)) return result.Get();
 
             // check if user role match one of the list of roles allowed to do this action
-            if (!roles.Contains(role)) return result.Massage("you do not have the permissions to do this action")
+            if (!roles.Contains(role)) return result.Message("you do not have the permissions to do this action")
                             .StatusCode(403)
                             .RedirectTo("/403")
                             .Get();

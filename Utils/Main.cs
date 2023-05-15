@@ -36,7 +36,7 @@ public static class Main
         {
             result = new HttpResult()
                     .IsOk(false)
-                    .Massage(errorMessage)
+                    .Message(errorMessage)
                     .StatusCode(400)
                     .Get();
 

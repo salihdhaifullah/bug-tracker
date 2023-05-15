@@ -4,14 +4,14 @@ using Microsoft.AspNetCore.Mvc;
 namespace Buegee.Utils;
 
 public class HttpResult {
-    private string? _massage {get; set;} = null;
+    private string? _message {get; set;} = null;
     private string? _redirectTo {get; set;} = null;
     private object? _body {get; set;} = null;
     private int _statusCode {get; set;} = 200;
     private bool _isOk {get; set;} = true;
 
-    public HttpResult Massage(string massage) {
-        _massage = massage;
+    public HttpResult Message(string message) {
+        _message = message;
         return this;
     }
 
@@ -38,7 +38,7 @@ public class HttpResult {
     public IActionResult Get() {
         var httpJson = JsonSerializer.Serialize(new {
             type = _isOk ? "ok" : "error",
-            massage = _massage,
+            message = _message,
             redirectTo = _redirectTo,
             body = _body
         });
