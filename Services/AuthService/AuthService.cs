@@ -1,4 +1,6 @@
+using System.Text.Json;
 using Buegee.Services.JWTService;
+using Buegee.Services.RedisCacheService;
 using Buegee.Utils;
 using Buegee.Utils.Enums;
 using Microsoft.AspNetCore.Mvc;
@@ -9,8 +11,13 @@ namespace Buegee.Services.AuthService;
 public class AuthService : IAuthService
 {
     private readonly IJWTService _jwt;
+    private readonly IRedisCacheService _cache;
 
-    public AuthService(IJWTService jwt){ _jwt = jwt; }
+    public AuthService(IJWTService jwt, IRedisCacheService cache)
+    {
+        _jwt = jwt;
+        _cache = cache;
+    }
 
     public void LogIn(int id, HttpContext ctx, Roles role = Roles.REPORTER)
     {
@@ -50,7 +57,7 @@ public class AuthService : IAuthService
             if (!data.TryGetValue("agent", out var agent) || String.IsNullOrEmpty(agent)) return result.Get();
 
             // get role
-            if (!data.TryGetValue("role", out var roleStr) || !Enum.TryParse(roleStr, out Roles role) )return result.Get();
+            if (!data.TryGetValue("role", out var roleStr) || !Enum.TryParse(roleStr, out Roles role)) return result.Get();
 
             // check if user role match one of the list of roles allowed to do this action
             if (!roles.Contains(role)) return result.Massage("you do not have the permissions to do this action")
@@ -76,6 +83,38 @@ public class AuthService : IAuthService
         // user are good
         return null;
     }
+
+    public async Task SetSessionAsync<T>(string sessionName, TimeSpan sessionTimeSpan, T payload, HttpContext ctx)
+    {
+        var sessionId = Guid.NewGuid().ToString();
+
+        ctx.Response.Cookies.Append(sessionName, sessionId, Main.CookieConfig(sessionTimeSpan));
+
+        await _cache.Redis.StringSetAsync(sessionId, JsonSerializer.Serialize<T>(payload), sessionTimeSpan);
+    }
+
+    public async Task<T?> GetSessionAsync<T>(string sessionName, HttpContext ctx) where T : class
+    {
+        if (!ctx.Request.Cookies.TryGetValue(sessionName, out var sessionId)) return null;
+
+        string? jsonSession = await _cache.Redis.StringGetAsync(sessionId);
+
+        if (jsonSession is null) return null;
+
+        var sessionData = JsonSerializer.Deserialize<T>(jsonSession);
+
+        return sessionData;
+    }
+
+    public async Task DeleteSessionAsync(string sessionName, HttpContext ctx)
+    {
+        if (!ctx.Request.Cookies.TryGetValue(sessionName, out var sessionId)) return;
+
+        ctx.Response.Cookies.Delete(sessionName);
+
+        await _cache.Redis.KeyDeleteAsync(sessionId);
+    }
+
 
     private string GetUserAgent(HttpContext context)
     {

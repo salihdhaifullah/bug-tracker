@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using Buegee.Models.VM;
 using Buegee.Services.RedisCacheService;
 using System.Text.Json;
-using System.Text;
 using Buegee.Services.EmailService;
 using Buegee.Services.CryptoService;
 using Buegee.Services.JWTService;
@@ -47,11 +46,15 @@ public class AuthController : Controller
         _auth = auth;
 
         string? adminEmail = configuration.GetSection("Admin").GetValue<string>("Email");
+
         if (String.IsNullOrEmpty(adminEmail)) throw new Exception("Admin Email Are Not Configured");
 
         _adminEmail = adminEmail;
     }
 
+
+    public record SingUpSession(string Code, string FirstName, string LastName, string Email, string Password);
+    public record ForgetPasswordSession(string Code, string Email);
 
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginVM data)
@@ -100,7 +103,14 @@ public class AuthController : Controller
                 .StatusCode(200)
                 .IsOk(true)
                 .Massage("logged in successfully")
-                .Body(new UserResult(isFound.Id, isFound.Role.ToString(), isFound.ImageId, isFound.Email, isFound.FullName))
+                .Body(new
+                {
+                    id = isFound.Id,
+                    role = isFound.Role.ToString(),
+                    imageId = isFound.ImageId,
+                    email = isFound.Email,
+                    fullName = isFound.FullName
+                })
                 .Get();
     }
 
@@ -130,23 +140,12 @@ public class AuthController : Controller
         // half an hour
         var sessionTimeSpan = new TimeSpan(0, 30, 0);
 
-        // generate new guid
-        var sessionId = Guid.NewGuid().ToString();
-
-        var claims = new Dictionary<string, string>();
-        claims["sing-up-session"] = sessionId;
-
-        // generate jwt with the guid as value
-        var sessionIdToken = _jwt.GenerateJwt(sessionTimeSpan, claims);
-
-        //  append the jwt in user cookies
-        Response.Cookies.Append("sing-up-session", sessionIdToken, Main.CookieConfig(sessionTimeSpan));
-
         // generate random 6 digits code
         string Code = Main.RandomCode();
 
-        //  Serialize the user sended data to sing-up with the random code, it will be stored for half an hour in redis cache
-        await _cache.Redis.StringSetAsync(sessionId, JsonSerializer.Serialize(new SingUpSession(Code, data.FirstName, data.LastName, data.Email, data.Password)), sessionTimeSpan);
+        var payload = new SingUpSession(Code, data.FirstName, data.LastName, data.Email, data.Password);
+
+        await _auth.SetSessionAsync<SingUpSession>("sing-up-session", sessionTimeSpan, payload, HttpContext);
 
         // send the email
         await _email.sendVerificationEmail(data.Email, $"{data.FirstName} {data.LastName}", Code);
@@ -159,62 +158,35 @@ public class AuthController : Controller
                 .Get();
     }
 
+
+
     [HttpPost("account-verification")]
-    public async Task<IActionResult> AccountVerification([FromForm] AccountVerificationVM data)
+    public async Task<IActionResult> AccountVerification([FromBody] AccountVerificationVM data)
     {
         // check modelState and send error massage if there any errors
         if (Main.TryGetModelErrorResult(ModelState, out var result)) return result!;
 
+        var session = await _auth.GetSessionAsync<SingUpSession>("sing-up-session", HttpContext);
 
-        Request.Cookies.TryGetValue("sing-up-session", out var sessionIdToken);
+        if (session is null) return new HttpResult()
+                                .IsOk(false)
+                                .Massage("session expired please try sign-up again")
+                                .StatusCode(404)
+                                .RedirectTo("/auth/sing-up")
+                                .Get();
 
-        Dictionary<string, string> payload;
 
-        try
-        {
-            payload = _jwt.VerifyJwt(sessionIdToken ?? "");
-        }
-        catch (Exception)
-        {
-            ViewData["Error"] = "session expired please try sign-up again";
-            return View(data);
-        }
+        if (session.Code != data.Code) return new HttpResult()
+                                .IsOk(false)
+                                .Massage("incorrect verification code. please try again")
+                                .StatusCode(400)
+                                .Get();
 
-        var sessionId = payload["sing-up-session"]?.ToString();
+        await _auth.DeleteSessionAsync("sing-up-session", HttpContext);
 
-        if (String.IsNullOrEmpty(sessionId))
-        {
-            ViewData["Error"] = "session expired please try sign-up again";
-            return View(data);
-        }
+        _crypto.Hash(session.Password, out byte[] hash, out byte[] salt);
 
-        string? jsonSession = await _cache.Redis.StringGetAsync(sessionId);
-
-        if (jsonSession is null)
-        {
-            ViewData["Error"] = "session expired please try sign-up again";
-            return View(data);
-        }
-
-        var sessionData = JsonSerializer.Deserialize<SingUpSession>(jsonSession);
-
-        if (sessionData is null)
-        {
-            ViewData["Error"] = "session expired please try sign-up again";
-            return View(data);
-        }
-
-        if (sessionData.Code != data.Code)
-        {
-            ViewData["Error"] = "incorrect verification code. please try again";
-            return View(data);
-        }
-
-        await _cache.Redis.KeyDeleteAsync(sessionId);
-
-        _crypto.Hash(sessionData.Password, out byte[] hash, out byte[] salt);
-
-        var imageBytes = await _client.GetByteArrayAsync($"https://api.dicebear.com/6.x/identicon/svg?seed={sessionData.FirstName}-{sessionData.LastName}-{sessionData.Email}");
+        var imageBytes = await _client.GetByteArrayAsync($"https://api.dicebear.com/6.x/identicon/svg?seed={session.FirstName}-{session.LastName}-{session.Email}");
 
         var image = new FileDB()
         {
@@ -224,12 +196,12 @@ public class AuthController : Controller
 
         var userData = await _ctx.Users.AddAsync(new UserDB
         {
-            Email = sessionData.Email,
-            FirstName = sessionData.FirstName,
-            LastName = sessionData.LastName,
+            Email = session.Email,
+            FirstName = session.FirstName,
+            LastName = session.LastName,
             PasswordHash = hash,
             PasswordSalt = salt,
-            Role = sessionData.Email == _adminEmail
+            Role = session.Email == _adminEmail
                     ? Roles.ADMIN
                     : Roles.REPORTER,
             ImageId = image.Id,
@@ -239,18 +211,24 @@ public class AuthController : Controller
         await _ctx.SaveChangesAsync();
 
         _auth.LogIn(userData.Entity.Id, HttpContext, userData.Entity.Role);
+
         // TODO || redirect to dashboard
-        return Redirect("/");
+        return new HttpResult().IsOk(true)
+                                .Massage("successfully verified your account")
+                                .StatusCode(201)
+                                .RedirectTo("/")
+                                .Get();
     }
 
 
 
-    public record UserResult(int id, string role, int imageId, string email, string fullName);
 
     [HttpPost("forget-password")]
-    public async Task<IActionResult> ForgetPassword([FromForm] ForgetPasswordVM data)
+    public async Task<IActionResult> ForgetPassword([FromBody] ForgetPasswordVM data)
     {
-        if (!ModelState.IsValid) return View(data);
+
+        if (Main.TryGetModelErrorResult(ModelState, out var result)) return result!;
+
         // first check if user email exist
         var isFound = await _ctx.Users
             .Where(u => u.Email == data.Email)
@@ -262,86 +240,64 @@ public class AuthController : Controller
             })
             .FirstOrDefaultAsync();
 
-        if (isFound is null)
-        {
-            ViewData["Error"] = $"this {data.Email} email dose not exist try sing-up";
-            return View(data);
-        }
 
-        // second send user one time password in email
-
-        var sessionTimeSpan = new TimeSpan(0, 30, 0);
-
-        var sessionId = Guid.NewGuid().ToString();
-
-        var claims = new Dictionary<string, string>();
-        claims["reset-password-session"] = sessionId;
-
-        var sessionIdToken = _jwt.GenerateJwt(sessionTimeSpan, claims);
-
-        Response.Cookies.Append("reset-password-session", sessionIdToken, Main.CookieConfig(sessionTimeSpan));
-
+        if (isFound is null) return new HttpResult()
+                            .RedirectTo("/auth/sing-up")
+                            .Massage($"this {data.Email} email dose not exist try sing-up")
+                            .IsOk(false)
+                            .StatusCode(404)
+                            .Get();
 
         string code = Main.RandomCode();
 
-        string sessionData = JsonSerializer.Serialize(new ForgetPasswordSession(code, isFound.Email));
+        var payload = new ForgetPasswordSession(code, isFound.Email);
 
-        // third create session and store the code in redis
-
-        await _cache.Redis.StringSetAsync(sessionId, sessionData, sessionTimeSpan);
+        await _auth.SetSessionAsync<ForgetPasswordSession>("reset-password-session", new TimeSpan(0, 30, 0), payload, HttpContext);
 
         await _email.resetPasswordEmail(isFound.Email, $"{isFound.FirstName} {isFound.LastName}", code);
 
-        return Redirect("/auth/reset-password");
+        return new HttpResult()
+                .StatusCode(200)
+                .IsOk(true)
+                .Massage("we have send to a 6 digits verification code")
+                .RedirectTo("/auth/reset-password")
+                .Get();
     }
 
 
     [HttpPost("reset-password")]
-    public async Task<IActionResult> ResetPassword([FromForm] ResetPasswordVM data)
+    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordVM data)
     {
-        if (!ModelState.IsValid) return View(data);
+        if (Main.TryGetModelErrorResult(ModelState, out var result)) return result!;
 
-        Request.Cookies.TryGetValue("reset-password-session", out var sessionIdToken);
-
-        Dictionary<string, string> payload;
-
-        try
-        {
-            payload = _jwt.VerifyJwt(sessionIdToken ?? "");
-        }
-        catch (Exception)
-        {
-            return SessionExpiredResetPassword();
-        }
+       var session = await  _auth.GetSessionAsync<ForgetPasswordSession>("reset-password-session", HttpContext);
 
 
-        var sessionId = payload["reset-password-session"]?.ToString();
+        if (session is null) return new HttpResult()
+                                .IsOk(false)
+                                .Massage("session expired please try again")
+                                .StatusCode(404)
+                                .RedirectTo("/auth/forget-password")
+                                .Get();
 
-        if (String.IsNullOrEmpty(sessionId)) return SessionExpiredResetPassword();
 
-        string? jsonSession = await _cache.Redis.StringGetAsync(sessionId);
+        if (session.Code != data.Code) return new HttpResult()
+                                .IsOk(false)
+                                .Massage("incorrect verification code. please try again")
+                                .StatusCode(400)
+                                .Get();
 
-        if (jsonSession is null) return SessionExpiredResetPassword();
+        var user = await _ctx.Users.FirstOrDefaultAsync(u => u.Email == session.Email);
 
-        var sessionData = JsonSerializer.Deserialize<ForgetPasswordSession>(jsonSession);
+        if (user is null) return new HttpResult()
+                                .IsOk(false)
+                                .Massage("this account dose not exist please try sing-up")
+                                .StatusCode(404)
+                                .RedirectTo("/auth/sing-up")
+                                .Get();
 
-        if (sessionData is null) return SessionExpiredResetPassword();
 
-        if (sessionData.Code != data.Code)
-        {
-            ViewData["Error"] = "incorrect code. please try again";
-            return View(data);
-        }
-
-        var user = await _ctx.Users.FirstOrDefaultAsync(u => u.Email == sessionData.Email);
-
-        if (user is null)
-        {
-            ViewData["Error"] = "Something Went wrong please try again";
-            return View(data);
-        }
-
-        await _cache.Redis.KeyDeleteAsync(sessionId);
+        await _auth.DeleteSessionAsync("reset-password-session", HttpContext);
 
         _crypto.Hash(data.NewPassword, out byte[] hash, out byte[] salt);
 
@@ -350,28 +306,18 @@ public class AuthController : Controller
 
         await _ctx.SaveChangesAsync();
 
-        return Redirect("/auth/login");
+        return new HttpResult()
+                    .IsOk(true)
+                    .Massage("successfully changed your password")
+                    .StatusCode(200)
+                    .RedirectTo("/auth/login")
+                    .Get();
     }
 
     [HttpGet("logout")]
     public IActionResult Logout()
     {
         Response.Cookies.Delete("token");
-        return Redirect("/");
-    }
-
-    public record SingUpSession(string Code, string FirstName, string LastName, string Email, string Password);
-    public record ForgetPasswordSession(string Code, string Email);
-
-    public IActionResult SessionExpired()
-    {
-        ViewData["Error"] = "session expired please try sign-up again";
-        return Redirect("/auth/sing-up");
-    }
-
-    public IActionResult SessionExpiredResetPassword()
-    {
-        ViewData["Error"] = "session expired please try again";
-        return View("Auth/ForgetPassword", new ForgetPasswordVM());
+        return new HttpResult().RedirectTo("/").Get();
     }
 }
