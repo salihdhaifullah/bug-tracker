@@ -1,7 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Buegee.Extensions.Attributes;
+namespace Buegee.Utils.Attributes;
 
 public class ApiRoute : RouteAttribute
 {

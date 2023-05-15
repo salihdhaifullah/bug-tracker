@@ -1,4 +1,4 @@
-namespace Buegee.Extensions.Attributes;
+namespace Buegee.Utils.Attributes;
 
 [AttributeUsage(AttributeTargets.Field)]
 public class StringValueAttribute : Attribute

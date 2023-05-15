@@ -1,6 +1,6 @@
-using Buegee.Extensions.Attributes;
+using Buegee.Utils.Attributes;
 
-namespace Buegee.Extensions.Enums;
+namespace Buegee.Utils.Enums;
 public enum ContentTypes
 {
     [StringValue("image/jpeg")]

@@ -1,7 +1,7 @@
 using System.Reflection;
-using Buegee.Extensions.Attributes;
+using Buegee.Utils.Attributes;
 
-namespace Buegee.Extensions.Utils;
+namespace Buegee.Utils.Extensions;
 
 public static class EnumExtensions
 {

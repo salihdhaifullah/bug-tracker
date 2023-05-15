@@ -4,15 +4,17 @@ namespace Buegee.Services.RedisCacheService;
 
 public class RedisCacheService : IRedisCacheService
 {
-    private readonly IDatabase Redis;
-    private readonly string? ConnectionString;
+    private readonly IDatabase _redis;
+    private readonly string? _connectionString;
 
     public RedisCacheService(IConfiguration config)
     {
-        ConnectionString = config.GetSection("Rides").GetValue<string>("ConnectionString");
-        if (String.IsNullOrEmpty(ConnectionString)) throw new Exception("Rides Connection String Are Not Configured");
-        Redis = ConnectionMultiplexer.Connect(ConnectionString).GetDatabase();
+        _connectionString = config.GetSection("Rides").GetValue<string>("ConnectionString");
+
+        if (String.IsNullOrEmpty(_connectionString)) throw new Exception("Rides Connection String Are Not Configured");
+
+        _redis = ConnectionMultiplexer.Connect(_connectionString).GetDatabase();
     }
 
-    IDatabase IRedisCacheService.Redis => Redis;
+    IDatabase IRedisCacheService.Redis => _redis;
 }

@@ -1,5 +1,4 @@
-using Buegee.Extensions.Data;
-using Buegee.Services;
+using Buegee.Data;
 using Buegee.Services.AuthService;
 using Buegee.Services.CryptoService;
 using Buegee.Services.EmailService;

@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Buegee.Extensions.Enums;
+using Buegee.Utils.Enums;
 
 namespace Buegee.Models.DB;
 

@@ -19,7 +19,7 @@ public class TicketDB
     */
     public string Status { get; set; }  = null!; // New, Active, In Progress, Resolved, Closed
     public DateTime CreatedAt { get; set; } = DateTime.Now;
-    public List<AttachmentDB> Attachments { get; set; } = null!;
+    public List<FileDB> Files { get; set; } = null!;
     public List<CommentDB> Comments { get; set; } = null!;
 
     [Required]

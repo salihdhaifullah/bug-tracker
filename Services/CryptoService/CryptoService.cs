@@ -12,10 +12,10 @@ public class CryptoService : ICryptoService
         salt = hmac.Key;
     }
 
-    public void Compar(string source, byte[] hash, byte[] salt, out bool IsMatch)
+    public void Compar(string source, byte[] hash, byte[] salt, out bool isMatch)
     {
         var hmac = new HMACSHA512(salt);
-        byte[] ComputeHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(source));
-        IsMatch = ComputeHash.SequenceEqual(hash);
+        byte[] computeHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(source));
+        isMatch = computeHash.SequenceEqual(hash);
     }
 }

@@ -1,7 +1,6 @@
-using Buegee.Controllers;
-using Buegee.Extensions.Classes;
-using Buegee.Extensions.Enums;
 using Buegee.Services.JWTService;
+using Buegee.Utils;
+using Buegee.Utils.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 
@@ -13,86 +12,65 @@ public class AuthService : IAuthService
 
     public AuthService(IJWTService jwt){ _jwt = jwt; }
 
-    public void LogIn(int Id, HttpContext ctx, Roles role = Roles.REPORTER)
+    public void LogIn(int id, HttpContext ctx, Roles role = Roles.REPORTER)
     {
         // a year
-        var Duration = new TimeSpan(365, 0, 0, 0);
+        var age = new TimeSpan(365, 0, 0, 0);
 
-        // config cookies
-        var cookieOptions = new CookieOptions()
-        {
-            IsEssential = true,
-            Secure = true,
-            HttpOnly = true,
-            SameSite = Microsoft.AspNetCore.Http.SameSiteMode.Strict,
-            MaxAge = Duration
-        };
-
-        // generate claims
-        var IdClaim = new Claim { Name = "id", Value = Id.ToString() };
-        var RoleClaim = new Claim { Name = "role", Value = role.ToString() };
-        var AgentClaim = new Claim { Name = "agent", Value = GetUserAgent(ctx) };
+        var claims = new Dictionary<string, string>();
+        claims["id"] = id.ToString();
+        claims["role"] = role.ToString();
+        claims["agent"] = GetUserAgent(ctx);
 
         // set auth cookie token
-        ctx.Response.Cookies.Append("auth", _jwt.GenerateJwt(Duration, new List<Claim> { IdClaim, RoleClaim, AgentClaim }), cookieOptions);
+        ctx.Response.Cookies.Append("auth", _jwt.GenerateJwt(age, claims), Main.CookieConfig(age));
     }
 
-    public IActionResult? CheckPermissions(HttpContext ctx, List<Roles> roles, out int? ID)
+    public IActionResult? CheckPermissions(HttpContext ctx, List<Roles> roles, out int? id)
     {
-        ID = null;
+        id = null;
 
-        var Unauthorized = new ObjectResult(new HTTPCustomResult(ResponseTypes.error, $"you need to login to do this action", "/auth/login").ToJson()) { StatusCode = StatusCodes.Status401Unauthorized };
+        var result = new HttpResult()
+                        .IsOk(false)
+                        .StatusCode(401)
+                        .Massage("you need to login to do this action");
 
         // is auth cookie found
-        if (!ctx.Request.Cookies.TryGetValue("auth", out var Token) || String.IsNullOrEmpty(Token))
-        {
-            return Unauthorized;
-        }
+        if (!ctx.Request.Cookies.TryGetValue("auth", out var token) || String.IsNullOrEmpty(token)) return result.Get();
 
         try
         {
             // if token un-valid VerifyJwt method will throw
-            var data = _jwt.VerifyJwt(Token);
-
+            var data = _jwt.VerifyJwt(token);
 
             // get id
-            if (!data.TryGetValue("id", out var IdStr) || String.IsNullOrEmpty(IdStr) || !int.TryParse(IdStr, out var Id))
-            {
-                return Unauthorized;
-            }
+            if (!data.TryGetValue("id", out var idStr) || String.IsNullOrEmpty(idStr) || !int.TryParse(idStr, out var userId)) return result.Get();
 
             // get agent
-            if (!data.TryGetValue("agent", out var agent) || String.IsNullOrEmpty(agent))
-            {
-                return Unauthorized;
-            }
+            if (!data.TryGetValue("agent", out var agent) || String.IsNullOrEmpty(agent)) return result.Get();
 
             // get role
-            if (!data.TryGetValue("role", out var roleStr) || !Enum.TryParse(roleStr, out Roles role))
-            {
-                return Unauthorized;
-            }
-
+            if (!data.TryGetValue("role", out var roleStr) || !Enum.TryParse(roleStr, out Roles role) )return result.Get();
 
             // check if user role match one of the list of roles allowed to do this action
-            if (!roles.Contains(role))
-            {
-                return new ObjectResult(new HTTPCustomResult(ResponseTypes.error, $"your not authorized to do this action", "/403").ToJson()) { StatusCode = StatusCodes.Status403Forbidden }; ;
-            }
+            if (!roles.Contains(role)) return result.Massage("you do not have the permissions to do this action")
+                            .StatusCode(403)
+                            .RedirectTo("/403")
+                            .Get();
 
             // invalidated user token if user agent changed
             if (agent != GetUserAgent(ctx))
             {
                 ctx.Response.Cookies.Delete("auth");
-                return Unauthorized;
+                return result.Get();
             }
 
-            ID = Id;
+            id = userId;
 
         }
         catch (Exception)
         {
-            return Unauthorized;
+            return result.Get();
         }
 
         // user are good

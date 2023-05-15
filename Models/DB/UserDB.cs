@@ -1,10 +1,9 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Buegee.Extensions.Enums;
+using Buegee.Utils.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace Buegee.Models.DB;
-
 
 [Table("users")]
 [Index(nameof(Email), IsUnique = true)]

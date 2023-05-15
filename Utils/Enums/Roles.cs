@@ -1,4 +1,4 @@
-namespace Buegee.Extensions.Enums;
+namespace Buegee.Utils.Enums;
 
 public enum Roles
 {

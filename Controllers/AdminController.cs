@@ -5,9 +5,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Buegee.Services.RedisCacheService;
 using Buegee.Services.CryptoService;
-using Buegee.Services;
-using Buegee.Extensions.Enums;
-using Buegee.Extensions.Attributes;
+using Buegee.Data;
+using Buegee.Utils.Attributes;
+using Buegee.Utils.Enums;
 
 namespace Buegee.Controllers;
 
@@ -34,6 +34,7 @@ public class AdminController : Controller
     public async Task<IActionResult> CreateProject()
     {
         var result = _auth.CheckPermissions(HttpContext, new List<Roles>{Roles.ADMIN}, out var ID);
+
         if(result is not null) return result;
 
         var projectMangers = await _ctx.Users
@@ -56,6 +57,7 @@ public class AdminController : Controller
     public async Task<IActionResult> MangeUsers([FromRoute] int page = 1)
     {
         var result = _auth.CheckPermissions(HttpContext, new List<Roles>{Roles.ADMIN}, out var ID);
+
         if(result is not null) return result;
 
         try
@@ -96,7 +98,7 @@ public class AdminController : Controller
         var result = _auth.CheckPermissions(HttpContext, new List<Roles>{Roles.ADMIN}, out var ID);
         if(result is not null) return result;
 
-        var Data = await _ctx.Users.Where(u => u.Id == userId)
+        var user = await _ctx.Users.Where(u => u.Id == userId)
             .Select(u => new ChangeRoleVM
             {
                 Email = u.Email,
@@ -107,13 +109,13 @@ public class AdminController : Controller
             })
             .FirstOrDefaultAsync();
 
-        if (Data is null) return NotFound();
+        if (user is null) return NotFound();
 
-        ViewBag.FirstName = Data.FirstName;
-        ViewBag.Email = Data.Email;
-        ViewBag.LastName = Data.LastName;
-        ViewBag.ImageId = Data.ImageId;
-        ViewBag.Role = Data.Role;
+        ViewBag.FirstName = user.FirstName;
+        ViewBag.Email = user.Email;
+        ViewBag.LastName = user.LastName;
+        ViewBag.ImageId = user.ImageId;
+        ViewBag.Role = user.Role;
         ViewBag.Id = userId;
 
         return View(new ChangeRoleVM.ChangeRoleVMDto() { NewRole = "" });
@@ -127,7 +129,7 @@ public class AdminController : Controller
 
         if (!ModelState.IsValid)
         {
-            var Data = await _ctx.Users.Where(u => u.Id == userId)
+            var user = await _ctx.Users.Where(u => u.Id == userId)
             .Select(u => new ChangeRoleVM
             {
                 Email = u.Email,
@@ -137,13 +139,13 @@ public class AdminController : Controller
                 ImageId = u.ImageId
             }).FirstOrDefaultAsync();
 
-            if (Data is null) return NotFound();
+            if (user is null) return NotFound();
 
-            ViewBag.FirstName = Data.FirstName;
-            ViewBag.Email = Data.Email;
-            ViewBag.LastName = Data.LastName;
-            ViewBag.Image = Data.ImageId;
-            ViewBag.Role = Data.Role;
+            ViewBag.FirstName = user.FirstName;
+            ViewBag.Email = user.Email;
+            ViewBag.LastName = user.LastName;
+            ViewBag.Image = user.ImageId;
+            ViewBag.Role = user.Role;
             ViewBag.Id = userId;
 
             return View(data);

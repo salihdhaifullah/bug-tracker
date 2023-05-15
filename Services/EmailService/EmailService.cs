@@ -3,94 +3,93 @@ using System.Net.Mail;
 using System.Text;
 
 namespace Buegee.Services.EmailService;
-// TODO use builder design pattern
 public class EmailService : IEmailService
 {
-    private readonly string? AppEmail;
-    private readonly string? AppPassword;
-    private SmtpClient smtpClient;
-    private readonly string verificationEmailHtml;
-    private readonly string resetPasswordHtml;
-    private readonly string RoleChangedHtml;
+    private readonly string? _appEmail;
+    private readonly string? _appPassword;
+    private SmtpClient _smtpClient;
+    private readonly string _verificationEmailHtml;
+    private readonly string _resetPasswordHtml;
+    private readonly string _roleChangedHtml;
 
     public EmailService(IConfiguration config)
     {
-        AppPassword = config.GetSection("EmailService").GetValue<string>("AppPassword");
-        AppEmail = config.GetSection("EmailService").GetValue<string>("AppEmail");
+        _appPassword = config.GetSection("EmailService").GetValue<string>("AppPassword");
+        _appEmail = config.GetSection("EmailService").GetValue<string>("AppEmail");
 
-        if (AppPassword is null || AppEmail is null)
+        if (_appPassword is null || _appEmail is null)
         {
             throw new Exception("email service is not configured");
         }
 
-        smtpClient = new SmtpClient("smtp.gmail.com", 587)
+        _smtpClient = new SmtpClient("smtp.gmail.com", 587)
         {
             EnableSsl = true,
-            Credentials = new NetworkCredential(AppEmail, AppPassword)
+            Credentials = new NetworkCredential(_appEmail, _appPassword)
         };
 
-        verificationEmailHtml = File.ReadAllText("./Emails/verification-email.html");
-        resetPasswordHtml = File.ReadAllText("./Emails/reset-password.html");
-        RoleChangedHtml = File.ReadAllText("./Emails/role-changed.html");
+        _verificationEmailHtml = File.ReadAllText("./Emails/verification-email.html");
+        _resetPasswordHtml = File.ReadAllText("./Emails/reset-password.html");
+        _roleChangedHtml = File.ReadAllText("./Emails/role-changed.html");
     }
 
     public Task sendVerificationEmail(string to, string name, string code)
     {
-        var BS = new StringBuilder(verificationEmailHtml);
-        BS.Replace("${name}", name);
-        BS.Replace("${code}", code);
+        var stringBuilder = new StringBuilder(_verificationEmailHtml);
+        stringBuilder.Replace("${name}", name);
+        stringBuilder.Replace("${code}", code);
 
         var massage = new MailMessage(
             from: "Team@Buegee.com",
             to: to,
             subject: "activate your account",
-            body: BS.ToString()
+            body: stringBuilder.ToString()
         );
 
         massage.IsBodyHtml = true;
         massage.Priority = MailPriority.High;
 
-        return smtpClient.SendMailAsync(massage);
+        return _smtpClient.SendMailAsync(massage);
     }
 
     public Task resetPasswordEmail(string to, string name, string code)
     {
-        var BS = new StringBuilder(resetPasswordHtml);
+        var stringBuilder = new StringBuilder(_resetPasswordHtml);
 
-        BS.Replace("${name}", name);
-        BS.Replace("${code}", code);
+        stringBuilder.Replace("${name}", name);
+        stringBuilder.Replace("${code}", code);
 
         var massage = new MailMessage(
             from: "Team@Buegee.com",
             to: to,
             subject: "reset your password",
-            body: BS.ToString()
+            body: stringBuilder.ToString()
         );
 
         massage.IsBodyHtml = true;
         massage.Priority = MailPriority.High;
 
-        return smtpClient.SendMailAsync(massage);
+        return _smtpClient.SendMailAsync(massage);
     }
 
     public Task roleChangedEmail(string to, string name, string role1, string role2)
     {
-        var BS = new StringBuilder(resetPasswordHtml);
+        var stringBuilder = new StringBuilder(_roleChangedHtml);
 
-        BS.Replace("${name}", name);
-        BS.Replace("${role1}", role1);
-        BS.Replace("${role2}", role2);
+        stringBuilder.Replace("${name}", name);
+        stringBuilder.Replace("${role1}", role1);
+        stringBuilder.Replace("${role2}", role2);
 
         var massage = new MailMessage(
             from: "Team@Buegee.com",
             to: to,
             subject: "your role changed",
-            body: BS.ToString()
+            body: stringBuilder.ToString()
         );
 
         massage.IsBodyHtml = true;
         massage.Priority = MailPriority.High;
 
-        return smtpClient.SendMailAsync(massage);
+        return _smtpClient.SendMailAsync(massage);
     }
 }

@@ -1,11 +1,11 @@
 using System.Text.Json;
-using Buegee.Extensions.Enums;
 using Buegee.Models.DB;
-using Buegee.Services;
+using Buegee.Data;
 using Buegee.Services.CryptoService;
+using Buegee.Utils.Enums;
 using Microsoft.EntityFrameworkCore;
 
-namespace Buegee.Extensions.Data;
+namespace Buegee.Data;
 
 public class Seed
 {
@@ -27,10 +27,10 @@ public class Seed
         _ctx = ctx;
         _crypto = crypto;
 
-        var Json = File.ReadAllText("data.json");
-        if (Json is null) throw new Exception("data.json is not found");
+        var json = File.ReadAllText("data.json");
+        if (json is null) throw new Exception("data.json is not found");
 
-        var isData = JsonSerializer.Deserialize<Data>(Json);
+        var isData = JsonSerializer.Deserialize<Data>(json);
 
         if (isData is not null) _data = isData;
         else _data = new Data(new List<User>());

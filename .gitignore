@@ -3,7 +3,8 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/main/VisualStudio.gitignore
 
-
+data.json
+DROP.sql
 .env
 appsettings.json
 .vscode
