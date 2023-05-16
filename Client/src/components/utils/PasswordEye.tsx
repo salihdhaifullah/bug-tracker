@@ -6,10 +6,10 @@ const PasswordEye = ({setType, type}: {setType: (type: string) => void, type: st
     <div className="absolute text-gray-500 text-bold text-3xl right-1 top-[15%]">
         {type === "password"
         ? <BsFillEyeFill
-                        className="rounded-md  hover:bg-gray-300 cursor-pointer p-1"
+                        className="rounded-md  hover:bg-slate-200 cursor-pointer p-1"
                         onClick={() => setType("text")}/>
         : <BsFillEyeSlashFill
-                        className="rounded-md  hover:bg-gray-300 cursor-pointer p-1"
+                        className="rounded-md  hover:bg-slate-200 cursor-pointer p-1"
                         onClick={() => setType("password")} />
         }
     </div>

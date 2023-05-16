@@ -10,7 +10,7 @@ const Layout = () => {
       <Header />
       <Notifications />
       <main>
-      <Outlet />
+        <Outlet />
       </main>
       <Footer />
     </Provider>

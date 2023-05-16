@@ -1,4 +1,4 @@
-import { Dispatch, ReactElement, createContext, useContext, useReducer } from 'react';
+import { Dispatch, ReactElement, createContext, useContext, useEffect, useReducer } from 'react';
 
 type IUserAction = {
     type: "add" | "logout";
@@ -11,14 +11,11 @@ export interface IUser {
     imageId: number;
     email: string;
     fullName: string;
-    role: "ADMIN" | "DEVELOPER" | "PROJECT_MANGER" | "REPORTER";
+    role: "developer" | "admin" | "project_manger" | "reporter";
 }
 
 
-const isUser = localStorage.getItem("user");
-const user = isUser ? JSON.parse(isUser) as IUser : null;
-
-const UserContext = createContext<IUser | null>(user);
+const UserContext = createContext<IUser | null>(null);
 const UserDispatchContext = createContext<Dispatch<IUserAction>>(() => null);
 
 export function useUser() {
@@ -32,14 +29,12 @@ export function useUserDispatch() {
 function userReducer(user: IUser | null, action: IUserAction): IUser | null {
     switch (action.type) {
         case 'add': {
-            console.log(action.payload);
+            console.log(action.payload)
             if (!action.payload) return user;
             user = action.payload;
-            localStorage.setItem("user", JSON.stringify(user))
             return user;
         }
         case 'logout': {
-            localStorage.clear();
             user = null;
             return user;
         }
@@ -50,8 +45,11 @@ function userReducer(user: IUser | null, action: IUserAction): IUser | null {
 }
 
 export default function UserProvider({ children }: { children: ReactElement }) {
-    const [User, dispatchUser] = useReducer(userReducer, user);
+    const [User, dispatchUser] = useReducer(userReducer, null);
 
+    useEffect(() => {
+        console.log("User from the Provider", User)
+    }, [User])
     return (
         <UserContext.Provider value={User}>
             <UserDispatchContext.Provider value={dispatchUser}>

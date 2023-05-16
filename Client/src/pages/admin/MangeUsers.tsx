@@ -47,7 +47,7 @@ const MangeUsers = () => {
                 return (
                     <li>
                         <a href="/admin/mange-users/@i"
-                            className="px-3 py-2  leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700">@i</a>
+                            className="px-3 py-2  leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-slate-200 hover:text-gray-700">@i</a>
                     </li>
                 )
             }
@@ -94,7 +94,7 @@ const MangeUsers = () => {
                     <li>
                         {CurrentPage != 1 ? (
                             <a href="/admin/mange-users/@(Model.CurrentPage - 1)"
-                            className="px-3 py-2 ml-0 leading-tight text-gray-500 bg-white border border-gray-300 rounded-l-lg hover:bg-gray-100 hover:text-gray-700">Previous</a>
+                            className="px-3 py-2 ml-0 leading-tight text-gray-500 bg-white border border-gray-300 rounded-l-lg hover:bg-slate-200 hover:text-gray-700">Previous</a>
                         ) : (
                             <div className="px-3 py-2 ml-0 leading-tight text-gray-500 bg-white border border-gray-300 rounded-l-lg">Previous
                             </div>
@@ -107,7 +107,7 @@ const MangeUsers = () => {
                     <li>
                         {CurrentPage != Pages ? (
                             <a href="/admin/mange-users/@(Model.CurrentPage + 1)"
-                                className="px-3 py-2 leading-tight text-gray-500 bg-white border border-gray-300 rounded-r-lg hover:bg-gray-100 hover:text-gray-700">Next</a>
+                                className="px-3 py-2 leading-tight text-gray-500 bg-white border border-gray-300 rounded-r-lg hover:bg-slate-200 hover:text-gray-700">Next</a>
                         ) : (
                             <div className="px-3 py-2 leading-tight  text-gray-500 bg-white border border-gray-300 rounded-r-lg">Next</div>
 

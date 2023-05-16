@@ -38,7 +38,7 @@ const ChangeRole = () => {
                                 {["PROJECT_MANGER", "REPORTER", "DEVELOPER"].map((role, index) => (
                                     <option
                                         key={index}
-                                        className="bg-white hover:bg-indigo-200 rounded-md hover:font-extrabold text-gray-600 p-1 mb-1 text-base cursor-pointer"
+                                        className="bg-white hover:bg-slate-200 rounded-md hover:font-extrabold text-gray-600 p-1 mb-1 text-base cursor-pointer"
                                         value={role}>{role}</option>
                                 ))}
 
