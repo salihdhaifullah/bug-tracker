@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Buegee.Models.VM;
 using Buegee.Services.RedisCacheService;
-using System.Text.Json;
 using Buegee.Services.EmailService;
 using Buegee.Services.CryptoService;
 using Buegee.Services.JWTService;
@@ -20,7 +19,6 @@ namespace Buegee.Controllers;
 public class AuthController : Controller
 {
     private readonly DataContext _ctx;
-    private readonly HttpClient _client;
     private readonly ICryptoService _crypto;
     private readonly IJWTService _jwt;
     private readonly IEmailService _email;
@@ -38,7 +36,6 @@ public class AuthController : Controller
      IAuthService auth)
     {
         _ctx = ctx;
-        _client = new HttpClient();
         _crypto = crypto;
         _jwt = jwt;
         _email = email;
@@ -186,11 +183,17 @@ public class AuthController : Controller
 
         _crypto.Hash(session.Password, out byte[] hash, out byte[] salt);
 
-        var imageBytes = await _client.GetByteArrayAsync($"https://api.dicebear.com/6.x/identicon/svg?seed={session.FirstName}-{session.LastName}-{session.Email}");
+
+        byte[] imageBytes;
+
+        using (var client = new HttpClient())
+        {
+            imageBytes = await client.GetByteArrayAsync($"https://api.dicebear.com/6.x/identicon/svg?seed={session.FirstName}-{session.LastName}-{session.Email}");
+        }
 
         var image = new FileDB()
         {
-            ContentType = ContentTypes.SVG,
+            ContentType = ContentTypes.svg,
             Data = imageBytes,
             IsPrivate = false,
         };
@@ -203,8 +206,8 @@ public class AuthController : Controller
             PasswordHash = hash,
             PasswordSalt = salt,
             Role = session.Email == _adminEmail
-                    ? Roles.ADMIN
-                    : Roles.REPORTER,
+                    ? Roles.admin
+                    : Roles.reporter,
             ImageId = image.Id,
             Image = image,
         });
@@ -271,7 +274,7 @@ public class AuthController : Controller
     {
         if (Main.TryGetModelErrorResult(ModelState, out var result)) return result!;
 
-       var session = await  _auth.GetSessionAsync<ForgetPasswordSession>("reset-password-session", HttpContext);
+        var session = await _auth.GetSessionAsync<ForgetPasswordSession>("reset-password-session", HttpContext);
 
 
         if (session is null) return new HttpResult()
@@ -319,6 +322,6 @@ public class AuthController : Controller
     public IActionResult Logout()
     {
         Response.Cookies.Delete("token");
-        return new HttpResult().RedirectTo("/").Get();
+        return new HttpResult().RedirectTo("/").IsOk(true).Message("logged out successfully").Get();
     }
 }

@@ -18,7 +18,7 @@ interface IPayload<T> {
 export default function useFetchApi<T>(method: "POST" | "PATCH" | "GET" | "DELETE", url: string, deps: DependencyList, body?: unknown): [payload: IPayload<T>, call: () => void] {
 
     const dispatchNotification = useNotificationDispatch();
-
+    const id = useId();
     const [result, setResult] = useState<T | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
@@ -48,7 +48,7 @@ export default function useFetchApi<T>(method: "POST" | "PATCH" | "GET" | "DELET
             if (response?.message) dispatchNotification({
                 type: "add",
                 payload: {
-                    id: useId(),
+                    id,
                     type: response.type,
                     message: response.message,
                 }
@@ -57,7 +57,6 @@ export default function useFetchApi<T>(method: "POST" | "PATCH" | "GET" | "DELET
             if(response?.redirectTo) navigate(response?.redirectTo);
 
         } catch (err) {
-            if (err instanceof Error && err.message.includes("500")) navigate("/500");
             console.log(err)
             setIsLoading(false);
         }

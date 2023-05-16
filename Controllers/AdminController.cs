@@ -33,12 +33,12 @@ public class AdminController : Controller
     [HttpGet("create-project")]
     public async Task<IActionResult> CreateProject()
     {
-        var result = _auth.CheckPermissions(HttpContext, new List<Roles>{Roles.ADMIN}, out var ID);
+        var result = _auth.CheckPermissions(HttpContext, new List<Roles>{Roles.admin}, out var ID);
 
         if(result is not null) return result;
 
         var projectMangers = await _ctx.Users
-            .Where(u => u.Role == Roles.PROJECT_MANGER)
+            .Where(u => u.Role == Roles.project_manger)
             .Select(u => new
             {
                 Id = u.Id,
@@ -56,17 +56,17 @@ public class AdminController : Controller
     [HttpGet("mange-users/{page?}")]
     public async Task<IActionResult> MangeUsers([FromRoute] int page = 1)
     {
-        var result = _auth.CheckPermissions(HttpContext, new List<Roles>{Roles.ADMIN}, out var ID);
+        var result = _auth.CheckPermissions(HttpContext, new List<Roles>{Roles.admin}, out var ID);
 
         if(result is not null) return result;
 
         try
         {
-        var usersCount = await _ctx.Users.Where(u => u.Role != Roles.ADMIN).CountAsync();
+        var usersCount = await _ctx.Users.Where(u => u.Role != Roles.admin).CountAsync();
         var pages = Math.Ceiling((double)usersCount / 10);
 
         var users = await _ctx.Users
-            .Where(u => u.Role != Roles.ADMIN)
+            .Where(u => u.Role != Roles.admin)
             .OrderBy(u => u.CreatedAt)
             .Select(u => new MangeUsersVM.User
             {
@@ -95,7 +95,7 @@ public class AdminController : Controller
     [HttpGet("change-role/{userId}")]
     public async Task<IActionResult> ChangeRole([FromRoute] int userId)
     {
-        var result = _auth.CheckPermissions(HttpContext, new List<Roles>{Roles.ADMIN}, out var ID);
+        var result = _auth.CheckPermissions(HttpContext, new List<Roles>{Roles.admin}, out var ID);
         if(result is not null) return result;
 
         var user = await _ctx.Users.Where(u => u.Id == userId)
@@ -124,7 +124,7 @@ public class AdminController : Controller
     [HttpPost("change-role/{userId}")]
     public async Task<IActionResult> ChangeRole([FromRoute] int userId, [FromForm] ChangeRoleVM.ChangeRoleVMDto data)
     {
-        var result = _auth.CheckPermissions(HttpContext, new List<Roles>{Roles.ADMIN}, out var ID);
+        var result = _auth.CheckPermissions(HttpContext, new List<Roles>{Roles.admin}, out var ID);
         if(result is not null) return result;
 
         if (!ModelState.IsValid)

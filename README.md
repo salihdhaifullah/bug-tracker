@@ -14,3 +14,15 @@ docker run -it --rm --entrypoint /bin/sh buegee
 ```sh
  docker run -d -p 5018:5018 buegee
 ```
+
+
+## to make first migrations
+
+```sh
+dotnet ef migrations add InitialCreate
+```
+
+## and then run
+```sh
+dotnet ef database update
+```

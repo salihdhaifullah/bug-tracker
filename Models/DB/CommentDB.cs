@@ -3,18 +3,23 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Buegee.Models.DB;
 
+[Table("comment")]
 public class CommentDB
 {
-    [Key]
+    [Key, Column("id")]
     public int Id { get; set; }
-    public string Html { get; set; } = null!;
-    public List<byte[]> images { get; set; } = null!;
-    [Required]
-    [ForeignKey("TicketId")]
+
+    [Required, Column("markdown"), StringLength(500)]
+    public string Markdown { get; set; } = null!;
+
+    [Column("files")]
+    public List<FileDB> Files { get; set; } = null!;
+
+    [Required, ForeignKey("Ticket"), Column("ticket")]
     public int TicketId { get; set; }
-    public virtual TicketDB Ticket { get; set; } = null!;
-    [Required]
-    [ForeignKey("UserId")]
+    public TicketDB Ticket { get; set; } = null!;
+
+    [Required, ForeignKey("User"), Column("user")]
     public int UserId { get; set; }
-    public virtual UserDB User { get; set; } = null!;
+    public UserDB User { get; set; } = null!;
 }

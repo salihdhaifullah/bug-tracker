@@ -7,7 +7,7 @@ namespace Buegee.Models.DB;
 [Table("files")]
 public class FileDB
 {
-    [Key, Column("id"), DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    [Key, Column("id")]
     public int Id { get; set; }
 
     [Required, Column("data")]
@@ -17,8 +17,8 @@ public class FileDB
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     [Column("is_private")]
-    public bool IsPrivate { get; set; } = true;
+    public bool IsPrivate { get; set; } = false;
 
     [Column("content_type"), EnumDataType(typeof(ContentTypes))]
-    public ContentTypes ContentType { get; set; } = ContentTypes.TEXT;
+    public ContentTypes ContentType { get; set; } = ContentTypes.text;
 }

@@ -19,7 +19,7 @@ public class AuthService : IAuthService
         _cache = cache;
     }
 
-    public void LogIn(int id, HttpContext ctx, Roles role = Roles.REPORTER)
+    public void LogIn(int id, HttpContext ctx, Roles role = Roles.reporter)
     {
         // a year
         var age = new TimeSpan(365, 0, 0, 0);
@@ -101,9 +101,7 @@ public class AuthService : IAuthService
 
         if (jsonSession is null) return null;
 
-        var sessionData = JsonSerializer.Deserialize<T>(jsonSession);
-
-        return sessionData;
+        return JsonSerializer.Deserialize<T>(jsonSession);
     }
 
     public async Task DeleteSessionAsync(string sessionName, HttpContext ctx)

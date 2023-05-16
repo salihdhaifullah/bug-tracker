@@ -4,11 +4,11 @@ namespace Buegee.Utils.Enums;
 public enum ContentTypes
 {
     [StringValue("image/jpeg")]
-    JPEG,
+    jpeg,
     [StringValue("image/png")]
-    PNG,
+    png,
     [StringValue("image/svg+xml")]
-    SVG,
+    svg,
     [StringValue("text/plain")]
-    TEXT,
+    text,
 }

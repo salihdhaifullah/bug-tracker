@@ -9,6 +9,7 @@ import AccountVerification from "./pages/auth/AccountVerification";
 import InternalServerError from "./pages/errors/InternalServerError";
 import Forbidden from "./pages/errors/Forbidden";
 import Unauthorized from "./pages/errors/Unauthorized";
+import Profile from "./pages/Profile";
 
 import { createBrowserRouter } from "react-router-dom";
 
@@ -17,6 +18,7 @@ const router = createBrowserRouter([{
     Component: Layout,
     children: [
         { path: "/", Component: Home },
+        { path: "/profile", Component: Profile },
         { path: "auth/login", Component: Login },
         { path: "auth/sing-up", Component: SingUp },
         { path: "auth/reset-password", Component: ResetPassword },

@@ -1,6 +1,5 @@
 using System.Text.Json;
 using Buegee.Models.DB;
-using Buegee.Data;
 using Buegee.Services.CryptoService;
 using Buegee.Utils.Enums;
 using Microsoft.EntityFrameworkCore;
@@ -59,13 +58,13 @@ public class Seed
             var isParsed = Enum.TryParse(item.Role, out Roles userRole);
 
             byte[] imageBytes;
-            var Type = ContentTypes.JPEG;
+            var Type = ContentTypes.jpeg;
 
             if (item.Image is not null) {
                 imageBytes = await _client.GetByteArrayAsync(item.Image);
             } else {
                 imageBytes = await _client.GetByteArrayAsync($"https://api.dicebear.com/6.x/identicon/svg?seed={item.FirstName}-{item.LastName}-{item.Email}");
-                Type =  ContentTypes.SVG;
+                Type =  ContentTypes.svg;
             }
 
             var image = new FileDB()
@@ -82,7 +81,7 @@ public class Seed
                 Email = item.Email,
                 PasswordHash = hash,
                 PasswordSalt = salt,
-                Role = isParsed ? userRole : Roles.REPORTER,
+                Role = isParsed ? userRole : Roles.reporter,
                 ImageId = image.Id,
                 Image = image,
             };

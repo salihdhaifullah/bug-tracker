@@ -10,6 +10,11 @@ public class DataContext : DbContext
 
     public DbSet<UserDB> Users { get; set; } = null!;
     public DbSet<FileDB> Files { get; set; } = null!;
+    public DbSet<ProjectDB> Projects { get; set; } = null!;
+    public DbSet<TicketDB> Tickets { get; set; } = null!;
+    public DbSet<CommentDB> Comments { get; set; } = null!;
+
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         var isFound = _configuration.GetSection("ConnectionStrings").GetValue<string>("DefaultConnection");

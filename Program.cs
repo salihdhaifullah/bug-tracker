@@ -20,10 +20,12 @@ var app = builder.Build();
 
 if (app.Environment.IsDevelopment() && args.Contains("seed"))
 {
-    await new Seed(
-            (DataContext)app.Services.GetService(typeof(DataContext))!,
-            (ICryptoService)app.Services.GetService(typeof(ICryptoService))!
-            ).SeedAsync();
+    using (var scope = app.Services.CreateScope())
+    {
+        var dataContext = scope.ServiceProvider.GetRequiredService<DataContext>();
+        var cryptoService = scope.ServiceProvider.GetRequiredService<ICryptoService>();
+        await new Seed(dataContext, cryptoService).SeedAsync();
+    }
 }
 
 app.UseRouting();
