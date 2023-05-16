@@ -5,7 +5,7 @@ import { RiLockPasswordFill } from "react-icons/ri";
 import useFetchApi from "../../utils/hooks/useFetchApi";
 import PasswordEye from "../../components/utils/PasswordEye";
 import CircleProgress from "../../components/utils/CircleProgress";
-import { IUser, useUserDispatch } from "../../utils/context";
+import { IUser, useUserDispatch } from "../../utils/context/user";
 import { Link } from "react-router-dom";
 
 const Login = () => {

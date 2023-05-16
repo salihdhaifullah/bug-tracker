@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom"
-import { useUser } from "../../utils/context"
+import { useUser } from "../../utils/context/user"
 
 const Header = () => {
   const user = useUser();

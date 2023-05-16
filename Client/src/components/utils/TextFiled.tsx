@@ -1,5 +1,4 @@
-import { ReactNode, useEffect, useRef, useState } from "react";
-import NewId from "../../utils/NewId";
+import { ReactNode, useEffect, useId, useState } from "react";
 import { IconType } from "react-icons";
 
 const LABEL_FOCUS = "bottom-[95%] left-[12%] text-sm text-secondary";
@@ -24,7 +23,7 @@ interface TextFiledProps {
 
 
 const TextFiled = (props: TextFiledProps) => {
-    const {current: Id} = useRef(NewId());
+    const Id = useId();
     const [isFocus, setIsFocus] = useState(false);
     const [isError, setIsError] = useState(false);
     const [changing, setChanging] = useState(false);
@@ -88,3 +87,4 @@ const TextFiled = (props: TextFiledProps) => {
 }
 
 export default TextFiled;
+

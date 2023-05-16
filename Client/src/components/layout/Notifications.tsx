@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { INotification, useNotification, useNotificationDispatch } from "../../utils/context";
+import { INotification, useNotification, useNotificationDispatch } from "../../utils/context/notification";
 import { FaTimes, FaCheck } from 'react-icons/fa';
 
 const Notifications = () => {

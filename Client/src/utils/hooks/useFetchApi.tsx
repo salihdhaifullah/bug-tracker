@@ -1,7 +1,6 @@
-import { useState, useCallback, DependencyList } from 'react';
+import { useState, useCallback, DependencyList, useId } from 'react';
 import { useNavigate } from 'react-router-dom';
-import NewId from '../NewId';
-import { useNotificationDispatch } from '../context';
+import { useNotificationDispatch } from '../context/notification';
 
 
 interface ICustomResult<T> {
@@ -49,7 +48,7 @@ export default function useFetchApi<T>(method: "POST" | "PATCH" | "GET" | "DELET
             if (response?.message) dispatchNotification({
                 type: "add",
                 payload: {
-                    id: NewId(),
+                    id: useId(),
                     type: response.type,
                     message: response.message,
                 }
