@@ -1,4 +1,4 @@
-import { Dispatch, ReactElement, createContext, useContext, useEffect, useReducer } from 'react';
+import { Dispatch, ReactElement, createContext, useContext, useReducer } from 'react';
 
 type IUserAction = {
     type: "add" | "logout";
@@ -29,7 +29,6 @@ export function useUserDispatch() {
 function userReducer(user: IUser | null, action: IUserAction): IUser | null {
     switch (action.type) {
         case 'add': {
-            console.log(action.payload)
             if (!action.payload) return user;
             user = action.payload;
             return user;
@@ -47,9 +46,6 @@ function userReducer(user: IUser | null, action: IUserAction): IUser | null {
 export default function UserProvider({ children }: { children: ReactElement }) {
     const [User, dispatchUser] = useReducer(userReducer, null);
 
-    useEffect(() => {
-        console.log("User from the Provider", User)
-    }, [User])
     return (
         <UserContext.Provider value={User}>
             <UserDispatchContext.Provider value={dispatchUser}>

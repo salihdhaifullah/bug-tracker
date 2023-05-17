@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useId, useState } from "react";
+import { ChangeEventHandler, HTMLProps, ReactNode, useEffect, useId, useState } from "react";
 import { IconType } from "react-icons";
 
 const LABEL_FOCUS = "bottom-[95%] left-[12%] text-sm text-secondary";
@@ -11,14 +11,16 @@ export interface IValidate {
 }
 
 interface TextFiledProps {
-    onChange: React.ChangeEventHandler<HTMLInputElement>;
-    value: string
+    onChange: ChangeEventHandler<HTMLInputElement>;
     label: string
     setIsValid: (bool: boolean) => void;
-    type?: React.HTMLInputTypeAttribute
     validation?: IValidate[]
     icon?: IconType
+    value: string
     InElement?: ReactNode
+    inputProps?: HTMLProps<HTMLInputElement>
+    onFocus?: () => void
+    onBlur?: () => void
 }
 
 
@@ -35,6 +37,19 @@ const TextFiled = (props: TextFiledProps) => {
         else setLabelClassName(`absolute z-10 font-extralight transition-all ease-in-out  ${isFocus ? LABEL_FOCUS : LABEL}`);
     }, [isFocus, changing])
 
+    useEffect(() => {
+        if (props.value) setLabelClassName("sr-only");
+    }, [props.value])
+
+    const onFocus = () => {
+        setIsFocus(true)
+        if (props?.onFocus) props.onFocus();
+    }
+
+    const onBlur= () => {
+        setIsFocus(false);
+        if (props?.onBlur) props.onBlur();
+    }
 
     const handelChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         props.onChange(e)
@@ -72,12 +87,12 @@ const TextFiled = (props: TextFiledProps) => {
                 {!props?.icon ? null : <props.icon className="text-gray-600 text-xl font-bold"/>}
                 {!props?.InElement ? null : props.InElement}
                 <input
+                    {...props.inputProps}
                     className={`p-2 border h-fit rounded-sm w-full ${isError ? "border-red-500 hover:border-red-700 focus:outline-red-600" : "border-gray-400 hover:border-gray-900 focus:outline-secondary"} `}
                     id={Id}
-                    type={props?.type}
                     value={props?.value}
-                    onFocus={() => setIsFocus(true)}
-                    onBlur={() => setIsFocus(false)}
+                    onFocus={onFocus}
+                    onBlur={onBlur}
                     onChange={handelChange}
                 />
             </div>

@@ -2,6 +2,7 @@ using Buegee.Data;
 using Buegee.Services.AuthService;
 using Buegee.Utils;
 using Buegee.Utils.Attributes;
+using Buegee.Utils.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,7 +20,7 @@ public class UserController : Controller {
 
 
     [HttpGet("how-am-i")]
-    public async Task<IActionResult> getUserByToken() {
+    public async Task<IActionResult> GetUserByToken() {
         if (!_auth.TryGetUser(HttpContext, out var user) || user is null) return new HttpResult().IsOk(false).StatusCode(401).Get();
 
         var isFound = await _ctx.Users
@@ -43,5 +44,26 @@ public class UserController : Controller {
                 .StatusCode(200)
                 .Body(isFound)
                 .Get();
+    }
+
+    [HttpGet("project-mangers")]
+    public async Task<IActionResult> ProjectMangers()
+    {
+        Console.WriteLine("RUNNING api/user/project-mangers");
+
+        var result = _auth.CheckPermissions(HttpContext, new List<Roles>{Roles.admin});
+
+        if(result is not null) return result;
+
+        var projectMangers = await _ctx.Users
+            .Where(u => u.Role == Roles.project_manger)
+            .Select(u => new {
+                id = u.Id,
+                fullName = $"{u.FirstName} {u.LastName}"
+            })
+            .ToListAsync();
+
+
+        return new HttpResult().IsOk(true).StatusCode(200).Body(projectMangers).Get();
     }
 }

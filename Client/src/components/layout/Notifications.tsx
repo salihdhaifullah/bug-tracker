@@ -6,7 +6,7 @@ const Notifications = () => {
     const notifications = useNotification();
 
     return (
-        <div className="flex flex-col ease-in-out transition-all gap-2 justify-center items-center fixed right-10 top-10">
+        <div className="flex flex-col ease-in-out transition-all z-[100] gap-2 justify-center items-center fixed right-10 top-10">
             {notifications.map((notification) => (
                 <Notification notification={notification} key={notification.id} />
             ))}

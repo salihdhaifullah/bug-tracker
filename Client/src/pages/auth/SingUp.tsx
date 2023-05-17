@@ -94,7 +94,7 @@ const SingUp = () => {
             ]}
             icon={RiLockPasswordFill}
             value={password}
-            type={passwordType}
+            inputProps={{ type: passwordType }}
             onChange={(e) => setPassword(e.target.value)}
             label="password"
             InElement={<PasswordEye type={passwordType} setType={setPasswordType} />}

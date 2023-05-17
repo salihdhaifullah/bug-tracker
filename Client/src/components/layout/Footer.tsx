@@ -1,6 +1,6 @@
 const Footer = () => {
   return (
-    <footer>&copy; 2023 - Buegee</footer>
+    <footer>&copy; {new Date().getFullYear()} - Buegee</footer>
   )
 }
 

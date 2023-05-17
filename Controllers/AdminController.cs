@@ -8,6 +8,7 @@ using Buegee.Services.CryptoService;
 using Buegee.Data;
 using Buegee.Utils.Attributes;
 using Buegee.Utils.Enums;
+using Buegee.Utils;
 
 namespace Buegee.Controllers;
 
@@ -28,28 +29,6 @@ public class AdminController : Controller
         _email = email;
         _cache = cache;
         _crypto = crypto;
-    }
-
-    [HttpGet("create-project")]
-    public async Task<IActionResult> CreateProject()
-    {
-        var result = _auth.CheckPermissions(HttpContext, new List<Roles>{Roles.admin}, out var ID);
-
-        if(result is not null) return result;
-
-        var projectMangers = await _ctx.Users
-            .Where(u => u.Role == Roles.project_manger)
-            .Select(u => new
-            {
-                Id = u.Id,
-                Email = u.Email,
-                FirstName = u.FirstName,
-                LastName = u.LastName
-            })
-            .ToListAsync();
-
-        ViewData["data"] = new string[] { "you", "Mom", "Cat", "Dog", "Monkey", "Banana" };
-        return View();
     }
 
 

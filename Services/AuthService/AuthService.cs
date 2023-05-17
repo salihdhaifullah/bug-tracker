@@ -102,6 +102,38 @@ public class AuthService : IAuthService
         return null;
     }
 
+    public IActionResult? CheckPermissions(HttpContext ctx, List<Roles> roles)
+    {
+
+        if (!TryGetUser(ctx, out User? user)) return new HttpResult()
+                        .IsOk(false)
+                        .StatusCode(401)
+                        .Message("you need to login to do this action")
+                        .Get();
+
+        // invalidated user token if user agent changed
+        if (user?.Agent != GetUserAgent(ctx))
+        {
+            ctx.Response.Cookies.Delete("auth");
+            return new HttpResult()
+                        .IsOk(false)
+                        .StatusCode(401)
+                        .Message("you need to login to do this action")
+                        .Get();
+        }
+
+        // check if user role match one of the list of roles allowed to do this action
+        if (!roles.Contains(user.Role)) return new HttpResult()
+                                    .Message("you do not have the permissions to do this action")
+                                    .IsOk(false)
+                                    .StatusCode(403)
+                                    .RedirectTo("/403")
+                                    .Get();
+
+        // user is good
+        return null;
+    }
+
     public async Task SetSessionAsync<T>(string sessionName, TimeSpan sessionTimeSpan, T payload, HttpContext ctx)
     {
         var sessionId = Guid.NewGuid().ToString();
