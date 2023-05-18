@@ -2,10 +2,10 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Buegee.Utils.Enums;
 
-namespace Buegee.Models.DB;
+namespace Buegee.Models;
 
 [Table("files")]
-public class FileDB
+public class Document
 {
     [Key, Column("id")]
     public int Id { get; set; }

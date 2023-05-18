@@ -2,12 +2,14 @@ using System.Text.Json;
 using Buegee.Services.JWTService;
 using Buegee.Services.RedisCacheService;
 using Buegee.Utils;
-using Buegee.Utils.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 
+using static Buegee.Utils.Utils;
+
 namespace Buegee.Services.AuthService;
-    public record User(int Id, string Agent, Roles Role);
+
+public record Auth(int Id, string Agent);
 
 public class AuthService : IAuthService
 {
@@ -20,22 +22,21 @@ public class AuthService : IAuthService
         _cache = cache;
     }
 
-    public void LogIn(int id, HttpContext ctx, Roles role = Roles.reporter)
+    public void LogIn(int id, HttpContext ctx)
     {
         // a year
         var age = new TimeSpan(365, 0, 0, 0);
 
         var claims = new Dictionary<string, string>();
         claims["id"] = id.ToString();
-        claims["role"] = role.ToString();
         claims["agent"] = GetUserAgent(ctx);
 
         // set auth cookie token
-        ctx.Response.Cookies.Append("auth", _jwt.GenerateJwt(age, claims), Main.CookieConfig(age));
+        ctx.Response.Cookies.Append("auth", _jwt.GenerateJwt(age, claims), CookieConfig(age));
     }
 
 
-    public bool TryGetUser(HttpContext ctx, out User? user)
+    public bool TryGetUser(HttpContext ctx, out Auth? user)
     {
         user = null;
 
@@ -53,10 +54,8 @@ public class AuthService : IAuthService
             // get agent
             if (!data.TryGetValue("agent", out var agent) || String.IsNullOrEmpty(agent)) return false;
 
-            // get role
-            if (!data.TryGetValue("role", out var roleStr) || !Enum.TryParse(roleStr, out Roles role)) return false;
 
-            user = new User(userId, agent, role);
+            user = new Auth(userId, agent);
         }
         catch (Exception)
         {
@@ -67,11 +66,11 @@ public class AuthService : IAuthService
     }
 
 
-    public IActionResult? CheckPermissions(HttpContext ctx, List<Roles> roles, out int? id)
+    public IActionResult? CheckPermissions(HttpContext ctx, out int id)
     {
-        id = null;
+        id = 0;
 
-        if (!TryGetUser(ctx, out User? user)) return new HttpResult()
+        if (!TryGetUser(ctx, out Auth? user)) return new HttpResult()
                         .IsOk(false)
                         .StatusCode(401)
                         .Message("you need to login to do this action")
@@ -87,14 +86,6 @@ public class AuthService : IAuthService
                         .Message("you need to login to do this action")
                         .Get();
         }
-
-        // check if user role match one of the list of roles allowed to do this action
-        if (!roles.Contains(user.Role)) return new HttpResult()
-                                    .Message("you do not have the permissions to do this action")
-                                    .IsOk(false)
-                                    .StatusCode(403)
-                                    .RedirectTo("/403")
-                                    .Get();
 
         id = user.Id;
 
@@ -102,10 +93,10 @@ public class AuthService : IAuthService
         return null;
     }
 
-    public IActionResult? CheckPermissions(HttpContext ctx, List<Roles> roles)
+    public IActionResult? CheckPermissions(HttpContext ctx)
     {
 
-        if (!TryGetUser(ctx, out User? user)) return new HttpResult()
+        if (!TryGetUser(ctx, out Auth? user)) return new HttpResult()
                         .IsOk(false)
                         .StatusCode(401)
                         .Message("you need to login to do this action")
@@ -121,14 +112,6 @@ public class AuthService : IAuthService
                         .Message("you need to login to do this action")
                         .Get();
         }
-
-        // check if user role match one of the list of roles allowed to do this action
-        if (!roles.Contains(user.Role)) return new HttpResult()
-                                    .Message("you do not have the permissions to do this action")
-                                    .IsOk(false)
-                                    .StatusCode(403)
-                                    .RedirectTo("/403")
-                                    .Get();
 
         // user is good
         return null;
@@ -138,7 +121,7 @@ public class AuthService : IAuthService
     {
         var sessionId = Guid.NewGuid().ToString();
 
-        ctx.Response.Cookies.Append(sessionName, sessionId, Main.CookieConfig(sessionTimeSpan));
+        ctx.Response.Cookies.Append(sessionName, sessionId, CookieConfig(sessionTimeSpan));
 
         await _cache.Redis.StringSetAsync(sessionId, JsonSerializer.Serialize<T>(payload), sessionTimeSpan);
     }

@@ -10,7 +10,6 @@ public class EmailService : IEmailService
     private SmtpClient _smtpClient;
     private readonly string _verificationEmailHtml;
     private readonly string _resetPasswordHtml;
-    private readonly string _roleChangedHtml;
 
     public EmailService(IConfiguration config)
     {
@@ -30,7 +29,6 @@ public class EmailService : IEmailService
 
         _verificationEmailHtml = File.ReadAllText("./Emails/verification-email.html");
         _resetPasswordHtml = File.ReadAllText("./Emails/reset-password.html");
-        _roleChangedHtml = File.ReadAllText("./Emails/role-changed.html");
     }
 
     public Task sendVerificationEmail(string to, string name, string code)
@@ -63,27 +61,6 @@ public class EmailService : IEmailService
             from: "Team@Buegee.com",
             to: to,
             subject: "reset your password",
-            body: stringBuilder.ToString()
-        );
-
-        message.IsBodyHtml = true;
-        message.Priority = MailPriority.High;
-
-        return _smtpClient.SendMailAsync(message);
-    }
-
-    public Task roleChangedEmail(string to, string name, string role1, string role2)
-    {
-        var stringBuilder = new StringBuilder(_roleChangedHtml);
-
-        stringBuilder.Replace("${name}", name);
-        stringBuilder.Replace("${role1}", role1);
-        stringBuilder.Replace("${role2}", role2);
-
-        var message = new MailMessage(
-            from: "Team@Buegee.com",
-            to: to,
-            subject: "your role changed",
             body: stringBuilder.ToString()
         );
 

@@ -1,7 +1,7 @@
 using System.Text.Json;
-using Buegee.Models.DB;
 using Buegee.Services.CryptoService;
 using Buegee.Utils.Enums;
+using Buegee.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Buegee.Data;
@@ -32,7 +32,7 @@ public class Seed
         var isData = JsonSerializer.Deserialize<Data>(json);
 
         if (isData is not null) _data = isData;
-        else _data = new Data(new List<User>());
+        else _data = new Data(new List<UserSeed>());
 
         _client = new HttpClient();
     }
@@ -42,8 +42,8 @@ public class Seed
         await SeedUsersAsync();
     }
 
-    private record User(string Role, string FirstName, string LastName, string Email, string? Image);
-    private record Data(List<User> Users);
+    private record UserSeed(string FirstName, string LastName, string Email, string? Image);
+    private record Data(List<UserSeed> Users);
 
     private async Task SeedUsersAsync()
     {
@@ -55,8 +55,6 @@ public class Seed
 
             _crypto.Hash(item.Email, out byte[] hash, out byte[] salt);
 
-            var isParsed = Enum.TryParse(item.Role, out Roles userRole);
-
             byte[] imageBytes;
             var Type = ContentTypes.jpeg;
 
@@ -67,21 +65,20 @@ public class Seed
                 Type =  ContentTypes.svg;
             }
 
-            var image = new FileDB()
+            var image = new Document()
             {
                 ContentType = Type,
                 Data = imageBytes,
                 IsPrivate = false
             };
 
-            var data = new UserDB()
+            var data = new User()
             {
                 FirstName = item.FirstName,
                 LastName = item.LastName,
                 Email = item.Email,
                 PasswordHash = hash,
                 PasswordSalt = salt,
-                Role = isParsed ? userRole : Roles.reporter,
                 ImageId = image.Id,
                 Image = image,
             };

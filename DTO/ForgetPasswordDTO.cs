@@ -1,9 +1,9 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
-namespace Buegee.Models.VM;
+namespace Buegee.DTO;
 
-public class ForgetPasswordVM {
+public class ForgetPasswordDTO {
     [JsonPropertyName("email")]
 
     [EmailAddress(ErrorMessage = "un-valid email address"),

@@ -1,16 +1,17 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Buegee.Models.VM;
+using Buegee.DTO;
 using Buegee.Services.RedisCacheService;
 using Buegee.Services.EmailService;
 using Buegee.Services.CryptoService;
 using Buegee.Services.JWTService;
-using Buegee.Models.DB;
 using Buegee.Data;
 using Buegee.Services.AuthService;
 using Buegee.Utils;
 using Buegee.Utils.Enums;
 using Buegee.Utils.Attributes;
+using Buegee.Models;
+using static Buegee.Utils.Utils;
 
 namespace Buegee.Controllers;
 
@@ -24,7 +25,6 @@ public class AuthController : Controller
     private readonly IEmailService _email;
     private readonly IRedisCacheService _cache;
     private readonly IAuthService _auth;
-    private readonly string _adminEmail;
 
     public AuthController(
      DataContext ctx,
@@ -41,12 +41,6 @@ public class AuthController : Controller
         _email = email;
         _cache = cache;
         _auth = auth;
-
-        string? adminEmail = configuration.GetSection("Admin").GetValue<string>("Email");
-
-        if (String.IsNullOrEmpty(adminEmail)) throw new Exception("Admin Email Are Not Configured");
-
-        _adminEmail = adminEmail;
     }
 
 
@@ -54,18 +48,17 @@ public class AuthController : Controller
     public record ForgetPasswordSession(string Code, string Email);
 
     [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginVM data)
+    public async Task<IActionResult> Login([FromBody] LoginDTO dto)
     {
-        if (Main.TryGetModelErrorResult(ModelState, out var result)) return result!;
+        if (TryGetModelErrorResult(ModelState, out var result)) return result!;
 
         var isFound = await _ctx.Users
-            .Where(u => u.Email == data.Email)
+            .Where(u => u.Email == dto.Email)
             .Select(u => new
             {
                 PasswordHash = u.PasswordHash,
                 PasswordSalt = u.PasswordSalt,
                 Id = u.Id,
-                Role = u.Role,
                 ImageId = u.ImageId,
                 Email = u.Email,
                 FullName = $"{u.FirstName}  {u.LastName}",
@@ -76,13 +69,13 @@ public class AuthController : Controller
         {
             return new HttpResult()
                     .IsOk(false)
-                    .Message($"this {data.Email} email dose not exist try sing-up")
+                    .Message($"this {dto.Email} email dose not exist try sing-up")
                     .StatusCode(404)
                     .RedirectTo("/auth/sing-up")
                     .Get();
         }
 
-        _crypto.Compar(data.Password, isFound.PasswordHash, isFound.PasswordSalt, out bool isMatch);
+        _crypto.Compar(dto.Password, isFound.PasswordHash, isFound.PasswordSalt, out bool isMatch);
 
         if (!isMatch)
         {
@@ -93,7 +86,7 @@ public class AuthController : Controller
                     .Get();
         };
 
-        _auth.LogIn(isFound.Id, HttpContext, isFound.Role);
+        _auth.LogIn(isFound.Id, HttpContext);
 
         // // TODO || redirect to dashboard
         return new HttpResult()
@@ -103,7 +96,6 @@ public class AuthController : Controller
                 .Body(new
                 {
                     id = isFound.Id,
-                    role = isFound.Role.ToString(),
                     imageId = isFound.ImageId,
                     email = isFound.Email,
                     fullName = isFound.FullName
@@ -112,15 +104,15 @@ public class AuthController : Controller
     }
 
     [HttpPost("sing-up")]
-    public async Task<IActionResult> SingUp([FromBody] SingUpVM data)
+    public async Task<IActionResult> SingUp([FromBody] SingUpDTO dto)
     {
         // check modelState and send error message if there any errors
-        if (Main.TryGetModelErrorResult(ModelState, out var result)) return result!;
+        if (TryGetModelErrorResult(ModelState, out var result)) return result!;
 
         // if there a user with this email redirect to login page with error message
 
         var isFound = await _ctx.Users
-            .Where(u => u.Email == data.Email)
+            .Where(u => u.Email == dto.Email)
             .Select(u => new { Id = u.Id })
             .FirstOrDefaultAsync();
 
@@ -128,7 +120,7 @@ public class AuthController : Controller
         {
             return new HttpResult()
                     .IsOk(false)
-                    .Message($"this account {data.Email} is already exist try login")
+                    .Message($"this account {dto.Email} is already exist try login")
                     .StatusCode(404)
                     .RedirectTo("/auth/login")
                     .Get();
@@ -138,14 +130,14 @@ public class AuthController : Controller
         var sessionTimeSpan = new TimeSpan(0, 30, 0);
 
         // generate random 6 digits code
-        string Code = Main.RandomCode();
+        string Code = RandomCode();
 
-        var payload = new SingUpSession(Code, data.FirstName, data.LastName, data.Email, data.Password);
+        var payload = new SingUpSession(Code, dto.FirstName, dto.LastName, dto.Email, dto.Password);
 
         await _auth.SetSessionAsync<SingUpSession>("sing-up-session", sessionTimeSpan, payload, HttpContext);
 
         // send the email
-        await _email.sendVerificationEmail(data.Email, $"{data.FirstName} {data.LastName}", Code);
+        await _email.sendVerificationEmail(dto.Email, $"{dto.FirstName} {dto.LastName}", Code);
 
         return new HttpResult()
                 .StatusCode(200)
@@ -158,10 +150,10 @@ public class AuthController : Controller
 
 
     [HttpPost("account-verification")]
-    public async Task<IActionResult> AccountVerification([FromBody] AccountVerificationVM data)
+    public async Task<IActionResult> AccountVerification([FromBody] AccountVerificationDTO dto)
     {
         // check modelState and send error message if there any errors
-        if (Main.TryGetModelErrorResult(ModelState, out var result)) return result!;
+        if (TryGetModelErrorResult(ModelState, out var result)) return result!;
 
         var session = await _auth.GetSessionAsync<SingUpSession>("sing-up-session", HttpContext);
 
@@ -173,7 +165,7 @@ public class AuthController : Controller
                                 .Get();
 
 
-        if (session.Code != data.Code) return new HttpResult()
+        if (session.Code != dto.Code) return new HttpResult()
                                 .IsOk(false)
                                 .Message("incorrect verification code. please try again")
                                 .StatusCode(400)
@@ -191,30 +183,27 @@ public class AuthController : Controller
             imageBytes = await client.GetByteArrayAsync($"https://api.dicebear.com/6.x/identicon/svg?seed={session.FirstName}-{session.LastName}-{session.Email}");
         }
 
-        var image = new FileDB()
+        var image = new Document()
         {
             ContentType = ContentTypes.svg,
             Data = imageBytes,
             IsPrivate = false,
         };
 
-        var userData = await _ctx.Users.AddAsync(new UserDB
+        var userData = await _ctx.Users.AddAsync(new User
         {
             Email = session.Email,
             FirstName = session.FirstName,
             LastName = session.LastName,
             PasswordHash = hash,
             PasswordSalt = salt,
-            Role = session.Email == _adminEmail
-                    ? Roles.admin
-                    : Roles.reporter,
             ImageId = image.Id,
             Image = image,
         });
 
         await _ctx.SaveChangesAsync();
 
-        _auth.LogIn(userData.Entity.Id, HttpContext, userData.Entity.Role);
+        _auth.LogIn(userData.Entity.Id, HttpContext);
 
         // TODO || redirect to dashboard
         return new HttpResult().IsOk(true)
@@ -228,14 +217,14 @@ public class AuthController : Controller
 
 
     [HttpPost("forget-password")]
-    public async Task<IActionResult> ForgetPassword([FromBody] ForgetPasswordVM data)
+    public async Task<IActionResult> ForgetPassword([FromBody] ForgetPasswordDTO dto)
     {
 
-        if (Main.TryGetModelErrorResult(ModelState, out var result)) return result!;
+        if (TryGetModelErrorResult(ModelState, out var result)) return result!;
 
         // first check if user email exist
         var isFound = await _ctx.Users
-            .Where(u => u.Email == data.Email)
+            .Where(u => u.Email == dto.Email)
             .Select(u => new
             {
                 Email = u.Email,
@@ -247,12 +236,12 @@ public class AuthController : Controller
 
         if (isFound is null) return new HttpResult()
                             .RedirectTo("/auth/sing-up")
-                            .Message($"this {data.Email} email dose not exist try sing-up")
+                            .Message($"this {dto.Email} email dose not exist try sing-up")
                             .IsOk(false)
                             .StatusCode(404)
                             .Get();
 
-        string code = Main.RandomCode();
+        string code = RandomCode();
 
         var payload = new ForgetPasswordSession(code, isFound.Email);
 
@@ -270,9 +259,9 @@ public class AuthController : Controller
 
 
     [HttpPost("reset-password")]
-    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordVM data)
+    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDTO dto)
     {
-        if (Main.TryGetModelErrorResult(ModelState, out var result)) return result!;
+        if (TryGetModelErrorResult(ModelState, out var result)) return result!;
 
         var session = await _auth.GetSessionAsync<ForgetPasswordSession>("reset-password-session", HttpContext);
 
@@ -285,7 +274,7 @@ public class AuthController : Controller
                                 .Get();
 
 
-        if (session.Code != data.Code) return new HttpResult()
+        if (session.Code != dto.Code) return new HttpResult()
                                 .IsOk(false)
                                 .Message("incorrect verification code. please try again")
                                 .StatusCode(400)
@@ -303,7 +292,7 @@ public class AuthController : Controller
 
         await _auth.DeleteSessionAsync("reset-password-session", HttpContext);
 
-        _crypto.Hash(data.NewPassword, out byte[] hash, out byte[] salt);
+        _crypto.Hash(dto.NewPassword, out byte[] hash, out byte[] salt);
 
         user.PasswordHash = hash;
         user.PasswordSalt = salt;

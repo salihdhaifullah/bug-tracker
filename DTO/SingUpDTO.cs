@@ -1,9 +1,9 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
-namespace Buegee.Models.VM;
+namespace Buegee.DTO;
 
-public class SingUpVM
+public class SingUpDTO
 {
     [JsonPropertyName("firstName")]
     [Required(ErrorMessage = "first name is required"),

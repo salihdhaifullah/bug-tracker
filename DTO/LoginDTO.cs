@@ -1,9 +1,9 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
-namespace Buegee.Models.VM;
+namespace Buegee.DTO;
 
-public class LoginVM
+public class LoginDTO
 {
     [JsonPropertyName("email")]
 

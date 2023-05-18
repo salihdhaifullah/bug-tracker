@@ -3,14 +3,14 @@ using System.ComponentModel.DataAnnotations.Schema;
 using Buegee.Utils.Enums;
 using Microsoft.EntityFrameworkCore;
 
-namespace Buegee.Models.DB;
+namespace Buegee.Models;
 
 [Table("ticket")]
 [Index(nameof(Title))]
 [Index(nameof(Type))]
 [Index(nameof(Priority))]
 [Index(nameof(Status))]
-public class TicketDB
+public class Ticket
 {
     [Key, Column("id")]
     public int Id { get; set; }
@@ -18,8 +18,9 @@ public class TicketDB
     [Required, Column("title"), StringLength(100)]
     public string Title { get; set; } = null!;
 
-    [Required, Column("description")]
-    public string Description { get; set; } = null!;
+    [ForeignKey("Description"), Column("description")]
+    public int? DescriptionId { get; set; }
+    public Content? Description { get; set; }
 
     [Column("type"), EnumDataType(typeof(TicketType))]
     public TicketType Type { get; set; } = TicketType.bug;
@@ -33,21 +34,14 @@ public class TicketDB
     [Column("created_at")]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-    [Column("files")]
-    public ICollection<FileDB> Files { get; set; } = null!;
-
     [Column("comments")]
-    public ICollection<CommentDB> Comments { get; set; } = null!;
+    public ICollection<Comment> Comments { get; set; } = null!;
+
+    [Required, ForeignKey("Creator"), Column("creator")]
+    public int CreatorId { get; set; }
+    public User Creator { get; set; } = null!;
 
     [ForeignKey("AssignedTo"), Column("assigned_to")]
     public int? AssignedToId { get; set; }
-    public UserDB? AssignedTo { get; set; } = null;
-
-    [ForeignKey("Reporter"), Column("reporter")]
-    public int? ReporterId { get; set; }
-    public UserDB? Reporter { get; set; } = null;
-
-    [ForeignKey("Creator"), Column("creator")]
-    public int? CreatorId { get; set; }
-    public UserDB? Creator { get; set; } = null;
+    public User? AssignedTo { get; set; }
 }

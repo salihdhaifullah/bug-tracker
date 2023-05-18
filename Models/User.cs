@@ -1,15 +1,13 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Buegee.Utils.Enums;
 using Microsoft.EntityFrameworkCore;
 
-namespace Buegee.Models.DB;
+namespace Buegee.Models;
 
 [Table("users")]
 [Index(nameof(Email), IsUnique = true)]
-[Index(nameof(Role))]
 [Index(nameof(FirstName), nameof(LastName))]
-public class UserDB
+public class User
 {
     [Key, Column("id")]
     public int Id { get; set; }
@@ -32,13 +30,17 @@ public class UserDB
     [Column("created_at")]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-    [Column("role"), EnumDataType(typeof(Roles))]
-    public Roles Role { get; set; } = Roles.reporter;
+    [Column("projects")]
+    public ICollection<Project> Projects {get; set;} = null!;
 
     [Required, ForeignKey("Image"), Column("image")]
     public int ImageId { get; set; }
-    public FileDB Image { get; set; } = null!;
+    public Document Image { get; set; } = null!;
 
     [Column("title"), StringLength(100)]
     public string? Title { get; set; }
+
+    [ForeignKey("Profile"), Column("profile")]
+    public int? ProfileId { get; set; }
+    public Content? Profile { get; set; }
 }

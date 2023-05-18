@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace Buegee.Utils;
-public static class Main
+public static class Utils
 {
     public static string UrlEncode(string str)
     {

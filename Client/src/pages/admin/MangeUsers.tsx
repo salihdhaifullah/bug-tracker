@@ -3,28 +3,24 @@ const data = [
         ImageId: 1,
         FirstName: "asvvvvvv",
         LastName: "asvvvvvvv",
-        Role: "ADMIN",
         Email: "ADMin@gmail.com"
     },
     {
         ImageId: 2,
         FirstName: "asv",
         LastName: "asvvethtennvvvvv",
-        Role: "PROJECT_MANGER",
         Email: "ADMin@gmail.com"
     },
     {
         ImageId: 3,
         FirstName: "svdsdv",
         LastName: "asvvmtyytvvvvv",
-        Role: "developer",
         Email: "developer@gmail.com"
     },
     {
         ImageId: 4,
         FirstName: "dev",
         LastName: "vsav",
-        Role: "REPORTER",
         Email: "ADMinREPORTER@gmail.com"
     }
 ];
@@ -70,19 +66,13 @@ const MangeUsers = () => {
                         <div className="flex w-full flex-col break-words justify-center">
                             <div className="flex sm:flex-row flex-wrap flex-col-reverse sm:gap-2">
                                 <p className="text-base text-gray-900 font-bold">{user.FirstName}  {user.LastName}</p>
-                                <p className="flex flex-row text-sm gap-1">
-                                    <span className="text-secondary">(</span>
-                                    <span className="text-primary">{user.Role}</span>
-                                    <span className="text-secondary">)</span>
-                                </p>
+
                             </div>
                             <p className="text-sm sm:text-base break-all max-w-fit text-gray-800 font-[400]">{user.Email}</p>
                         </div>
 
                         <div className="flex flex-col break-keep  items-end justify-center w-full">
-                            <a href="/admin/change-role/@item.Id"
-                                className="border-2 bg-secondary border-secondary hover:bg-white hover:opacity-95 hover:shadow-lg text-xs p-2 w-fit text-primary sm:text-ellipsis font-bold rounded-md shadow-md">Change
-                                Role</a>
+
                         </div>
                     </div>
                 ))}
