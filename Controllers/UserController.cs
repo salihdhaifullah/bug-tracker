@@ -17,25 +17,4 @@ public class UserController : Controller {
         _auth = auth;
         _ctx = ctx;
     }
-
-
-    [HttpGet("project-mangers")]
-    public async Task<IActionResult> ProjectMangers()
-    {
-        Console.WriteLine("RUNNING api/user/project-mangers");
-
-        var result = _auth.CheckPermissions(HttpContext);
-
-        if(result is not null) return result;
-
-        var projectMangers = await _ctx.Users
-            .Select(u => new {
-                id = u.Id,
-                fullName = $"{u.FirstName} {u.LastName}"
-            })
-            .ToListAsync();
-
-
-        return new HttpResult().IsOk(true).StatusCode(200).Body(projectMangers).Get();
-    }
 }

@@ -21,6 +21,7 @@ const Notification = ({ notification }: { notification: INotification }) => {
     const isError = notification.type === "error";
     const [width, setWidth] = useState(-25);
 
+
     const dispatchNotification = useNotificationDispatch();
 
     function deleteNotification() {

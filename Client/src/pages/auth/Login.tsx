@@ -4,9 +4,9 @@ import { MdEmail } from "react-icons/md";
 import { RiLockPasswordFill } from "react-icons/ri";
 import useFetchApi from "../../utils/hooks/useFetchApi";
 import PasswordEye from "../../components/utils/PasswordEye";
-import CircleProgress from "../../components/utils/CircleProgress";
 import { IUser, useUserDispatch } from "../../utils/context/user";
 import { Link } from "react-router-dom";
+import SubmitButton from "../../components/utils/SubmitButton";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -61,7 +61,7 @@ const Login = () => {
             ]}
             icon={RiLockPasswordFill}
             value={password}
-            type={passwordType}
+            inputProps={{type: passwordType}}
             onChange={(e) => setPassword(e.target.value)}
             label="password"
             InElement={<PasswordEye type={passwordType} setType={setPasswordType} />}
@@ -73,19 +73,10 @@ const Login = () => {
             <Link to="/auth/sing-up" className="link">sing up ?</Link>
           </div>
 
-          <div className="flex justify-center">
-            {(payload.isLoading || !isValidEmail || !isValidPassword) ? (
-              <button disabled
-                className="text-primary bg-gray-300 min-w-[50px] text-center p-2 cursor-not-allowed rounded-md border-0 text-base font-bold shadow-md">
-                {payload.isLoading ? <CircleProgress size="md" /> : "submit"}
-              </button>
-            ) : (
-              <button type="submit"
-                className="text-primary bg-secondary text-center p-2 rounded-md border-0 text-base font-bold cursor-pointer transition-all  ease-in-out shadow-lg hover:shadow-xl hover:border-gray-600 hover:text-white">
-                submit
-              </button>
-            )}
-          </div>
+          <SubmitButton
+                    isValid={isValidEmail && isValidPassword}
+                    isLoading={payload.isLoading}
+                    />
 
         </form>
 

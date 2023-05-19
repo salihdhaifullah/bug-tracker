@@ -1,8 +1,8 @@
 import { MdDomainVerification } from 'react-icons/md';
 import TextFiled from '../../components/utils/TextFiled';
 import { FormEvent, useState } from 'react';
-import CircleProgress from '../../components/utils/CircleProgress';
 import useFetchApi from '../../utils/hooks/useFetchApi';
+import SubmitButton from '../../components/utils/SubmitButton';
 
 const AccountVerification = () => {
     const [isValidCode, setIsValidCode] = useState(false);
@@ -44,19 +44,12 @@ const AccountVerification = () => {
                         setIsValid={setIsValidCode}
                     />
 
-                    <div className="flex justify-center">
-                        {(payload.isLoading || !isValidCode) ? (
-                            <button disabled
-                                className="text-primary bg-gray-300 min-w-[50px] text-center p-2 cursor-not-allowed rounded-md border-0 text-base font-bold shadow-md">
-                                {payload.isLoading ? <CircleProgress size="md" /> : "submit"}
-                            </button>
-                        ) : (
-                            <button type="submit"
-                                className="text-primary bg-secondary text-center p-2 rounded-md border-0 text-base font-bold cursor-pointer transition-all  ease-in-out shadow-lg hover:shadow-xl hover:border-gray-600 hover:text-white">
-                                submit
-                            </button>
-                        )}
-                    </div>
+
+
+                    <SubmitButton
+                    isValid={isValidCode}
+                    isLoading={payload.isLoading}
+                    />
 
                 </form>
 

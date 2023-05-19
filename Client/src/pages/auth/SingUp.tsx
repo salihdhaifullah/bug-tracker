@@ -4,9 +4,9 @@ import { RiLockPasswordFill } from 'react-icons/ri';
 import { FormEvent, useState } from 'react';
 import PasswordEye from '../../components/utils/PasswordEye';
 import useFetchApi from '../../utils/hooks/useFetchApi';
-import CircleProgress from '../../components/utils/CircleProgress';
 import { Link } from 'react-router-dom';
 import { FaUserCircle } from 'react-icons/fa';
+import SubmitButton from '../../components/utils/SubmitButton';
 
 
 const SingUp = () => {
@@ -41,7 +41,7 @@ const SingUp = () => {
 
         <form className="flex-col flex w-full justify-center items-center" onSubmit={handelSubmit}>
 
-        <h1 className="text-primary font-bold text-2xl text-center">sign-up</h1>
+          <h1 className="text-primary font-bold text-2xl text-center">sign-up</h1>
 
           <TextFiled
             validation={[
@@ -57,7 +57,7 @@ const SingUp = () => {
 
           <TextFiled
             validation={[
-              { validate: (str: string) => str.length > 0, massage: "last name is required"},
+              { validate: (str: string) => str.length > 0, massage: "last name is required" },
               { validate: (str: string) => str.length <= 50, massage: "max length of last name is 50 character" }
             ]}
             icon={FaUserCircle}
@@ -106,19 +106,11 @@ const SingUp = () => {
             <Link to="/auth/login" className="link">login ?</Link>
           </div>
 
-          <div className="flex justify-center">
-            {(payload.isLoading || !isValidEmail || !isValidPassword || !isValidFirstName || !isValidLastName) ? (
-              <button disabled
-                className="text-primary bg-gray-300 min-w-[50px] text-center p-2 cursor-not-allowed rounded-md border-0 text-base font-bold shadow-md">
-                {payload.isLoading ? <CircleProgress size="md" /> : "submit"}
-              </button>
-            ) : (
-              <button type="submit"
-                className="text-primary bg-secondary text-center p-2 rounded-md border-0 text-base font-bold cursor-pointer transition-all  ease-in-out shadow-lg hover:shadow-xl hover:border-gray-600 hover:text-white">
-                submit
-              </button>
-            )}
-          </div>
+
+          <SubmitButton
+            isValid={isValidFirstName && isValidLastName && isValidEmail && isValidPassword}
+            isLoading={payload.isLoading}
+          />
 
         </form>
 

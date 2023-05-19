@@ -2,9 +2,9 @@ import { RiLockPasswordFill } from "react-icons/ri"
 import TextFiled from "../../components/utils/TextFiled"
 import PasswordEye from "../../components/utils/PasswordEye"
 import { FormEvent, useState } from "react";
-import CircleProgress from "../../components/utils/CircleProgress";
 import useFetchApi from "../../utils/hooks/useFetchApi";
 import { MdDomainVerification } from "react-icons/md";
+import SubmitButton from "../../components/utils/SubmitButton";
 
 const ResetPassword = () => {
     const [newPassword, setNewPassword] = useState("");
@@ -57,26 +57,19 @@ const ResetPassword = () => {
                         ]}
                         icon={RiLockPasswordFill}
                         value={newPassword}
-                        type={passwordType}
+                        inputProps={{ type: passwordType }}
                         onChange={(e) => setNewPassword(e.target.value)}
                         label="new password"
                         InElement={<PasswordEye type={passwordType} setType={setPasswordType} />}
                         setIsValid={setIsValidPassword}
                     />
 
-                    <div className="flex justify-center">
-                        {(payload.isLoading || !isValidCode || !isValidPassword) ? (
-                            <button disabled
-                                className="text-primary bg-gray-300 min-w-[50px] text-center p-2 cursor-not-allowed rounded-md border-0 text-base font-bold shadow-md">
-                                {payload.isLoading ? <CircleProgress size="md" /> : "submit"}
-                            </button>
-                        ) : (
-                            <button type="submit"
-                                className="text-primary bg-secondary text-center p-2 rounded-md border-0 text-base font-bold cursor-pointer transition-all  ease-in-out shadow-lg hover:shadow-xl hover:border-gray-600 hover:text-white">
-                                submit
-                            </button>
-                        )}
-                    </div>
+
+
+                    <SubmitButton
+                        isValid={isValidCode && isValidPassword}
+                        isLoading={payload.isLoading}
+                    />
 
                 </form>
 
