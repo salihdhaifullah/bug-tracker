@@ -54,8 +54,55 @@ public class ProjectController : Controller
 
         return new HttpResult()
                             .IsOk(true)
-                            .Body(new {data.Entity.Team, data.Entity.CreatedAt, data.Entity.IsPrivate, data.Entity.Name, data.Entity.Id})
+                            .Body(new { data.Entity.Team, data.Entity.CreatedAt, data.Entity.IsPrivate, data.Entity.Name, data.Entity.Id })
                             .Message($"project {dto.Name} successfully created")
                             .Get();
+    }
+
+    [HttpGet("{page?}")]
+    public async Task<IActionResult> GetMyProjects([FromRoute] int page = 1, [FromQuery] int take = 10)
+    {
+        if (!_auth.TryGetUser(HttpContext, out var user) || user is null) return new HttpResult().IsOk(true).Message("no projects found for you, to create project please sing-up").StatusCode(404).Get();
+
+        var projects = await _ctx.Projects
+                        .Where((p) => p.Team.OwnerId == user.Id)
+                        .OrderBy((p) => p.CreatedAt)
+                        .Select((p) => new
+                        {
+                            createdAt = p.CreatedAt,
+                            id = p.Id,
+                            isPrivate = p.IsPrivate,
+                            name = p.Name
+                        })
+                        .Skip((page - 1) * take)
+                        .Take(take)
+                        .ToListAsync();
+
+        if (projects is null || projects.Count == 0) return new HttpResult()
+                                    .IsOk(true)
+                                    .Message("sorry, no project found")
+                                    .StatusCode(404)
+                                    .Get();
+        return new HttpResult()
+                .IsOk(true)
+                .Body(projects)
+                .StatusCode(200)
+                .Get();
+    }
+
+    [HttpGet("count")]
+    public async Task<IActionResult> GetMyProjectsCount([FromQuery] int take = 10)
+    {
+        if (!_auth.TryGetUser(HttpContext, out var user) || user is null) return new HttpResult().IsOk(true).Message("no projects found for you, to create project please sing-up").StatusCode(404).Get();
+
+        var projectsCount = await _ctx.Projects.Where((p) => p.Team.OwnerId == user.Id).CountAsync();
+
+        int pages = (int)Math.Ceiling((double) projectsCount / take);
+
+        return new HttpResult()
+                .IsOk(true)
+                .Body(pages)
+                .StatusCode(200)
+                .Get();
     }
 }

@@ -21,7 +21,6 @@ const Notification = ({ notification }: { notification: INotification }) => {
     const isError = notification.type === "error";
     const [width, setWidth] = useState(-25);
 
-
     const dispatchNotification = useNotificationDispatch();
 
     function deleteNotification() {
@@ -38,12 +37,12 @@ const Notification = ({ notification }: { notification: INotification }) => {
 
     const stopTimer = useCallback(() => clearInterval(intervalID), []);
 
-    useEffect(() => { if (width === 99) stopTimer() }, [width])
+    useEffect(() => { if (width === 100) stopTimer() }, [width])
 
     useEffect(() => startTimer(), [])
 
     return (
-        <div className="flex notification-animation flex-col rounded shadow-lg bg-gray-50 drop-shadow-xl">
+        <div className="flex notification-animation max-w-[70vw] h-auto flex-col rounded shadow-lg bg-gray-50 drop-shadow-xl">
 
             <div className="flex flex-row justify-center">
 
@@ -53,7 +52,7 @@ const Notification = ({ notification }: { notification: INotification }) => {
                     {isError ? <FaTimes className="text-white bg-red-600 rounded-full p-0.5" /> : <FaCheck className="text-white bg-green-600 rounded-full p-0.5 " />}
                 </div>
 
-                <div className="p-2 flex flex-col  flex-grow">
+                <div className="p-2 flex flex-col ml-2 flex-grow">
                     <p className={`${isError ? "text-red-600" : "text-green-600"} text-bold`}>{notification.message}</p>
                 </div>
 

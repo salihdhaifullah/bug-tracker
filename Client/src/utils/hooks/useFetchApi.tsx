@@ -1,4 +1,4 @@
-import { useState, useCallback, DependencyList, useId } from 'react';
+import { useState, useCallback, DependencyList } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useNotificationDispatch } from '../context/notification';
 
@@ -15,10 +15,10 @@ interface IPayload<T> {
     result: T | null;
 }
 
+
 export default function useFetchApi<T>(method: "POST" | "PATCH" | "GET" | "DELETE", url: string, deps: DependencyList, body?: unknown): [payload: IPayload<T>, call: () => void] {
 
     const dispatchNotification = useNotificationDispatch();
-    const id = useId();
     const [result, setResult] = useState<T | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
@@ -48,7 +48,7 @@ export default function useFetchApi<T>(method: "POST" | "PATCH" | "GET" | "DELET
             if (response?.message) dispatchNotification({
                 type: "add",
                 payload: {
-                    id,
+                    id: Date.now().toString(),
                     type: response.type,
                     message: response.message,
                 }
