@@ -37,14 +37,15 @@ const Projects = () => {
 
           <Fragment key={item.id}>
             <div className="flex flex-row gap-2 items-center justify-between" >
-              <Link className="link text-2xl" to={`/projects/${item.id}`}>{item.name}</Link>
+              <Link className="link text-2xl" to={`/project/${item.id}`}>{item.name}</Link>
 
               <Tag name={item.isPrivate ? "private" : "public"} />
 
-              <div className="flex flex-row gap-2">
+              <div className="flex text-sm flex-row gap-2">
                 <span className="text-gray-800 font-bold">created at:</span>
                 <p className="text-primary font-bold">{dateFormat(item.createdAt)}</p>
               </div>
+
             </div>
             {index !== ((projectsPayload.result?.length as number) - 1) && <hr className="flex my-2" />}
           </ Fragment>

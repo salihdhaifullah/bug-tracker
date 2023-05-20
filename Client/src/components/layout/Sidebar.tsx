@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom';
 
 import { useUser, useUserDispatch } from "../../utils/context/user"
 import useFetchApi from "../../utils/hooks/useFetchApi";
+import { GrProjects } from 'react-icons/gr';
 
 const Sidebar = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -56,6 +57,13 @@ const Sidebar = () => {
                     onClick={() => setIsOpen(false)}
                     className="text-primary hover:bg-slate-200 transition-all ease-in-out rounded-md text-xl p-2 flex-row flex gap-2 items-center ">
                     <MdOutlineCreateNewFolder /> <p>create project</p>
+                </Link>
+
+                <Link
+                    to="/projects"
+                    onClick={() => setIsOpen(false)}
+                    className="text-primary hover:bg-slate-200 transition-all ease-in-out rounded-md text-xl p-2 flex-row flex gap-2 items-center ">
+                    <GrProjects /> <p>your projects</p>
                 </Link>
 
 

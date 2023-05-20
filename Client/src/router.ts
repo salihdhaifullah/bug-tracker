@@ -14,6 +14,7 @@ import Profile from "./pages/Profile";
 import { createBrowserRouter } from "react-router-dom";
 import CreateProject from "./pages/admin/CreateProject";
 import Projects from "./pages/admin/Projects";
+import Project from "./pages/admin/Project";
 
 const router = createBrowserRouter([{
     path: "/",
@@ -27,7 +28,8 @@ const router = createBrowserRouter([{
         { path: "auth/account-verification", Component: AccountVerification },
         { path: "admin/create-project", Component: CreateProject },
         { path: "profile/:userId", Component: Profile },
-        { path: "projects/:page", Component: Projects },
+        { path: "projects", Component: Projects },
+        { path: "project/:page", Component: Project },
         { path: "500", Component: InternalServerError },
         { path: "403", Component: Forbidden },
         { path: "401", Component: Unauthorized },

@@ -72,7 +72,7 @@ footer {
 }
 
 .link {
-    @apply text-blue-600 hover:text-blue-500 underline text-base
+    @apply text-blue-600 hover:text-blue-500 hover:underline text-lg font-bold
 }
 
 .notification-animation {
@@ -98,4 +98,33 @@ footer {
         opacity: 0;
         transform: translateX(100%);
     }
+}
+
+.custom-html-style > h5 {
+  @apply text-sm
+}
+
+.custom-html-style > table {
+  @apply block my-10 min-w-full border-0 !important;
+}
+
+.custom-html-style > h6 {
+  @apply text-xs
+}
+
+.custom-html-style > p > img {
+  @apply my-6
+}
+
+.custom-html-style > ol {
+ @apply list-decimal
+}
+
+.custom-html-style > ol > li {
+  display: list-item !important;
+  text-align: -webkit-match-parent !important;
+}
+
+.custom-html-style > ul {
+  @apply list-disc
 }
