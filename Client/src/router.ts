@@ -29,7 +29,7 @@ const router = createBrowserRouter([{
         { path: "admin/create-project", Component: CreateProject },
         { path: "profile/:userId", Component: Profile },
         { path: "projects", Component: Projects },
-        { path: "project/:page", Component: Project },
+        { path: "project/:projectId", Component: Project },
         { path: "500", Component: InternalServerError },
         { path: "403", Component: Forbidden },
         { path: "401", Component: Unauthorized },

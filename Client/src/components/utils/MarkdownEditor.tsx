@@ -1,9 +1,7 @@
-import { SetStateAction, useEffect, useRef, useState } from "react";
+import { SetStateAction } from "react";
 import MdEditor from 'react-markdown-editor-lite';
 import { toWEBPImage, mdParser } from "../../utils";
 import 'react-markdown-editor-lite/lib/index.css';
-
-
 
 interface IMarkdownEditorProps {
     setMd: (md: SetStateAction<string>) => void;

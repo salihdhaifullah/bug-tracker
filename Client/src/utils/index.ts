@@ -29,7 +29,7 @@ export function mdParser(markdown: string): string {
 type Enumerate<N extends number, Acc extends number[] = []> = Acc['length'] extends N ? Acc[number] : Enumerate<N, [...Acc, Acc['length']]>
 type Range<F extends number, T extends number> = Exclude<Enumerate<T>, Enumerate<F>>
 
-export function toWEBPImage(file: File, quality: Range<1, 101> = 80): Promise<Blob | null> {
+export function toWEBPImage(file: File, quality: Range<1, 101> = 80): Promise<string> {
     return new Promise((resolve, reject) => {
         if (!file || !file.type || !file.type.includes("image")) throw Error("File Is NOT Image! OR THEY ARE NO FILE");
         const reader = new FileReader();
@@ -58,7 +58,7 @@ export function toWEBPImage(file: File, quality: Range<1, 101> = 80): Promise<Bl
 
                 ctx.drawImage(image, 0, 0, width, height);
 
-                canvas.toBlob((b) =>  { resolve(b) }, "image/WEBP", qualityDecimal)
+                resolve(canvas.toDataURL("image/WEBP", qualityDecimal).split(",")[1]);
             };
 
             reader.onerror = (error: any) => { reject(new Error(error)) };

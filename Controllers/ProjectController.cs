@@ -59,7 +59,7 @@ public class ProjectController : Controller
                             .Get();
     }
 
-    [HttpGet("{page?}")]
+    [HttpGet("projects/{page?}")]
     public async Task<IActionResult> GetMyProjects([FromRoute] int page = 1, [FromQuery] int take = 10)
     {
         if (!_auth.TryGetUser(HttpContext, out var user) || user is null) return new HttpResult().IsOk(true).Message("no projects found for you, to create project please sing-up").StatusCode(404).Get();
@@ -67,8 +67,9 @@ public class ProjectController : Controller
         var projects = await _ctx.Projects
                         .Where((p) => p.Team.OwnerId == user.Id)
                         .OrderBy((p) => p.CreatedAt)
-                        .Select((p) => new
-                        {
+                        .Select((p) => new {
+                            members = p.Team.Members.Count + 1,
+                            tickets = p.Tickets.Count,
                             createdAt = p.CreatedAt,
                             id = p.Id,
                             isPrivate = p.IsPrivate,
@@ -86,6 +87,35 @@ public class ProjectController : Controller
         return new HttpResult()
                 .IsOk(true)
                 .Body(projects)
+                .StatusCode(200)
+                .Get();
+    }
+
+    [HttpGet("{projectId}")]
+    public async Task<IActionResult> xdvsv([FromRoute] int projectId)
+    {
+        if (!_auth.TryGetUser(HttpContext, out var user) || user is null) return new HttpResult().IsOk(true).Message("no projects found for you, to create project please sing-up").StatusCode(404).Get();
+
+        var project = await _ctx.Projects
+                        .Where((p) => p.Id == projectId)
+                        .Select((p) => new {
+                            activities = p.Activities,
+                            createdAt = p.CreatedAt,
+                            description = p.Description,
+                            ownerId = p.Team.OwnerId,
+                            members = p.Team.Members.Count,
+                        })
+                        .FirstOrDefaultAsync();
+
+        if (project is null) return new HttpResult()
+                            .IsOk(true)
+                            .Message("sorry, project not found")
+                            .StatusCode(404)
+                            .Get();
+
+        return new HttpResult()
+                .IsOk(true)
+                .Body(project)
                 .StatusCode(200)
                 .Get();
     }

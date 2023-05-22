@@ -16,7 +16,10 @@ interface IPayload<T> {
 }
 
 
-export default function useFetchApi<T>(method: "POST" | "PATCH" | "GET" | "DELETE", url: string, deps: DependencyList, body?: unknown): [payload: IPayload<T>, call: () => void] {
+export default function useFetchApi<T>
+(method: "POST" | "PATCH" | "GET" | "DELETE",
+url: string, deps: DependencyList, body?: unknown,
+callback?: (arg: T | null) => void): [payload: IPayload<T>, call: () => void] {
 
     const dispatchNotification = useNotificationDispatch();
     const [result, setResult] = useState<T | null>(null);
@@ -24,7 +27,7 @@ export default function useFetchApi<T>(method: "POST" | "PATCH" | "GET" | "DELET
     const navigate = useNavigate();
 
 
-    const callback = useCallback(async () => {
+    const init = useCallback(async () => {
         setIsLoading(true);
 
         try {
@@ -56,6 +59,8 @@ export default function useFetchApi<T>(method: "POST" | "PATCH" | "GET" | "DELET
 
             if(response?.redirectTo) navigate(response?.redirectTo);
 
+            callback && callback(result);
+
         } catch (err) {
             console.log(err)
             setIsLoading(false);
@@ -64,5 +69,5 @@ export default function useFetchApi<T>(method: "POST" | "PATCH" | "GET" | "DELET
     }, deps);
 
 
-    return [{ isLoading, result }, callback];
+    return [{ isLoading, result }, init];
 }

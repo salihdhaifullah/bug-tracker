@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import Tag from "../../components/utils/Tag";
 import { dateFormat } from "../../utils";
 import Pagination from "../../components/utils/Pagination";
+import { FaTasks } from "react-icons/fa";
 
 interface IProject {
   id: number;
@@ -15,9 +16,9 @@ interface IProject {
 
 const Projects = () => {
   const [page, setPage] = useState(1)
-  const [take, setTake] = useState(3)
+  const [take, _] = useState(10)
 
-  const [projectsPayload, callProjects] = useFetchApi<IProject[]>("GET", `project/${page}/?take=${take}`, [page, take]);
+  const [projectsPayload, callProjects] = useFetchApi<IProject[]>("GET", `project/projects/${page}/?take=${take}`, [page, take]);
   const [PagesCountPayload, callPagesCount] = useFetchApi<number>("GET", `project/count/?take=${take}`, [take]);
 
   useEffect(() => { callProjects() }, [page, take])
@@ -36,21 +37,29 @@ const Projects = () => {
 
 
           <Fragment key={item.id}>
-            <div className="flex flex-row gap-2 items-center justify-between" >
-              <Link className="link text-2xl" to={`/project/${item.id}`}>{item.name}</Link>
+            <div className="flex w-full flex-row gap-2 items-center justify-between" >
 
-              <Tag name={item.isPrivate ? "private" : "public"} />
+              <div className="flex flex-col gap-2 justify-start">
+                <Link className="link text-2xl" to={`/project/${item.id}`}>{item.name}</Link>
 
-              <div className="flex text-sm flex-row gap-2">
-                <span className="text-gray-800 font-bold">created at:</span>
-                <p className="text-primary font-bold">{dateFormat(item.createdAt)}</p>
+                <div className="flex justify-start gap-2 items-center">
+                  <Tag name={item.isPrivate ? "private" : "public"} />
+
+                  <div className="flex text-sm flex-row justify-end gap-2">
+                    <p className="text-primary font-bold">{dateFormat(item.createdAt)}</p>
+                  </div>
+                </div>
+
+              </div>
+
+              <div className="flex flex-row ">
+                <Tag name={`tickets ${2}`} icon={FaTasks} />
+                <Tag name={`members ${2}`} icon={FaTasks} />
               </div>
 
             </div>
             {index !== ((projectsPayload.result?.length as number) - 1) && <hr className="flex my-2" />}
           </ Fragment>
-
-
         ))}
       </div>
 

@@ -9,6 +9,8 @@ public enum ContentTypes
     png,
     [StringValue("image/svg+xml")]
     svg,
+    [StringValue("image/webp")]
+    webp,
     [StringValue("text/plain")]
     text,
 }
