@@ -8,7 +8,7 @@ public class CreateProjectDTO {
 
     [Required(ErrorMessage ="project name is required"),
     MaxLength(100, ErrorMessage ="maximum length of project name  is 100 character")]
-    public string Name { get; set; } = "";
+    public string Name { get; set; } = null!;
 
     [JsonPropertyName("isPrivate")]
     public bool IsPrivate { get; set; } = false;

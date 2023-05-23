@@ -9,5 +9,5 @@ public class ForgetPasswordDTO {
     [EmailAddress(ErrorMessage = "un-valid email address"),
     Required(ErrorMessage ="email address is required"),
     MaxLength(100, ErrorMessage ="maximum length of email address is 100 character")]
-    public string Email {get; set;} = "";
+    public string Email {get; set;} = null!;
 }

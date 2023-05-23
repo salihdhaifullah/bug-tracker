@@ -14,8 +14,8 @@ public class DataContext : DbContext
     public DbSet<Ticket> Tickets { get; set; } = null!;
     public DbSet<Comment> Comments { get; set; } = null!;
     public DbSet<Activity> Activities { get; set; } = null!;
-    public DbSet<Team> Teams { get; set; } = null!;
     public DbSet<Content> Contents { get; set; } = null!;
+    public DbSet<Member> Members { get; set; } = null!;
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {

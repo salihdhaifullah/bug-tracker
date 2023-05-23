@@ -31,7 +31,7 @@ public class ProjectController : Controller
         if (TryGetModelErrorResult(ModelState, out var modelResult)) return modelResult!;
 
 
-        var isFound = await _ctx.Projects.AnyAsync((p) => p.Name == dto.Name && p.Team.OwnerId == userId);
+        var isFound = await _ctx.Projects.AnyAsync((p) => p.Name == dto.Name && p.OwnerId == userId);
 
         if (isFound) return new HttpResult()
                             .IsOk(false)
@@ -39,22 +39,18 @@ public class ProjectController : Controller
                             .StatusCode(400).Get();
 
 
-        var team = _ctx.Teams.Add(new Team() { OwnerId = userId });
-
-        await _ctx.SaveChangesAsync();
-
         var data = _ctx.Projects.Add(new Project()
         {
             Name = dto.Name,
             IsPrivate = dto.IsPrivate,
-            TeamId = team.Entity.Id
+            OwnerId = userId,
         });
 
         await _ctx.SaveChangesAsync();
 
         return new HttpResult()
                             .IsOk(true)
-                            .Body(new { data.Entity.Team, data.Entity.CreatedAt, data.Entity.IsPrivate, data.Entity.Name, data.Entity.Id })
+                            .Body(new { data.Entity.Members, data.Entity.Owner, data.Entity.CreatedAt, data.Entity.IsPrivate, data.Entity.Name, data.Entity.Id })
                             .Message($"project {dto.Name} successfully created")
                             .Get();
     }
@@ -65,10 +61,10 @@ public class ProjectController : Controller
         if (!_auth.TryGetUser(HttpContext, out var user) || user is null) return new HttpResult().IsOk(true).Message("no projects found for you, to create project please sing-up").StatusCode(404).Get();
 
         var projects = await _ctx.Projects
-                        .Where((p) => p.Team.OwnerId == user.Id)
+                        .Where((p) => p.OwnerId == user.Id)
                         .OrderBy((p) => p.CreatedAt)
                         .Select((p) => new {
-                            members = p.Team.Members.Count + 1,
+                            members = p.Members.Count + 1,
                             tickets = p.Tickets.Count,
                             createdAt = p.CreatedAt,
                             id = p.Id,
@@ -102,8 +98,8 @@ public class ProjectController : Controller
                             activities = p.Activities,
                             createdAt = p.CreatedAt,
                             description = p.Description,
-                            ownerId = p.Team.OwnerId,
-                            members = p.Team.Members.Count,
+                            ownerId = p.OwnerId,
+                            members = p.Members.Count,
                         })
                         .FirstOrDefaultAsync();
 
@@ -125,7 +121,7 @@ public class ProjectController : Controller
     {
         if (!_auth.TryGetUser(HttpContext, out var user) || user is null) return new HttpResult().IsOk(true).Message("no projects found for you, to create project please sing-up").StatusCode(404).Get();
 
-        var projectsCount = await _ctx.Projects.Where((p) => p.Team.OwnerId == user.Id).CountAsync();
+        var projectsCount = await _ctx.Projects.Where((p) => p.OwnerId == user.Id).CountAsync();
 
         int pages = (int)Math.Ceiling((double) projectsCount / take);
 

@@ -8,8 +8,8 @@ public class Content {
     [Key, Column("id")]
     public int Id { get; set; }
 
-    [Required, Column("html")]
-    public string Html {get; set;} = null!;
+    [Required, Column("markdown")]
+    public string Markdown {get; set;} = null!;
 
     [Column("files")]
     public ICollection<Document> Files { get; set; } = null!;

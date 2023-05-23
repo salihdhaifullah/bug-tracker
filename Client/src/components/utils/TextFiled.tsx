@@ -1,4 +1,4 @@
-import { ChangeEventHandler, HTMLProps, ReactNode, useEffect, useId, useState } from "react";
+import { ChangeEventHandler, ForwardedRef, HTMLProps, LegacyRef, ReactNode, forwardRef, useEffect, useId, useState } from "react";
 import { IconType } from "react-icons";
 
 const LABEL_FOCUS = "bottom-[95%] left-[12%] text-sm text-secondary";
@@ -21,10 +21,11 @@ interface TextFiledProps {
     inputProps?: HTMLProps<HTMLInputElement>
     onFocus?: () => void
     onBlur?: () => void
+    maxLength?: number
 }
 
 
-const TextFiled = (props: TextFiledProps) => {
+const TextFiled = forwardRef((props: TextFiledProps, ref: ForwardedRef<HTMLDivElement>) => {
     const Id = useId();
     const [isFocus, setIsFocus] = useState(false);
     const [isError, setIsError] = useState(false);
@@ -46,7 +47,7 @@ const TextFiled = (props: TextFiledProps) => {
         if (props?.onFocus) props.onFocus();
     }
 
-    const onBlur= () => {
+    const onBlur = () => {
         setIsFocus(false);
         if (props?.onBlur) props.onBlur();
     }
@@ -60,9 +61,9 @@ const TextFiled = (props: TextFiledProps) => {
 
         if (
             !props?.validation ||
-             props?.validation.length === 0 ||
+            props?.validation.length === 0 ||
             !e.target.value
-            ) return;
+        ) return;
 
         for (let i = 0; i < props?.validation.length; i++) {
             const item = props?.validation[i];
@@ -77,29 +78,33 @@ const TextFiled = (props: TextFiledProps) => {
     }
 
     return (
-        <div className="flex flex-col justify-center items-center p-2 px-6 w-full gap-2">
+        <div ref={ref} className="flex flex-col justify-center items-center p-2 px-6 w-full gap-2">
             <div className="flex flex-row gap-2 w-full justify-center items-center relative">
                 <label
                     htmlFor={Id}
                     className={labelClassName}>
                     {props.label}
                 </label>
-                {!props?.icon ? null : <props.icon className="text-gray-600 text-xl font-bold"/>}
+                {!props?.icon ? null : <props.icon className="text-gray-600 text-xl font-bold" />}
                 {!props?.InElement ? null : props.InElement}
                 <input
                     {...props.inputProps}
                     className={`p-2 border h-fit rounded-sm w-full ${isError ? "border-red-500 hover:border-red-700 focus:outline-red-600" : "border-gray-400 hover:border-gray-900 focus:outline-secondary"} `}
                     id={Id}
-                    value={props?.value}
+                    value={props.value}
                     onFocus={onFocus}
                     onBlur={onBlur}
                     onChange={handelChange}
+                    maxLength={props.maxLength}
                 />
             </div>
-            {!isError ? null : <p className="text-red-600 text-center text-base font-bold">{errorMassage}</p>}
+            {!isError
+                ? (props.maxLength !== undefined
+                    && <p className="text-gray-600 text-center text-xs font-light">You have {props.maxLength - props.value.length} characters remaining out of a maximum of {props.maxLength}.</p>)
+                : <p className="text-red-600 text-center text-base font-bold">{errorMassage}</p>}
         </div>
     )
-}
+})
 
 export default TextFiled;
 
