@@ -39,16 +39,47 @@ public class UserController : Controller
 
         if (isFound is null) return new HttpResult().IsOk(false).StatusCode(404).Message("user not found please sing-up").RedirectTo("/auth/sing-up").Get();
 
-        Console.WriteLine($"\n\n\t isFound and isFound.Image is not null {isFound.Image.Id}");
-
         isFound.Image.ContentType = contentType;
         isFound.Image.Data = Convert.FromBase64String(dto.Data);
 
         await _ctx.SaveChangesAsync();
 
-        Console.WriteLine("\n\n\t Saved Changes Async ");
-
         return new HttpResult().IsOk(true).Message("successfully changed profile image").Get();
+    }
+
+
+    [HttpGet("title/{userId?}")]
+    public async Task<IActionResult> GetTitle([FromRoute] int userId)
+    {
+
+        var isFound = await _ctx.Users
+                        .Where(u => u.Id == userId)
+                        .Select(u => new {title = u.Title})
+                        .FirstOrDefaultAsync();
+
+        if (isFound is null) return new HttpResult().IsOk(false).StatusCode(404).Get();
+
+        return new HttpResult().IsOk(true).Body(isFound).StatusCode(200).Get();
+    }
+
+    [HttpPost("title")]
+    public async Task<IActionResult> UpdateTitle([FromBody] TitleDTO dto)
+    {
+        var result = _auth.CheckPermissions(HttpContext, out var userId);
+
+        if (result is not null) return result;
+
+        if (TryGetModelErrorResult(ModelState, out var modelResult)) return modelResult!;
+
+        var isFound = _ctx.Users.FirstOrDefault(u => u.Id == userId);
+
+        if (isFound is null) return new HttpResult().IsOk(false).StatusCode(404).Message("user not found please sing-up").RedirectTo("/auth/sing-up").Get();
+
+        isFound.Title = dto.Title;
+
+        await _ctx.SaveChangesAsync();
+
+        return new HttpResult().IsOk(true).Message("successfully changed bio").Get();
     }
 
 }

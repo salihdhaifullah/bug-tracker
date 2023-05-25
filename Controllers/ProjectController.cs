@@ -58,10 +58,10 @@ public class ProjectController : Controller
     [HttpGet("projects/{page?}")]
     public async Task<IActionResult> GetMyProjects([FromRoute] int page = 1, [FromQuery] int take = 10)
     {
-        if (!_auth.TryGetUser(HttpContext, out var user) || user is null) return new HttpResult().IsOk(true).Message("no projects found for you, to create project please sing-up").StatusCode(404).Get();
+        if (!_auth.TryGetUser(HttpContext, out var userId) || userId is null) return new HttpResult().IsOk(true).Message("no projects found for you, to create project please sing-up").StatusCode(404).Get();
 
         var projects = await _ctx.Projects
-                        .Where((p) => p.OwnerId == user.Id)
+                        .Where((p) => p.OwnerId == userId)
                         .OrderBy((p) => p.CreatedAt)
                         .Select((p) => new {
                             members = p.Members.Count + 1,
@@ -119,9 +119,9 @@ public class ProjectController : Controller
     [HttpGet("count")]
     public async Task<IActionResult> GetMyProjectsCount([FromQuery] int take = 10)
     {
-        if (!_auth.TryGetUser(HttpContext, out var user) || user is null) return new HttpResult().IsOk(true).Message("no projects found for you, to create project please sing-up").StatusCode(404).Get();
+        if (!_auth.TryGetUser(HttpContext, out var userId) || userId is null) return new HttpResult().IsOk(true).Message("no projects found for you, to create project please sing-up").StatusCode(404).Get();
 
-        var projectsCount = await _ctx.Projects.Where((p) => p.OwnerId == user.Id).CountAsync();
+        var projectsCount = await _ctx.Projects.Where((p) => p.OwnerId == userId).CountAsync();
 
         int pages = (int)Math.Ceiling((double) projectsCount / take);
 

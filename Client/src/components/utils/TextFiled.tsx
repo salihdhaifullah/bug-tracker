@@ -1,4 +1,4 @@
-import { ChangeEventHandler, ForwardedRef, HTMLProps, LegacyRef, ReactNode, forwardRef, useEffect, useId, useState } from "react";
+import { ChangeEventHandler, ForwardedRef, HTMLProps, ReactNode, forwardRef, useEffect, useId, useState } from "react";
 import { IconType } from "react-icons";
 
 const LABEL_FOCUS = "bottom-[95%] left-[12%] text-sm text-secondary";
@@ -13,10 +13,10 @@ export interface IValidate {
 interface TextFiledProps {
     onChange: ChangeEventHandler<HTMLInputElement>;
     label: string
-    setIsValid: (bool: boolean) => void;
+    value: string
+    setIsValid?: (bool: boolean) => void;
     validation?: IValidate[]
     icon?: IconType
-    value: string
     InElement?: ReactNode
     inputProps?: HTMLProps<HTMLInputElement>
     onFocus?: () => void
@@ -70,10 +70,10 @@ const TextFiled = forwardRef((props: TextFiledProps, ref: ForwardedRef<HTMLDivEl
             if (!item.validate(e.target.value)) {
                 setErrorMassage(item.massage)
                 setIsError(true)
-                props.setIsValid(false);
+                props?.setIsValid && props.setIsValid(false);
                 continue;
             }
-            props.setIsValid(true);
+            props?.setIsValid && props.setIsValid(true);
         }
     }
 

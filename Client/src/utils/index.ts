@@ -10,6 +10,7 @@ export function mdParser(markdown: string): string {
 
     const parser: MarkdownIt = new MarkdownIt({
         highlight: (str, lang) => {
+
             if (lang && hljs.getLanguage(lang)) {
                 try {
                     return '<pre class="hljs"><code>' +

@@ -100,31 +100,39 @@ footer {
     }
 }
 
-.custom-html-style > h5 {
+.markdown > h5 {
   @apply text-sm
 }
 
-.custom-html-style > table {
+.markdown > table {
   @apply block my-10 min-w-full border-0 !important;
 }
 
-.custom-html-style > h6 {
+.markdown > h6 {
   @apply text-xs
 }
 
-.custom-html-style > p > img {
+.markdown > p > img {
   @apply my-6
 }
 
-.custom-html-style > ol {
+.markdown > p > code {
+  @apply bg-slate-100 border-[0.2px] border-gray-500 p-1 rounded-md
+}
+
+.markdown > ol {
  @apply list-decimal
 }
 
-.custom-html-style > ol > li {
+.markdown > ol > li {
   display: list-item !important;
   text-align: -webkit-match-parent !important;
 }
 
-.custom-html-style > ul {
+.markdown > ul {
   @apply list-disc
+}
+
+.markdown > pre {
+    @apply p-2 rounded-md shadow-md my-4
 }
