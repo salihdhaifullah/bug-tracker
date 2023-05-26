@@ -1,4 +1,4 @@
-import Editor from "../components/utils/Editor"
+import Editor from "../components/utils/markdown"
 
 const Home = () => {
   return <Editor />
