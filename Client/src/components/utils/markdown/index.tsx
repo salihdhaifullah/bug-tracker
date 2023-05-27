@@ -11,6 +11,7 @@ import Heading from "./Heading";
 // import UnOrderedList from "./UnOrderedList";
 // import OrderedList from "./OrderedList";
 import "highlight.js/styles/androidstudio.css";
+import Bold from "./Bold";
 
 export type OnKeyDownCallBack = (e: KeyboardEvent<HTMLTextAreaElement>) => void;
 
@@ -69,10 +70,11 @@ const Editor = () => {
                                     textarea={textarea}
                                 />
 
-                                {/* <Bold
+                                <Bold
                                     setMdAndSaveChanges={setMdAndSaveChanges}
                                     textarea={textarea}
                                 />
+                                {/*
 
                                 <Italic
                                     setMdAndSaveChanges={setMdAndSaveChanges}

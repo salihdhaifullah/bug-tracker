@@ -1,79 +1,130 @@
-import { SetStateAction, useState } from "react";
 import { BiBold } from "react-icons/bi";
+import { setRange } from ".";
+
+// constants for symbols and characters
+const ASTERISK = "*";
+const DOUBLE_ASTERISK = "**";
+const SPACE = " ";
+const NEWLINE = "\n";
 
 interface IBoldProps {
-    md: string;
-    textarea: HTMLTextAreaElement
-    repeatKeyHandler: (key: string) => boolean
-    setMdAndSaveChanges: (md: string) => void
-    setCursorTo: (position: SetStateAction<number>) => void
+  textarea: HTMLTextAreaElement;
+  setMdAndSaveChanges: (md: string) => void;
 }
 
 const Bold = (props: IBoldProps) => {
-    const isBold = (text: string, start: number) => {
-        const lineStart = text.lastIndexOf("\n", start - 1) + 1;
-        let lineEnd = text.lastIndexOf("\n", start);
+  // helper function to check if a string is wrapped with asterisks
+  const isWrappedWithAsterisks = (str: string) => {
+    return str.startsWith(DOUBLE_ASTERISK) && str.endsWith(DOUBLE_ASTERISK);
+  };
 
-        if (lineEnd === -1) {
-            lineEnd = text.length;
-        }
+  // helper function to find the boundaries of a word in a text
+  const findWordBoundaries = (text: string, index: number) => {
+    let boundaryStart = index === 0 ? 0 : index - 1;
+    let boundaryEnd = index + 1;
 
-        const lineText = text.substring(lineStart, lineEnd);
-        const boldPattern = /^\*\*.*\*\*$/;
-        return boldPattern.test(lineText);
+    // find the left boundary by moving backwards until a space or newline is encountered
+    while (boundaryStart >= 0) {
+      const char = text[boundaryStart];
+      if (char === SPACE || char === NEWLINE || !char) break;
+      boundaryStart--;
     }
 
-    const insertMarkdown = (before: string, after: string) => {
-        const start = props.textarea.selectionStart;
-        const end = props.textarea.selectionEnd;
-        const text = props.md.substring(start, end);
-
-        if (isBold(text, start)) {
-            props.textarea.setRangeText(text.substring(2, text.length - 2), start, end, "select")
-        } else {
-            props.textarea.setRangeText("**" + text + "**", start, end, "select")
-            props.textarea.selectionStart = start + before.length;
-            props.textarea.selectionEnd = end + before.length;
-            props.textarea.focus()
-        }
-
-        // const newText = before + text + after;
-        // props.textarea.setRangeText(newText);
-
+    // find the right boundary by moving forward until a space or newline is encountered
+    while (boundaryEnd < text.length) {
+      const char = text[boundaryEnd];
+      if (char === SPACE || char === NEWLINE || !char) break;
+      boundaryEnd++;
     }
 
-    const bold = () => {
-        // if (props.repeatKeyHandler("bold")) return;
-        insertMarkdown("**", "**");
+    return { boundaryStart, boundaryEnd };
+  };
 
-        // let text = props.md;
-        // const start = props.textarea.selectionStart;
-        // let currentLines = text.slice(0, start).split("\n");
-        // const afterCurrentLines = text.slice(start).split("\n");
-        // const currentLine = currentLines[currentLines.length - 1];
+  // function to insert bold formatting to the selected text or word
+  const insertBold = () => {
+    let text = props.textarea.value;
+    const start = props.textarea.selectionStart;
+    const end = props.textarea.selectionEnd;
 
-        // let currentLineTrimmed = currentLine.trim();
+    // this means we have a selected text
+    if (start !== end) {
+      // get the parts of the text before and after the selection
+      const part1 = text.slice(0, start);
+      const part2 = text.slice(end);
+      // get the selected text
+      const selectedText = text.slice(start, end);
 
-        // if (currentLineTrimmed.length && currentLineTrimmed.endsWith("**") && currentLineTrimmed.startsWith("**")) {
-        //     const undoValue = currentLineTrimmed.substring(2, currentLineTrimmed.length - 2);
-        //     text = `${currentLines.slice(0, currentLines.length - 1)}${undoValue}${afterCurrentLines.join("\n")}`;
-        // }
-        // else if (currentLineTrimmed.length === 0) {
-        //     text = `${text.substring(0, start)}****${text.substring(start)}`;
-        // } else {
-        //     text = `${currentLines.slice(0, currentLines.length - 1)}**${currentLine}**${afterCurrentLines.join("\n")}`;
-        // }
+      let isUndo = true;
+      // if ends and starts with ** remove it
+      if (isWrappedWithAsterisks(selectedText)) {
+        // remove the asterisks from the selected text
+        text = `${part1}${selectedText.slice(2, -2)}${part2}`;
+      } else if (
+        // check if the surrounding characters are asterisks
+        text[start - 1] === ASTERISK &&
+        text[start - 2] === ASTERISK &&
+        text[end] === ASTERISK &&
+        text[end + 1] === ASTERISK
+      ) {
+        // remove the surrounding asterisks
+        text = `${part1.slice(0, -2)}${selectedText}${part2.slice(2)}`;
+      } else {
+        isUndo = false;
+        // add asterisks to the selected text
+        text = `${part1}${DOUBLE_ASTERISK}${selectedText}${DOUBLE_ASTERISK}${part2}`;
+      }
 
-        // props.setMdAndSaveChanges(text);
-        // props.setCursorTo(start - 2)
+      props.textarea.value = text;
+      props.setMdAndSaveChanges(text);
+
+      const rangeStart = isUndo ? start - 2 : start + 2;
+      const rangeEnd = isUndo ? end - 2 : end + 2;
+
+      setRange(props.textarea, rangeStart, rangeEnd);
+    } else {
+      // no text is selected, so find the word at the cursor position
+      let word = "";
+
+      // find the boundaries of the word
+      const { boundaryStart, boundaryEnd } = findWordBoundaries(text, start);
+
+      // get the word from the boundaries
+      word = text.slice(boundaryStart + 1, boundaryEnd);
+
+      let newWord = word;
+      let isUndo = false;
+      if (isWrappedWithAsterisks(newWord)) {
+        // remove the asterisks from the word
+        newWord = newWord.slice(2, -2);
+        isUndo = true;
+      } else {
+        // add asterisks to the word
+        newWord = `${DOUBLE_ASTERISK}${newWord}${DOUBLE_ASTERISK}`;
+      }
+
+      // get the parts of the text before and after the word
+      let part1 = text.slice(0, boundaryStart + 1);
+      let part2 = text.slice(boundaryEnd);
+
+      // replace the word with the new word in the text
+      text = `${part1}${newWord}${part2}`;
+
+      props.textarea.value = text;
+      props.setMdAndSaveChanges(text);
+
+      const rangeStart = isUndo ? part1.length : part1.length + 2;
+      const rangeEnd =
+        isUndo ? part1.length + newWord.length : part1.length + newWord.length - 2;
+
+      setRange(props.textarea, rangeStart, rangeEnd);
     }
+  };
 
-    return (
-        <div className="flex justify-center items-center"
-            onClick={() => bold()}>
-            <BiBold className="text-gray-700 text-xl rounded-sm hover:bg-gray-200 hover:text-secondary cursor-pointer" />
-        </div>
-    )
-}
+  return (
+    <div className="flex justify-center items-center" onClick={() => insertBold()}>
+      <BiBold className="text-gray-700 text-xl rounded-sm hover:bg-gray-200 hover:text-secondary cursor-pointer" />
+    </div>
+  );
+};
 
-export default Bold
+export default Bold;
