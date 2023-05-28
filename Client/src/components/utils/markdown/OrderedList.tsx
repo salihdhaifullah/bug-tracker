@@ -1,27 +1,43 @@
-import { SetStateAction, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { BiListOl } from "react-icons/bi";
 
 interface IOrderedListProps {
-    md: string;
     textarea: HTMLTextAreaElement
-    repeatKeyHandler: (key: string) => boolean
     setMdAndSaveChanges: (md: string) => void
-    setCursorTo: (position: SetStateAction<number>) => void
 }
 
 const OrderedList = (props: IOrderedListProps) => {
-    const [counter, setCounter] = useState(1);
+    const [isOrderedList, setIsOrderedList] = useState(false);
+    const [enterCount, setEnterCount] = useState(0);
 
-    const orderedList = () => {
-        if (props.repeatKeyHandler("orderedList")) return;
-        props.setMdAndSaveChanges(`${props.md}\n${counter}. `);
-        props.setCursorTo(props.md.length + 2 + counter.toString().length)
-        setCounter((prev) => (prev + 1))
+    const keydownListener =  useCallback((e: KeyboardEvent) => {
+        if (e.key === "Enter") setEnterCount((prev) => prev + 1);
+        else setEnterCount(0);
+    }, [])
+
+    useEffect(() => {
+        if (isOrderedList) props.textarea.addEventListener("keydown", keydownListener);
+        else props.textarea.removeEventListener("keydown", keydownListener);
+
+        return () => props.textarea.removeEventListener("keydown", keydownListener);
+    }, [isOrderedList])
+
+    useEffect(() => {
+        if (enterCount === 2) {
+            setIsOrderedList(false);
+            setEnterCount(0);
+        }
+    }, [enterCount]);
+
+    const insertOrderedList = () => {
+        setIsOrderedList(true);
     }
+
+    useEffect(() => { console.table({ enterCount, isOrderedList }) }, [isOrderedList, enterCount])
 
     return (
         <div className="flex justify-center items-center"
-            onClick={() => orderedList()}>
+            onClick={() => insertOrderedList()}>
             <BiListOl className="text-gray-700 text-xl rounded-sm hover:bg-gray-200 hover:text-secondary cursor-pointer" />
         </div>
     )

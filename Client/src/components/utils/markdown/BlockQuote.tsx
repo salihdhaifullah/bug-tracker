@@ -1,15 +1,16 @@
-import { BiHeading } from "react-icons/bi";
+import { BsQuote } from "react-icons/bs";
 import { setRange } from ".";
 
+interface IQuoteProps {
+    textarea: HTMLTextAreaElement
+    setMdAndSaveChanges: (md: string) => void
+}
+
+const BLOCK_QUOTE = ">";
 const NEWLINE = "\n";
 const SPACE = " ";
 
-interface IHeadingProps {
-    textarea: HTMLTextAreaElement;
-    setMdAndSaveChanges: (md: string) => void;
-}
-
-const Heading = (props: IHeadingProps) => {
+const BlockQuote = (props: IQuoteProps) => {
 
     const findWordBoundaries = (text: string, index: number): { boundaryStart: number, boundaryEnd: number } => {
         let boundaryStart = index > 0 ? index - 1 : 0;
@@ -31,7 +32,7 @@ const Heading = (props: IHeadingProps) => {
     };
 
 
-    const insertHeading = (headingType: number) => {
+    const insertBlockQuote = () => {
         let text = props.textarea.value;
         const start = props.textarea.selectionStart;
         const end = props.textarea.selectionEnd;
@@ -41,14 +42,11 @@ const Heading = (props: IHeadingProps) => {
             const part2 = text.slice(end);
             const selectedText = text.slice(start, end);
 
-            text = `${part1} ${"#".repeat(headingType)} ${selectedText} ${part2}`;
+            text = `${part1} ${BLOCK_QUOTE} ${selectedText} ${part2}`;
 
             props.textarea.value = text;
             props.setMdAndSaveChanges(text);
-
-            const range = headingType + end + 3;
-
-            setRange(props.textarea, range, range);
+            setRange(props.textarea, end + 4, end + 4);
         } else {
             const { boundaryStart, boundaryEnd } = findWordBoundaries(text, start);
 
@@ -56,34 +54,23 @@ const Heading = (props: IHeadingProps) => {
             const word = text.slice(boundaryStart, boundaryEnd);
             const part2 = text.slice(boundaryEnd, text.length);
 
-            text = `${part1} ${"#".repeat(headingType)} ${word} ${part2}`;
+            const range = (part1.trim().length ? 2 : 0) + 4 + boundaryEnd;
+
+            text = `${part1}${part1.trim().length ? "\n\n" : ""} ${BLOCK_QUOTE} ${word} ${part2}`;
 
             props.textarea.value = text;
             props.setMdAndSaveChanges(text);
-
-            const range = headingType + end + 3;
-
             setRange(props.textarea, range, range);
         }
     };
 
+
     return (
-        <div className="flex group flex-row gap-2 items-center relative">
-            <BiHeading className="text-gray-700 text-xl rounded-sm hover:bg-gray-200 hover:text-secondary cursor-pointer" />
-
-            <div className="group-hover:h-auto group-hover:w-auto w-0 h-0 max-h-40 -left-8 top-4 absolute transition-all ease-in-out bg-white group-hover:p-2 rounded-md group-hover:shadow-md">
-                {["text-2xl", "text-xl", "text-lg", "text-base", "text-sm", "text-xs"].map(
-                    (textType, index) => (
-                        <p key={index}
-                            className={`text-gray-700 p-1 flex justify-center items-center rounded-sm hover:bg-gray-200 hover:text-secondary cursor-pointer ${textType} `}
-                            onClick={() => insertHeading(index + 1)}>
-                            <BiHeading />
-                        </p>
-                    )
-                )}
-            </div>
+        <div className="flex justify-center items-center"
+            onClick={() => insertBlockQuote()}>
+            <BsQuote className="text-gray-700 text-xl rounded-sm hover:bg-gray-200 hover:text-secondary cursor-pointer" />
         </div>
-    );
-};
+    )
+}
 
-export default Heading;
+export default BlockQuote;

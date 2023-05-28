@@ -1,24 +1,36 @@
 import { BiLink } from "react-icons/bi";
+import { setRange } from ".";
 
 interface ILinkProps {
-    md: string;
     textarea: HTMLTextAreaElement
-    repeatKeyHandler: (key: string) => boolean
     setMdAndSaveChanges: (md: string) => void
-    setSelectionTo: (position: { start: number; end: number; }) => void
 }
+
+const LINK = "[](https://)";
 
 const Link = (props: ILinkProps) => {
 
-    const link = () => {
-        if (props.repeatKeyHandler("link")) return;
-        props.setMdAndSaveChanges(`${props.md}[text](link)`);
-        props.setSelectionTo({ start: (props.md.length + 7), end: (props.md.length + 11) });
+    const insertLink = () => {
+        let text = props.textarea.value;
+        const start = props.textarea.selectionStart;
+        const end = props.textarea.selectionEnd;
+
+        const part1 = text.slice(0, start);
+        const part2 = text.slice(end);
+
+        text = `${part1} ${LINK} ${part2}`;
+
+        props.textarea.value = text;
+        props.setMdAndSaveChanges(text);
+
+        const range = start + 2;
+
+        setRange(props.textarea, range, range);
     }
 
     return (
         <div className="flex justify-center items-center"
-            onClick={() => link()}>
+            onClick={() => insertLink()}>
             <BiLink className="text-gray-700 text-xl rounded-sm hover:bg-gray-200 hover:text-secondary cursor-pointer" />
         </div>
     )

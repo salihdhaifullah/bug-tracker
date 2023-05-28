@@ -1,32 +1,46 @@
 import { BsFileEarmarkImage } from "react-icons/bs";
 import { toWEBPImage } from "../../../utils";
-import { SetStateAction } from "react";
+import { setRange } from ".";
 
 interface IImageProps {
-    md: string;
     textarea: HTMLTextAreaElement
-    repeatKeyHandler: (key: string) => boolean
     setMdAndSaveChanges: (md: string) => void
-    setCursorTo: (position: SetStateAction<number>) => void
-    files: Record<string, string>
+    files: {base64: string, preViewUrl: string}[]
 }
+
 
 const Image = (props: IImageProps) => {
 
-    const image = async (file: File | null) => {
+    const insertImage = async (file: File | null) => {
         if (file === null) return;
-        props.repeatKeyHandler("");
+
         const preViewUrl = URL.createObjectURL(file);
         const base64 = await toWEBPImage(file);
-        props.files[preViewUrl] = base64;
+        props.files.push({base64, preViewUrl});
 
-        props.setMdAndSaveChanges(`${props.md}\n![${file.name}](${preViewUrl})\n`);
-        props.setCursorTo(props.md.length + 5 + file.name.length + preViewUrl.length);
+
+        let text = props.textarea.value;
+        const start = props.textarea.selectionStart;
+        const end = props.textarea.selectionEnd;
+
+        const part1 = text.slice(0, start);
+        const part2 = text.slice(end);
+
+        const image = `\n![${file.name}](${preViewUrl})\n`;
+
+        text = `${part1}${image}${part2}`;
+
+        props.textarea.value = text;
+        props.setMdAndSaveChanges(text);
+
+        const range = start + 5 + file.name.length + preViewUrl.length;
+
+        setRange(props.textarea, range, range);
     }
 
     return (
         <>
-            <input type="file" id="image-input" className="hidden" accept="image/*" onChange={(e) => image(e?.target?.files ? e?.target?.files[0] : null)} />
+            <input type="file" id="image-input" className="hidden" accept="image/*" onChange={(e) => insertImage(e?.target?.files ? e?.target?.files[0] : null)} />
             <label htmlFor="image-input">
                 <div className="flex justify-center items-center">
                     <BsFileEarmarkImage className="text-gray-700 text-xl rounded-sm hover:bg-gray-200 hover:text-secondary cursor-pointer" />

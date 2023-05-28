@@ -1,19 +1,17 @@
 import { useRef, useState, KeyboardEvent, useCallback } from "react";
-import Parser from "./Parser";
 import Heading from "./Heading";
-// import Bold from "./Bold";
-// import Italic from "./Italic";
-// import CodeBlock from "./CodeBlock";
-// import Quote from "./Quote";
-// import Link from "./Link";
-// import CodeLangues from "./CodeLangues";
-// import Image from "./Image";
-// import UnOrderedList from "./UnOrderedList";
-// import OrderedList from "./OrderedList";
-import "highlight.js/styles/androidstudio.css";
 import Bold from "./Bold";
-
-export type OnKeyDownCallBack = (e: KeyboardEvent<HTMLTextAreaElement>) => void;
+import Italic from "./Italic";
+import CodeBlock from "./CodeBlock";
+import BlockQuote from "./BlockQuote";
+import Link from "./Link";
+import CodeLangues from "./CodeLangues";
+import Image from "./Image";
+import UnOrderedList from "./UnOrderedList";
+import OrderedList from "./OrderedList";
+import Parser from "./Parser";
+import "highlight.js/styles/atom-one-dark.css";
+import Stack from "../../../utils/Stack";
 
 export function setRange(input: HTMLTextAreaElement, start: number | null, end: number | null) {
     input.setSelectionRange(start, end);
@@ -25,34 +23,37 @@ const Editor = () => {
     const [md, setMd] = useState("");
     const [textarea, setTextarea] = useState<HTMLTextAreaElement | null>(null);
 
-    let { current: changes } = useRef<string[]>([""]);
-    const [onKeyDownCallBacks, setOnKeyDownCallBacks] = useState<OnKeyDownCallBack[]>([]);
+    let { current: files } = useRef<{ base64: string, preViewUrl: string }[]>([]);
 
-    // let { current: files } = useRef<Record<string, string>>({});
+    let { current: undoStack } = useRef<Stack<string>>(new Stack<string>());
+    let { current: redoStack } = useRef<Stack<string>>(new Stack<string>());
 
     const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
-        if (e.ctrlKey && e.key === "z" && changes.length > 1) {
-            changes.pop();
-            setMd(changes[changes.length - 1])
+        if (e.ctrlKey && e.key === "z") {
+            if (!undoStack.isEmpty()) {
+                const lastChange = undoStack.pop() as string;
+                redoStack.push(md);
+                setMd(lastChange);
+            }
         }
-
-        if (e.key === " " && md.endsWith(" ")) { changes.push(md) }
-        for (let i = 0; i< onKeyDownCallBacks.length; i++) { onKeyDownCallBacks[i](e) }
+        else if (e.ctrlKey && e.key === "y") {
+            if (!redoStack.isEmpty()) {
+                const lastChange = redoStack.pop() as string;
+                undoStack.push(md);
+                setMd(lastChange);
+            }
+        }
+        else {
+            if (e.key === " ") undoStack.push(md);
+        }
     }
 
     const setMdAndSaveChanges = (md: string) => {
         setMd(md);
-        changes.push(md);
+        undoStack.push(md);
     }
 
     const textareaCallback = useCallback((element: HTMLTextAreaElement | null) => { setTextarea(element) }, [])
-
-    const registerCallback = useCallback((callback: OnKeyDownCallBack) => {
-        setOnKeyDownCallBacks((prev) => {
-            prev.push(callback);
-            return prev;
-        });
-    }, [])
 
     return (
         <div className="m-4 flex flex-col flex-grow w-auto border-gray-700 justify-center items-center ">
@@ -65,58 +66,16 @@ const Editor = () => {
                     <div className="flex flex-row gap-2 items-center">
                         {textarea === null ? null : (
                             <>
-                                <Heading
-                                    setMdAndSaveChanges={setMdAndSaveChanges}
-                                    textarea={textarea}
-                                />
-
-                                <Bold
-                                    setMdAndSaveChanges={setMdAndSaveChanges}
-                                    textarea={textarea}
-                                />
-                                {/*
-
-                                <Italic
-                                    setMdAndSaveChanges={setMdAndSaveChanges}
-                                    textarea={textarea}
-                                />
-
-                                <CodeBlock
-                                    setMdAndSaveChanges={setMdAndSaveChanges}
-                                    textarea={textarea}
-                                />
-
-                                <Quote
-                                    setMdAndSaveChanges={setMdAndSaveChanges}
-                                    textarea={textarea}
-                                />
-
-                                <Link
-                                    setMdAndSaveChanges={setMdAndSaveChanges}
-                                    textarea={textarea}
-                                />
-
-
-                                <CodeLangues
-                                    setMdAndSaveChanges={setMdAndSaveChanges}
-                                    textarea={textarea}
-                                />
-
-                                <Image
-                                    setMdAndSaveChanges={setMdAndSaveChanges}
-                                    textarea={textarea}
-                                    files={files}
-                                />
-
-                                <UnOrderedList
-                                    setMdAndSaveChanges={setMdAndSaveChanges}
-                                    textarea={textarea}
-                                />
-
-                                <OrderedList
-                                    setMdAndSaveChanges={setMdAndSaveChanges}
-                                    textarea={textarea}
-                                /> */}
+                                <Heading setMdAndSaveChanges={setMdAndSaveChanges} textarea={textarea} />
+                                <Bold setMdAndSaveChanges={setMdAndSaveChanges} textarea={textarea} />
+                                <Italic setMdAndSaveChanges={setMdAndSaveChanges} textarea={textarea} />
+                                <CodeBlock setMdAndSaveChanges={setMdAndSaveChanges} textarea={textarea} />
+                                <BlockQuote setMdAndSaveChanges={setMdAndSaveChanges} textarea={textarea} />
+                                <Link setMdAndSaveChanges={setMdAndSaveChanges} textarea={textarea} />
+                                <CodeLangues setMdAndSaveChanges={setMdAndSaveChanges} textarea={textarea} />
+                                <Image setMdAndSaveChanges={setMdAndSaveChanges} textarea={textarea} files={files} />
+                                <UnOrderedList setMdAndSaveChanges={setMdAndSaveChanges} textarea={textarea} />
+                                <OrderedList setMdAndSaveChanges={setMdAndSaveChanges} textarea={textarea} />
                             </>
                         )}
                     </div>
