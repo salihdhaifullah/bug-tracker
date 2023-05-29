@@ -13,8 +13,8 @@ import Parser from "./Parser";
 import "highlight.js/styles/atom-one-dark.css";
 import Stack from "../../../utils/Stack";
 
-export function setRange(input: HTMLTextAreaElement, start: number | null, end: number | null) {
-    input.setSelectionRange(start, end);
+export function setRange(input: HTMLTextAreaElement, start: number, end?: number) {
+    input.setSelectionRange(start, end ? end : start);
     input.focus();
 }
 
@@ -23,34 +23,34 @@ const Editor = () => {
     const [md, setMd] = useState("");
     const [textarea, setTextarea] = useState<HTMLTextAreaElement | null>(null);
 
-    let { current: files } = useRef<{ base64: string, preViewUrl: string }[]>([]);
+    let files = useRef<{ base64: string, preViewUrl: string }[]>([]);
 
-    let { current: undoStack } = useRef<Stack<string>>(new Stack<string>());
-    let { current: redoStack } = useRef<Stack<string>>(new Stack<string>());
+    let undoStack = useRef<Stack<string>>(new Stack<string>());
+    let redoStack = useRef<Stack<string>>(new Stack<string>());
 
     const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
         if (e.ctrlKey && e.key === "z") {
-            if (!undoStack.isEmpty()) {
-                const lastChange = undoStack.pop() as string;
-                redoStack.push(md);
+            if (!undoStack.current.isEmpty()) {
+                const lastChange = undoStack.current.pop() as string;
+                redoStack.current.push(md);
                 setMd(lastChange);
             }
         }
         else if (e.ctrlKey && e.key === "y") {
-            if (!redoStack.isEmpty()) {
-                const lastChange = redoStack.pop() as string;
-                undoStack.push(md);
+            if (!redoStack.current.isEmpty()) {
+                const lastChange = redoStack.current.pop() as string;
+                undoStack.current.push(md);
                 setMd(lastChange);
             }
         }
         else {
-            if (e.key === " ") undoStack.push(md);
+            if (e.key === " ") undoStack.current.push(md);
         }
     }
 
     const setMdAndSaveChanges = (md: string) => {
         setMd(md);
-        undoStack.push(md);
+        undoStack.current.push(md);
     }
 
     const textareaCallback = useCallback((element: HTMLTextAreaElement | null) => { setTextarea(element) }, [])

@@ -1,11 +1,12 @@
 import { BsFileEarmarkImage } from "react-icons/bs";
 import { toWEBPImage } from "../../../utils";
 import { setRange } from ".";
+import { MutableRefObject } from "react";
 
 interface IImageProps {
     textarea: HTMLTextAreaElement
     setMdAndSaveChanges: (md: string) => void
-    files: {base64: string, preViewUrl: string}[]
+    files: MutableRefObject<{base64: string; preViewUrl: string;}[]>
 }
 
 
@@ -16,7 +17,7 @@ const Image = (props: IImageProps) => {
 
         const preViewUrl = URL.createObjectURL(file);
         const base64 = await toWEBPImage(file);
-        props.files.push({base64, preViewUrl});
+        props.files.current.push({base64, preViewUrl});
 
 
         let text = props.textarea.value;
@@ -33,9 +34,7 @@ const Image = (props: IImageProps) => {
         props.textarea.value = text;
         props.setMdAndSaveChanges(text);
 
-        const range = start + 5 + file.name.length + preViewUrl.length;
-
-        setRange(props.textarea, range, range);
+        setRange(props.textarea, start + 5 + file.name.length + preViewUrl.length);
     }
 
     return (

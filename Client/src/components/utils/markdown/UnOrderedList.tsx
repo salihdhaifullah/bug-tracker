@@ -1,5 +1,5 @@
 import { BiListUl } from "react-icons/bi";
-import { useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { setRange } from ".";
 
 interface IUnOrderedListProps {
@@ -8,92 +8,60 @@ interface IUnOrderedListProps {
 }
 
 const UnOrderedList = (props: IUnOrderedListProps) => {
-    let { current: enterKeyCount } = useRef(0);
-    let { current: isStartingListMode } = useRef(false);
-    let { current: isUnOrderedListMode } = useRef(false);
+    let isUnOrderedListMode = useRef(false);
 
     const insertDash = () => {
         let text = props.textarea.value;
         const start = props.textarea.selectionStart;
         const end = props.textarea.selectionEnd;
-
-        const part1 = text.slice(0, start);
-        const part2 = text.slice(end);
-
-        text = `${part1}- ${part2}`;
-
+        text = `${text.slice(0, start)}- ${text.slice(end)}`;
         props.textarea.value = text;
         props.setMdAndSaveChanges(text);
-
-        const range = start + 3;
-
-        setRange(props.textarea, range, range);
+        setRange(props.textarea, start + 2);
     };
 
-    const keydownListener = useCallback((e: KeyboardEvent) => {
-
-
-        if (e.key === "Enter") {
-            e.preventDefault();
-            let text = props.textarea.value;
-            const start = props.textarea.selectionStart;
-            const end = props.textarea.selectionEnd;
-            const currentLines = text.slice(0, start).split("\n");
-            const currentLine = currentLines[currentLines.length - 1];
-            const part2 = text.slice(end);
-
-            console.error("currentLines", currentLines)
-            console.error("currentLine", `"${currentLine}"`)
-
-            if (currentLine.trim().startsWith("-")) {
-                if (currentLine.trim().length > 1) {
-                    const slicedText = currentLines.slice(0, currentLines.length).join("\n");
-                    text = `${slicedText}${isStartingListMode ? "" : "\n"}${part2}`;
-                    props.textarea.value = text;
-                    props.setMdAndSaveChanges(text);
-                    const range = start + 3;
-                    setRange(props.textarea, range, range);
-                    console.error("the one")
-                } else {
-                    const slicedText = currentLines.slice(0, currentLines.length - 1).join("\n");
-                    text = `${slicedText}${part2}`;
-                    props.textarea.value = text;
-                    props.setMdAndSaveChanges(text);
-                    const range = start + 3;
-                    setRange(props.textarea, range, range);
-                    console.error("the two")
-                }
-            }
-            else isUnOrderedListMode = false;
-        }
-
-        if (e.key === "Enter" && !enterKeyCount && !isStartingListMode) {
-            e.preventDefault();
-            insertDash();
-        }
-
-        if (isStartingListMode) isStartingListMode = false;
-
-        if (e.key === "Enter") enterKeyCount += 1;
-        else enterKeyCount = 0;
-
-        if (enterKeyCount === 2) {
-            isUnOrderedListMode = false;
-            enterKeyCount = 0;
-        }
-
-
-
-        if (!isUnOrderedListMode) props.textarea.removeEventListener("keydown", keydownListener);
-    }, []);
 
     const enterUnOrderedListMode = () => {
-        if (!isUnOrderedListMode) props.textarea.addEventListener("keydown", keydownListener);
-
-        isUnOrderedListMode = true;
-        isStartingListMode = true;
+        isUnOrderedListMode.current = true;
         insertDash();
-    };
+    }
+
+    const keydownListener = useCallback((e: KeyboardEvent) => {
+        if (e.key !== "Enter" || !isUnOrderedListMode.current) return;
+
+        e.preventDefault();
+        let text = props.textarea.value;
+        const start = props.textarea.selectionStart;
+        const end = props.textarea.selectionEnd;
+        const currentLines = text.slice(0, start).split("\n");
+        const currentLine = currentLines[currentLines.length - 1];
+        const part2 = text.slice(end);
+
+        if (currentLine.trim().startsWith("-") && currentLine.trim().length > 1) {
+            const slicedText = currentLines.slice(0, currentLines.length).join("\n");
+            const inner = slicedText.trim().length ? "\n- " : "- ";
+            text = `${slicedText}${inner}${part2}`;
+            props.textarea.value = text;
+            props.setMdAndSaveChanges(text);
+            setRange(props.textarea, start + inner.length);
+        }
+        else if (currentLine.trim().startsWith("-") && currentLine.trim() === "-") {
+            isUnOrderedListMode.current = false;
+            const slicedText = currentLines.slice(0, currentLines.length - 1).join("\n");
+            const inner = slicedText.trim().length ? "\n" : "";
+            text = `${slicedText}${inner}${part2}`;
+            props.textarea.value = text;
+            props.setMdAndSaveChanges(text);
+
+            setRange(props.textarea, start - currentLine.length);
+        }
+    }, []);
+
+
+    useEffect(() => {
+        props.textarea.addEventListener("keydown", keydownListener);
+        return () => props.textarea.removeEventListener("keydown", keydownListener);
+    }, []);
 
     return (
         <div className="flex justify-center items-center" onClick={() => enterUnOrderedListMode()}>

@@ -12,7 +12,7 @@ interface IHeadingProps {
 const Heading = (props: IHeadingProps) => {
 
     const findWordBoundaries = (text: string, index: number): { boundaryStart: number, boundaryEnd: number } => {
-        let boundaryStart = index > 0 ? index - 1 : 0;
+        let boundaryStart = index > 0 ? (text[index - 1] !== NEWLINE ? index - 1 : index) : index;
         let boundaryEnd = index + 1;
 
         while (boundaryStart > 0) {
@@ -46,9 +46,7 @@ const Heading = (props: IHeadingProps) => {
             props.textarea.value = text;
             props.setMdAndSaveChanges(text);
 
-            const range = headingType + end + 3;
-
-            setRange(props.textarea, range, range);
+            setRange(props.textarea, headingType + end + 3);
         } else {
             const { boundaryStart, boundaryEnd } = findWordBoundaries(text, start);
 
@@ -61,9 +59,7 @@ const Heading = (props: IHeadingProps) => {
             props.textarea.value = text;
             props.setMdAndSaveChanges(text);
 
-            const range = headingType + end + 3;
-
-            setRange(props.textarea, range, range);
+            setRange(props.textarea, headingType + end + 3);
         }
     };
 

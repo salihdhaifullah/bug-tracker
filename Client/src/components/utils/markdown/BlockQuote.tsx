@@ -13,8 +13,8 @@ const SPACE = " ";
 const BlockQuote = (props: IQuoteProps) => {
 
     const findWordBoundaries = (text: string, index: number): { boundaryStart: number, boundaryEnd: number } => {
-        let boundaryStart = index > 0 ? index - 1 : 0;
-        let boundaryEnd = index + 1;
+        let boundaryStart = index > 0 ? (text[index - 1] !== NEWLINE ? index - 1 : index) : index;
+        let boundaryEnd = text[index] !== NEWLINE ? index + 1 : index;
 
         while (boundaryStart > 0) {
             const char = text[boundaryStart];
@@ -41,26 +41,37 @@ const BlockQuote = (props: IQuoteProps) => {
             const part1 = text.slice(0, start);
             const part2 = text.slice(end);
             const selectedText = text.slice(start, end);
+            const currentLines = part1.split("\n");
 
-            text = `${part1} ${BLOCK_QUOTE} ${selectedText} ${part2}`;
+            const spaces = `\n${currentLines[currentLines.length - 1] ? "\n" : ""}`
+            text = `${part1}${spaces}${BLOCK_QUOTE} ${selectedText}\n${part2}`;
 
             props.textarea.value = text;
             props.setMdAndSaveChanges(text);
-            setRange(props.textarea, end + 4, end + 4);
+            setRange(props.textarea, end + 2 + spaces.length);
         } else {
             const { boundaryStart, boundaryEnd } = findWordBoundaries(text, start);
 
             const part1 = text.slice(0, boundaryStart);
             const word = text.slice(boundaryStart, boundaryEnd);
             const part2 = text.slice(boundaryEnd, text.length);
+            const text1 = text;
 
-            const range = (part1.trim().length ? 2 : 0) + 4 + boundaryEnd;
+            const spaces = part1.trim().length ? "\n\n" : "";
 
-            text = `${part1}${part1.trim().length ? "\n\n" : ""} ${BLOCK_QUOTE} ${word} ${part2}`;
+            text = `${part1}${spaces}${BLOCK_QUOTE} ${word} \n${part2}`;
+
+            console.table({
+                text1: `"${text1}"`,
+                word: `"${word}"`,
+                part1: `"${part1}"`,
+                part2: `"${part2}"`,
+                text: `"${text}"`
+            })
 
             props.textarea.value = text;
             props.setMdAndSaveChanges(text);
-            setRange(props.textarea, range, range);
+            setRange(props.textarea, start + spaces.length + (word.length ? 2 : -2));
         }
     };
 

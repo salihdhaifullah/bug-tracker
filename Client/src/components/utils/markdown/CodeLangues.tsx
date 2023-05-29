@@ -24,9 +24,7 @@ const CodeLangues = (props: ICodeLanguesProps) => {
         props.textarea.value = text;
         props.setMdAndSaveChanges(text);
 
-        const range = start + 5 + lang.length;
-
-        setRange(props.textarea, range, range);
+        setRange(props.textarea, start + 5 + lang.length);
 
         props.setMdAndSaveChanges(`${props.textarea.value}`);
     }

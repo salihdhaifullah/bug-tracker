@@ -23,9 +23,7 @@ const Link = (props: ILinkProps) => {
         props.textarea.value = text;
         props.setMdAndSaveChanges(text);
 
-        const range = start + 2;
-
-        setRange(props.textarea, range, range);
+        setRange(props.textarea, start + 2);
     }
 
     return (
