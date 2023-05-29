@@ -12,6 +12,8 @@ import OrderedList from "./OrderedList";
 import Parser from "./Parser";
 import "highlight.js/styles/atom-one-dark.css";
 import Stack from "../../../utils/Stack";
+import Table from "./Table";
+import LineBreak from "./LineBreak";
 
 export function setRange(input: HTMLTextAreaElement, start: number, end?: number) {
     input.setSelectionRange(start, end ? end : start);
@@ -25,7 +27,7 @@ const Editor = () => {
 
     let files = useRef<{ base64: string, preViewUrl: string }[]>([]);
 
-    let undoStack = useRef<Stack<string>>(new Stack<string>());
+    let undoStack = useRef<Stack<string>>(new Stack<string>([""]));
     let redoStack = useRef<Stack<string>>(new Stack<string>());
 
     const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
@@ -74,6 +76,8 @@ const Editor = () => {
                                 <Link setMdAndSaveChanges={setMdAndSaveChanges} textarea={textarea} />
                                 <CodeLangues setMdAndSaveChanges={setMdAndSaveChanges} textarea={textarea} />
                                 <Image setMdAndSaveChanges={setMdAndSaveChanges} textarea={textarea} files={files} />
+                                <Table setMdAndSaveChanges={setMdAndSaveChanges} textarea={textarea} />
+                                <LineBreak setMdAndSaveChanges={setMdAndSaveChanges} textarea={textarea} />
                                 <UnOrderedList setMdAndSaveChanges={setMdAndSaveChanges} textarea={textarea} />
                                 <OrderedList setMdAndSaveChanges={setMdAndSaveChanges} textarea={textarea} />
                             </>

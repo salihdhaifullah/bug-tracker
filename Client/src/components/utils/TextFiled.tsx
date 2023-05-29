@@ -100,7 +100,7 @@ const TextFiled = forwardRef((props: TextFiledProps, ref: ForwardedRef<HTMLDivEl
             </div>
             {!isError
                 ? (props.maxLength !== undefined
-                    && <p className="text-gray-600 text-center text-xs font-light">You have {props.maxLength - props.value.length} characters remaining out of a maximum of {props.maxLength}.</p>)
+                    && <p className="text-gray-600 text-center text-xs font-light">You have {props.maxLength - props.value.toString().length} characters remaining out of a maximum of {props.maxLength}.</p>)
                 : <p className="text-red-600 text-center text-base font-bold">{errorMassage}</p>}
         </div>
     )
