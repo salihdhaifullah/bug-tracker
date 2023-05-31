@@ -6,7 +6,7 @@ import { MutableRefObject } from "react";
 interface IImageProps {
     textarea: HTMLTextAreaElement
     setMdAndSaveChanges: (md: string) => void
-    files: MutableRefObject<{base64: string; preViewUrl: string;}[]>
+    files: MutableRefObject<{base64: string; previewUrl: string;}[]>
 }
 
 
@@ -15,9 +15,9 @@ const Image = (props: IImageProps) => {
     const insertImage = async (file: File | null) => {
         if (file === null) return;
 
-        const preViewUrl = URL.createObjectURL(file);
+        const previewUrl = URL.createObjectURL(file);
         const base64 = await toWEBPImage(file);
-        props.files.current.push({base64, preViewUrl});
+        props.files.current.push({base64, previewUrl});
 
 
         let text = props.textarea.value;
@@ -27,14 +27,14 @@ const Image = (props: IImageProps) => {
         const part1 = text.slice(0, start);
         const part2 = text.slice(end);
 
-        const image = `\n![${file.name}](${preViewUrl})\n`;
+        const image = `\n![${file.name}](${previewUrl})\n`;
 
         text = `${part1}${image}${part2}`;
 
         props.textarea.value = text;
         props.setMdAndSaveChanges(text);
 
-        setRange(props.textarea, start + 5 + file.name.length + preViewUrl.length);
+        setRange(props.textarea, start + 5 + file.name.length + previewUrl.length);
     }
 
     return (

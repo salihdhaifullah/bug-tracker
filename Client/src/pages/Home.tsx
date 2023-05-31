@@ -1,7 +1,5 @@
-import Editor from "../components/utils/markdown"
-
 const Home = () => {
-  return <Editor />
+  return <h1>home page</h1>
 }
 
 export default Home

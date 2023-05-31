@@ -1,5 +1,3 @@
-
-using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
 namespace Buegee.DTO;
@@ -8,13 +6,15 @@ namespace Buegee.DTO;
 public class ProfileContentDTO {
 
     [JsonPropertyName("markdown")]
-    [Required(ErrorMessage = "markdown is required"),
-    MaxLength(100, ErrorMessage = "maximum length of markdown is 100 character")]
-    public string markdown { get; set; } = null!;
+    public string Markdown { get; set; } = null!;
 
+    [JsonPropertyName("files")]
+    public List<Image> Files {get; set;} = null!;
+}
 
-    [JsonPropertyName("markdown")]
-    [Required(ErrorMessage = "markdown is required"),
-    MaxLength(100, ErrorMessage = "maximum length of markdown is 100 character")]
-    public Dictionary<string, string> Images = null!;
+public class Image {
+    [JsonPropertyName("base64")]
+    public string Base64 {get; set;} = null!;
+    [JsonPropertyName("previewUrl")]
+    public string PreviewUrl {get; set;} = null!;
 }

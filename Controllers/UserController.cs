@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using Buegee.Data;
 using Buegee.DTO;
 using Buegee.Models;
@@ -54,7 +55,7 @@ public class UserController : Controller
 
         var isFound = await _ctx.Users
                         .Where(u => u.Id == userId)
-                        .Select(u => new {title = u.Title})
+                        .Select(u => new { title = u.Title })
                         .FirstOrDefaultAsync();
 
         if (isFound is null) return new HttpResult().IsOk(false).StatusCode(404).Get();
@@ -80,6 +81,71 @@ public class UserController : Controller
         await _ctx.SaveChangesAsync();
 
         return new HttpResult().IsOk(true).Message("successfully changed bio").Get();
+    }
+
+    [HttpPost("profile")]
+    public async Task<IActionResult> Profile([FromBody] ProfileContentDTO dto)
+    {
+        var result = _auth.CheckPermissions(HttpContext, out var userId);
+
+        if (result is not null) return result;
+
+        if (TryGetModelErrorResult(ModelState, out var modelResult)) return modelResult!;
+
+        var isFound = _ctx.Users.FirstOrDefault(u => u.Id == userId);
+
+        if (isFound is null) return new HttpResult().IsOk(false).StatusCode(404).Message("user not found please sing-up").RedirectTo("/auth/sing-up").Get();
+
+        var profile = isFound.Profile;
+
+        if (profile is not null)
+        {
+            foreach (var file in profile.Files)
+            {
+                _ctx.Files.Remove(file);
+            }
+        }
+        else
+        {
+            profile = new Content();
+            if (profile.Files is null) profile.Files = new Collection<Document>();
+        }
+
+        foreach (var f in dto.Files)
+        {
+            var file = await _ctx.Files.AddAsync(new Document()
+            {
+                ContentType = ContentTypes.webp,
+                Data = Convert.FromBase64String(f.Base64),
+                IsPrivate = false
+            });
+
+            dto.Markdown = dto.Markdown.Replace(f.PreviewUrl, $"/api/files/public/{file.Entity.Id}");
+            profile.Files.Add(file.Entity);
+        }
+
+        profile.Markdown = dto.Markdown;
+
+        isFound.Profile = profile;
+        isFound.ProfileId = profile.Id;
+
+        await _ctx.SaveChangesAsync();
+
+        return new HttpResult().IsOk(true).Message("successfully changed profile").Get();
+    }
+
+    [HttpGet("profile/{userId?}")]
+    public async Task<IActionResult> GetProfile([FromRoute] int userId)
+    {
+
+        var isFound = await _ctx.Users
+                        .Where(u => u.Id == userId && u.Profile != null)
+                        .Select(u => new { markdown = u.Profile!.Markdown })
+                        .FirstOrDefaultAsync();
+
+        if (isFound is null) return new HttpResult().IsOk(false).StatusCode(404).Get();
+
+        return new HttpResult().IsOk(true).Body(isFound).StatusCode(200).Get();
     }
 
 }

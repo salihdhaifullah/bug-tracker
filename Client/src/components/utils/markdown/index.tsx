@@ -1,4 +1,4 @@
-import { useRef, useState, KeyboardEvent, useCallback } from "react";
+import { useRef, useState, KeyboardEvent, useCallback, MutableRefObject } from "react";
 import Heading from "./Heading";
 import Bold from "./Bold";
 import Italic from "./Italic";
@@ -20,12 +20,16 @@ export function setRange(input: HTMLTextAreaElement, start: number, end?: number
     input.focus();
 }
 
-const Editor = () => {
-    const [isPreview, setIsPreview] = useState(false);
-    const [md, setMd] = useState("");
-    const [textarea, setTextarea] = useState<HTMLTextAreaElement | null>(null);
+interface IEditorProps {
+    md: string
+    setMd: (md: string) => void
+    files: MutableRefObject<{ base64: string, previewUrl: string }[]>
+    onSubmit?: () => void
+}
 
-    let files = useRef<{ base64: string, preViewUrl: string }[]>([]);
+const Editor = ({ md, setMd, files, onSubmit }: IEditorProps) => {
+    const [isPreview, setIsPreview] = useState(false);
+    const [textarea, setTextarea] = useState<HTMLTextAreaElement | null>(null);
 
     let undoStack = useRef<Stack<string>>(new Stack<string>([""]));
     let redoStack = useRef<Stack<string>>(new Stack<string>());
@@ -58,12 +62,12 @@ const Editor = () => {
     const textareaCallback = useCallback((element: HTMLTextAreaElement | null) => { setTextarea(element) }, [])
 
     return (
-        <div className="m-4 flex flex-col flex-grow w-auto border-gray-700 justify-center items-center ">
-            <div className="flex flex-col w-full border-gray-700 bg-white p-2 shadow-lg rounded-md">
+        <div className="flex flex-col w-full h-auto border-gray-700 justify-center items-center ">
+            <div className="flex flex-col w-full border-gray-700 bg-white p-2 rounded-md">
                 <div className="inline-flex w-full justify-between">
                     <div className="flex flex-row gap-2 mb-2">
-                        <button onClick={() => setIsPreview(false)} className="border border-gray-800 p-2 rounded-md">Write</button>
-                        <button onClick={() => setIsPreview(true)} className="border border-gray-800 p-2 rounded-md">Preview</button>
+                        <button onClick={() => setIsPreview(false)} className="border border-secondary text-primary hover:bg-gray-100 px-2 py-1 rounded-md">Write</button>
+                        <button onClick={() => setIsPreview(true)} className="border border-secondary text-primary hover:bg-gray-100 px-2 py-1 rounded-md">Preview</button>
                     </div>
                     <div className="flex flex-row gap-2 items-center">
                         {textarea === null ? null : (
@@ -86,7 +90,7 @@ const Editor = () => {
                 </div>
 
                 {isPreview ? (
-                    <div className="markdown" dangerouslySetInnerHTML={{ __html: Parser(md) }}></div>
+                    <div className="markdown flex flex-col flex-1 flex-grow w-full h-full" dangerouslySetInnerHTML={{ __html: Parser(md) }}></div>
                 ) : (
                     <div className="inline-flex w-full">
                         <textarea
@@ -94,13 +98,13 @@ const Editor = () => {
                             value={md}
                             onChange={(e) => setMd(e.target.value)}
                             ref={textareaCallback}
-                            className="flex border outline-secondary border-secondary p-2 rounded-md w-full min-h-[5rem]"></textarea>
+                            className="border h-auto flex flex-1 flex-grow outline-secondary border-secondary p-2 rounded-md w-full min-h-[20vh]"></textarea>
                     </div>
                 )}
 
-                <div className="justify-end inline-flex w-full">
-                    <button>button</button>
-                </div>
+                {!onSubmit || isPreview ? null : <div className="justify-end inline-flex w-full">
+                    <button onClick={onSubmit} className="hover:bg-secondary hover:border-white bg-white border border-secondary px-2 py-1 mt-1 text-base text-primary shadow-md rounded-md">submit</button>
+                </div>}
             </div>
         </div>
     )
