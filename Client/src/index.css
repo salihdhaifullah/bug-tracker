@@ -52,7 +52,7 @@
 
 html,
 body {
-    @apply min-h-[100vh] h-auto m-0 p-0
+    @apply min-h-[100vh] h-auto m-0 p-0 overflow-x-hidden
 }
 
 body {
@@ -98,12 +98,6 @@ footer {
         opacity: 0;
         transform: translateX(100%);
     }
-}
-
-
-
-.markdown table {
-  @apply block my-10 min-w-full border-0;
 }
 
 .markdown h6 {
@@ -187,4 +181,32 @@ footer {
 
 .markdown p {
     @apply text-base text-gray-800 font-bold my-1
+}
+
+.markdown table {
+    @apply flex bg-white rounded-md p-1 shadow-md w-fit border flex-col
+}
+
+.markdown table tbody  {
+    @apply gap-1 border-t flex flex-col w-fit
+}
+
+.markdown table tbody tr {
+    @apply gap-1 flex p-1 flex-row
+}
+
+.markdown table tbody tr td {
+    @apply gap-1 min-w-[4rem] text-center w-auto bg-slate-100 border flex p-1 flex-col
+}
+
+.markdown table thead {
+    @apply gap-1 flex py-1 flex-col w-fit
+}
+
+.markdown table thead tr {
+    @apply gap-1 flex px-1 flex-row
+}
+
+.markdown table thead tr th {
+    @apply gap-1 min-w-[4rem] text-center w-auto bg-slate-100 border flex p-1 flex-col
 }

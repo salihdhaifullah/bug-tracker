@@ -30,7 +30,6 @@ interface IEditorProps {
 const Editor = ({ md, setMd, files, onSubmit }: IEditorProps) => {
     const [isPreview, setIsPreview] = useState(false);
     const [textarea, setTextarea] = useState<HTMLTextAreaElement | null>(null);
-
     let undoStack = useRef<Stack<string>>(new Stack<string>([""]));
     let redoStack = useRef<Stack<string>>(new Stack<string>());
 

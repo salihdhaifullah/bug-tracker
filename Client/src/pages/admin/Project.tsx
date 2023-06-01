@@ -10,9 +10,7 @@ const Project = () => {
   useEffect(() => { console.log(projectsPayload) }, [projectsPayload])
 
   return (
-    <div>
-      Project Id {projectId}
-    </div>
+    <div>Project Id {projectId}</div>
   )
 }
 

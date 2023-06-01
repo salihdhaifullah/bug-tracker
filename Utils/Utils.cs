@@ -34,12 +34,7 @@ public static class Utils
 
         if (!String.IsNullOrEmpty(errorMessage))
         {
-            result = new HttpResult()
-                    .IsOk(false)
-                    .Message(errorMessage)
-                    .StatusCode(400)
-                    .Get();
-
+            result = BadRequestResult(errorMessage);
             return true;
         }
 
@@ -59,4 +54,53 @@ public static class Utils
     }
 
 
+    private static IActionResult helper(HttpResult result, string? massage = null, object? body = null, string? redirectTo = null)
+    {
+        if (redirectTo is not null) result.RedirectTo(redirectTo);
+        if (massage is not null) result.Message(massage);
+        if (body is not null) result.Body(body);
+        return result.Get();
+    }
+
+    public static IActionResult OkResult(string? massage = null, object? body = null, string? redirectTo = null)
+    {
+        var result = new HttpResult().IsOk(true).StatusCode(StatusCodes.Status200OK);
+        return helper(result, massage, body, redirectTo);
+    }
+
+    public static IActionResult CreatedResult(string? massage = null, object? body = null, string? redirectTo = null)
+    {
+        var result = new HttpResult().IsOk(true).StatusCode(StatusCodes.Status201Created);
+        return helper(result, massage, body, redirectTo);
+    }
+
+    public static IActionResult NotFoundResult(string? massage = null, object? body = null, string? redirectTo = null)
+    {
+        var result = new HttpResult().IsOk(false).StatusCode(StatusCodes.Status404NotFound);
+        return helper(result, massage, body, redirectTo);
+    }
+
+    public static IActionResult BadRequestResult(string? massage = null, object? body = null, string? redirectTo = null)
+    {
+        var result = new HttpResult().IsOk(false).StatusCode(StatusCodes.Status400BadRequest);
+        return helper(result, massage, body, redirectTo);
+    }
+
+    public static IActionResult InternalServerErrorResult(string? massage = null, object? body = null, string? redirectTo = null)
+    {
+        var result = new HttpResult().IsOk(false).StatusCode(StatusCodes.Status500InternalServerError);
+        return helper(result, massage, body, redirectTo);
+    }
+
+    public static IActionResult UnAuthorizedResult(string? massage = null, object? body = null, string? redirectTo = null)
+    {
+        var result = new HttpResult().IsOk(false).StatusCode(StatusCodes.Status401Unauthorized);
+        return helper(result, massage, body, redirectTo);
+    }
+
+    public static IActionResult ForbiddenResult(string? massage = null, object? body = null, string? redirectTo = null)
+    {
+        var result = new HttpResult().IsOk(false).StatusCode(StatusCodes.Status403Forbidden);
+        return helper(result, massage, body, redirectTo);
+    }
 }

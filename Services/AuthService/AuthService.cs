@@ -62,11 +62,7 @@ public class AuthService : IAuthService
     {
         id = 0;
 
-        if (!TryGetUser(ctx, out int? userId) || userId is null) return new HttpResult()
-                        .IsOk(false)
-                        .StatusCode(401)
-                        .Message("you need to login to do this action")
-                        .Get();
+        if (!TryGetUser(ctx, out int? userId) || userId is null) return UnAuthorizedResult("you need to login to do this action");
 
         id = (int)userId;
 
@@ -77,11 +73,7 @@ public class AuthService : IAuthService
     public IActionResult? CheckPermissions(HttpContext ctx)
     {
 
-        if (!TryGetUser(ctx, out int? userId) || userId is null) return new HttpResult()
-                        .IsOk(false)
-                        .StatusCode(401)
-                        .Message("you need to login to do this action")
-                        .Get();
+        if (!TryGetUser(ctx, out int? userId) || userId is null) return UnAuthorizedResult("you need to login to do this action");
 
         // user is good
         return null;

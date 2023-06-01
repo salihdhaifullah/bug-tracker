@@ -15,6 +15,7 @@ import { createBrowserRouter } from "react-router-dom";
 import CreateProject from "./pages/admin/CreateProject";
 import Projects from "./pages/admin/Projects";
 import Project from "./pages/admin/Project";
+import MyProfile from "./pages/MyProfile";
 
 const router = createBrowserRouter([{
     path: "/",
@@ -27,6 +28,7 @@ const router = createBrowserRouter([{
         { path: "auth/forget-password", Component: ForgetPassword },
         { path: "auth/account-verification", Component: AccountVerification },
         { path: "admin/create-project", Component: CreateProject },
+        { path: "my-profile", Component: MyProfile },
         { path: "profile/:userId", Component: Profile },
         { path: "projects", Component: Projects },
         { path: "project/:projectId", Component: Project },

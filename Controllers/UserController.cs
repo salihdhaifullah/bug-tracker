@@ -3,7 +3,6 @@ using Buegee.Data;
 using Buegee.DTO;
 using Buegee.Models;
 using Buegee.Services.AuthService;
-using Buegee.Utils;
 using Buegee.Utils.Attributes;
 using Buegee.Utils.Enums;
 using Microsoft.AspNetCore.Mvc;
@@ -38,14 +37,14 @@ public class UserController : Controller
 
         var isFound = _ctx.Users.Include(u => u.Image).FirstOrDefault(u => u.Id == userId);
 
-        if (isFound is null) return new HttpResult().IsOk(false).StatusCode(404).Message("user not found please sing-up").RedirectTo("/auth/sing-up").Get();
+        if (isFound is null) return  NotFoundResult("user not found please sing-up", null, "/auth/sing-up");
 
         isFound.Image.ContentType = contentType;
         isFound.Image.Data = Convert.FromBase64String(dto.Data);
 
         await _ctx.SaveChangesAsync();
 
-        return new HttpResult().IsOk(true).Message("successfully changed profile image").Get();
+        return OkResult("successfully changed profile image");
     }
 
 
@@ -58,9 +57,9 @@ public class UserController : Controller
                         .Select(u => new { title = u.Title })
                         .FirstOrDefaultAsync();
 
-        if (isFound is null) return new HttpResult().IsOk(false).StatusCode(404).Get();
+        if (isFound is null) return NotFoundResult();
 
-        return new HttpResult().IsOk(true).Body(isFound).StatusCode(200).Get();
+        return OkResult(null, isFound);
     }
 
     [HttpPost("title")]
@@ -74,13 +73,12 @@ public class UserController : Controller
 
         var isFound = _ctx.Users.FirstOrDefault(u => u.Id == userId);
 
-        if (isFound is null) return new HttpResult().IsOk(false).StatusCode(404).Message("user not found please sing-up").RedirectTo("/auth/sing-up").Get();
-
+        if (isFound is null) return  NotFoundResult("user not found please sing-up", null, "/auth/sing-up");
         isFound.Title = dto.Title;
 
         await _ctx.SaveChangesAsync();
 
-        return new HttpResult().IsOk(true).Message("successfully changed bio").Get();
+        return OkResult("successfully changed bio");
     }
 
     [HttpPost("profile")]
@@ -94,7 +92,7 @@ public class UserController : Controller
 
         var isFound = _ctx.Users.FirstOrDefault(u => u.Id == userId);
 
-        if (isFound is null) return new HttpResult().IsOk(false).StatusCode(404).Message("user not found please sing-up").RedirectTo("/auth/sing-up").Get();
+        if (isFound is null) return  NotFoundResult("user not found please sing-up", null, "/auth/sing-up");
 
         var profile = isFound.Profile;
 
@@ -120,6 +118,8 @@ public class UserController : Controller
                 IsPrivate = false
             });
 
+            await _ctx.SaveChangesAsync();
+
             dto.Markdown = dto.Markdown.Replace(f.PreviewUrl, $"/api/files/public/{file.Entity.Id}");
             profile.Files.Add(file.Entity);
         }
@@ -131,7 +131,7 @@ public class UserController : Controller
 
         await _ctx.SaveChangesAsync();
 
-        return new HttpResult().IsOk(true).Message("successfully changed profile").Get();
+        return OkResult("successfully changed profile");
     }
 
     [HttpGet("profile/{userId?}")]
@@ -143,9 +143,9 @@ public class UserController : Controller
                         .Select(u => new { markdown = u.Profile!.Markdown })
                         .FirstOrDefaultAsync();
 
-        if (isFound is null) return new HttpResult().IsOk(false).StatusCode(404).Get();
+        if (isFound is null) return NotFoundResult();
 
-        return new HttpResult().IsOk(true).Body(isFound).StatusCode(200).Get();
+        return OkResult(null, isFound);
     }
 
 }

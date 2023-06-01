@@ -7,7 +7,6 @@ using Buegee.Services.CryptoService;
 using Buegee.Services.JWTService;
 using Buegee.Data;
 using Buegee.Services.AuthService;
-using Buegee.Utils;
 using Buegee.Utils.Enums;
 using Buegee.Utils.Attributes;
 using Buegee.Models;
@@ -67,40 +66,26 @@ public class AuthController : Controller
 
         if (isFound is null)
         {
-            return new HttpResult()
-                    .IsOk(false)
-                    .Message($"this {dto.Email} email dose not exist try sing-up")
-                    .StatusCode(404)
-                    .RedirectTo("/auth/sing-up")
-                    .Get();
+            return NotFoundResult($"this {dto.Email} email dose not exist try sing-up", null, "/auth/sing-up");
         }
 
         _crypto.Compar(dto.Password, isFound.PasswordHash, isFound.PasswordSalt, out bool isMatch);
 
         if (!isMatch)
         {
-            return new HttpResult()
-                    .IsOk(false)
-                    .Message("wrong email or password")
-                    .StatusCode(400)
-                    .Get();
+            return BadRequestResult("wrong email or password");
         };
 
         _auth.LogIn(isFound.Id, HttpContext);
 
         // // TODO || redirect to dashboard
-        return new HttpResult()
-                .StatusCode(200)
-                .IsOk(true)
-                .Message("logged in successfully")
-                .Body(new
-                {
-                    id = isFound.Id,
-                    imageId = isFound.ImageId,
-                    email = isFound.Email,
-                    fullName = isFound.FullName
-                })
-                .Get();
+        return OkResult("logged in successfully", new
+        {
+            id = isFound.Id,
+            imageId = isFound.ImageId,
+            email = isFound.Email,
+            fullName = isFound.FullName
+        });
     }
 
     [HttpPost("sing-up")]
@@ -118,12 +103,7 @@ public class AuthController : Controller
 
         if (isFound is not null)
         {
-            return new HttpResult()
-                    .IsOk(false)
-                    .Message($"this account {dto.Email} is already exist try login")
-                    .StatusCode(404)
-                    .RedirectTo("/auth/login")
-                    .Get();
+            return NotFoundResult($"this account {dto.Email} is already exist try login", null, "/auth/login");
         }
 
         // half an hour
@@ -139,12 +119,7 @@ public class AuthController : Controller
         // send the email
         await _email.sendVerificationEmail(dto.Email, $"{dto.FirstName} {dto.LastName}", Code);
 
-        return new HttpResult()
-                .StatusCode(200)
-                .IsOk(true)
-                .Message("we have send to a 6 digits verification code")
-                .RedirectTo("/auth/account-verification")
-                .Get();
+        return OkResult("we have send to a 6 digits verification code", null, "/auth/account-verification");
     }
 
 
@@ -157,19 +132,9 @@ public class AuthController : Controller
 
         var session = await _auth.GetSessionAsync<SingUpSession>("sing-up-session", HttpContext);
 
-        if (session is null) return new HttpResult()
-                                .IsOk(false)
-                                .Message("session expired please try sign-up again")
-                                .StatusCode(404)
-                                .RedirectTo("/auth/sing-up")
-                                .Get();
+        if (session is null) return NotFoundResult("session expired please try sign-up again", null, "/auth/sing-up");
 
-
-        if (session.Code != dto.Code) return new HttpResult()
-                                .IsOk(false)
-                                .Message("incorrect verification code. please try again")
-                                .StatusCode(400)
-                                .Get();
+        if (session.Code != dto.Code) return BadRequestResult("incorrect verification code. please try again");
 
         await _auth.DeleteSessionAsync("sing-up-session", HttpContext);
 
@@ -206,11 +171,7 @@ public class AuthController : Controller
         _auth.LogIn(userData.Entity.Id, HttpContext);
 
         // TODO || redirect to dashboard
-        return new HttpResult().IsOk(true)
-                                .Message("successfully verified your account")
-                                .StatusCode(201)
-                                .RedirectTo("/auth/login")
-                                .Get();
+        return CreatedResult("successfully verified your account", null, "/auth/login");
     }
 
 
@@ -234,12 +195,7 @@ public class AuthController : Controller
             .FirstOrDefaultAsync();
 
 
-        if (isFound is null) return new HttpResult()
-                            .RedirectTo("/auth/sing-up")
-                            .Message($"this {dto.Email} email dose not exist try sing-up")
-                            .IsOk(false)
-                            .StatusCode(404)
-                            .Get();
+        if (isFound is null) return NotFoundResult($"this {dto.Email} email dose not exist try sing-up", null, "/auth/sing-up");
 
         string code = RandomCode();
 
@@ -249,12 +205,7 @@ public class AuthController : Controller
 
         await _email.resetPasswordEmail(isFound.Email, $"{isFound.FirstName} {isFound.LastName}", code);
 
-        return new HttpResult()
-                .StatusCode(200)
-                .IsOk(true)
-                .Message("we have send to a 6 digits verification code")
-                .RedirectTo("/auth/reset-password")
-                .Get();
+        return OkResult("we have send to a 6 digits verification code", null, "/auth/reset-password");
     }
 
 
@@ -266,29 +217,13 @@ public class AuthController : Controller
         var session = await _auth.GetSessionAsync<ForgetPasswordSession>("reset-password-session", HttpContext);
 
 
-        if (session is null) return new HttpResult()
-                                .IsOk(false)
-                                .Message("session expired please try again")
-                                .StatusCode(404)
-                                .RedirectTo("/auth/forget-password")
-                                .Get();
+        if (session is null) return NotFoundResult("session expired please try again", null, "/auth/forget-password");
 
-
-        if (session.Code != dto.Code) return new HttpResult()
-                                .IsOk(false)
-                                .Message("incorrect verification code. please try again")
-                                .StatusCode(400)
-                                .Get();
+        if (session.Code != dto.Code) return BadRequestResult("incorrect verification code. please try again");
 
         var user = await _ctx.Users.FirstOrDefaultAsync(u => u.Email == session.Email);
 
-        if (user is null) return new HttpResult()
-                                .IsOk(false)
-                                .Message("this account dose not exist please try sing-up")
-                                .StatusCode(404)
-                                .RedirectTo("/auth/sing-up")
-                                .Get();
-
+        if (user is null) return NotFoundResult("this account dose not exist please try sing-up", null, "/auth/sing-up");
 
         await _auth.DeleteSessionAsync("reset-password-session", HttpContext);
 
@@ -299,18 +234,13 @@ public class AuthController : Controller
 
         await _ctx.SaveChangesAsync();
 
-        return new HttpResult()
-                    .IsOk(true)
-                    .Message("successfully changed your password")
-                    .StatusCode(200)
-                    .RedirectTo("/auth/login")
-                    .Get();
-    }
+        return OkResult("successfully changed your password", null, "/auth/login");
+        }
 
     [HttpGet("logout")]
     public IActionResult Logout()
     {
         Response.Cookies.Delete("token");
-        return new HttpResult().RedirectTo("/").IsOk(true).Message("logged out successfully").Get();
+        return OkResult("logged out successfully", null, "/");
     }
 }
