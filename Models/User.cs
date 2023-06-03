@@ -4,13 +4,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Buegee.Models;
 
-[Table("users")]
-[Index(nameof(Email), IsUnique = true)]
+[Table("user")]
 [Index(nameof(FirstName), nameof(LastName))]
+[Index(nameof(Email), IsUnique = true)]
 public class User
 {
     [Key, Column("id")]
-    public int Id { get; set; }
+    public int Id {get; set;}
+
+    [Required, Column("email"), StringLength(100), EmailAddress]
+    public string Email { get; set; } = null!;
 
     [Required, Column("first_name"), StringLength(50)]
     public string FirstName { get; set; } = null!;
@@ -18,8 +21,8 @@ public class User
     [Required, Column("last_name"), StringLength(50)]
     public string LastName { get; set; } = null!;
 
-    [Required, Column("email"), StringLength(100), EmailAddress]
-    public string Email { get; set; } = null!;
+    [Required, Column("image_url")]
+    public string ImageUrl { get; set; } = null!;
 
     [Required, Column("password_hash")]
     public byte[] PasswordHash { get; set; } = null!;
@@ -27,20 +30,13 @@ public class User
     [Required, Column("password_salt")]
     public byte[] PasswordSalt { get; set; } = null!;
 
-    [Column("created_at")]
+    [Required, Column("created_at")]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-    [Column("projects")]
-    public ICollection<Project> Projects {get; set;} = null!;
+    [Column("bio"), StringLength(100)]
+    public string? Bio { get; set; }
 
-    [Required, ForeignKey("Image"), Column("image")]
-    public int ImageId { get; set; }
-    public Document Image { get; set; } = null!;
-
-    [Column("title"), StringLength(100)]
-    public string? Title { get; set; }
-
-    [ForeignKey("Profile"), Column("profile")]
-    public int? ProfileId { get; set; }
-    public Content? Profile { get; set; }
+    [ForeignKey("Content"), Column("content_id")]
+    public int? ContentId { get; set; }
+    public Content? Content { get; set; }
 }

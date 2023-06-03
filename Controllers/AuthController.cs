@@ -7,10 +7,11 @@ using Buegee.Services.CryptoService;
 using Buegee.Services.JWTService;
 using Buegee.Data;
 using Buegee.Services.AuthService;
-using Buegee.Utils.Enums;
 using Buegee.Utils.Attributes;
 using Buegee.Models;
 using static Buegee.Utils.Utils;
+using Buegee.Services.FirebaseService;
+using Buegee.Utils.Enums;
 
 namespace Buegee.Controllers;
 
@@ -24,6 +25,7 @@ public class AuthController : Controller
     private readonly IEmailService _email;
     private readonly IRedisCacheService _cache;
     private readonly IAuthService _auth;
+    private readonly IFirebaseService _firebase;
 
     public AuthController(
      DataContext ctx,
@@ -32,7 +34,8 @@ public class AuthController : Controller
      IEmailService email,
      IRedisCacheService cache,
      IConfiguration configuration,
-     IAuthService auth)
+     IAuthService auth,
+     IFirebaseService firebase)
     {
         _ctx = ctx;
         _crypto = crypto;
@@ -40,6 +43,7 @@ public class AuthController : Controller
         _email = email;
         _cache = cache;
         _auth = auth;
+        _firebase = firebase;
     }
 
 
@@ -58,7 +62,7 @@ public class AuthController : Controller
                 PasswordHash = u.PasswordHash,
                 PasswordSalt = u.PasswordSalt,
                 Id = u.Id,
-                ImageId = u.ImageId,
+                ImageUrl = u.ImageUrl,
                 Email = u.Email,
                 FullName = $"{u.FirstName}  {u.LastName}",
             })
@@ -82,7 +86,7 @@ public class AuthController : Controller
         return OkResult("logged in successfully", new
         {
             id = isFound.Id,
-            imageId = isFound.ImageId,
+            imageUrl = isFound.ImageUrl,
             email = isFound.Email,
             fullName = isFound.FullName
         });
@@ -141,19 +145,13 @@ public class AuthController : Controller
         _crypto.Hash(session.Password, out byte[] hash, out byte[] salt);
 
 
-        byte[] imageBytes;
+        string url;
 
         using (var client = new HttpClient())
         {
-            imageBytes = await client.GetByteArrayAsync($"https://api.dicebear.com/6.x/identicon/svg?seed={session.FirstName}-{session.LastName}-{session.Email}");
+            var imageBytes = await client.GetByteArrayAsync($"https://api.dicebear.com/6.x/identicon/svg?seed={session.FirstName}-{session.LastName}-{session.Email}");
+            url = await _firebase.Upload(imageBytes, ContentTypes.svg);
         }
-
-        var image = new Document()
-        {
-            ContentType = ContentTypes.svg,
-            Data = imageBytes,
-            IsPrivate = false,
-        };
 
         var userData = await _ctx.Users.AddAsync(new User
         {
@@ -162,8 +160,7 @@ public class AuthController : Controller
             LastName = session.LastName,
             PasswordHash = hash,
             PasswordSalt = salt,
-            ImageId = image.Id,
-            Image = image,
+            ImageUrl = url
         });
 
         await _ctx.SaveChangesAsync();

@@ -30,20 +30,24 @@ public class ProjectController : Controller
         if (TryGetModelErrorResult(ModelState, out var modelResult)) return modelResult!;
 
 
-        var isFound = await _ctx.Projects.AnyAsync((p) => p.Name == dto.Name && p.OwnerId == userId);
-
-        if (isFound) BadRequestResult($"there a project name with the same name as {dto.Name}, please chose another name");
-
-        var data = _ctx.Projects.Add(new Project()
+        var project = await _ctx.Projects.AddAsync(new Project()
         {
             Name = dto.Name,
-            IsPrivate = dto.IsPrivate,
-            OwnerId = userId,
+            IsPrivate = dto.IsPrivate
+        });
+
+        var description =  await _ctx.Contents.AddAsync(new Content() { Markdown = "" });
+
+        var ProjectDetails = await _ctx.ProjectsDetails.AddAsync(new ProjectDetails()
+        {
+            ProjectId = project.Entity.Id,
+            DescriptionId = description.Entity.Id,
+            OwnerId = userId
         });
 
         await _ctx.SaveChangesAsync();
 
-        return OkResult($"project {dto.Name} successfully created", new { data.Entity.Members, data.Entity.Owner, data.Entity.CreatedAt, data.Entity.IsPrivate, data.Entity.Name, data.Entity.Id });
+        return OkResult($"project {dto.Name} successfully created");
     }
 
     [HttpGet("projects/{page?}")]
@@ -51,9 +55,9 @@ public class ProjectController : Controller
     {
         if (!_auth.TryGetUser(HttpContext, out var userId) || userId is null) return NotFoundResult("no projects found for you, to create project please sing-up");
 
-        var projects = await _ctx.Projects
+        var projects = await _ctx.ProjectsDetails
                         .Where((p) => p.OwnerId == userId)
-                        .OrderBy((p) => p.CreatedAt)
+                        .OrderBy((p) => p.Project.CreatedAt)
                         .Select((p) => new
                         {
                             members = p.Members.Count + 1,
@@ -73,7 +77,7 @@ public class ProjectController : Controller
     }
 
     [HttpGet("{projectId}")]
-    public async Task<IActionResult> xdvsv([FromRoute] int projectId)
+    public async Task<IActionResult> GetProject([FromRoute] int projectId)
     {
         if (!_auth.TryGetUser(HttpContext, out var user) || user is null) return NotFoundResult("no projects found for you, to create project please sing-up");
 
@@ -81,18 +85,76 @@ public class ProjectController : Controller
                         .Where((p) => p.Id == projectId)
                         .Select((p) => new
                         {
-                            activities = p.Activities,
+                            name = p.Name,
+                            activities = p.Activities.Select(a => new
+                            {
+                                createdAt = a.CreatedAt,
+                                markdown = a.Content.Markdown
+                            }),
                             createdAt = p.CreatedAt,
-                            description = p.Description,
-                            ownerId = p.OwnerId,
-                            members = p.Members.Count,
+                            descriptionMarkdown = p.Description != null ? p.Description.Markdown : "",
+                            id = p.Id,
+                            tickets = p.Tickets.Select(t => new
+                            {
+                                createdAt = t.CreatedAt,
+                                creator = new
+                                {
+                                    firstName = t.Creator.FirstName,
+                                    lastName = t.Creator.LastName,
+                                    imageId = t.Creator.ImageId,
+                                    id = t.Creator.Id,
+                                },
+                                assignedTo = t.AssignedTo != null ? new
+                                {
+                                    firstName = t.AssignedTo.User.FirstName,
+                                    lastName = t.AssignedTo.User.LastName,
+                                    imageId = t.AssignedTo.User.ImageId,
+                                    id = t.AssignedTo.User.Id,
+                                } : null,
+                                title = t.Title,
+                                priority = t.Priority.ToString(),
+                                status = t.Status.ToString(),
+                                type = t.Type.ToString(),
+                            }),
+                            owner = new
+                            {
+                                firstName = p.Owner.FirstName,
+                                lastName = p.Owner.LastName,
+                                imageId = p.Owner.ImageId,
+                                id = p.Owner.Id,
+                            },
+                            members = p.Members.Select(m =>
+                            new
+                            {
+                                joinedAt = m.CreatedAt,
+                                firstName = m.User.FirstName,
+                                lastName = m.User.LastName,
+                                imageId = m.User.ImageId,
+                                id = m.User.Id
+                            }),
                         })
+                        .AsSplitQuery()
                         .FirstOrDefaultAsync();
 
         if (project is null) return NotFoundResult("sorry, project not found");
 
         return OkResult(null, project);
+    }
 
+    [HttpDelete("{projectId}")]
+    public async Task<IActionResult> DeleteProject([FromRoute] int projectId)
+    {
+        if (!_auth.TryGetUser(HttpContext, out var userId) || userId is null) return NotFoundResult("please sing-up to continue");
+
+        var project = await _ctx.Projects.Where((p) => p.Id == projectId && p.OwnerId == userId).FirstOrDefaultAsync();
+
+        if (project is null) return NotFoundResult("sorry, project not found");
+
+        _ctx.Projects.Remove(project);
+
+        await _ctx.SaveChangesAsync();
+
+        return OkResult($"project \"{project.Name}\" successfully deleted");
     }
 
     [HttpGet("count")]

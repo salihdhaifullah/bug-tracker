@@ -35,14 +35,15 @@ public class UserController : Controller
 
         ContentTypes contentType = (ContentTypes)Enum.Parse(typeof(ContentTypes), dto.ContentType);
 
-        var isFound = _ctx.Users.Include(u => u.Image).FirstOrDefault(u => u.Id == userId);
+        var row = await _ctx.Database.ExecuteSqlRawAsync("UPDATE file SET content_type = {0}, data = {1} WHERE id IN (SELECT image_id FROM user_details WHERE user_id = {2})", (int)contentType, Convert.FromBase64String(dto.Data), userId);
 
-        if (isFound is null) return  NotFoundResult("user not found please sing-up", null, "/auth/sing-up");
-
-        isFound.Image.ContentType = contentType;
-        isFound.Image.Data = Convert.FromBase64String(dto.Data);
+        if (row == 0) return NotFoundResult("user not found please sing-up", null, "/auth/sing-up");
 
         await _ctx.SaveChangesAsync();
+
+var image = await _ctx.files.FirstOrDefaultAsync(i => i.Id == dto.ImageId);
+ if (image == null) return NotFoundResult(“image not found”, null, “/images”);
+  image.ContentType = contentType; image.Data = Convert.FromBase64String(dto.Data); _ctx.Images.Update(image); await _ctx.SaveChangesAsync();
 
         return OkResult("successfully changed profile image");
     }
@@ -73,7 +74,7 @@ public class UserController : Controller
 
         var isFound = _ctx.Users.FirstOrDefault(u => u.Id == userId);
 
-        if (isFound is null) return  NotFoundResult("user not found please sing-up", null, "/auth/sing-up");
+        if (isFound is null) return NotFoundResult("user not found please sing-up", null, "/auth/sing-up");
         isFound.Title = dto.Title;
 
         await _ctx.SaveChangesAsync();
@@ -90,9 +91,9 @@ public class UserController : Controller
 
         if (TryGetModelErrorResult(ModelState, out var modelResult)) return modelResult!;
 
-        var isFound = _ctx.Users.FirstOrDefault(u => u.Id == userId);
+        var isFound = _ctx.UserDetails.FirstOrDefault(u => u.UserId == userId);
 
-        if (isFound is null) return  NotFoundResult("user not found please sing-up", null, "/auth/sing-up");
+        if (isFound is null) return NotFoundResult("user not found please sing-up", null, "/auth/sing-up");
 
         var profile = isFound.Profile;
 
@@ -138,9 +139,9 @@ public class UserController : Controller
     public async Task<IActionResult> GetProfile([FromRoute] int userId)
     {
 
-        var isFound = await _ctx.Users
-                        .Where(u => u.Id == userId && u.Profile != null)
-                        .Select(u => new { markdown = u.Profile!.Markdown })
+        var isFound = await _ctx.UserDetails
+                        .Where(u => u.UserId == userId)
+                        .Select(u => new { markdown = u.Profile.Markdown })
                         .FirstOrDefaultAsync();
 
         if (isFound is null) return NotFoundResult();

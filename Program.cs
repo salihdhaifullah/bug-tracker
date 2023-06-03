@@ -2,6 +2,7 @@ using Buegee.Data;
 using Buegee.Services.AuthService;
 using Buegee.Services.CryptoService;
 using Buegee.Services.EmailService;
+using Buegee.Services.FirebaseService;
 using Buegee.Services.JWTService;
 using Buegee.Services.RedisCacheService;
 
@@ -15,6 +16,7 @@ builder.Services.AddSingleton<ICryptoService, CryptoService>();
 builder.Services.AddSingleton<IEmailService, EmailService>();
 builder.Services.AddSingleton<IRedisCacheService, RedisCacheService>();
 builder.Services.AddSingleton<IAuthService, AuthService>();
+builder.Services.AddSingleton<IFirebaseService, FirebaseService>();
 
 var app = builder.Build();
 
@@ -24,7 +26,8 @@ if (app.Environment.IsDevelopment() && args.Contains("seed"))
     {
         var dataContext = scope.ServiceProvider.GetRequiredService<DataContext>();
         var cryptoService = scope.ServiceProvider.GetRequiredService<ICryptoService>();
-        await new Seed(dataContext, cryptoService).SeedAsync();
+        var firebaseService = scope.ServiceProvider.GetRequiredService<IFirebaseService>();
+        await new Seed(dataContext, cryptoService, firebaseService).SeedAsync();
     }
 }
 

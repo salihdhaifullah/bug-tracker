@@ -3,6 +3,7 @@ using Buegee.Services.CryptoService;
 using Buegee.Utils.Enums;
 using Buegee.Models;
 using Microsoft.EntityFrameworkCore;
+using Buegee.Services.FirebaseService;
 
 namespace Buegee.Data;
 
@@ -12,8 +13,9 @@ public class Seed
     private readonly Data _data;
     private readonly ICryptoService _crypto;
     private readonly HttpClient _client;
+    private readonly IFirebaseService _firebase;
 
-    public Seed(DataContext ctx, ICryptoService crypto)
+    public Seed(DataContext ctx, ICryptoService crypto, IFirebaseService firebase)
     {
         Console.WriteLine("\n ************************************************************** \n");
         Console.WriteLine("************************************************************** \n");
@@ -25,6 +27,7 @@ public class Seed
 
         _ctx = ctx;
         _crypto = crypto;
+        _firebase = firebase;
 
         var json = File.ReadAllText("data.json");
         if (json is null) throw new Exception("data.json is not found");
@@ -55,35 +58,29 @@ public class Seed
 
             _crypto.Hash(item.Email, out byte[] hash, out byte[] salt);
 
-            byte[] imageBytes;
-            var Type = ContentTypes.jpeg;
+            string url;
 
-            if (item.Image is not null) {
-                imageBytes = await _client.GetByteArrayAsync(item.Image);
-            } else {
-                imageBytes = await _client.GetByteArrayAsync($"https://api.dicebear.com/6.x/identicon/svg?seed={item.FirstName}-{item.LastName}-{item.Email}");
-                Type =  ContentTypes.svg;
+            if (item.Image is not null)
+            {
+                var imageBytes = await _client.GetByteArrayAsync(item.Image);
+                url = await _firebase.Upload(imageBytes, ContentTypes.jpeg);
+            }
+            else
+            {
+                var imageBytes = await _client.GetByteArrayAsync($"https://api.dicebear.com/6.x/identicon/svg?seed={item.FirstName}-{item.LastName}-{item.Email}");
+                url = await _firebase.Upload(imageBytes, ContentTypes.svg);
             }
 
-            var image = new Document()
-            {
-                ContentType = Type,
-                Data = imageBytes,
-                IsPrivate = false
-            };
-
-            var data = new User()
+            var user = await _ctx.Users.AddAsync(new User()
             {
                 FirstName = item.FirstName,
                 LastName = item.LastName,
                 Email = item.Email,
                 PasswordHash = hash,
                 PasswordSalt = salt,
-                ImageId = image.Id,
-                Image = image,
-            };
+                ImageUrl = url
+            });
 
-            _ctx.Users.Add(data);
         }
 
         await _ctx.SaveChangesAsync();

@@ -9,18 +9,18 @@ public class Comment
     [Key, Column("id")]
     public int Id { get; set; }
 
-    [Column("created_at")]
+    [Required, Column("created_at")]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-    [Required, ForeignKey("Ticket"), Column("ticket")]
+    [Required, ForeignKey("Ticket"), Column("ticket_id")]
     public int TicketId { get; set; }
     public Ticket Ticket { get; set; } = null!;
 
-    [Required, ForeignKey("Content"), Column("content")]
+    [Required, ForeignKey("Content"), Column("content_id")]
     public int ContentId { get; set; }
     public Content Content { get; set; } = null!;
 
-    [Required, ForeignKey("Commenter"), Column("commenter")]
+    [Required, ForeignKey("Commenter"), Column("commenter_id")]
     public int CommenterId { get; set; }
     public User Commenter { get; set; } = null!;
 }
