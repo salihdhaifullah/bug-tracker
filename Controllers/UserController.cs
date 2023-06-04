@@ -1,8 +1,8 @@
-using System.Collections.ObjectModel;
 using Buegee.Data;
 using Buegee.DTO;
 using Buegee.Models;
 using Buegee.Services.AuthService;
+using Buegee.Services.FirebaseService;
 using Buegee.Utils.Attributes;
 using Buegee.Utils.Enums;
 using Microsoft.AspNetCore.Mvc;
@@ -17,11 +17,13 @@ public class UserController : Controller
 {
     private readonly DataContext _ctx;
     private readonly IAuthService _auth;
+    private readonly IFirebaseService _firebase;
 
-    public UserController(DataContext ctx, IAuthService auth)
+    public UserController(DataContext ctx, IAuthService auth, IFirebaseService firebase)
     {
         _auth = auth;
         _ctx = ctx;
+        _firebase = firebase;
     }
 
     [HttpPost("upload-profile")]
@@ -33,17 +35,13 @@ public class UserController : Controller
 
         if (TryGetModelErrorResult(ModelState, out var modelResult)) return modelResult!;
 
-        ContentTypes contentType = (ContentTypes)Enum.Parse(typeof(ContentTypes), dto.ContentType);
+        var contentType = (ContentTypes)Enum.Parse(typeof(ContentTypes), dto.ContentType);
 
-        var row = await _ctx.Database.ExecuteSqlRawAsync("UPDATE file SET content_type = {0}, data = {1} WHERE id IN (SELECT image_id FROM user_details WHERE user_id = {2})", (int)contentType, Convert.FromBase64String(dto.Data), userId);
+        var url = await _ctx.Users.Where(u => u.Id == userId).Select(u => u.ImageUrl).FirstOrDefaultAsync();
 
-        if (row == 0) return NotFoundResult("user not found please sing-up", null, "/auth/sing-up");
+        if (url is null) return NotFoundResult(massage: "your account not found please sing-up to continue", redirectTo: "/auth/sing-up");
 
-        await _ctx.SaveChangesAsync();
-
-var image = await _ctx.files.FirstOrDefaultAsync(i => i.Id == dto.ImageId);
- if (image == null) return NotFoundResult(“image not found”, null, “/images”);
-  image.ContentType = contentType; image.Data = Convert.FromBase64String(dto.Data); _ctx.Images.Update(image); await _ctx.SaveChangesAsync();
+        await _firebase.Update(url, Convert.FromBase64String(dto.Data));
 
         return OkResult("successfully changed profile image");
     }
@@ -55,7 +53,7 @@ var image = await _ctx.files.FirstOrDefaultAsync(i => i.Id == dto.ImageId);
 
         var isFound = await _ctx.Users
                         .Where(u => u.Id == userId)
-                        .Select(u => new { title = u.Title })
+                        .Select(u => new { bio = u.Bio })
                         .FirstOrDefaultAsync();
 
         if (isFound is null) return NotFoundResult();
@@ -63,8 +61,8 @@ var image = await _ctx.files.FirstOrDefaultAsync(i => i.Id == dto.ImageId);
         return OkResult(null, isFound);
     }
 
-    [HttpPost("title")]
-    public async Task<IActionResult> UpdateTitle([FromBody] TitleDTO dto)
+    [HttpPost("bio")]
+    public async Task<IActionResult> UpdateBio([FromBody] BioDTO dto)
     {
         var result = _auth.CheckPermissions(HttpContext, out var userId);
 
@@ -72,10 +70,11 @@ var image = await _ctx.files.FirstOrDefaultAsync(i => i.Id == dto.ImageId);
 
         if (TryGetModelErrorResult(ModelState, out var modelResult)) return modelResult!;
 
-        var isFound = _ctx.Users.FirstOrDefault(u => u.Id == userId);
+        var isFound = await _ctx.Users.Where(u => u.Id == userId).FirstOrDefaultAsync();
 
         if (isFound is null) return NotFoundResult("user not found please sing-up", null, "/auth/sing-up");
-        isFound.Title = dto.Title;
+
+        isFound.Bio = dto.Bio;
 
         await _ctx.SaveChangesAsync();
 
@@ -91,62 +90,61 @@ var image = await _ctx.files.FirstOrDefaultAsync(i => i.Id == dto.ImageId);
 
         if (TryGetModelErrorResult(ModelState, out var modelResult)) return modelResult!;
 
-        var isFound = _ctx.UserDetails.FirstOrDefault(u => u.UserId == userId);
+        var user = await _ctx.Users
+                    .Include(u => u.Content)
+                    .ThenInclude(c => c != null ? c.ContentUrls : null)
+                    .FirstOrDefaultAsync(u => u.Id == userId);
 
-        if (isFound is null) return NotFoundResult("user not found please sing-up", null, "/auth/sing-up");
+        if (user is null) return NotFoundResult("user not found please sing-up", null, "/auth/sing-up");
 
-        var profile = isFound.Profile;
-
-        if (profile is not null)
+        if (user.Content is null || user.ContentId is null)
         {
-            foreach (var file in profile.Files)
+            user.Content = new Content() { Markdown = dto.Markdown };
+            await _ctx.Contents.AddAsync(user.Content);
+        }
+
+        var contentUrls = new List<ContentUrl>();
+
+        foreach (var file in dto.Files)
+        {
+            var url = await _firebase.Upload(Convert.FromBase64String(file.Base64), ContentTypes.webp);
+
+            contentUrls.Add(new ContentUrl() { Url = url, ContentId = (int)user.ContentId });
+
+            dto.Markdown = dto.Markdown.Replace(file.PreviewUrl, url);
+        }
+
+        await _ctx.ContentUrls.AddRangeAsync(contentUrls);
+
+        // Delete unused content urls and files
+        foreach (var contentUrl in user.Content.ContentUrls)
+        {
+            if (!dto.Markdown.Contains(contentUrl.Url))
             {
-                _ctx.Files.Remove(file);
+                await _firebase.Delete(contentUrl.Url);
+                _ctx.ContentUrls.Remove(contentUrl);
             }
         }
-        else
-        {
-            profile = new Content();
-            if (profile.Files is null) profile.Files = new Collection<Document>();
-        }
 
-        foreach (var f in dto.Files)
-        {
-            var file = await _ctx.Files.AddAsync(new Document()
-            {
-                ContentType = ContentTypes.webp,
-                Data = Convert.FromBase64String(f.Base64),
-                IsPrivate = false
-            });
-
-            await _ctx.SaveChangesAsync();
-
-            dto.Markdown = dto.Markdown.Replace(f.PreviewUrl, $"/api/files/public/{file.Entity.Id}");
-            profile.Files.Add(file.Entity);
-        }
-
-        profile.Markdown = dto.Markdown;
-
-        isFound.Profile = profile;
-        isFound.ProfileId = profile.Id;
+        user.Content.Markdown = dto.Markdown;
 
         await _ctx.SaveChangesAsync();
 
-        return OkResult("successfully changed profile");
+        return OkResult($"successfully changed profile for user {userId}");
+
     }
 
     [HttpGet("profile/{userId?}")]
     public async Task<IActionResult> GetProfile([FromRoute] int userId)
     {
 
-        var isFound = await _ctx.UserDetails
-                        .Where(u => u.UserId == userId)
-                        .Select(u => new { markdown = u.Profile.Markdown })
+        var isFound = await _ctx.Users
+                        .Where(u => u.Id == userId)
+                        .Select(u => new { markdown = u.Content != null ? u.Content.Markdown : "" })
                         .FirstOrDefaultAsync();
 
         if (isFound is null) return NotFoundResult();
 
         return OkResult(null, isFound);
     }
-
 }

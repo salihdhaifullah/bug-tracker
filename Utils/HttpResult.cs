@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Buegee.Utils;
 
-public class HttpResult {
+internal class HttpResult {
     private string? _message {get; set;} = null;
     private string? _redirectTo {get; set;} = null;
     private object? _body {get; set;} = null;

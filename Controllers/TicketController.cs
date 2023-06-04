@@ -30,30 +30,28 @@ public class TicketController : Controller
 
         if (TryGetModelErrorResult(ModelState, out var modelResult)) return modelResult!;
 
-        var ticket = new Ticket();
-        var ticketDetails = new TicketDetails();
-
-        ticket.Name = dto.Name;
+        var ticket = new Ticket()
+        {
+            Name = dto.Name,
+            CreatorId = userId
+        };
 
         if (dto.Type is not null) ticket.Type = Enum.Parse<TicketType>(dto.Type);
         if (dto.Status is not null) ticket.Status = Enum.Parse<TicketStatus>(dto.Status);
         if (dto.Priority is not null) ticket.Priority = Enum.Parse<TicketPriority>(dto.Priority);
 
-        var ticketData = _ctx.Tickets.Add(ticket);
-
-        ticketDetails.CreatorId
         if (dto.AssignedToId is not null)
         {
-            var isFound = await _ctx.Members.Where(m => m.Id == dto.AssignedToId).FirstOrDefaultAsync();
-            if (isFound is null) return NotFoundResult("user is not found to assignee ticket to");
-            ticketDetails.AssignedTo = isFound;
-            ticketDetails.AssignedToId = isFound.Id;
+            var isFound = await _ctx.Members.AnyAsync(m => m.Id == dto.AssignedToId);
+            if (isFound) return NotFoundResult("user is not found to assignee ticket to");
+            ticket.AssignedToId = dto.AssignedToId;
         }
 
+        await _ctx.Tickets.AddAsync(ticket);
 
         await _ctx.SaveChangesAsync();
 
-        return OkResult($"project {dto.Title} successfully created", ticket);
+        return OkResult($"Ticket {dto.Name} successfully created");
     }
 
     [HttpGet("tickets/{page?}")]
@@ -96,17 +94,17 @@ public class TicketController : Controller
                             {
                                 firstName = t.Creator.FirstName,
                                 lastName = t.Creator.LastName,
-                                imageId = t.Creator.ImageId,
+                                imageId = t.Creator.ImageUrl,
                                 id = t.Creator.Id,
                             },
                             assignedTo = t.AssignedTo != null ? new
                             {
                                 firstName = t.AssignedTo.User.FirstName,
                                 lastName = t.AssignedTo.User.LastName,
-                                imageId = t.AssignedTo.User.ImageId,
+                                imageId = t.AssignedTo.User.ImageUrl,
                                 id = t.AssignedTo.User.Id,
                             } : null,
-                            title = t.Title,
+                            name = t.Name,
                             priority = t.Priority.ToString(),
                             status = t.Status.ToString(),
                             type = t.Type.ToString(),
@@ -131,7 +129,7 @@ public class TicketController : Controller
 
         await _ctx.SaveChangesAsync();
 
-        return OkResult($"ticket \"{ticket.Title}\" successfully deleted");
+        return OkResult($"ticket \"{ticket.Name}\" successfully deleted");
     }
 
     [HttpGet("count")]

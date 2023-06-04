@@ -100,15 +100,9 @@ public class AuthController : Controller
 
         // if there a user with this email redirect to login page with error message
 
-        var isFound = await _ctx.Users
-            .Where(u => u.Email == dto.Email)
-            .Select(u => new { Id = u.Id })
-            .FirstOrDefaultAsync();
+        var isFound = await _ctx.Users.AnyAsync(u => u.Email == dto.Email);
 
-        if (isFound is not null)
-        {
-            return NotFoundResult($"this account {dto.Email} is already exist try login", null, "/auth/login");
-        }
+        if (isFound) return NotFoundResult($"this account {dto.Email} is already exist try login", null, "/auth/login");
 
         // half an hour
         var sessionTimeSpan = new TimeSpan(0, 30, 0);

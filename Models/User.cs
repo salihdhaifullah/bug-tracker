@@ -38,5 +38,11 @@ public class User
 
     [ForeignKey("Content"), Column("content_id")]
     public int? ContentId { get; set; }
-    public Content? Content { get; set; }
+    public virtual Content? Content { get; set; }
+
+    [Column("member_ships")]
+    public virtual ICollection<Member> MemberShips { get; set; } = new List<Member>();
+
+    [Column("Projects")]
+    public virtual ICollection<Project> Projects { get; set; } = new List<Project>();
 }

@@ -14,9 +14,9 @@ public class Activity
 
     [Required, ForeignKey("Project"), Column("project_id")]
     public int ProjectId { get; set; }
-    public Project Project { get; set; } = null!;
+    public virtual Project Project { get; set; } = null!;
 
     [Required, ForeignKey("Content"), Column("content_id")]
     public int ContentId { get; set; }
-    public Content Content { get; set; } = null!;
+    public virtual Content Content { get; set; } = null!;
 }

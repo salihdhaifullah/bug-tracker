@@ -33,17 +33,10 @@ public class ProjectController : Controller
         var project = await _ctx.Projects.AddAsync(new Project()
         {
             Name = dto.Name,
-            IsPrivate = dto.IsPrivate
-        });
-
-        var description =  await _ctx.Contents.AddAsync(new Content() { Markdown = "" });
-
-        var ProjectDetails = await _ctx.ProjectsDetails.AddAsync(new ProjectDetails()
-        {
-            ProjectId = project.Entity.Id,
-            DescriptionId = description.Entity.Id,
+            IsPrivate = dto.IsPrivate,
             OwnerId = userId
         });
+
 
         await _ctx.SaveChangesAsync();
 
@@ -55,13 +48,11 @@ public class ProjectController : Controller
     {
         if (!_auth.TryGetUser(HttpContext, out var userId) || userId is null) return NotFoundResult("no projects found for you, to create project please sing-up");
 
-        var projects = await _ctx.ProjectsDetails
+        var projects = await _ctx.Projects
                         .Where((p) => p.OwnerId == userId)
-                        .OrderBy((p) => p.Project.CreatedAt)
+                        .OrderBy((p) => p.CreatedAt)
                         .Select((p) => new
                         {
-                            members = p.Members.Count + 1,
-                            tickets = p.Tickets.Count,
                             createdAt = p.CreatedAt,
                             id = p.Id,
                             isPrivate = p.IsPrivate,
@@ -92,8 +83,7 @@ public class ProjectController : Controller
                                 markdown = a.Content.Markdown
                             }),
                             createdAt = p.CreatedAt,
-                            descriptionMarkdown = p.Description != null ? p.Description.Markdown : "",
-                            id = p.Id,
+                            descriptionMarkdown = p.Content != null ? p.Content.Markdown : null,
                             tickets = p.Tickets.Select(t => new
                             {
                                 createdAt = t.CreatedAt,
@@ -101,17 +91,17 @@ public class ProjectController : Controller
                                 {
                                     firstName = t.Creator.FirstName,
                                     lastName = t.Creator.LastName,
-                                    imageId = t.Creator.ImageId,
+                                    imageUrl = t.Creator.ImageUrl,
                                     id = t.Creator.Id,
                                 },
                                 assignedTo = t.AssignedTo != null ? new
                                 {
                                     firstName = t.AssignedTo.User.FirstName,
                                     lastName = t.AssignedTo.User.LastName,
-                                    imageId = t.AssignedTo.User.ImageId,
+                                    imageUrl = t.AssignedTo.User.ImageUrl,
                                     id = t.AssignedTo.User.Id,
                                 } : null,
-                                title = t.Title,
+                                name = t.Name,
                                 priority = t.Priority.ToString(),
                                 status = t.Status.ToString(),
                                 type = t.Type.ToString(),
@@ -120,16 +110,16 @@ public class ProjectController : Controller
                             {
                                 firstName = p.Owner.FirstName,
                                 lastName = p.Owner.LastName,
-                                imageId = p.Owner.ImageId,
+                                imageUrl = p.Owner.ImageUrl,
                                 id = p.Owner.Id,
                             },
                             members = p.Members.Select(m =>
                             new
                             {
-                                joinedAt = m.CreatedAt,
+                                joinedAt = m.JoinedAt,
                                 firstName = m.User.FirstName,
                                 lastName = m.User.LastName,
-                                imageId = m.User.ImageId,
+                                imageUrl = m.User.ImageUrl,
                                 id = m.User.Id
                             }),
                         })
