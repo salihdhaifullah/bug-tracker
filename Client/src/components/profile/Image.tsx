@@ -27,7 +27,7 @@ const Image = () => {
                 <img
                     title="change image"
                     className="rounded-full cursor-pointer shadow-md w-60 h-60 object-contain"
-                    src={`/api/files/public/${user.imageId}?${change}`} // to force react to rerender the image
+                    src={`${user.imageUrl}?${change}`} // ?${change} to force reloading the image
                     alt={user.fullName} />
             </label>
         </>

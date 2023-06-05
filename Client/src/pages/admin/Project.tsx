@@ -8,7 +8,7 @@ import Content from "../../components/profile/Content";
 interface IUser {
   firstName: string;
   lastName: string;
-  imageId: number;
+  imageUrl: string;
   id: number;
 }
 
@@ -49,7 +49,7 @@ const User = ({ user }: { user: IUser }) => {
     <div className="flex items-center">
       <img
         className="rounded-full shadow-md w-10 h-10 object-contain"
-        src={`/api/files/public/${user.imageId}`}
+        src={user.imageUrl}
         alt={`${user.firstName} ${user.lastName}`}
       />
       <span className="ml-2 font-medium">{user.firstName} {user.lastName}</span>

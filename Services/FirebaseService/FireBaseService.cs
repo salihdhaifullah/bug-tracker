@@ -26,20 +26,19 @@ public class FirebaseService : IFirebaseService
         });
     }
 
-    public async Task<string> Upload(byte[] data, ContentTypes ContentType)
+    public async Task<(string url, string name)> Upload(byte[] data, ContentTypes ContentType)
     {
-        return await _storage.Child($"{Guid.NewGuid()}.{ContentType.ToString()}").PutAsync(new MemoryStream(data));
+        var name = $"{Guid.NewGuid()}.{ContentType.ToString()}";
+        return (await _storage.Child(name).PutAsync(new MemoryStream(data)), name);
     }
 
-    public async Task Delete(string url)
+    public async Task Delete(string name)
     {
-        var items = url.Split("/");
-        await _storage.Child(items[items.Length - 1]).DeleteAsync();
+        await _storage.Child(name).DeleteAsync();
     }
 
-    public async Task Update(string url, byte[] data)
+    public async Task Update(string name, byte[] data)
     {
-        var items = url.Split("/");
-        await _storage.Child(items[items.Length - 1]).PutAsync(new MemoryStream(data));
+        await _storage.Child(name).PutAsync(new MemoryStream(data));
     }
 }

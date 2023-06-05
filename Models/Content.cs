@@ -13,5 +13,5 @@ public class Content
     public string Markdown { get; set; } = null!;
 
     [Column("content_urls")]
-    public virtual ICollection<ContentUrl> ContentUrls { get; set; } = new List<ContentUrl>();
+    public List<ContentUrl> ContentUrls { get; set; } = new List<ContentUrl>();
 }

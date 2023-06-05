@@ -24,6 +24,9 @@ public class User
     [Required, Column("image_url")]
     public string ImageUrl { get; set; } = null!;
 
+    [Required, Column("image_name")]
+    public string ImageName { get; set; } = null!;
+
     [Required, Column("password_hash")]
     public byte[] PasswordHash { get; set; } = null!;
 
@@ -33,16 +36,16 @@ public class User
     [Required, Column("created_at")]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-    [Column("bio"), StringLength(100)]
-    public string? Bio { get; set; }
+    [Required, ForeignKey("Content"), Column("content_id")]
+    public int ContentId { get; set; }
+    public Content Content { get; set; } = null!;
 
-    [ForeignKey("Content"), Column("content_id")]
-    public int? ContentId { get; set; }
-    public virtual Content? Content { get; set; }
+    [Column("bio"), StringLength(100)]
+    public string Bio { get; set; } = string.Empty;
 
     [Column("member_ships")]
-    public virtual ICollection<Member> MemberShips { get; set; } = new List<Member>();
+    public List<Member> MemberShips { get; set; } = new List<Member>();
 
     [Column("Projects")]
-    public virtual ICollection<Project> Projects { get; set; } = new List<Project>();
+    public List<Project> Projects { get; set; } = new List<Project>();
 }

@@ -12,9 +12,9 @@ type IUserAction = {
 
 export interface IUser {
     id: number;
-    imageId: number;
     email: string;
     fullName: string;
+    imageUrl: string;
 }
 
 

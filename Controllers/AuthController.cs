@@ -64,7 +64,7 @@ public class AuthController : Controller
                 Id = u.Id,
                 ImageUrl = u.ImageUrl,
                 Email = u.Email,
-                FullName = $"{u.FirstName}  {u.LastName}",
+                FullName = $"{u.FirstName} {u.LastName}",
             })
             .FirstOrDefaultAsync();
 
@@ -139,13 +139,17 @@ public class AuthController : Controller
         _crypto.Hash(session.Password, out byte[] hash, out byte[] salt);
 
 
-        string url;
+        (string url, string name) image;
 
         using (var client = new HttpClient())
         {
             var imageBytes = await client.GetByteArrayAsync($"https://api.dicebear.com/6.x/identicon/svg?seed={session.FirstName}-{session.LastName}-{session.Email}");
-            url = await _firebase.Upload(imageBytes, ContentTypes.svg);
+            image = await _firebase.Upload(imageBytes, ContentTypes.svg);
         }
+
+        var content = await _ctx.Contents.AddAsync(new Content() { Markdown = "" });
+
+        await _ctx.SaveChangesAsync();
 
         var userData = await _ctx.Users.AddAsync(new User
         {
@@ -154,7 +158,9 @@ public class AuthController : Controller
             LastName = session.LastName,
             PasswordHash = hash,
             PasswordSalt = salt,
-            ImageUrl = url
+            ImageUrl = image.url,
+            ImageName = image.name,
+            ContentId = content.Entity.Id
         });
 
         await _ctx.SaveChangesAsync();
@@ -226,7 +232,7 @@ public class AuthController : Controller
         await _ctx.SaveChangesAsync();
 
         return OkResult("successfully changed your password", null, "/auth/login");
-        }
+    }
 
     [HttpGet("logout")]
     public IActionResult Logout()

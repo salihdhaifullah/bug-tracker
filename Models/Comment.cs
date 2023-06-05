@@ -14,13 +14,13 @@ public class Comment
 
     [Required, ForeignKey("Ticket"), Column("ticket_id")]
     public int TicketId { get; set; }
-    public virtual Ticket Ticket { get; set; } = null!;
+    public Ticket Ticket { get; set; } = null!;
 
     [Required, ForeignKey("Content"), Column("content_id")]
     public int ContentId { get; set; }
-    public virtual Content Content { get; set; } = null!;
+    public Content Content { get; set; } = null!;
 
     [Required, ForeignKey("Commenter"), Column("commenter_id")]
     public int CommenterId { get; set; }
-    public virtual User Commenter { get; set; } = null!;
+    public User Commenter { get; set; } = null!;
 }

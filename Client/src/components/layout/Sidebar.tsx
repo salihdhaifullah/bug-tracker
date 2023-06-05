@@ -31,7 +31,7 @@ const Sidebar = () => {
 
                     <img
                         className="rounded-full shadow-md w-10 h-10 object-contain"
-                        src={`/api/files/public/${user.imageId}`}
+                        src={user.imageUrl}
                         alt={user.fullName} />
 
                     <MdClose onClick={() => setIsOpen(false)} className="text-4xl text-gray-600 p-1 cursor-pointer rounded-md hover:text-gray-700 hover:bg-slate-200" />

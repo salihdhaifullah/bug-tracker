@@ -11,8 +11,11 @@ public class ContentUrl
 
     [Required, ForeignKey("Content"), Column("content_id")]
     public int ContentId { get; set; }
-    public virtual Content Content { get; set; } = null!;
+    public Content Content { get; set; } = null!;
 
     [Required, Column("url")]
     public string Url { get; set; } = null!;
+
+    [Required, Column("name")]
+    public string Name { get; set; } = null!;
 }

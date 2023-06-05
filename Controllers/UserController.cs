@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Buegee.Data;
 using Buegee.DTO;
 using Buegee.Models;
@@ -18,12 +19,14 @@ public class UserController : Controller
     private readonly DataContext _ctx;
     private readonly IAuthService _auth;
     private readonly IFirebaseService _firebase;
+    private readonly ILogger<UserController> _logger;
 
-    public UserController(DataContext ctx, IAuthService auth, IFirebaseService firebase)
+    public UserController(DataContext ctx, IAuthService auth, IFirebaseService firebase, ILogger<UserController> logger)
     {
         _auth = auth;
         _ctx = ctx;
         _firebase = firebase;
+        _logger = logger;
     }
 
     [HttpPost("upload-profile")]
@@ -81,9 +84,24 @@ public class UserController : Controller
         return OkResult("successfully changed bio");
     }
 
+    private class userContent
+    {
+        public int ContentId { get; set; }
+        public Content Content { get; set; } = null!;
+        public List<ContentUrl> ContentUrls { get; set; } = null!;
+    }
+
+
+
     [HttpPost("profile")]
     public async Task<IActionResult> Profile([FromBody] ProfileContentDTO dto)
     {
+        _logger.LogWarning("\n\n\n\\n\n\n\n start start start \n\n\n\n\n\n\n\n");
+        var options = new JsonSerializerOptions
+        {
+            WriteIndented = true
+        };
+
         var result = _auth.CheckPermissions(HttpContext, out var userId);
 
         if (result is not null) return result;
@@ -91,37 +109,72 @@ public class UserController : Controller
         if (TryGetModelErrorResult(ModelState, out var modelResult)) return modelResult!;
 
         var user = await _ctx.Users
-                    .Include(u => u.Content)
-                    .ThenInclude(c => c != null ? c.ContentUrls : null)
-                    .FirstOrDefaultAsync(u => u.Id == userId);
+                    .Where(u => u.Id == userId)
+                    .Select(u => new userContent() { ContentId = u.ContentId, Content = u.Content, ContentUrls = u.Content.ContentUrls })
+                    .FirstOrDefaultAsync();
+
 
         if (user is null) return NotFoundResult("user not found please sing-up", null, "/auth/sing-up");
 
-        if (user.Content is null || user.ContentId is null)
+        _logger.LogWarning($"user is {JsonSerializer.Serialize(new
         {
-            user.Content = new Content() { Markdown = dto.Markdown };
-            await _ctx.Contents.AddAsync(user.Content);
+            ContentId = user.ContentId,
+            ContentUrls = user.ContentUrls.Select(c => c.Url),
+            Markdown = user.Content.Markdown,
+            ContentIdIn = user.Content.Id,
+        }, options)}");
+
+        for (var i = 0; i < dto.Files.Count; i++)
+        {
+            var file = dto.Files[i];
+
+
+            if (dto.Markdown.Contains(file.PreviewUrl))
+            {
+                var image = await _firebase.Upload(Convert.FromBase64String(file.Base64), ContentTypes.webp);
+
+                _logger.LogWarning($"\n\n\n uploaded new image image ur {image.url} image name {image.name}\n\n\n ");
+
+                var svvsv = await _ctx.ContentUrls.AddAsync(new ContentUrl() { Url = image.url, Name = image.name, ContentId = user.ContentId });
+
+                await _ctx.SaveChangesAsync();
+
+                user.ContentUrls.Add(svvsv.Entity);
+
+                dto.Markdown = dto.Markdown.Replace(file.PreviewUrl, image.url);
+            }
+            else
+            {
+                _logger.LogWarning($"\n\n\n file previewUrl is {file.PreviewUrl} and its not in the markdown {dto.Markdown} so it will not be add \n\n\n ");
+
+            }
         }
 
-        var contentUrls = new List<ContentUrl>();
+        await _ctx.SaveChangesAsync();
 
-        foreach (var file in dto.Files)
+        _logger.LogWarning($"user is {JsonSerializer.Serialize(new
         {
-            var url = await _firebase.Upload(Convert.FromBase64String(file.Base64), ContentTypes.webp);
+            ContentId = user.ContentId,
+            ContentUrls = user.ContentUrls.Select(c => c.Url),
+            Markdown = user.Content.Markdown,
+            ContentIdIn = user.Content.Id,
+        }, options)}");
 
-            contentUrls.Add(new ContentUrl() { Url = url, ContentId = (int)user.ContentId });
+        _logger.LogWarning($"\n\n\n dto Markdown is \"{dto.Markdown}\"\n\n\n");
 
-            dto.Markdown = dto.Markdown.Replace(file.PreviewUrl, url);
-        }
-
-        await _ctx.ContentUrls.AddRangeAsync(contentUrls);
-
-        // Delete unused content urls and files
-        foreach (var contentUrl in user.Content.ContentUrls)
+        for (var i = 0; i < user.ContentUrls.Count; i++)
         {
+            var contentUrl = user.ContentUrls[i];
+
+            _logger.LogWarning($"\n\n\n user content url is \"{contentUrl.Url}\"\n\n\n");
+            _logger.LogWarning($"\n\n\n is Markdown Contains contentUrl Url \"{dto.Markdown.Contains(contentUrl.Url)}\"\n\n\n");
+            _logger.LogWarning($"\n\n\n contentUrl Name \"{contentUrl.Name}\"\n\n\n");
+
             if (!dto.Markdown.Contains(contentUrl.Url))
             {
-                await _firebase.Delete(contentUrl.Url);
+                _logger.LogWarning($"\n\n\n removing this contentUrl Name {contentUrl.Name}\n\n\n");
+
+                await _firebase.Delete(contentUrl.Name);
                 _ctx.ContentUrls.Remove(contentUrl);
             }
         }
@@ -130,8 +183,17 @@ public class UserController : Controller
 
         await _ctx.SaveChangesAsync();
 
-        return OkResult($"successfully changed profile for user {userId}");
+        _logger.LogWarning($"\n\n\n user is {JsonSerializer.Serialize(new
+        {
+            ContentId = user.ContentId,
+            ContentUrls = user.ContentUrls.Select(c => c.Url),
+            Markdown = user.Content.Markdown,
+            ContentIdIn = user.Content.Id,
+        }, options)}\n\n\n");
 
+        _logger.LogWarning("\n\n\n\\n\n\n\n end end end \n\n\n\n\n\n\n\n");
+
+        return OkResult($"successfully changed profile");
     }
 
     [HttpGet("profile/{userId?}")]
@@ -140,7 +202,7 @@ public class UserController : Controller
 
         var isFound = await _ctx.Users
                         .Where(u => u.Id == userId)
-                        .Select(u => new { markdown = u.Content != null ? u.Content.Markdown : "" })
+                        .Select(u => new { markdown = u.Content.Markdown })
                         .FirstOrDefaultAsync();
 
         if (isFound is null) return NotFoundResult();

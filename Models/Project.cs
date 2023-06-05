@@ -22,18 +22,18 @@ public class Project
 
     [Required, ForeignKey("Owner"), Column("owner_id")]
     public int OwnerId { get; set; }
-    public virtual User Owner { get; set; } = null!;
+    public User Owner { get; set; } = null!;
 
-    [ForeignKey("Content"), Column("content_id")]
-    public int? ContentId { get; set; }
-    public virtual Content? Content { get; set; }
+    [Required, ForeignKey("Content"), Column("content_id")]
+    public int ContentId { get; set; }
+    public Content Content { get; set; } = null!;
 
     [Column("activities")]
-    public virtual ICollection<Activity> Activities { get; set; } = new List<Activity>();
+    public List<Activity> Activities { get; set; } = new List<Activity>();
 
     [Column("members")]
-    public virtual ICollection<Member> Members { get; set; } = new List<Member>();
+    public List<Member> Members { get; set; } = new List<Member>();
 
     [Column("tickets")]
-    public virtual ICollection<Ticket> Tickets { get; set; } = new List<Ticket>();
+    public List<Ticket> Tickets { get; set; } = new List<Ticket>();
 }

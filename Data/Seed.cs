@@ -58,18 +58,22 @@ public class Seed
 
             _crypto.Hash(item.Email, out byte[] hash, out byte[] salt);
 
-            string url;
+            (string url, string name) image;
 
             if (item.Image is not null)
             {
                 var imageBytes = await _client.GetByteArrayAsync(item.Image);
-                url = await _firebase.Upload(imageBytes, ContentTypes.jpeg);
+                image = await _firebase.Upload(imageBytes, ContentTypes.jpeg);
             }
             else
             {
                 var imageBytes = await _client.GetByteArrayAsync($"https://api.dicebear.com/6.x/identicon/svg?seed={item.FirstName}-{item.LastName}-{item.Email}");
-                url = await _firebase.Upload(imageBytes, ContentTypes.svg);
+                image = await _firebase.Upload(imageBytes, ContentTypes.svg);
             }
+
+            var content = await _ctx.Contents.AddAsync(new Content() {Markdown = ""});
+
+            await _ctx.SaveChangesAsync();
 
             var user = await _ctx.Users.AddAsync(new User()
             {
@@ -78,7 +82,9 @@ public class Seed
                 Email = item.Email,
                 PasswordHash = hash,
                 PasswordSalt = salt,
-                ImageUrl = url
+                ImageUrl = image.url,
+                ImageName = image.name,
+                ContentId = content.Entity.Id
             });
 
         }

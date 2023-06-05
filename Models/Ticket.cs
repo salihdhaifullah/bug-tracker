@@ -32,20 +32,20 @@ public class Ticket
 
     [Required, ForeignKey("Project"), Column("project_id")]
     public int ProjectId { get; set; }
-    public virtual Project Project { get; set; } = null!;
+    public Project Project { get; set; } = null!;
 
     [Required, ForeignKey("Creator"), Column("creator_id")]
     public int CreatorId { get; set; }
-    public virtual User Creator { get; set; } = null!;
+    public User Creator { get; set; } = null!;
 
-    [ForeignKey("Content"), Column("content_id")]
-    public int? ContentId { get; set; }
-    public virtual Content? Content { get; set; }
+    [Required, ForeignKey("Content"), Column("content_id")]
+    public int ContentId { get; set; }
+    public Content Content { get; set; } = null!;
 
     [ForeignKey("AssignedTo"), Column("assigned_to_id")]
     public int? AssignedToId { get; set; }
-    public virtual Member? AssignedTo { get; set; }
+    public Member? AssignedTo { get; set; }
 
     [Column("comments")]
-    public virtual ICollection<Comment> Comments { get; set; } = new List<Comment>();
+    public List<Comment> Comments { get; set; } = new List<Comment>();
 }

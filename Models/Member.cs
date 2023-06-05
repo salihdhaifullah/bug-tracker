@@ -13,14 +13,14 @@ public class Member
 
     [Required, ForeignKey("User"), Column("user_id")]
     public int UserId { get; set; }
-    public virtual User User { get; set; } = null!;
+    public User User { get; set; } = null!;
 
     [Required, ForeignKey("Project"), Column("project_id")]
     public int ProjectId { get; set; }
-    public virtual Project Project { get; set; } = null!;
+    public Project Project { get; set; } = null!;
 
     [Column("assigned_to")]
-    public virtual ICollection<Ticket> AssignedTo { get; set; } = new List<Ticket>();
+    public List<Ticket> AssignedTo { get; set; } = new List<Ticket>();
 
     [Column("joined_at")]
     public DateTime JoinedAt { get; set; } = DateTime.UtcNow;
