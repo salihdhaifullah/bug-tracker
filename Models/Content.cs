@@ -12,6 +12,6 @@ public class Content
     [Required, Column("markdown")]
     public string Markdown { get; set; } = null!;
 
-    [Column("content_urls")]
-    public List<ContentUrl> ContentUrls { get; set; } = new List<ContentUrl>();
+    [Column("documents")]
+    public List<Document> Documents { get; set; } = new List<Document>();
 }

@@ -21,12 +21,6 @@ public class User
     [Required, Column("last_name"), StringLength(50)]
     public string LastName { get; set; } = null!;
 
-    [Required, Column("image_url")]
-    public string ImageUrl { get; set; } = null!;
-
-    [Required, Column("image_name")]
-    public string ImageName { get; set; } = null!;
-
     [Required, Column("password_hash")]
     public byte[] PasswordHash { get; set; } = null!;
 
@@ -39,6 +33,10 @@ public class User
     [Required, ForeignKey("Content"), Column("content_id")]
     public int ContentId { get; set; }
     public Content Content { get; set; } = null!;
+
+    [Required, ForeignKey("Image"), Column("image_id")]
+    public int ImageId { get; set; }
+    public Document Image { get; set; } = null!;
 
     [Column("bio"), StringLength(100)]
     public string Bio { get; set; } = string.Empty;

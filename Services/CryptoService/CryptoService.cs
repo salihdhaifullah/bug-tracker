@@ -12,8 +12,6 @@ public class CryptoService : ICryptoService
             hash = hmac.ComputeHash(Encoding.UTF8.GetBytes(source));
             salt = hmac.Key;
         }
-
-
     }
 
     public void Compar(string source, byte[] hash, byte[] salt, out bool isMatch)

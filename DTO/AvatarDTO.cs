@@ -3,9 +3,10 @@ using System.Text.Json.Serialization;
 
 namespace Buegee.DTO;
 
-public class UploadProfileDTO
+public class AvatarDTO
 {
     [JsonPropertyName("contentType")]
+    [Required(ErrorMessage = "content-type is required")]
     [RegularExpression(@"^(jpeg|png|svg|webp)$", ErrorMessage = "un-valid content type")]
     public string ContentType { get; set; } = null!;
 

@@ -1,34 +1,26 @@
 using Buegee.Data;
 using Buegee.DTO;
 using Buegee.Models;
-using Buegee.Services.AuthService;
+using Buegee.Utils;
 using Buegee.Utils.Attributes;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using static Buegee.Utils.Utils;
 
 [ApiRoute("project")]
 [Consumes("application/json")]
 public class ProjectController : Controller
 {
     private readonly DataContext _ctx;
-    private readonly IAuthService _auth;
 
-    public ProjectController(DataContext ctx, IAuthService auth)
+    public ProjectController(DataContext ctx)
     {
-        _auth = auth;
         _ctx = ctx;
     }
 
-    [HttpPost]
+    [HttpPost, Validation, Authorized]
     public async Task<IActionResult> CreateProject([FromBody] CreateProjectDTO dto)
     {
-        var result = _auth.CheckPermissions(HttpContext, out var userId);
-
-        if (result is not null) return result;
-
-        if (TryGetModelErrorResult(ModelState, out var modelResult)) return modelResult!;
-
+        var userId = (int)(HttpContext.Items["userId"])!;
 
         var project = await _ctx.Projects.AddAsync(new Project()
         {
@@ -37,16 +29,15 @@ public class ProjectController : Controller
             OwnerId = userId
         });
 
-
         await _ctx.SaveChangesAsync();
 
-        return OkResult($"project {dto.Name} successfully created");
+        return HttpResult.Ok($"project {dto.Name} successfully created");
     }
 
-    [HttpGet("projects/{page?}")]
+    [HttpGet("projects/{page?}"), Authorized]
     public async Task<IActionResult> GetMyProjects([FromRoute] int page = 1, [FromQuery] int take = 10)
     {
-        if (!_auth.TryGetUser(HttpContext, out var userId) || userId is null) return NotFoundResult("no projects found for you, to create project please sing-up");
+        var userId = (int)(HttpContext.Items["userId"])!;
 
         var projects = await _ctx.Projects
                         .Where((p) => p.OwnerId == userId)
@@ -62,16 +53,14 @@ public class ProjectController : Controller
                         .Take(take)
                         .ToListAsync();
 
-        if (projects is null || projects.Count == 0) return NotFoundResult("sorry, no project found");
+        if (projects is null || projects.Count == 0) return HttpResult.NotFound("sorry, no project found");
 
-        return OkResult(null, projects);
+        return HttpResult.Ok(null, projects);
     }
 
     [HttpGet("{projectId}")]
     public async Task<IActionResult> GetProject([FromRoute] int projectId)
     {
-        if (!_auth.TryGetUser(HttpContext, out var user) || user is null) return NotFoundResult("no projects found for you, to create project please sing-up");
-
         var project = await _ctx.Projects
                         .Where((p) => p.Id == projectId)
                         .Select((p) => new
@@ -91,14 +80,14 @@ public class ProjectController : Controller
                                 {
                                     firstName = t.Creator.FirstName,
                                     lastName = t.Creator.LastName,
-                                    imageUrl = t.Creator.ImageUrl,
+                                    imageUrl = t.Creator.Image.Url,
                                     id = t.Creator.Id,
                                 },
                                 assignedTo = t.AssignedTo != null ? new
                                 {
                                     firstName = t.AssignedTo.User.FirstName,
                                     lastName = t.AssignedTo.User.LastName,
-                                    imageUrl = t.AssignedTo.User.ImageUrl,
+                                    imageUrl = t.AssignedTo.User.Image.Url,
                                     id = t.AssignedTo.User.Id,
                                 } : null,
                                 name = t.Name,
@@ -110,7 +99,7 @@ public class ProjectController : Controller
                             {
                                 firstName = p.Owner.FirstName,
                                 lastName = p.Owner.LastName,
-                                imageUrl = p.Owner.ImageUrl,
+                                imageUrl = p.Owner.Image.Url,
                                 id = p.Owner.Id,
                             },
                             members = p.Members.Select(m =>
@@ -119,45 +108,44 @@ public class ProjectController : Controller
                                 joinedAt = m.JoinedAt,
                                 firstName = m.User.FirstName,
                                 lastName = m.User.LastName,
-                                imageUrl = m.User.ImageUrl,
+                                imageUrl = m.User.Image.Url,
                                 id = m.User.Id
                             }),
                         })
                         .AsSplitQuery()
                         .FirstOrDefaultAsync();
 
-        if (project is null) return NotFoundResult("sorry, project not found");
+        if (project is null) return HttpResult.NotFound("sorry, project not found");
 
-        return OkResult(null, project);
+        return HttpResult.Ok(null, project);
     }
 
-    [HttpDelete("{projectId}")]
+    [HttpDelete("{projectId}"), Authorized]
     public async Task<IActionResult> DeleteProject([FromRoute] int projectId)
     {
-        if (!_auth.TryGetUser(HttpContext, out var userId) || userId is null) return NotFoundResult("please sing-up to continue");
+        var userId = (int)(HttpContext.Items["userId"])!;
 
         var project = await _ctx.Projects.Where((p) => p.Id == projectId && p.OwnerId == userId).FirstOrDefaultAsync();
 
-        if (project is null) return NotFoundResult("sorry, project not found");
+        if (project is null) return HttpResult.NotFound("sorry, project not found");
 
         _ctx.Projects.Remove(project);
 
         await _ctx.SaveChangesAsync();
 
-        return OkResult($"project \"{project.Name}\" successfully deleted");
+        return HttpResult.Ok($"project \"{project.Name}\" successfully deleted");
     }
 
-    [HttpGet("count")]
+    [HttpGet("count"), Authorized]
     public async Task<IActionResult> GetMyProjectsCount([FromQuery] int take = 10)
     {
-        if (!_auth.TryGetUser(HttpContext, out var userId) || userId is null) return NotFoundResult("no projects found for you, to create project please sing-up");
+        var userId = (int)(HttpContext.Items["userId"])!;
 
         var projectsCount = await _ctx.Projects.Where((p) => p.OwnerId == userId).CountAsync();
 
         int pages = (int)Math.Ceiling((double)projectsCount / take);
 
-
-        return OkResult(null, pages);
+        return HttpResult.Ok(null, pages);
 
     }
 }

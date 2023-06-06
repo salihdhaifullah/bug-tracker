@@ -1,34 +1,27 @@
 using Buegee.Data;
 using Buegee.DTO;
 using Buegee.Models;
-using Buegee.Services.AuthService;
+using Buegee.Utils;
 using Buegee.Utils.Attributes;
 using Buegee.Utils.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using static Buegee.Utils.Utils;
 
 [ApiRoute("project")]
 [Consumes("application/json")]
 public class TicketController : Controller
 {
     private readonly DataContext _ctx;
-    private readonly IAuthService _auth;
 
-    public TicketController(DataContext ctx, IAuthService auth)
+    public TicketController(DataContext ctx)
     {
-        _auth = auth;
         _ctx = ctx;
     }
 
-    [HttpPost]
+    [HttpPost, Validation, Authorized]
     public async Task<IActionResult> CreateTicket([FromBody] CreateTicketDTO dto)
     {
-        var result = _auth.CheckPermissions(HttpContext, out var userId);
-
-        if (result is not null) return result;
-
-        if (TryGetModelErrorResult(ModelState, out var modelResult)) return modelResult!;
+        var userId = (int)(HttpContext.Items["userId"])!;
 
         var ticket = new Ticket()
         {
@@ -43,7 +36,7 @@ public class TicketController : Controller
         if (dto.AssignedToId is not null)
         {
             var isFound = await _ctx.Members.AnyAsync(m => m.Id == dto.AssignedToId);
-            if (isFound) return NotFoundResult("user is not found to assignee ticket to");
+            if (isFound) return HttpResult.NotFound("user is not found to assignee ticket to");
             ticket.AssignedToId = dto.AssignedToId;
         }
 
@@ -51,13 +44,13 @@ public class TicketController : Controller
 
         await _ctx.SaveChangesAsync();
 
-        return OkResult($"Ticket {dto.Name} successfully created");
+        return HttpResult.Ok($"Ticket {dto.Name} successfully created");
     }
 
-    [HttpGet("tickets/{page?}")]
+    [HttpGet("tickets/{page?}"), Authorized]
     public async Task<IActionResult> GetTickets([FromRoute] int page = 1, [FromQuery] int take = 10)
     {
-        if (!_auth.TryGetUser(HttpContext, out var userId) || userId is null) return NotFoundResult("no projects found for you, to create project please sing-up");
+        var userId = (int)(HttpContext.Items["userId"])!;
 
         var projects = await _ctx.Projects
                         .Where((p) => p.OwnerId == userId)
@@ -75,16 +68,14 @@ public class TicketController : Controller
                         .Take(take)
                         .ToListAsync();
 
-        if (projects is null || projects.Count == 0) return NotFoundResult("sorry, no project found");
+        if (projects is null || projects.Count == 0) return HttpResult.NotFound("sorry, no project found");
 
-        return OkResult(null, projects);
+        return HttpResult.Ok(null, projects);
     }
 
     [HttpGet("{ticketId}")]
     public async Task<IActionResult> GetTicket([FromRoute] int ticketId)
     {
-        if (!_auth.TryGetUser(HttpContext, out var user) || user is null) return NotFoundResult("ticket not found");
-
         var ticket = await _ctx.Tickets
                         .Where((t) => t.Id == ticketId)
                         .Select((t) => new
@@ -94,14 +85,14 @@ public class TicketController : Controller
                             {
                                 firstName = t.Creator.FirstName,
                                 lastName = t.Creator.LastName,
-                                imageId = t.Creator.ImageUrl,
+                                imageId = t.Creator.Image.Url,
                                 id = t.Creator.Id,
                             },
                             assignedTo = t.AssignedTo != null ? new
                             {
                                 firstName = t.AssignedTo.User.FirstName,
                                 lastName = t.AssignedTo.User.LastName,
-                                imageId = t.AssignedTo.User.ImageUrl,
+                                imageId = t.AssignedTo.User.Image.Url,
                                 id = t.AssignedTo.User.Id,
                             } : null,
                             name = t.Name,
@@ -111,38 +102,36 @@ public class TicketController : Controller
                         })
                         .FirstOrDefaultAsync();
 
-        if (ticket is null) return NotFoundResult("ticket not found");
+        if (ticket is null) return HttpResult.NotFound("ticket not found");
 
-        return OkResult(body: ticket);
+        return HttpResult.Ok(body: ticket);
     }
 
-    [HttpDelete("{ticketId}")]
+    [HttpDelete("{ticketId}"), Authorized]
     public async Task<IActionResult> DeleteTicket([FromRoute] int ticketId)
     {
-        if (!_auth.TryGetUser(HttpContext, out var userId) || userId is null) return UnAuthorizedResult("unauthorized");
+        var userId = (int)(HttpContext.Items["userId"])!;
 
         var ticket = await _ctx.Tickets.Where((t) => t.Id == ticketId && t.Creator.Id == userId).FirstOrDefaultAsync();
 
-        if (ticket is null) return NotFoundResult("sorry, ticket not found");
+        if (ticket is null) return HttpResult.NotFound("sorry, ticket not found");
 
         _ctx.Tickets.Remove(ticket);
 
         await _ctx.SaveChangesAsync();
 
-        return OkResult($"ticket \"{ticket.Name}\" successfully deleted");
+        return HttpResult.Ok($"ticket \"{ticket.Name}\" successfully deleted");
     }
 
-    [HttpGet("count")]
+    [HttpGet("count"), Authorized]
     public async Task<IActionResult> GetTicketsCount([FromQuery] int take = 10)
     {
-        if (!_auth.TryGetUser(HttpContext, out var userId) || userId is null) return NotFoundResult("no projects found for you, to create project please sing-up");
+        var userId = (int)(HttpContext.Items["userId"])!;
 
         var projectsCount = await _ctx.Projects.Where((p) => p.OwnerId == userId).CountAsync();
 
         int pages = (int)Math.Ceiling((double)projectsCount / take);
 
-
-        return OkResult(null, pages);
-
+        return HttpResult.Ok(null, pages);
     }
 }

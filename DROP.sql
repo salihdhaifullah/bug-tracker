@@ -2,7 +2,7 @@ DROP TABLE "__EFMigrationsHistory" CASCADE;
 DROP TABLE "user" CASCADE;
 DROP TABLE "comment" CASCADE;
 DROP TABLE "content" CASCADE;
-DROP TABLE "content_url" CASCADE;
+DROP TABLE "document" CASCADE;
 DROP TABLE "project" CASCADE;
 DROP TABLE "ticket" CASCADE;
 DROP TABLE "member" CASCADE;

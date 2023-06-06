@@ -71,7 +71,8 @@ public class Seed
                 image = await _firebase.Upload(imageBytes, ContentTypes.svg);
             }
 
-            var content = await _ctx.Contents.AddAsync(new Content() {Markdown = ""});
+            var content = await _ctx.Contents.AddAsync(new Content() { Markdown = "" });
+            var document = await _ctx.Documents.AddAsync(new Document() { Url = image.url, Name = image.name });
 
             await _ctx.SaveChangesAsync();
 
@@ -82,11 +83,9 @@ public class Seed
                 Email = item.Email,
                 PasswordHash = hash,
                 PasswordSalt = salt,
-                ImageUrl = image.url,
-                ImageName = image.name,
+                ImageId = document.Entity.Id,
                 ContentId = content.Entity.Id
             });
-
         }
 
         await _ctx.SaveChangesAsync();

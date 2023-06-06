@@ -14,7 +14,7 @@ public class DataContext : DbContext
     public DbSet<Comment> Comments { get; set; } = null!;
     public DbSet<Activity> Activities { get; set; } = null!;
     public DbSet<Content> Contents { get; set; } = null!;
-    public DbSet<ContentUrl> ContentUrls { get; set; } = null!;
+    public DbSet<Document> Documents { get; set; } = null!;
     public DbSet<Member> Members { get; set; } = null!;
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
