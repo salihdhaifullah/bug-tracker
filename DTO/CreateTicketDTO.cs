@@ -22,6 +22,6 @@ public class CreateTicketDTO {
     [RegularExpression(@"^(review|active|in_progress|resolved|closed)$", ErrorMessage = "un-valid ticket status")]
     public string? Status { get; set; }
 
-    [JsonPropertyName("assignedToId")]
-    public int? AssignedToId {get; set;}
+    [JsonPropertyName("assignedToId"), MinLength(26), MaxLength(26)]
+    public string? AssignedToId {get; set;}
 }

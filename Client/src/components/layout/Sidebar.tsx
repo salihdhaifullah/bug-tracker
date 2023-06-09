@@ -48,7 +48,7 @@ const Sidebar = () => {
                     </Link>
 
                     <Link
-                        to="/admin/create-project"
+                        to="/create-project"
                         onClick={() => setIsOpen(false)}
                         className="text-primary hover:bg-slate-200 transition-all ease-in-out rounded-md text-xl p-2 flex-row flex gap-2 items-center ">
                         <MdOutlineCreateNewFolder /> <p>create project</p>

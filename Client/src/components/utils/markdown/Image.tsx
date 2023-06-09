@@ -1,5 +1,5 @@
 import { BsFileEarmarkImage } from "react-icons/bs";
-import { toWEBPImage } from "../../../utils";
+import toWEBPImage from "../../../utils/toWEBPImage";
 import { setRange } from ".";
 import { MutableRefObject } from "react";
 

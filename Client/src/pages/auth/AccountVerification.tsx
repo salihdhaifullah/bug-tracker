@@ -2,7 +2,7 @@ import { MdDomainVerification } from 'react-icons/md';
 import TextFiled from '../../components/utils/TextFiled';
 import { FormEvent, useState } from 'react';
 import useFetchApi from '../../utils/hooks/useFetchApi';
-import SubmitButton from '../../components/utils/SubmitButton';
+import Button from '../../components/utils/Button';
 
 const AccountVerification = () => {
     const [isValidCode, setIsValidCode] = useState(false);
@@ -44,13 +44,12 @@ const AccountVerification = () => {
                         setIsValid={setIsValidCode}
                     />
 
-
-
-                    <SubmitButton
-                    isValid={isValidCode}
-                    isLoading={payload.isLoading}
+                    <Button
+                        buttonProps={{ type: "submit" }}
+                        isLoading={payload.isLoading}
+                        isValid={isValidCode}
+                        text="submit"
                     />
-
                 </form>
 
             </div>

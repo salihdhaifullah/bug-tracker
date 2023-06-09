@@ -51,7 +51,8 @@ public class AuthController : Controller
                 PasswordHash = u.PasswordHash,
                 PasswordSalt = u.PasswordSalt,
                 Id = u.Id,
-                ImageUrl = u.Image.Url,
+                ContentId = u.ContentId,
+                ImageUrl = Helper.StorageUrl(u.ImageName),
                 Email = u.Email,
                 FullName = $"{u.FirstName} {u.LastName}",
             })
@@ -71,7 +72,8 @@ public class AuthController : Controller
             id = isFound.Id,
             imageUrl = isFound.ImageUrl,
             email = isFound.Email,
-            fullName = isFound.FullName
+            fullName = isFound.FullName,
+            contentId = isFound.ContentId
         });
     }
 
@@ -108,33 +110,34 @@ public class AuthController : Controller
 
         _crypto.Hash(session.Password, out byte[] hash, out byte[] salt);
 
-        (string url, string name) image;
+        string imageName;
+
+        var userId = Ulid.NewUlid().ToString();
+        var contentId = Ulid.NewUlid().ToString();
 
         using (var client = new HttpClient())
         {
-            var imageBytes = await client.GetByteArrayAsync($"https://api.dicebear.com/6.x/identicon/svg?seed={session.FirstName}-{session.LastName}-{session.Email}");
-            image = await _firebase.Upload(imageBytes, ContentTypes.svg);
+            var imageBytes = await client.GetByteArrayAsync($"https://api.dicebear.com/6.x/identicon/svg?seed={userId}");
+            imageName = await _firebase.Upload(imageBytes, ContentTypes.svg);
         }
 
-        var content = await _ctx.Contents.AddAsync(new Content() { Markdown = "" });
-        var document = await _ctx.Documents.AddAsync(new Document() { Url = image.url, Name = image.name });
+        var content = await _ctx.Contents.AddAsync(new Content() { Markdown = "", OwnerId = userId, Id = contentId });
 
-        await _ctx.SaveChangesAsync();
-
-        var userData = await _ctx.Users.AddAsync(new User
+        var user = await _ctx.Users.AddAsync(new User
         {
             Email = session.Email,
             FirstName = session.FirstName,
             LastName = session.LastName,
             PasswordHash = hash,
             PasswordSalt = salt,
-            ImageId = document.Entity.Id,
-            ContentId = content.Entity.Id
+            Id = userId,
+            ImageName = imageName,
+            ContentId = contentId
         });
 
         await _ctx.SaveChangesAsync();
 
-        _auth.LogIn(userData.Entity.Id, HttpContext);
+        _auth.LogIn(userId, HttpContext);
 
         // TODO || redirect to dashboard
         return HttpResult.Created("successfully verified your account", null, "/auth/login");

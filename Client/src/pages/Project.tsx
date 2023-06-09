@@ -1,15 +1,16 @@
 import { Link, useParams } from "react-router-dom"
 import { useEffect } from "react";
-import useFetchApi from "../../utils/hooks/useFetchApi";
-import { formatDate } from "../../utils";
-import CircleProgress from "../../components/utils/CircleProgress";
-import Content from "../../components/profile/Content";
+import useFetchApi from "../utils/hooks/useFetchApi";
+import formatDate from "../utils/formatDate";
+import CircleProgress from "../components/utils/CircleProgress";
+import Content from "../components/profile/Content";
+import Button from "../components/utils/Button";
 
 interface IUser {
   firstName: string;
   lastName: string;
   imageUrl: string;
-  id: number;
+  id: string;
 }
 
 interface IMember extends IUser {
@@ -32,7 +33,7 @@ interface IActivity {
 }
 
 interface IProject {
-  id: number;
+  id: string;
   createdAt: string;
   name: string;
   descriptionMarkdown: string;
@@ -109,7 +110,9 @@ const Project = () => {
 
         <div className="flex flex-row gap-4 mt-4 items-center">
           <h2 className="text-xl font-bold">Tickets</h2>
-          <button className="bg-secondary text-primary shadow-md rounded-md px-1 p-[2px]">create ticket</button>
+          <Link to={`/project/${projectsPayload.result.id}/create-ticket`}>
+              <Button text="create ticket" size="sm" />
+          </Link>
         </div>
 
         <div className="grid grid-cols-2 gap-4">

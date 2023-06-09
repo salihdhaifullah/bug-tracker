@@ -35,4 +35,9 @@ public static class Helper
             MaxAge = duration
         };
     }
+
+    public static string StorageUrl(string name)
+    {
+        return $"https://firebasestorage.googleapis.com/v0/b/bug-tracker-buegee.appspot.com/o/{name}?alt=media";
+    }
 }

@@ -4,7 +4,7 @@ import PasswordEye from "../../components/utils/PasswordEye"
 import { FormEvent, useState } from "react";
 import useFetchApi from "../../utils/hooks/useFetchApi";
 import { MdDomainVerification } from "react-icons/md";
-import SubmitButton from "../../components/utils/SubmitButton";
+import Button from "../../components/utils/Button";
 
 const ResetPassword = () => {
     const [newPassword, setNewPassword] = useState("");
@@ -66,9 +66,11 @@ const ResetPassword = () => {
 
 
 
-                    <SubmitButton
-                        isValid={isValidCode && isValidPassword}
+
+                    <Button
+                        buttonProps={{ type: "submit" }}
                         isLoading={payload.isLoading}
+                        isValid={isValidCode && isValidPassword} text="submit"
                     />
 
                 </form>

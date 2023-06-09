@@ -6,7 +6,7 @@ import PasswordEye from '../../components/utils/PasswordEye';
 import useFetchApi from '../../utils/hooks/useFetchApi';
 import { Link } from 'react-router-dom';
 import { FaUserCircle } from 'react-icons/fa';
-import SubmitButton from '../../components/utils/SubmitButton';
+import Button from '../../components/utils/Button';
 
 
 const SingUp = () => {
@@ -106,10 +106,11 @@ const SingUp = () => {
             <Link to="/auth/login" className="link">login ?</Link>
           </div>
 
-
-          <SubmitButton
-            isValid={isValidFirstName && isValidLastName && isValidEmail && isValidPassword}
+          <Button
+            buttonProps={{ type: "submit" }}
             isLoading={payload.isLoading}
+            isValid={isValidFirstName && isValidLastName && isValidEmail && isValidPassword}
+            text="submit"
           />
 
         </form>

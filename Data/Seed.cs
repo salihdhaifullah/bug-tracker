@@ -58,33 +58,32 @@ public class Seed
 
             _crypto.Hash(item.Email, out byte[] hash, out byte[] salt);
 
-            (string url, string name) image;
+            var userId = Ulid.NewUlid().ToString();
+            var contentId = Ulid.NewUlid().ToString();
+            string imageName;
 
             if (item.Image is not null)
             {
                 var imageBytes = await _client.GetByteArrayAsync(item.Image);
-                image = await _firebase.Upload(imageBytes, ContentTypes.jpeg);
+                imageName = await _firebase.Upload(imageBytes, ContentTypes.jpeg);
             }
             else
             {
-                var imageBytes = await _client.GetByteArrayAsync($"https://api.dicebear.com/6.x/identicon/svg?seed={item.FirstName}-{item.LastName}-{item.Email}");
-                image = await _firebase.Upload(imageBytes, ContentTypes.svg);
+                var imageBytes = await _client.GetByteArrayAsync($"https://api.dicebear.com/6.x/identicon/svg?seed={userId.ToString()}");
+                imageName = await _firebase.Upload(imageBytes, ContentTypes.svg);
             }
 
-            var content = await _ctx.Contents.AddAsync(new Content() { Markdown = "" });
-            var document = await _ctx.Documents.AddAsync(new Document() { Url = image.url, Name = image.name });
-
-            await _ctx.SaveChangesAsync();
-
-            var user = await _ctx.Users.AddAsync(new User()
+            var content = await _ctx.Contents.AddAsync(new Content() { Markdown = "", OwnerId = userId, Id = contentId });
+            var user = await _ctx.Users.AddAsync(new User
             {
                 FirstName = item.FirstName,
                 LastName = item.LastName,
                 Email = item.Email,
                 PasswordHash = hash,
                 PasswordSalt = salt,
-                ImageId = document.Entity.Id,
-                ContentId = content.Entity.Id
+                Id = userId,
+                ContentId = contentId,
+                ImageName = imageName
             });
         }
 

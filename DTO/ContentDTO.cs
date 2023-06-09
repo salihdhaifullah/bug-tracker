@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 namespace Buegee.DTO;
 
 
-public class ProfileContentDTO {
+public class ContentDTO {
 
     [JsonPropertyName("markdown")]
     public string Markdown { get; set; } = null!;

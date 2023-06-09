@@ -1,7 +1,5 @@
 import { Dispatch, ReactElement, createContext, useContext, useReducer } from 'react';
 
-
-
 const isUser = localStorage.getItem("user");
 const user: IUser | null = isUser ? JSON.parse(isUser) : null;
 
@@ -11,7 +9,8 @@ type IUserAction = {
 }
 
 export interface IUser {
-    id: number;
+    id: string;
+    contentId: string;
     email: string;
     fullName: string;
     imageUrl: string;

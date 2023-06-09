@@ -8,8 +8,8 @@ namespace Buegee.Models;
 [Index(nameof(Name), nameof(OwnerId), IsUnique = true)]
 public class Project
 {
-    [Key, Column("id")]
-    public int Id { get; set; }
+    [Key, Column("id"), MinLength(26), MaxLength(26)]
+    public string Id { get; set; } = null!;
 
     [Required, StringLength(100), Column("name")]
     public string Name { get; set; } = null!;
@@ -20,12 +20,12 @@ public class Project
     [Required, Column("is_private")]
     public bool IsPrivate { get; set; } = false;
 
-    [Required, ForeignKey("Owner"), Column("owner_id")]
-    public int OwnerId { get; set; }
+    [Required, ForeignKey("Owner"), Column("owner_id"), MinLength(26), MaxLength(26)]
+    public string OwnerId { get; set; } = null!;
     public User Owner { get; set; } = null!;
 
-    [Required, ForeignKey("Content"), Column("content_id")]
-    public int ContentId { get; set; }
+    [Required, ForeignKey("Content"), Column("content_id"), MinLength(26), MaxLength(26)]
+    public string ContentId { get; set; } = null!;
     public Content Content { get; set; } = null!;
 
     [Column("activities")]

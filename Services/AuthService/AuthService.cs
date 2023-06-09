@@ -16,13 +16,12 @@ public class AuthService : IAuthService
         _cache = cache;
     }
 
-    public void LogIn(int id, HttpContext ctx)
+    public void LogIn(string id, HttpContext ctx)
     {
         // a year
         var age = new TimeSpan(365, 0, 0, 0);
-
         var claims = new Dictionary<string, string>();
-        claims["id"] = id.ToString();
+        claims["id"] = id;
 
         // set auth cookie token
         ctx.Response.Cookies.Append("auth", _jwt.GenerateJwt(age, claims), Helper.CookieConfig(age));

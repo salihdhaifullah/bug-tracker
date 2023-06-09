@@ -23,25 +23,34 @@ public class UserController : Controller
         _firebase = firebase;
     }
 
+    public class UpdateAvatar
+    {
+        public string ImageName { get; set; } = null!;
+    };
+
     [HttpPost("avatar"), Authorized, Validation]
     public async Task<IActionResult> Avatar([FromBody] AvatarDTO dto)
     {
-        var userId = (int)(HttpContext.Items["userId"])!;
+        var userId = (string)(HttpContext.Items["id"])!;
 
         var contentType = (ContentTypes)Enum.Parse(typeof(ContentTypes), dto.ContentType);
 
-        var ImageName = await _ctx.Users.Where(u => u.Id == userId).Select(u => u.Image.Name).FirstOrDefaultAsync();
+        var user = await _ctx.Users.Where(u => u.Id == userId).Select(u => new UpdateAvatar { ImageName = u.ImageName }).FirstOrDefaultAsync();
 
-        if (String.IsNullOrEmpty(ImageName)) return HttpResult.UnAuthorized(massage: "your account not found please sing-up to continue", redirectTo: "/auth/sing-up");
+        if (user is null) return HttpResult.UnAuthorized(massage: "your account not found please sing-up to continue", redirectTo: "/auth/sing-up");
 
-        await _firebase.Update(ImageName, Convert.FromBase64String(dto.Data));
+        var newImageName = await _firebase.Update(user.ImageName, ContentTypes.webp, Convert.FromBase64String(dto.Data));
 
-        return HttpResult.Ok("successfully changed profile image");
+        user.ImageName = newImageName;
+
+        await _ctx.SaveChangesAsync();
+
+        return HttpResult.Ok("successfully changed profile image", new { imageUrl = Helper.StorageUrl(newImageName) });
     }
 
 
     [HttpGet("bio/{userId?}")]
-    public async Task<IActionResult> GetBio([FromRoute] int userId)
+    public async Task<IActionResult> GetBio([FromRoute] string userId)
     {
 
         var isFound = await _ctx.Users
@@ -57,7 +66,7 @@ public class UserController : Controller
     [HttpPost("bio"), Authorized, Validation]
     public async Task<IActionResult> EditBio([FromBody] BioDTO dto)
     {
-        var userId = (int)(HttpContext.Items["userId"])!;
+        var userId = (string)(HttpContext.Items["id"])!;
 
         var isFound = await _ctx.Users.Where(u => u.Id == userId).FirstOrDefaultAsync();
 
@@ -70,24 +79,30 @@ public class UserController : Controller
         return HttpResult.Ok("successfully changed bio");
     }
 
-    private class userContent
-    {
-        public Content Content { get; set; } = null!;
-        public List<Document> Documents { get; set; } = null!;
-    }
-
     [HttpPost("profile"), Validation, Authorized]
-    public async Task<IActionResult> Profile([FromBody] ProfileContentDTO dto)
+    public async Task<IActionResult> Profile([FromBody] ContentDTO dto)
     {
-        var userId = (int)(HttpContext.Items["userId"])!;
+        var userId = (string)(HttpContext.Items["id"])!;
 
         var user = await _ctx.Users
                     .Where(u => u.Id == userId)
-                    .Select(u => new userContent() { Content = u.Content, Documents = u.Content.Documents })
+                    .Include(u => u.Content)
+                    .ThenInclude(c => c.Documents)
+                    .Select(u => new { Content = u.Content })
                     .FirstOrDefaultAsync();
 
-
         if (user is null) return HttpResult.NotFound("user not found please sing-up", null, "/auth/sing-up");
+
+        for (var i = 0; i < user.Content.Documents.Count; i++)
+        {
+            var document = user.Content.Documents[i];
+
+            if (!dto.Markdown.Contains(document.Name))
+            {
+                await _firebase.Delete(document.Name);
+                _ctx.Documents.Remove(document);
+            }
+        }
 
         for (var i = 0; i < dto.Files.Count; i++)
         {
@@ -95,28 +110,10 @@ public class UserController : Controller
 
             if (dto.Markdown.Contains(file.PreviewUrl))
             {
-                var image = await _firebase.Upload(Convert.FromBase64String(file.Base64), ContentTypes.webp);
-
-                var document = await _ctx.Documents.AddAsync(new Document() { Url = image.url, Name = image.name });
-
-                await _ctx.SaveChangesAsync();
-
-                user.Documents.Add(document.Entity);
-
-                dto.Markdown = dto.Markdown.Replace(file.PreviewUrl, image.url);
-            }
-        }
-
-        await _ctx.SaveChangesAsync();
-
-        for (var i = 0; i < user.Documents.Count; i++)
-        {
-            var contentUrl = user.Documents[i];
-
-            if (!dto.Markdown.Contains(contentUrl.Url))
-            {
-                await _firebase.Delete(contentUrl.Name);
-                _ctx.Documents.Remove(contentUrl);
+                var imageName = await _firebase.Upload(Convert.FromBase64String(file.Base64), ContentTypes.webp);
+                var document = await _ctx.Documents.AddAsync(new Document() { Name = imageName, Id = Ulid.NewUlid().ToString() });
+                user.Content.Documents.Add(document.Entity);
+                dto.Markdown = dto.Markdown.Replace(file.PreviewUrl, Helper.StorageUrl(imageName));
             }
         }
 
@@ -128,7 +125,7 @@ public class UserController : Controller
     }
 
     [HttpGet("profile/{userId?}")]
-    public async Task<IActionResult> GetProfile([FromRoute] int userId)
+    public async Task<IActionResult> GetProfile([FromRoute] string userId)
     {
 
         var isFound = await _ctx.Users

@@ -9,8 +9,8 @@ namespace Buegee.Models;
 [Index(nameof(Email), IsUnique = true)]
 public class User
 {
-    [Key, Column("id")]
-    public int Id {get; set;}
+    [Key, Column("id"), MinLength(26), MaxLength(26)]
+    public string Id { get; set; } = null!;
 
     [Required, Column("email"), StringLength(100), EmailAddress]
     public string Email { get; set; } = null!;
@@ -30,13 +30,12 @@ public class User
     [Required, Column("created_at")]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-    [Required, ForeignKey("Content"), Column("content_id")]
-    public int ContentId { get; set; }
+    [Required, ForeignKey("Content"), Column("content_id"), MinLength(26), MaxLength(26)]
+    public string ContentId { get; set; } = null!;
     public Content Content { get; set; } = null!;
 
-    [Required, ForeignKey("Image"), Column("image_id")]
-    public int ImageId { get; set; }
-    public Document Image { get; set; } = null!;
+    [Required, Column("image_name")]
+    public string ImageName { get; set; } = null!;
 
     [Column("bio"), StringLength(100)]
     public string Bio { get; set; } = string.Empty;

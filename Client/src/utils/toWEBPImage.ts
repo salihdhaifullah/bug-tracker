@@ -1,12 +1,7 @@
-export function formatDate(date: Date | string): string {
-    return new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
-}
-
-
 type Enumerate<N extends number, Acc extends number[] = []> = Acc['length'] extends N ? Acc[number] : Enumerate<N, [...Acc, Acc['length']]>
 type Range<F extends number, T extends number> = Exclude<Enumerate<T>, Enumerate<F>>
 
-export function toWEBPImage(file: File, quality: Range<1, 101> = 80): Promise<string> {
+export default function toWEBPImage(file: File, quality: Range<1, 101> = 80): Promise<string> {
     return new Promise((resolve, reject) => {
         if (!file || !file.type || !file.type.includes("image")) throw Error("File Is NOT Image! OR THEY ARE NO FILE");
         const reader = new FileReader();

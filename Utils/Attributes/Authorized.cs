@@ -25,13 +25,13 @@ public class Authorized : Attribute, IAsyncActionFilter
         {
             var data = jwt.VerifyJwt(token);
 
-            if (!data.TryGetValue("id", out var idStr) || String.IsNullOrEmpty(idStr) || !int.TryParse(idStr, out var id))
+            if (!data.TryGetValue("id", out var id) || String.IsNullOrEmpty(id) || id.Length != 26)
             {
                 context.Result = HttpResult.UnAuthorized("you need to login to do this action");
                 return;
             }
 
-            context.HttpContext.Items["userId"] = id;
+            context.HttpContext.Items["id"] = id;
         }
         catch (Exception)
         {

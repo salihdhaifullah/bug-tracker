@@ -6,7 +6,7 @@ import useFetchApi from "../../utils/hooks/useFetchApi";
 import PasswordEye from "../../components/utils/PasswordEye";
 import { IUser, useUserDispatch } from "../../utils/context/user";
 import { Link } from "react-router-dom";
-import SubmitButton from "../../components/utils/SubmitButton";
+import Button from "../../components/utils/Button";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -61,7 +61,7 @@ const Login = () => {
             ]}
             icon={RiLockPasswordFill}
             value={password}
-            inputProps={{type: passwordType}}
+            inputProps={{ type: passwordType }}
             onChange={(e) => setPassword(e.target.value)}
             label="password"
             InElement={<PasswordEye type={passwordType} setType={setPasswordType} />}
@@ -73,10 +73,12 @@ const Login = () => {
             <Link to="/auth/sing-up" className="link">sing up ?</Link>
           </div>
 
-          <SubmitButton
-                    isValid={isValidEmail && isValidPassword}
-                    isLoading={payload.isLoading}
-                    />
+          <Button
+            buttonProps={{ type: "submit" }}
+            isLoading={payload.isLoading}
+            isValid={isValidEmail && isValidPassword}
+            text="submit"
+          />
 
         </form>
 

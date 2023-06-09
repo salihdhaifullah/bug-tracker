@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useNotificationDispatch } from '../context/notification';
 
 
-interface ICustomResult<T> {
+interface IResult<T> {
     type: "ok" | "error"
     body?: T
     message?: string
@@ -19,7 +19,7 @@ interface IPayload<T> {
 export default function useFetchApi<T>
 (method: "POST" | "PATCH" | "GET" | "DELETE",
 url: string, deps: DependencyList, body?: unknown,
-callback?: (arg: T | null) => void): [payload: IPayload<T>, call: () => void] {
+callback?: (arg: T) => void): [payload: IPayload<T>, call: () => void] {
 
     const dispatchNotification = useNotificationDispatch();
     const [result, setResult] = useState<T | null>(null);
@@ -40,7 +40,7 @@ callback?: (arg: T | null) => void): [payload: IPayload<T>, call: () => void] {
                 }
             });
 
-            const response = await responseBlob.json() as ICustomResult<T>;
+            const response = await responseBlob.json() as IResult<T>;
 
             setIsLoading(false);
 
@@ -59,7 +59,7 @@ callback?: (arg: T | null) => void): [payload: IPayload<T>, call: () => void] {
 
             if(response?.redirectTo) navigate(response?.redirectTo);
 
-            callback && callback(result);
+            callback && callback(response.body as T);
 
         } catch (err) {
             console.log(err)

@@ -17,19 +17,20 @@ public class FirebaseService : IFirebaseService
 
         var defaultAuth = FirebaseAuth.GetAuth(defaultApp);
 
-        var token = defaultAuth.CreateCustomTokenAsync(uid);
+        var tokenAsync = defaultAuth.CreateCustomTokenAsync(uid);
 
         _storage = new FirebaseStorage("bug-tracker-buegee.appspot.com", new FirebaseStorageOptions
         {
-            AuthTokenAsyncFactory = async () => await token,
+            AuthTokenAsyncFactory = async () => await tokenAsync,
             ThrowOnCancel = true,
         });
     }
 
-    public async Task<(string url, string name)> Upload(byte[] data, ContentTypes ContentType)
+    public async Task<string> Upload(byte[] data, ContentTypes ContentType)
     {
         var name = $"{Guid.NewGuid()}.{ContentType.ToString()}";
-        return (await _storage.Child(name).PutAsync(new MemoryStream(data)), name);
+        await _storage.Child(name).PutAsync(new MemoryStream(data));
+        return name;
     }
 
     public async Task Delete(string name)
@@ -37,8 +38,11 @@ public class FirebaseService : IFirebaseService
         await _storage.Child(name).DeleteAsync();
     }
 
-    public async Task Update(string name, byte[] data)
+    public async Task<string> Update(string oldName, ContentTypes ContentType, byte[] data)
     {
+        await Delete(oldName);
+        var name = $"{Guid.NewGuid()}.{ContentType.ToString()}";
         await _storage.Child(name).PutAsync(new MemoryStream(data));
+        return name;
     }
 }

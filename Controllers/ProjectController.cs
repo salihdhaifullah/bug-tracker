@@ -20,13 +20,23 @@ public class ProjectController : Controller
     [HttpPost, Validation, Authorized]
     public async Task<IActionResult> CreateProject([FromBody] CreateProjectDTO dto)
     {
-        var userId = (int)(HttpContext.Items["userId"])!;
+        var userId = (string)(HttpContext.Items["id"])!;
 
+        var isFoundSameName = await _ctx.Projects.AnyAsync(p => p.OwnerId == userId && p.Name == dto.Name);
+
+        if (isFoundSameName) return HttpResult.BadRequest("project name is already exist please chose another name");
+
+        var contentId = Ulid.NewUlid().ToString();
+        var projectId = Ulid.NewUlid().ToString();
+
+        var content = await _ctx.Contents.AddAsync(new Content() { Markdown = "", OwnerId = userId, Id = contentId });
         var project = await _ctx.Projects.AddAsync(new Project()
         {
             Name = dto.Name,
             IsPrivate = dto.IsPrivate,
-            OwnerId = userId
+            OwnerId = userId,
+            Id = projectId,
+            ContentId = contentId
         });
 
         await _ctx.SaveChangesAsync();
@@ -37,7 +47,7 @@ public class ProjectController : Controller
     [HttpGet("projects/{page?}"), Authorized]
     public async Task<IActionResult> GetMyProjects([FromRoute] int page = 1, [FromQuery] int take = 10)
     {
-        var userId = (int)(HttpContext.Items["userId"])!;
+        var userId = (string)(HttpContext.Items["id"])!;
 
         var projects = await _ctx.Projects
                         .Where((p) => p.OwnerId == userId)
@@ -47,7 +57,9 @@ public class ProjectController : Controller
                             createdAt = p.CreatedAt,
                             id = p.Id,
                             isPrivate = p.IsPrivate,
-                            name = p.Name
+                            name = p.Name,
+                            members = p.Members.Count,
+                            tickets = p.Tickets.Count
                         })
                         .Skip((page - 1) * take)
                         .Take(take)
@@ -58,14 +70,15 @@ public class ProjectController : Controller
         return HttpResult.Ok(null, projects);
     }
 
-    [HttpGet("{projectId}")]
-    public async Task<IActionResult> GetProject([FromRoute] int projectId)
+    [HttpGet("{projectId}")] // TODO make an attribute for id validation
+    public async Task<IActionResult> GetProject([FromRoute] string projectId)
     {
         var project = await _ctx.Projects
                         .Where((p) => p.Id == projectId)
                         .Select((p) => new
                         {
                             name = p.Name,
+                            id = p.Id,
                             activities = p.Activities.Select(a => new
                             {
                                 createdAt = a.CreatedAt,
@@ -80,14 +93,14 @@ public class ProjectController : Controller
                                 {
                                     firstName = t.Creator.FirstName,
                                     lastName = t.Creator.LastName,
-                                    imageUrl = t.Creator.Image.Url,
+                                    imageUrl = Helper.StorageUrl(t.Creator.ImageName),
                                     id = t.Creator.Id,
                                 },
                                 assignedTo = t.AssignedTo != null ? new
                                 {
                                     firstName = t.AssignedTo.User.FirstName,
                                     lastName = t.AssignedTo.User.LastName,
-                                    imageUrl = t.AssignedTo.User.Image.Url,
+                                    imageUrl = Helper.StorageUrl(t.AssignedTo.User.ImageName),
                                     id = t.AssignedTo.User.Id,
                                 } : null,
                                 name = t.Name,
@@ -99,7 +112,7 @@ public class ProjectController : Controller
                             {
                                 firstName = p.Owner.FirstName,
                                 lastName = p.Owner.LastName,
-                                imageUrl = p.Owner.Image.Url,
+                                imageUrl = Helper.StorageUrl(p.Owner.ImageName),
                                 id = p.Owner.Id,
                             },
                             members = p.Members.Select(m =>
@@ -108,11 +121,10 @@ public class ProjectController : Controller
                                 joinedAt = m.JoinedAt,
                                 firstName = m.User.FirstName,
                                 lastName = m.User.LastName,
-                                imageUrl = m.User.Image.Url,
+                                imageUrl = Helper.StorageUrl(m.User.ImageName),
                                 id = m.User.Id
                             }),
                         })
-                        .AsSplitQuery()
                         .FirstOrDefaultAsync();
 
         if (project is null) return HttpResult.NotFound("sorry, project not found");
@@ -121,9 +133,9 @@ public class ProjectController : Controller
     }
 
     [HttpDelete("{projectId}"), Authorized]
-    public async Task<IActionResult> DeleteProject([FromRoute] int projectId)
+    public async Task<IActionResult> DeleteProject([FromRoute] string projectId)
     {
-        var userId = (int)(HttpContext.Items["userId"])!;
+        var userId = (string)(HttpContext.Items["id"])!;
 
         var project = await _ctx.Projects.Where((p) => p.Id == projectId && p.OwnerId == userId).FirstOrDefaultAsync();
 
@@ -139,7 +151,7 @@ public class ProjectController : Controller
     [HttpGet("count"), Authorized]
     public async Task<IActionResult> GetMyProjectsCount([FromQuery] int take = 10)
     {
-        var userId = (int)(HttpContext.Items["userId"])!;
+        var userId = (string)(HttpContext.Items["id"])!;
 
         var projectsCount = await _ctx.Projects.Where((p) => p.OwnerId == userId).CountAsync();
 

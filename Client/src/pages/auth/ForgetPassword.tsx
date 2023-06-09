@@ -2,7 +2,7 @@ import { MdEmail } from "react-icons/md"
 import TextFiled from "../../components/utils/TextFiled"
 import { FormEvent, useState } from "react";
 import useFetchApi from "../../utils/hooks/useFetchApi";
-import SubmitButton from "../../components/utils/SubmitButton";
+import Button from "../../components/utils/Button";
 
 const ForgetPassword = () => {
     const [isValidEmail, setIsValidEmail] = useState(false);
@@ -39,9 +39,11 @@ const ForgetPassword = () => {
                         setIsValid={setIsValidEmail}
                     />
 
-                    <SubmitButton
-                    isValid={isValidEmail}
-                    isLoading={payload.isLoading}
+                    <Button
+                        buttonProps={{ type: "submit" }}
+                        isLoading={payload.isLoading}
+                        isValid={isValidEmail}
+                        text="submit"
                     />
 
                 </form>

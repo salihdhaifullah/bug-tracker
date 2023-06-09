@@ -42,7 +42,7 @@ const MangeUsers = () => {
             } else {
                 return (
                     <li>
-                        <a href="/admin/mange-users/@i"
+                        <a href="/mange-users/@i"
                             className="px-3 py-2  leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-slate-200 hover:text-gray-700">@i</a>
                     </li>
                 )
@@ -83,7 +83,7 @@ const MangeUsers = () => {
                 <ul className="flex flex-row w-full  justify-center items-center">
                     <li>
                         {CurrentPage != 1 ? (
-                            <a href="/admin/mange-users/@(Model.CurrentPage - 1)"
+                            <a href="/mange-users/@(Model.CurrentPage - 1)"
                             className="px-3 py-2 ml-0 leading-tight text-gray-500 bg-white border border-gray-300 rounded-l-lg hover:bg-slate-200 hover:text-gray-700">Previous</a>
                         ) : (
                             <div className="px-3 py-2 ml-0 leading-tight text-gray-500 bg-white border border-gray-300 rounded-l-lg">Previous
@@ -96,7 +96,7 @@ const MangeUsers = () => {
 
                     <li>
                         {CurrentPage != Pages ? (
-                            <a href="/admin/mange-users/@(Model.CurrentPage + 1)"
+                            <a href="/mange-users/@(Model.CurrentPage + 1)"
                                 className="px-3 py-2 leading-tight text-gray-500 bg-white border border-gray-300 rounded-r-lg hover:bg-slate-200 hover:text-gray-700">Next</a>
                         ) : (
                             <div className="px-3 py-2 leading-tight  text-gray-500 bg-white border border-gray-300 rounded-r-lg">Next</div>

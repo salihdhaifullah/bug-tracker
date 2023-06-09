@@ -1,10 +1,10 @@
 import { Fragment, useEffect, useState } from "react"
-import useFetchApi from "../../utils/hooks/useFetchApi"
-import CircleProgress from "../../components/utils/CircleProgress"
+import useFetchApi from "../utils/hooks/useFetchApi"
+import CircleProgress from "../components/utils/CircleProgress"
 import { Link } from "react-router-dom";
-import Tag from "../../components/utils/Tag";
-import { formatDate } from "../../utils";
-import Pagination from "../../components/utils/Pagination";
+import Tag from "../components/utils/Tag";
+import formatDate from "../utils/formatDate";
+import Pagination from "../components/utils/Pagination";
 import { BiTask } from "react-icons/bi";
 import { FiUsers } from "react-icons/fi";
 

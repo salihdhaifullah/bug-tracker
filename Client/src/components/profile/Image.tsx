@@ -1,17 +1,27 @@
 import { ChangeEvent, useEffect, useState } from "react";
-import { IUser, useUser } from "../../utils/context/user";
+import { IUser, useUser, useUserDispatch } from "../../utils/context/user";
 import useFetchApi from "../../utils/hooks/useFetchApi";
-import { toWEBPImage } from "../../utils";
+import toWEBPImage from "../../utils/toWEBPImage";
 
 const Image = () => {
     const [base64, setBase64] = useState("")
-    const [change, SetChange] = useState(false);
     const user = useUser() as IUser;
+    const dispatchUser = useUserDispatch();
 
-    const [_, call] = useFetchApi("POST", "user/upload-profile", [base64],
-        { data: base64, contentType: "webp" }, (_) => { SetChange(!change) });
+    const [_, call] = useFetchApi<{ imageUrl: string }>("POST", "user/avatar", [base64],
+        { data: base64, contentType: "webp" }, (payload) => {
+            dispatchUser({
+                type: "add",
+                payload: {
+                    ...user,
+                    imageUrl: payload.imageUrl
+                }
+            });
+        });
 
-    useEffect(() => { if (base64.length) call() }, [base64]);
+    useEffect(() => {
+        if (base64.length) call();
+    }, [base64]);
 
     const handelChangeImage = async (e: ChangeEvent<HTMLInputElement>) => {
         const file = e?.target?.files?.item(0);
@@ -27,7 +37,7 @@ const Image = () => {
                 <img
                     title="change image"
                     className="rounded-full cursor-pointer shadow-md w-60 h-60 object-contain"
-                    src={`${user.imageUrl}?${change}`} // ?${change} to force reloading the image
+                    src={user.imageUrl}
                     alt={user.fullName} />
             </label>
         </>

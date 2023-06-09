@@ -12,10 +12,11 @@ import Unauthorized from "./pages/errors/Unauthorized";
 import Profile from "./pages/Profile";
 
 import { createBrowserRouter } from "react-router-dom";
-import CreateProject from "./pages/admin/CreateProject";
-import Projects from "./pages/admin/Projects";
-import Project from "./pages/admin/Project";
+import CreateProject from "./pages/CreateProject";
+import Projects from "./pages/Projects";
+import Project from "./pages/Project";
 import MyProfile from "./pages/MyProfile";
+import CreateTicket from "./pages/CreateTicket";
 
 const router = createBrowserRouter([{
     path: "/",
@@ -27,11 +28,12 @@ const router = createBrowserRouter([{
         { path: "auth/reset-password", Component: ResetPassword },
         { path: "auth/forget-password", Component: ForgetPassword },
         { path: "auth/account-verification", Component: AccountVerification },
-        { path: "admin/create-project", Component: CreateProject },
+        { path: "create-project", Component: CreateProject },
         { path: "my-profile", Component: MyProfile },
         { path: "profile/:userId", Component: Profile },
         { path: "projects", Component: Projects },
         { path: "project/:projectId", Component: Project },
+        { path: "project/:projectId/create-ticket", Component: CreateTicket },
         { path: "500", Component: InternalServerError },
         { path: "403", Component: Forbidden },
         { path: "401", Component: Unauthorized },

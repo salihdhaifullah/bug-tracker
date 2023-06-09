@@ -1,4 +1,4 @@
-type Size = "sm" | "md" | "lg" | "xl" | "2xl";
+type Size = "sm" | "md" | "lg" | "xl" | "2xl" | undefined;
 
 function getSize(size: Size) {
     let sizeClass = "";
@@ -27,7 +27,7 @@ function getSize(size: Size) {
     return sizeClass;
 }
 
-const CircleProgress = ({ size }: { size: "sm" | "md" | "lg" | "xl" | "2xl" }) => {
+const CircleProgress = ({ size }: { size: Size }) => {
 
     return (
         <div role="status" className="flex w-full h-full flex-grow justify-center items-center text-center">

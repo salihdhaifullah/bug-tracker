@@ -7,7 +7,7 @@ using Buegee.Utils.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-[ApiRoute("project")]
+[ApiRoute("ticket")]
 [Consumes("application/json")]
 public class TicketController : Controller
 {
@@ -18,29 +18,38 @@ public class TicketController : Controller
         _ctx = ctx;
     }
 
-    [HttpPost, Validation, Authorized]
-    public async Task<IActionResult> CreateTicket([FromBody] CreateTicketDTO dto)
+    [HttpPost("{projectId}"), Validation, Authorized]
+    public async Task<IActionResult> CreateTicket([FromBody] CreateTicketDTO dto, [FromRoute] string projectId)
     {
-        var userId = (int)(HttpContext.Items["userId"])!;
+        var userId = (string)(HttpContext.Items["id"])!;
 
-        var ticket = new Ticket()
+        var isProjectFound = await _ctx.Projects.AnyAsync(p => p.Id == projectId && p.OwnerId == userId);
+
+        if (!isProjectFound) return HttpResult.NotFound("project not found");
+
+        var contentId = Ulid.NewUlid().ToString();
+        var ticketId = Ulid.NewUlid().ToString();
+
+        var content = await _ctx.Contents.AddAsync(new Content() { Markdown = "", Id = contentId, OwnerId = userId });
+        var ticket = await _ctx.Tickets.AddAsync(new Ticket()
         {
             Name = dto.Name,
-            CreatorId = userId
-        };
+            CreatorId = userId,
+            ProjectId = projectId,
+            ContentId = contentId,
+            Id = ticketId
+        });
 
-        if (dto.Type is not null) ticket.Type = Enum.Parse<TicketType>(dto.Type);
-        if (dto.Status is not null) ticket.Status = Enum.Parse<TicketStatus>(dto.Status);
-        if (dto.Priority is not null) ticket.Priority = Enum.Parse<TicketPriority>(dto.Priority);
+        if (dto.Type is not null) ticket.Entity.Type = Enum.Parse<TicketType>(dto.Type);
+        if (dto.Status is not null) ticket.Entity.Status = Enum.Parse<TicketStatus>(dto.Status);
+        if (dto.Priority is not null) ticket.Entity.Priority = Enum.Parse<TicketPriority>(dto.Priority);
 
         if (dto.AssignedToId is not null)
         {
             var isFound = await _ctx.Members.AnyAsync(m => m.Id == dto.AssignedToId);
             if (isFound) return HttpResult.NotFound("user is not found to assignee ticket to");
-            ticket.AssignedToId = dto.AssignedToId;
+            ticket.Entity.AssignedToId = dto.AssignedToId;
         }
-
-        await _ctx.Tickets.AddAsync(ticket);
 
         await _ctx.SaveChangesAsync();
 
@@ -50,7 +59,7 @@ public class TicketController : Controller
     [HttpGet("tickets/{page?}"), Authorized]
     public async Task<IActionResult> GetTickets([FromRoute] int page = 1, [FromQuery] int take = 10)
     {
-        var userId = (int)(HttpContext.Items["userId"])!;
+        var userId = (string)(HttpContext.Items["id"])!;
 
         var projects = await _ctx.Projects
                         .Where((p) => p.OwnerId == userId)
@@ -74,7 +83,7 @@ public class TicketController : Controller
     }
 
     [HttpGet("{ticketId}")]
-    public async Task<IActionResult> GetTicket([FromRoute] int ticketId)
+    public async Task<IActionResult> GetTicket([FromRoute] string ticketId)
     {
         var ticket = await _ctx.Tickets
                         .Where((t) => t.Id == ticketId)
@@ -85,14 +94,14 @@ public class TicketController : Controller
                             {
                                 firstName = t.Creator.FirstName,
                                 lastName = t.Creator.LastName,
-                                imageId = t.Creator.Image.Url,
+                                imageId = Helper.StorageUrl(t.Creator.ImageName),
                                 id = t.Creator.Id,
                             },
                             assignedTo = t.AssignedTo != null ? new
                             {
                                 firstName = t.AssignedTo.User.FirstName,
                                 lastName = t.AssignedTo.User.LastName,
-                                imageId = t.AssignedTo.User.Image.Url,
+                                imageId = Helper.StorageUrl(t.AssignedTo.User.ImageName),
                                 id = t.AssignedTo.User.Id,
                             } : null,
                             name = t.Name,
@@ -108,9 +117,9 @@ public class TicketController : Controller
     }
 
     [HttpDelete("{ticketId}"), Authorized]
-    public async Task<IActionResult> DeleteTicket([FromRoute] int ticketId)
+    public async Task<IActionResult> DeleteTicket([FromRoute] string ticketId)
     {
-        var userId = (int)(HttpContext.Items["userId"])!;
+        var userId = (string)(HttpContext.Items["id"])!;
 
         var ticket = await _ctx.Tickets.Where((t) => t.Id == ticketId && t.Creator.Id == userId).FirstOrDefaultAsync();
 
@@ -126,7 +135,7 @@ public class TicketController : Controller
     [HttpGet("count"), Authorized]
     public async Task<IActionResult> GetTicketsCount([FromQuery] int take = 10)
     {
-        var userId = (int)(HttpContext.Items["userId"])!;
+        var userId = (string)(HttpContext.Items["id"])!;
 
         var projectsCount = await _ctx.Projects.Where((p) => p.OwnerId == userId).CountAsync();
 
