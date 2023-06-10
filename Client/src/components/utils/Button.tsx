@@ -1,4 +1,4 @@
-import { HTMLProps } from 'react';
+import { HTMLProps, ReactElement } from 'react';
 import CircleProgress from './CircleProgress'
 
 
@@ -33,31 +33,31 @@ function getSize(size: Size) {
 
 
 interface IButtonProps {
-    text: string;
+    className?: string
+    children?: ReactElement | ReactElement[] | string
+    onClick?: () => void;
     isLoading?: boolean;
     isValid?: boolean;
-    buttonProps?: HTMLProps<HTMLButtonElement> & {type?: "button" | "submit" | "reset"}
+    buttonProps?: HTMLProps<HTMLButtonElement> & { type?: "button" | "submit" | "reset" }
     size?: Size
 }
 
 const Button = (props: IButtonProps) => {
-
     return (
-        <div className="flex justify-center my-2">
-            {props.isValid === false ? (
-                <button disabled
-                    className={`text-primary ${getSize(props.size)} bg-gray-300 text-center cursor-not-allowed rounded-md border-0 font-bold shadow-md`}>
-                    {props.text}
-                </button>
-            ) : (
-                <button
-                    {...props.buttonProps}
-                    disabled={props.isLoading}
-                    className={`text-primary ${getSize(props.size)} bg-secondary flex justify-center items-center text-center rounded-md border-0 font-bold ${props.isLoading ? "cursor-wait" : "cursor-pointer"} transition-all  ease-in-out shadow-lg hover:shadow-xl hover:border-gray-600 hover:text-white`}>
-                    {props.isLoading ? <CircleProgress size="md" /> : props.text}
-                </button>
-            )}
-        </div>
+        <button
+            {...(props.isValid === false ? {} : props.buttonProps)}
+            disabled={props.isValid === false || props.isLoading}
+
+            onClick={() => props.onClick && props.onClick()}
+            className={`
+                ${getSize(props.size)}
+                ${props.isValid === false ? "bg-gray-300 cursor-not-allowed" : !props.className ? "bg-secondary" : ""}
+                ${props.isLoading ? "cursor-wait" : "cursor-pointer"}
+                ${props.className || "rounded-md border-0 font-bold text-primary text-center transition-all ease-in-out shadow-lg hover:shadow-xl hover:border-gray-600 hover:text-white"}
+            `}>
+
+            {props.isLoading ? <CircleProgress size="md" /> : props.children}
+        </button>
     )
 }
 

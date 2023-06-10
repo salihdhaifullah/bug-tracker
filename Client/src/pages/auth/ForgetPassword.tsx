@@ -8,11 +8,11 @@ const ForgetPassword = () => {
     const [isValidEmail, setIsValidEmail] = useState(false);
     const [email, setEmail] = useState("");
 
-    const [payload, call] = useFetchApi("POST", "auth/forget-password", [email], { email });
+    const [payload, call] = useFetchApi<unknown, { email: string }>("POST", "auth/forget-password", []);
 
     const handelSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        call();
+        call({ email });
     }
 
     return (
@@ -39,12 +39,13 @@ const ForgetPassword = () => {
                         setIsValid={setIsValidEmail}
                     />
 
-                    <Button
-                        buttonProps={{ type: "submit" }}
-                        isLoading={payload.isLoading}
-                        isValid={isValidEmail}
-                        text="submit"
-                    />
+                    <div className="flex flex-col justify-center items-center w-full my-1">
+                        <Button
+                            buttonProps={{ type: "submit" }}
+                            isLoading={payload.isLoading}
+                            isValid={isValidEmail}
+                        >submit</Button>
+                    </div>
 
                 </form>
 

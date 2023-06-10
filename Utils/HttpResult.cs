@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Buegee.Utils;
 
-internal class HttpResult
+public class HttpResult
 {
     private string? _message { get; set; } = null;
     private string? _redirectTo { get; set; } = null;
@@ -86,7 +86,7 @@ internal class HttpResult
         return helper(result, massage, body, redirectTo);
     }
 
-    public static IActionResult InternalServerError(string? massage = null, object? body = null, string? redirectTo = null)
+    public static IActionResult InternalServerError(string? massage = "something went wrong on our side", object? body = null, string? redirectTo = "/500")
     {
         var result = new HttpResult().IsOk(false).StatusCode(StatusCodes.Status500InternalServerError);
         return helper(result, massage, body, redirectTo);

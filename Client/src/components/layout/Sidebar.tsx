@@ -7,18 +7,16 @@ import { Link } from 'react-router-dom';
 import { useUser, useUserDispatch } from "../../utils/context/user"
 import useFetchApi from "../../utils/hooks/useFetchApi";
 import { GrProjects } from 'react-icons/gr';
+import Button from '../../components/utils/Button';
 
 const Sidebar = () => {
     const [isOpen, setIsOpen] = useState(false);
     const user = useUser();
     const userDispatch = useUserDispatch();
-    const [_, call] = useFetchApi("GET", "auth/logout", []);
-
-    const handelLogout = () => {
-        call();
+    const [logoutPayload, callLogout] = useFetchApi("GET", "auth/logout", [], () => {
         userDispatch({ type: "logout" })
         setIsOpen(false)
-    }
+    });
 
     return user ? (
         <>
@@ -62,10 +60,13 @@ const Sidebar = () => {
                     </Link>
 
 
-                    <button onClick={handelLogout}
-                        className="text-primary hover:bg-slate-200 transition-all ease-in-out rounded-md text-xl p-2 flex-row flex gap-2 items-center ">
-                        <BiLogOut /> <p>logout</p>
-                    </button>
+                    <Button
+                        onClick={callLogout}
+                        isLoading={logoutPayload.isLoading}
+                        className="text-primary hover:bg-slate-200 transition-all ease-in-out rounded-md text-xl p-2 flex-row flex gap-2 items-center">
+                        <BiLogOut />
+                        <p>logout</p>
+                    </Button>
                 </div>
 
             </div>

@@ -18,21 +18,16 @@ public class AuthService : IAuthService
 
     public void LogIn(string id, HttpContext ctx)
     {
-        // a year
         var age = new TimeSpan(365, 0, 0, 0);
         var claims = new Dictionary<string, string>();
         claims["id"] = id;
-
-        // set auth cookie token
         ctx.Response.Cookies.Append("auth", _jwt.GenerateJwt(age, claims), Helper.CookieConfig(age));
     }
 
     public async Task SetSessionAsync<T>(string sessionName, TimeSpan sessionTimeSpan, T payload, HttpContext ctx)
     {
         var sessionId = Guid.NewGuid().ToString();
-
         ctx.Response.Cookies.Append(sessionName, sessionId, Helper.CookieConfig(sessionTimeSpan));
-
         await _cache.Redis.StringSetAsync(sessionId, JsonSerializer.Serialize<T>(payload), sessionTimeSpan);
     }
 

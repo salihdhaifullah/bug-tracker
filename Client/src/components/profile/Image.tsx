@@ -8,8 +8,7 @@ const Image = () => {
     const user = useUser() as IUser;
     const dispatchUser = useUserDispatch();
 
-    const [_, call] = useFetchApi<{ imageUrl: string }>("POST", "user/avatar", [base64],
-        { data: base64, contentType: "webp" }, (payload) => {
+    const [_, call] = useFetchApi<{ imageUrl: string }, { data: string, contentType: string }>("POST", "user/avatar", [], (payload) => {
             dispatchUser({
                 type: "add",
                 payload: {
@@ -20,7 +19,7 @@ const Image = () => {
         });
 
     useEffect(() => {
-        if (base64.length) call();
+        if (base64.length) call({ data: base64, contentType: "webp" });
     }, [base64]);
 
     const handelChangeImage = async (e: ChangeEvent<HTMLInputElement>) => {

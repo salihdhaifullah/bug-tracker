@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Buegee.Utils.Attributes;
 
-public class Validation : Attribute, IAsyncActionFilter
+public class ValidationAttribute : Attribute, IAsyncActionFilter
 {
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {

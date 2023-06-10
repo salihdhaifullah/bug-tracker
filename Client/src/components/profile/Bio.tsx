@@ -13,11 +13,11 @@ const Bio = () => {
     const iconRef = useRef<null | HTMLDivElement>(null);
     const user = useUser() as IUser;
 
-    const [updateBioPayload, call] = useFetchApi("POST", "user/bio", [bio], { bio });
+    const [updateBioPayload, call] = useFetchApi<unknown, { bio: string }>("POST", "user/bio", []);
 
-    const [getBioPayload, callGetTitle] = useFetchApi<{ bio: string }>("GET", `user/bio/${user.id}`, []);
+    const [getBioPayload, callGetBio] = useFetchApi<{ bio: string }, unknown>("GET", `user/bio/${user.id}`, []);
 
-    useEffect(() => { callGetTitle() }, [])
+    useEffect(() => { callGetBio() }, [])
 
     useEffect(() => {
         if (!getBioPayload.isLoading && getBioPayload.result) {
@@ -30,7 +30,7 @@ const Bio = () => {
 
     const SubmitChanges = () => {
         setIsEditing(false);
-        call();
+        call({ bio });
     }
 
     const onEnter = (e: KeyboardEvent) => {
@@ -39,23 +39,21 @@ const Bio = () => {
 
     return <div className="flex flex-col w-80 h-full">
         {isEditing && !getBioPayload.isLoading ? (
-            <div className="flex flex-row gap-0 justify-start items-start w-full h-full">
+            <div ref={bioRef} className="flex flex-row gap-0 justify-start items-start w-full h-full">
                 <TextFiled
                     icon={MdOutlineSubtitles}
                     inputProps={{ onKeyDown: onEnter }}
-                    ref={bioRef}
                     onChange={(e) => { setBio(e.target.value); setIsEditing(true); }}
                     value={bio}
                     label="Bio"
                     maxLength={100}
                 />
-                <div className="mt-1">
+                <div className="mt-3">
                     <Button
-                        buttonProps={{ onClick: SubmitChanges }}
+                        onClick={() => SubmitChanges()}
                         isLoading={updateBioPayload.isLoading}
                         isValid={true}
-                        text="ok"
-                    />
+                    >ok</Button>
                 </div>
             </div>
         ) : (

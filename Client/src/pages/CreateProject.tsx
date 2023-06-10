@@ -13,11 +13,11 @@ const CreateProject = () => {
 
     const [isValidName, setIsValidName] = useState(false);
 
-    const [payload, call] = useFetchApi("POST", "project", [name, projectState], { name, isPrivate: projectState === "private" });
+    const [payload, call] = useFetchApi<unknown, { name: string, isPrivate: boolean }>("POST", "project", []);
 
     const handelSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        call();
+        call({ name, isPrivate: projectState === "private" });
     }
 
     return (
@@ -60,13 +60,15 @@ const CreateProject = () => {
                         ]}
                     />
 
-                    <Button
-                    size="md"
-                        buttonProps={{ type: "submit" }}
-                        isLoading={payload.isLoading}
-                        isValid={isValidName}
-                        text="submit"
-                    />
+
+
+                    <div className="flex flex-col justify-center items-center w-full my-1">
+                        <Button
+                            buttonProps={{ type: "submit" }}
+                            isLoading={payload.isLoading}
+                            isValid={isValidName}
+                        >submit</Button>
+                    </div>
 
                 </form>
             </div>

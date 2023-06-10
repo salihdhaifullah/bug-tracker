@@ -14,11 +14,11 @@ const ResetPassword = () => {
     const [isValidPassword, setIsValidPassword] = useState(false);
     const [isValidCode, setIsValidCode] = useState(false);
 
-    const [payload, call] = useFetchApi("POST", "auth/reset-password", [code, newPassword], { code, newPassword });
+    const [payload, call] = useFetchApi<unknown, { code: string, newPassword: string }>("POST", "auth/reset-password", []);
 
     const handelSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        call();
+        call({ code, newPassword });
     }
 
     return (
@@ -52,9 +52,7 @@ const ResetPassword = () => {
                     />
 
                     <TextFiled
-                        validation={[
-                            { validate: (str: string) => str.length > 8, massage: "min length of password is 8 character" }
-                        ]}
+                        validation={[{ validate: (str: string) => str.length >= 8, massage: "min length of password is 8 character" }]}
                         icon={RiLockPasswordFill}
                         value={newPassword}
                         inputProps={{ type: passwordType }}
@@ -66,12 +64,13 @@ const ResetPassword = () => {
 
 
 
-
-                    <Button
-                        buttonProps={{ type: "submit" }}
-                        isLoading={payload.isLoading}
-                        isValid={isValidCode && isValidPassword} text="submit"
-                    />
+                    <div className="flex flex-col justify-center items-center w-full my-1">
+                        <Button
+                            buttonProps={{ type: "submit" }}
+                            isLoading={payload.isLoading}
+                            isValid={isValidCode && isValidPassword}
+                        >submit</Button>
+                    </div>
 
                 </form>
 

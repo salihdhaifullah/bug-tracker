@@ -12,135 +12,177 @@ using Microsoft.EntityFrameworkCore;
 public class TicketController : Controller
 {
     private readonly DataContext _ctx;
+    private readonly ILogger<TicketController> _logger;
 
-    public TicketController(DataContext ctx)
+    public TicketController(DataContext ctx, ILogger<TicketController> logger)
     {
         _ctx = ctx;
+        _logger = logger;
     }
 
     [HttpPost("{projectId}"), Validation, Authorized]
     public async Task<IActionResult> CreateTicket([FromBody] CreateTicketDTO dto, [FromRoute] string projectId)
     {
-        var userId = (string)(HttpContext.Items["id"])!;
-
-        var isProjectFound = await _ctx.Projects.AnyAsync(p => p.Id == projectId && p.OwnerId == userId);
-
-        if (!isProjectFound) return HttpResult.NotFound("project not found");
-
-        var contentId = Ulid.NewUlid().ToString();
-        var ticketId = Ulid.NewUlid().ToString();
-
-        var content = await _ctx.Contents.AddAsync(new Content() { Markdown = "", Id = contentId, OwnerId = userId });
-        var ticket = await _ctx.Tickets.AddAsync(new Ticket()
+        try
         {
-            Name = dto.Name,
-            CreatorId = userId,
-            ProjectId = projectId,
-            ContentId = contentId,
-            Id = ticketId
-        });
+            var userId = (string)(HttpContext.Items["id"])!;
 
-        if (dto.Type is not null) ticket.Entity.Type = Enum.Parse<TicketType>(dto.Type);
-        if (dto.Status is not null) ticket.Entity.Status = Enum.Parse<TicketStatus>(dto.Status);
-        if (dto.Priority is not null) ticket.Entity.Priority = Enum.Parse<TicketPriority>(dto.Priority);
+            var isProjectFound = await _ctx.Projects.AnyAsync(p => p.Id == projectId && p.OwnerId == userId);
 
-        if (dto.AssignedToId is not null)
-        {
-            var isFound = await _ctx.Members.AnyAsync(m => m.Id == dto.AssignedToId);
-            if (isFound) return HttpResult.NotFound("user is not found to assignee ticket to");
-            ticket.Entity.AssignedToId = dto.AssignedToId;
+            if (!isProjectFound) return HttpResult.NotFound("project not found");
+
+            var contentId = Ulid.NewUlid().ToString();
+            var ticketId = Ulid.NewUlid().ToString();
+
+            var content = await _ctx.Contents.AddAsync(new Content() { Markdown = "", Id = contentId, OwnerId = userId });
+            var ticket = await _ctx.Tickets.AddAsync(new Ticket()
+            {
+                Name = dto.Name,
+                CreatorId = userId,
+                ProjectId = projectId,
+                ContentId = contentId,
+                Id = ticketId
+            });
+
+            if (dto.Type is not null) ticket.Entity.Type = Enum.Parse<TicketType>(dto.Type);
+            if (dto.Status is not null) ticket.Entity.Status = Enum.Parse<TicketStatus>(dto.Status);
+            if (dto.Priority is not null) ticket.Entity.Priority = Enum.Parse<TicketPriority>(dto.Priority);
+
+            if (dto.AssignedToId is not null)
+            {
+                var isFound = await _ctx.Members.AnyAsync(m => m.Id == dto.AssignedToId);
+                if (isFound) return HttpResult.NotFound("user is not found to assignee ticket to");
+                ticket.Entity.AssignedToId = dto.AssignedToId;
+            }
+
+            await _ctx.SaveChangesAsync();
+
+            return HttpResult.Ok($"Ticket {dto.Name} successfully created");
         }
-
-        await _ctx.SaveChangesAsync();
-
-        return HttpResult.Ok($"Ticket {dto.Name} successfully created");
+         catch (Exception e)
+        {
+            _logger.LogError(e.Message);
+            return HttpResult.InternalServerError();
+        }
     }
 
     [HttpGet("tickets/{page?}"), Authorized]
     public async Task<IActionResult> GetTickets([FromRoute] int page = 1, [FromQuery] int take = 10)
     {
-        var userId = (string)(HttpContext.Items["id"])!;
+        try
+        {
+            var userId = (string)(HttpContext.Items["id"])!;
 
-        var projects = await _ctx.Projects
-                        .Where((p) => p.OwnerId == userId)
-                        .OrderBy((p) => p.CreatedAt)
-                        .Select((p) => new
-                        {
-                            members = p.Members.Count + 1,
-                            tickets = p.Tickets.Count,
-                            createdAt = p.CreatedAt,
-                            id = p.Id,
-                            isPrivate = p.IsPrivate,
-                            name = p.Name
-                        })
-                        .Skip((page - 1) * take)
-                        .Take(take)
-                        .ToListAsync();
+            var projects = await _ctx.Projects
+                            .Where((p) => p.OwnerId == userId)
+                            .OrderBy((p) => p.CreatedAt)
+                            .Select((p) => new
+                            {
+                                members = p.Members.Count + 1,
+                                tickets = p.Tickets.Count,
+                                createdAt = p.CreatedAt,
+                                id = p.Id,
+                                isPrivate = p.IsPrivate,
+                                name = p.Name
+                            })
+                            .Skip((page - 1) * take)
+                            .Take(take)
+                            .ToListAsync();
 
-        if (projects is null || projects.Count == 0) return HttpResult.NotFound("sorry, no project found");
+            if (projects is null || projects.Count == 0) return HttpResult.NotFound("sorry, no project found");
 
-        return HttpResult.Ok(null, projects);
+            return HttpResult.Ok(null, projects);
+        }
+         catch (Exception e)
+        {
+            _logger.LogError(e.Message);
+            return HttpResult.InternalServerError();
+        }
     }
 
     [HttpGet("{ticketId}")]
     public async Task<IActionResult> GetTicket([FromRoute] string ticketId)
     {
-        var ticket = await _ctx.Tickets
-                        .Where((t) => t.Id == ticketId)
-                        .Select((t) => new
-                        {
-                            createdAt = t.CreatedAt,
-                            creator = new
+        try
+        {
+            var ticket = await _ctx.Tickets
+                            .Where((t) => t.Id == ticketId)
+                            .Select((t) => new
                             {
-                                firstName = t.Creator.FirstName,
-                                lastName = t.Creator.LastName,
-                                imageId = Helper.StorageUrl(t.Creator.ImageName),
-                                id = t.Creator.Id,
-                            },
-                            assignedTo = t.AssignedTo != null ? new
-                            {
-                                firstName = t.AssignedTo.User.FirstName,
-                                lastName = t.AssignedTo.User.LastName,
-                                imageId = Helper.StorageUrl(t.AssignedTo.User.ImageName),
-                                id = t.AssignedTo.User.Id,
-                            } : null,
-                            name = t.Name,
-                            priority = t.Priority.ToString(),
-                            status = t.Status.ToString(),
-                            type = t.Type.ToString(),
-                        })
-                        .FirstOrDefaultAsync();
+                                createdAt = t.CreatedAt,
+                                creator = new
+                                {
+                                    firstName = t.Creator.FirstName,
+                                    lastName = t.Creator.LastName,
+                                    imageId = Helper.StorageUrl(t.Creator.ImageName),
+                                    id = t.Creator.Id,
+                                },
+                                assignedTo = t.AssignedTo != null ? new
+                                {
+                                    firstName = t.AssignedTo.User.FirstName,
+                                    lastName = t.AssignedTo.User.LastName,
+                                    imageId = Helper.StorageUrl(t.AssignedTo.User.ImageName),
+                                    id = t.AssignedTo.User.Id,
+                                } : null,
+                                name = t.Name,
+                                priority = t.Priority.ToString(),
+                                status = t.Status.ToString(),
+                                type = t.Type.ToString(),
+                            })
+                            .FirstOrDefaultAsync();
 
-        if (ticket is null) return HttpResult.NotFound("ticket not found");
+            if (ticket is null) return HttpResult.NotFound("ticket not found");
 
-        return HttpResult.Ok(body: ticket);
+            return HttpResult.Ok(body: ticket);
+        }
+         catch (Exception e)
+        {
+            _logger.LogError(e.Message);
+            return HttpResult.InternalServerError();
+        }
     }
 
     [HttpDelete("{ticketId}"), Authorized]
     public async Task<IActionResult> DeleteTicket([FromRoute] string ticketId)
     {
-        var userId = (string)(HttpContext.Items["id"])!;
+        try
+        {
+            var userId = (string)(HttpContext.Items["id"])!;
 
-        var ticket = await _ctx.Tickets.Where((t) => t.Id == ticketId && t.Creator.Id == userId).FirstOrDefaultAsync();
+            var ticket = await _ctx.Tickets.Where((t) => t.Id == ticketId && t.Creator.Id == userId).FirstOrDefaultAsync();
 
-        if (ticket is null) return HttpResult.NotFound("sorry, ticket not found");
+            if (ticket is null) return HttpResult.NotFound("sorry, ticket not found");
 
-        _ctx.Tickets.Remove(ticket);
+            _ctx.Tickets.Remove(ticket);
 
-        await _ctx.SaveChangesAsync();
+            await _ctx.SaveChangesAsync();
 
-        return HttpResult.Ok($"ticket \"{ticket.Name}\" successfully deleted");
+            return HttpResult.Ok($"ticket \"{ticket.Name}\" successfully deleted");
+        }
+         catch (Exception e)
+        {
+            _logger.LogError(e.Message);
+            return HttpResult.InternalServerError();
+        }
     }
 
     [HttpGet("count"), Authorized]
     public async Task<IActionResult> GetTicketsCount([FromQuery] int take = 10)
     {
-        var userId = (string)(HttpContext.Items["id"])!;
+        try
+        {
+            var userId = (string)(HttpContext.Items["id"])!;
 
-        var projectsCount = await _ctx.Projects.Where((p) => p.OwnerId == userId).CountAsync();
+            var projectsCount = await _ctx.Projects.Where((p) => p.OwnerId == userId).CountAsync();
 
-        int pages = (int)Math.Ceiling((double)projectsCount / take);
+            int pages = (int)Math.Ceiling((double)projectsCount / take);
 
-        return HttpResult.Ok(null, pages);
+            return HttpResult.Ok(null, pages);
+        }
+         catch (Exception e)
+        {
+            _logger.LogError(e.Message);
+            return HttpResult.InternalServerError();
+        }
     }
 }

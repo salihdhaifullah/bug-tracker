@@ -8,11 +8,11 @@ const AccountVerification = () => {
     const [isValidCode, setIsValidCode] = useState(false);
     const [code, setCode] = useState("");
 
-    const [payload, call] = useFetchApi("POST", "auth/account-verification", [code], { code });
+    const [payload, call] = useFetchApi<unknown, { code: string }>("POST", "auth/account-verification", []);
 
     const handelSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        call();
+        call({ code });
     }
 
     return (
@@ -44,12 +44,14 @@ const AccountVerification = () => {
                         setIsValid={setIsValidCode}
                     />
 
-                    <Button
-                        buttonProps={{ type: "submit" }}
-                        isLoading={payload.isLoading}
-                        isValid={isValidCode}
-                        text="submit"
-                    />
+
+<div className="flex flex-col justify-center items-center w-full my-1">
+                        <Button
+                            buttonProps={{ type: "submit" }}
+                            isLoading={payload.isLoading}
+                            isValid={isValidCode}
+                            >submit</Button>
+                    </div>
                 </form>
 
             </div>

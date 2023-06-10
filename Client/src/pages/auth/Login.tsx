@@ -16,13 +16,13 @@ const Login = () => {
   const [isValidEmail, setIsValidEmail] = useState(false);
   const [isValidPassword, setIsValidPassword] = useState(false);
 
-  const [payload, call] = useFetchApi<IUser>("POST", "auth/login", [email, password], { email, password });
+  const [payload, call] = useFetchApi<IUser, { email: string, password: string }>("POST", "auth/login", []);
 
   const dispatchUser = useUserDispatch();
 
   const handelSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    call()
+    call({ email, password })
   }
 
 
@@ -73,12 +73,13 @@ const Login = () => {
             <Link to="/auth/sing-up" className="link">sing up ?</Link>
           </div>
 
-          <Button
-            buttonProps={{ type: "submit" }}
-            isLoading={payload.isLoading}
-            isValid={isValidEmail && isValidPassword}
-            text="submit"
-          />
+          <div className="flex flex-col justify-center items-center w-full my-1">
+            <Button
+              buttonProps={{ type: "submit" }}
+              isLoading={payload.isLoading}
+              isValid={isValidEmail && isValidPassword}
+            >submit</Button>
+          </div>
 
         </form>
 

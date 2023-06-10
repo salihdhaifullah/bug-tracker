@@ -41,6 +41,7 @@ interface IProject {
   tickets: ITicket[]
   activities: IActivity[];
   members: IMember[]
+  contentId: string;
 }
 
 
@@ -83,7 +84,7 @@ const Ticket = ({ ticket }: { ticket: ITicket }) => {
 
 const Project = () => {
   const { projectId } = useParams();
-  const [projectsPayload, callProjects] = useFetchApi<IProject>("GET", `project/${projectId}`, []);
+  const [projectsPayload, callProjects] = useFetchApi<IProject, unknown>("GET", `project/${projectId}`, []);
 
   useEffect(() => { callProjects() }, [])
   useEffect(() => { console.log(projectsPayload.result) }, [projectsPayload])
@@ -94,10 +95,9 @@ const Project = () => {
 
         <h1 className="text-2xl font-bold">{projectsPayload.result.name}</h1>
 
-        <Content />
+        <Content contentId={projectsPayload.result.contentId}/>
 
         <p className="text-lg text-gray-700">{projectsPayload.result.descriptionMarkdown}</p>
-        {/* todo handel content here */}
 
         <div className="flex flex-col gap-2 justify-center items-start">
           <p className="text-sm text-gray-600">owner: </p>
@@ -111,7 +111,7 @@ const Project = () => {
         <div className="flex flex-row gap-4 mt-4 items-center">
           <h2 className="text-xl font-bold">Tickets</h2>
           <Link to={`/project/${projectsPayload.result.id}/create-ticket`}>
-              <Button text="create ticket" size="sm" />
+              <Button size="sm" >create ticket</Button>
           </Link>
         </div>
 

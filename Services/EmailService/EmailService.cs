@@ -31,6 +31,7 @@ public class EmailService : IEmailService
         _resetPasswordHtml = File.ReadAllText("./Emails/reset-password.html");
     }
 
+
     public Task sendVerificationEmail(string to, string name, string code)
     {
         var stringBuilder = new StringBuilder(_verificationEmailHtml);

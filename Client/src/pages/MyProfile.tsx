@@ -21,7 +21,7 @@ const MyProfile = () => {
                     <hr className="bg-gray-500 w-full h-[2px] rounded-md" />
                 </div>
             </div>
-            <Content />
+            <Content contentId={user.contentId} />
         </section>
     )
 }

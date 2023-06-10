@@ -8,8 +8,9 @@ namespace Buegee.Services.FirebaseService;
 public class FirebaseService : IFirebaseService
 {
     private readonly FirebaseStorage _storage;
+    private readonly ILogger<FirebaseService> _logger;
 
-    public FirebaseService(IConfiguration config)
+    public FirebaseService(IConfiguration config, ILogger<FirebaseService> logger)
     {
         var uid = config.GetSection("Firebase").GetValue<string>("Id");
 
@@ -24,6 +25,7 @@ public class FirebaseService : IFirebaseService
             AuthTokenAsyncFactory = async () => await tokenAsync,
             ThrowOnCancel = true,
         });
+        _logger = logger;
     }
 
     public async Task<string> Upload(byte[] data, ContentTypes ContentType)
@@ -40,7 +42,15 @@ public class FirebaseService : IFirebaseService
 
     public async Task<string> Update(string oldName, ContentTypes ContentType, byte[] data)
     {
-        await Delete(oldName);
+        try
+        {
+            await Delete(oldName);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError($"Filed to delete file {oldName}, \n error massage {e.Message}");
+        }
+
         var name = $"{Guid.NewGuid()}.{ContentType.ToString()}";
         await _storage.Child(name).PutAsync(new MemoryStream(data));
         return name;

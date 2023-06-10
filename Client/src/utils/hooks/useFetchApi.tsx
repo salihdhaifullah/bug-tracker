@@ -16,18 +16,18 @@ interface IPayload<T> {
 }
 
 
-export default function useFetchApi<T>
+export default function useFetchApi<R, B>
 (method: "POST" | "PATCH" | "GET" | "DELETE",
-url: string, deps: DependencyList, body?: unknown,
-callback?: (arg: T) => void): [payload: IPayload<T>, call: () => void] {
+url: string, deps: DependencyList,
+callback?: (arg: R) => void): [payload: IPayload<R>, call: (body?: B) => void] {
 
     const dispatchNotification = useNotificationDispatch();
-    const [result, setResult] = useState<T | null>(null);
+    const [result, setResult] = useState<R | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
 
 
-    const init = useCallback(async () => {
+    const init = useCallback(async (body?: B) => {
         setIsLoading(true);
 
         try {
@@ -40,7 +40,7 @@ callback?: (arg: T) => void): [payload: IPayload<T>, call: () => void] {
                 }
             });
 
-            const response = await responseBlob.json() as IResult<T>;
+            const response = await responseBlob.json() as IResult<R>;
 
             setIsLoading(false);
 
@@ -59,7 +59,7 @@ callback?: (arg: T) => void): [payload: IPayload<T>, call: () => void] {
 
             if(response?.redirectTo) navigate(response?.redirectTo);
 
-            callback && callback(response.body as T);
+            callback && callback(response.body as R);
 
         } catch (err) {
             console.log(err)

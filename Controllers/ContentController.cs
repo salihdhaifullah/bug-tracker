@@ -16,70 +16,84 @@ public class ContentController : Controller
 {
     private readonly DataContext _ctx;
     private readonly IFirebaseService _firebase;
+    private readonly ILogger<ContentController> _logger;
 
-    public ContentController(DataContext ctx, IFirebaseService firebase)
+    public ContentController(DataContext ctx, IFirebaseService firebase, ILogger<ContentController> logger)
     {
         _ctx = ctx;
         _firebase = firebase;
-    }
-
-    private class userContent
-    {
-        public Content Content { get; set; } = null!;
-        public List<Document> Documents { get; set; } = null!;
+        _logger = logger;
     }
 
     [HttpPost("{contentId}"), Validation, Authorized]
-    public async Task<IActionResult> Content([FromBody] ContentDTO dto)
+    public async Task<IActionResult> Content([FromBody] ContentDTO dto, [FromRoute] string contentId)
     {
-        var userId = (string)(HttpContext.Items["id"])!;
-
-        var user = await _ctx.Users
-                    .Where(u => u.Id == userId)
-                    .Select(u => new userContent() { Content = u.Content, Documents = u.Content.Documents })
-                    .FirstOrDefaultAsync();
-            // TODO you need to decentralize Content Management
-
-
-        if (user is null) return HttpResult.NotFound("user not found please sing-up", null, "/auth/sing-up");
-
-        for (var i = 0; i < dto.Files.Count; i++)
+        try
         {
-            var file = dto.Files[i];
+            var userId = (string)(HttpContext.Items["id"])!;
 
-            if (dto.Markdown.Contains(file.PreviewUrl))
+            var content = await _ctx.Contents
+                        .Where(c => c.Id == contentId && c.OwnerId == userId)
+                        .Include(c => c.Documents)
+                        .FirstOrDefaultAsync();
+
+            if (content is null) return HttpResult.NotFound("content not found");
+
+            for (var i = 0; i < content.Documents.Count; i++)
             {
+                var document = content.Documents[i];
 
-                var imageName = await _firebase.Upload(Convert.FromBase64String(file.Base64), ContentTypes.webp);
-
-                var document = await _ctx.Documents.AddAsync(new Document() { Name = imageName, Id = Ulid.NewUlid().ToString() });
-
-                // TODO Check if it will work or not
-                // await _ctx.SaveChangesAsync();
-
-                user.Documents.Add(document.Entity);
-
-                dto.Markdown = dto.Markdown.Replace(file.PreviewUrl, Helper.StorageUrl(imageName));
+                if (!dto.Markdown.Contains(document.Name))
+                {
+                    await _firebase.Delete(document.Name);
+                    _ctx.Documents.Remove(document);
+                }
             }
+
+            for (var i = 0; i < dto.Files.Count; i++)
+            {
+                var file = dto.Files[i];
+
+                if (dto.Markdown.Contains(file.PreviewUrl))
+                {
+                    var imageName = await _firebase.Upload(Convert.FromBase64String(file.Base64), ContentTypes.webp);
+                    var document = await _ctx.Documents.AddAsync(new Document() { Name = imageName, Id = Ulid.NewUlid().ToString() });
+                    content.Documents.Add(document.Entity);
+                    dto.Markdown = dto.Markdown.Replace(file.PreviewUrl, Helper.StorageUrl(imageName));
+                }
+            }
+
+            content.Markdown = dto.Markdown;
+
+            await _ctx.SaveChangesAsync();
+
+            return HttpResult.Ok($"successfully changed content");
         }
-
-        await _ctx.SaveChangesAsync();
-
-        for (var i = 0; i < user.Documents.Count; i++)
+         catch (Exception e)
         {
-            var document = user.Documents[i];
-
-            if (!dto.Markdown.Contains(document.Name))
-            {
-                await _firebase.Delete(document.Name);
-                _ctx.Documents.Remove(document);
-            }
+            _logger.LogError(e.Message);
+            return HttpResult.InternalServerError();
         }
+    }
 
-        user.Content.Markdown = dto.Markdown;
+    [HttpGet("{contentId}")]
+    public async Task<IActionResult> GetContent([FromRoute] string contentId)
+    {
+        try
+        {
+            var content = await _ctx.Contents
+                        .Where(c => c.Id == contentId)
+                        .Select(c => new { markdown = c.Markdown })
+                        .FirstOrDefaultAsync();
 
-        await _ctx.SaveChangesAsync();
+            if (content is null) return HttpResult.NotFound("content not found");
 
-        return HttpResult.Ok($"successfully changed profile");
+            return HttpResult.Ok(body: content);
+        }
+         catch (Exception e)
+        {
+            _logger.LogError(e.Message);
+            return HttpResult.InternalServerError();
+        }
     }
 }

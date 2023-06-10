@@ -22,11 +22,11 @@ const SingUp = () => {
 
   const [passwordType, setPasswordType] = useState("password");
 
-  const [payload, call] = useFetchApi("POST", "auth/sing-up", [email, password, firstName, lastName], { email, password, firstName, lastName });
+  const [payload, call] = useFetchApi<unknown, { email: string, password: string, firstName: string, lastName: string }>("POST", "auth/sing-up", []);
 
   const handelSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    call();
+    call({ email, password, firstName, lastName });
   }
 
 
@@ -73,10 +73,7 @@ const SingUp = () => {
                 validate: (str: string) => /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(str),
                 massage: "un-valid email address"
               },
-              {
-                validate: (str: string) => str.length <= 100,
-                massage: "max length of email address is 100 character"
-              }
+              { validate: (str: string) => str.length <= 100, massage: "max length of email address is 100 character" }
             ]}
             icon={MdEmail}
             value={email}
@@ -86,12 +83,7 @@ const SingUp = () => {
           />
 
           <TextFiled
-            validation={[
-              {
-                validate: (str: string) => str.length > 8,
-                massage: "min length of password is 8 character"
-              }
-            ]}
+            validation={[ { validate: (str: string) => str.length >= 8, massage: "min length of password is 8 character" } ]}
             icon={RiLockPasswordFill}
             value={password}
             inputProps={{ type: passwordType }}
@@ -106,12 +98,13 @@ const SingUp = () => {
             <Link to="/auth/login" className="link">login ?</Link>
           </div>
 
-          <Button
-            buttonProps={{ type: "submit" }}
-            isLoading={payload.isLoading}
-            isValid={isValidFirstName && isValidLastName && isValidEmail && isValidPassword}
-            text="submit"
-          />
+          <div className="flex flex-col justify-center items-center w-full my-1">
+            <Button
+              buttonProps={{ type: "submit" }}
+              isLoading={payload.isLoading}
+              isValid={isValidFirstName && isValidLastName && isValidEmail && isValidPassword}
+            >submit</Button>
+          </div>
 
         </form>
 
