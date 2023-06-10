@@ -7,39 +7,25 @@ interface ISelectProps {
     value: string
     setValue: (value: SetStateAction<string>) => void
     label: string
-    setIsValid: (bool: boolean) => void;
-    options: Object[]
+    setIsValid?: (bool: boolean) => void;
+    options: string[]
     validation?: IValidate[]
     icon?: IconType
-}
-
-interface IOption {
-    key: string,
-    value: string
 }
 
 const Select = (props: ISelectProps) => {
     const [isOpen, setIsOpen] = useState(false);
     const [activeOption, setActiveOption] = useState(1);
-    const [search, setSearch] = useState("");
-    const [options, setOptions] = useState<{ key: string, value: string }[]>([]);
+    const [search, setSearch] = useState(props.value);
+    const [options, setOptions] = useState<string[]>([]);
 
-    // ref to store options after possessing them
-    const optionsRef = useRef<IOption[]>([]);
+    const optionsRef = useRef<string[]>([]);
     const targetRef = useRef<HTMLDivElement>(null);
 
 
-    // abstractly handel the array of object as the first propriety
-    // in the object as the key ad the second is the value
 
     useEffect(() => {
-        for (const option of props.options) {
-            const [key, value] = Object.keys(option);
-
-           // @ts-ignore
-            optionsRef.current.push({ key: option[key], value: option[value] })
-        }
-
+        optionsRef.current = props.options;
         setOptions(optionsRef.current);
     }, [props.options])
 
@@ -47,18 +33,17 @@ const Select = (props: ISelectProps) => {
     useOnClickOutside(targetRef, () => setIsOpen(false));
 
     const choseOption = (optionIndex: number) => {
-        props.setValue(options[optionIndex].key)
-        setSearch(options[optionIndex].value)
+        props.setValue(options[optionIndex])
+        setSearch(options[optionIndex])
         setIsOpen(false);
     }
 
-    // filter option based on search input
     useEffect(() => {
         const text = search.toLowerCase();
         const data = [];
 
         for (let option of optionsRef.current) {
-            const optionValue = option.value.toLowerCase();
+            const optionValue = option.toLowerCase();
             if (optionValue.startsWith(text)) data.push(option);
         }
 
@@ -99,14 +84,14 @@ const Select = (props: ISelectProps) => {
             />
 
             <datalist
-                className={`${isOpen ? "block" : "none"} absolute w-full shadow-lg max-h-40 top-[100%] bg-white no-scrollbar border rounded-md border-t-0 p-2 overflow-y-scroll`}>
+                className={`${isOpen ? "block" : "none"} absolute w-full shadow-lg z-40 max-h-40 top-[100%] bg-white no-scrollbar border rounded-md border-t-0 p-2 overflow-y-scroll`}>
                 {options.map((option, index) => (
                     <option
-                        key={option.key}
+                        key={option}
                         onClick={() => choseOption(index)}
                         className={`${index === activeOption ? "bg-slate-200 font-extrabold" : "bg-white"} block bg-slate-200 rounded-md text-gray-600 p-1 mb-1 text-base cursor-pointer`}
-                        value={option.value}>
-                            {option.value}
+                        value={option}>
+                            {option}
                     </option>
                 ))}
             </datalist>

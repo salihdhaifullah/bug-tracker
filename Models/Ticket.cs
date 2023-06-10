@@ -12,7 +12,7 @@ namespace Buegee.Models;
 [Index(nameof(Status))]
 public class Ticket
 {
-    [Key, Column("id"), MinLength(26), MaxLength(26)]
+    [Key, Column("id"), StringLength(26)]
     public string Id { get; set; } = null!;
 
     [Required, Column("name"), StringLength(100)]
@@ -30,19 +30,19 @@ public class Ticket
     [Required, Column("created_at")]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-    [Required, ForeignKey("Project"), Column("project_id"), MinLength(26), MaxLength(26)]
+    [Required, ForeignKey("Project"), Column("project_id"), StringLength(26)]
     public string ProjectId { get; set; } = null!;
     public Project Project { get; set; } = null!;
 
-    [Required, ForeignKey("Creator"), Column("creator_id"), MinLength(26), MaxLength(26)]
+    [Required, ForeignKey("Creator"), Column("creator_id"), StringLength(26)]
     public string CreatorId { get; set; } = null!;
     public User Creator { get; set; } = null!;
 
-    [Required, ForeignKey("Content"), Column("content_id"), MinLength(26), MaxLength(26)]
+    [Required, ForeignKey("Content"), Column("content_id"), StringLength(26)]
     public string ContentId { get; set; } = null!;
     public Content Content { get; set; } = null!;
 
-    [ForeignKey("AssignedTo"), Column("assigned_to_id"), MinLength(26), MaxLength(26)]
+    [ForeignKey("AssignedTo"), Column("assigned_to_id"), StringLength(26)]
     public string? AssignedToId { get; set; }
     public Member? AssignedTo { get; set; }
 

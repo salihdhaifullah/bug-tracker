@@ -5,6 +5,7 @@ import formatDate from "../utils/formatDate";
 import CircleProgress from "../components/utils/CircleProgress";
 import Content from "../components/profile/Content";
 import Button from "../components/utils/Button";
+import { useUser } from "../utils/context/user";
 
 interface IUser {
   firstName: string;
@@ -88,14 +89,14 @@ const Project = () => {
 
   useEffect(() => { callProjects() }, [])
   useEffect(() => { console.log(projectsPayload.result) }, [projectsPayload])
-
+  const user = useUser();
   return (projectsPayload.isLoading || !projectsPayload.result) ? <CircleProgress size="lg" /> : (
     <section className="flex flex-col w-full h-full my-10 p-2 flex-grow">
       <div className="bg-white mb-4 rounded-md shadow-md p-4 gap-2 flex flex-col">
 
         <h1 className="text-2xl font-bold">{projectsPayload.result.name}</h1>
 
-        <Content contentId={projectsPayload.result.contentId}/>
+        <Content contentId={projectsPayload.result.contentId} isAllowedToEdit={user?.id === projectsPayload.result.owner.id}/>
 
         <p className="text-lg text-gray-700">{projectsPayload.result.descriptionMarkdown}</p>
 
@@ -111,7 +112,7 @@ const Project = () => {
         <div className="flex flex-row gap-4 mt-4 items-center">
           <h2 className="text-xl font-bold">Tickets</h2>
           <Link to={`/project/${projectsPayload.result.id}/create-ticket`}>
-              <Button size="sm" >create ticket</Button>
+              <Button size="sm">create ticket</Button>
           </Link>
         </div>
 

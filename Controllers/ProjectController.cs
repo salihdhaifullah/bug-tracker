@@ -32,8 +32,10 @@ public class ProjectController : Controller
 
             var contentId = Ulid.NewUlid().ToString();
             var projectId = Ulid.NewUlid().ToString();
+            var memberId = Ulid.NewUlid().ToString();
 
-            var content = await _ctx.Contents.AddAsync(new Content() { Markdown = "", OwnerId = userId, Id = contentId });
+            var member = await _ctx.Members.AddAsync(new Member() { UserId = userId, Id = memberId, ProjectId = projectId });
+            var content = await _ctx.Contents.AddAsync(new Content() { OwnerId = userId, Id = contentId });
             var project = await _ctx.Projects.AddAsync(new Project()
             {
                 Name = dto.Name,
@@ -47,7 +49,7 @@ public class ProjectController : Controller
 
             return HttpResult.Ok($"project {dto.Name} successfully created");
         }
-         catch (Exception e)
+        catch (Exception e)
         {
             _logger.LogError(e.Message);
             return HttpResult.InternalServerError();
@@ -81,7 +83,7 @@ public class ProjectController : Controller
 
             return HttpResult.Ok(null, projects);
         }
-         catch (Exception e)
+        catch (Exception e)
         {
             _logger.LogError(e.Message);
             return HttpResult.InternalServerError();
@@ -153,7 +155,7 @@ public class ProjectController : Controller
             return HttpResult.Ok(null, project);
 
         }
-         catch (Exception e)
+        catch (Exception e)
         {
             _logger.LogError(e.Message);
             return HttpResult.InternalServerError();
@@ -177,7 +179,7 @@ public class ProjectController : Controller
 
             return HttpResult.Ok($"project \"{project.Name}\" successfully deleted");
         }
-         catch (Exception e)
+        catch (Exception e)
         {
             _logger.LogError(e.Message);
             return HttpResult.InternalServerError();
@@ -197,7 +199,7 @@ public class ProjectController : Controller
 
             return HttpResult.Ok(null, pages);
         }
-         catch (Exception e)
+        catch (Exception e)
         {
             _logger.LogError(e.Message);
             return HttpResult.InternalServerError();

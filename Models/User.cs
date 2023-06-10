@@ -9,7 +9,7 @@ namespace Buegee.Models;
 [Index(nameof(Email), IsUnique = true)]
 public class User
 {
-    [Key, Column("id"), MinLength(26), MaxLength(26)]
+    [Key, Column("id"), StringLength(26)]
     public string Id { get; set; } = null!;
 
     [Required, Column("email"), StringLength(100), EmailAddress]
@@ -30,7 +30,7 @@ public class User
     [Required, Column("created_at")]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-    [Required, ForeignKey("Content"), Column("content_id"), MinLength(26), MaxLength(26)]
+    [Required, ForeignKey("Content"), Column("content_id"), StringLength(26)]
     public string ContentId { get; set; } = null!;
     public Content Content { get; set; } = null!;
 

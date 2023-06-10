@@ -6,13 +6,13 @@ namespace Buegee.Models;
 [Table("content")]
 public class Content
 {
-    [Key, Column("id"), MinLength(26), MaxLength(26)]
+    [Key, Column("id"), StringLength(26)]
     public string Id { get; set; } = null!;
 
     [Required, Column("markdown")]
-    public string Markdown { get; set; } = null!;
+    public string Markdown { get; set; } = string.Empty;
 
-    [Required, Column("owner_id"), MinLength(26), MaxLength(26)]
+    [Required, Column("owner_id"), StringLength(26)]
     public string OwnerId { get; set; } = null!;
 
     [Column("documents")]

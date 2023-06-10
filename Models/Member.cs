@@ -8,14 +8,14 @@ namespace Buegee.Models;
 [Index(nameof(UserId), nameof(ProjectId), IsUnique = true)]
 public class Member
 {
-    [Key, Column("id"), MinLength(26), MaxLength(26)]
+    [Key, Column("id"), StringLength(26)]
     public string Id { get; set; } = null!;
 
-    [Required, ForeignKey("User"), Column("user_id"), MinLength(26), MaxLength(26)]
+    [Required, ForeignKey("User"), Column("user_id"), StringLength(26)]
     public string UserId { get; set; } = null!;
     public User User { get; set; } = null!;
 
-    [Required, ForeignKey("Project"), Column("project_id"), MinLength(26), MaxLength(26)]
+    [Required, ForeignKey("Project"), Column("project_id"), StringLength(26)]
     public string ProjectId { get; set; } = null!;
     public Project Project { get; set; } = null!;
 

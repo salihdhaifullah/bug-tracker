@@ -142,7 +142,7 @@ public class AuthController : Controller
                 imageName = await _firebase.Upload(imageBytes, ContentTypes.svg);
             }
 
-            var content = await _ctx.Contents.AddAsync(new Content() { Markdown = "", OwnerId = userId, Id = contentId });
+            var content = await _ctx.Contents.AddAsync(new Content() { OwnerId = userId, Id = contentId });
 
             var user = await _ctx.Users.AddAsync(new User
             {

@@ -34,32 +34,31 @@ public class TicketController : Controller
             var contentId = Ulid.NewUlid().ToString();
             var ticketId = Ulid.NewUlid().ToString();
 
-            var content = await _ctx.Contents.AddAsync(new Content() { Markdown = "", Id = contentId, OwnerId = userId });
+            var content = await _ctx.Contents.AddAsync(new Content() { Id = contentId, OwnerId = userId });
             var ticket = await _ctx.Tickets.AddAsync(new Ticket()
             {
                 Name = dto.Name,
                 CreatorId = userId,
                 ProjectId = projectId,
                 ContentId = contentId,
+                Type = Enum.Parse<TicketType>(dto.Type),
+                Status = Enum.Parse<TicketStatus>(dto.Status),
+                Priority = Enum.Parse<TicketPriority>(dto.Priority),
                 Id = ticketId
             });
 
-            if (dto.Type is not null) ticket.Entity.Type = Enum.Parse<TicketType>(dto.Type);
-            if (dto.Status is not null) ticket.Entity.Status = Enum.Parse<TicketStatus>(dto.Status);
-            if (dto.Priority is not null) ticket.Entity.Priority = Enum.Parse<TicketPriority>(dto.Priority);
-
-            if (dto.AssignedToId is not null)
+            if (dto.AssignedToEmail is not null)
             {
-                var isFound = await _ctx.Members.AnyAsync(m => m.Id == dto.AssignedToId);
-                if (isFound) return HttpResult.NotFound("user is not found to assignee ticket to");
-                ticket.Entity.AssignedToId = dto.AssignedToId;
+                var isFound = await _ctx.Members.Where(m => m.User.Email == dto.AssignedToEmail).Select(m => new {Id = m.Id}).FirstOrDefaultAsync();
+                if (isFound is null) return HttpResult.NotFound("user is not found to assignee ticket to");
+                ticket.Entity.AssignedToId = isFound.Id;
             }
 
             await _ctx.SaveChangesAsync();
 
-            return HttpResult.Ok($"Ticket {dto.Name} successfully created");
+            return HttpResult.Ok($"Ticket {dto.Name} successfully created", redirectTo: $"/project/{projectId}");
         }
-         catch (Exception e)
+        catch (Exception e)
         {
             _logger.LogError(e.Message);
             return HttpResult.InternalServerError();
@@ -93,7 +92,7 @@ public class TicketController : Controller
 
             return HttpResult.Ok(null, projects);
         }
-         catch (Exception e)
+        catch (Exception e)
         {
             _logger.LogError(e.Message);
             return HttpResult.InternalServerError();
@@ -135,7 +134,7 @@ public class TicketController : Controller
 
             return HttpResult.Ok(body: ticket);
         }
-         catch (Exception e)
+        catch (Exception e)
         {
             _logger.LogError(e.Message);
             return HttpResult.InternalServerError();
@@ -159,7 +158,7 @@ public class TicketController : Controller
 
             return HttpResult.Ok($"ticket \"{ticket.Name}\" successfully deleted");
         }
-         catch (Exception e)
+        catch (Exception e)
         {
             _logger.LogError(e.Message);
             return HttpResult.InternalServerError();
@@ -179,7 +178,7 @@ public class TicketController : Controller
 
             return HttpResult.Ok(null, pages);
         }
-         catch (Exception e)
+        catch (Exception e)
         {
             _logger.LogError(e.Message);
             return HttpResult.InternalServerError();

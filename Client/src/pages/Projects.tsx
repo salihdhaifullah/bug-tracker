@@ -30,7 +30,7 @@ const Projects = () => {
   return (
     <section className="flex flex-col w-full h-full my-10 p-2 flex-grow">
       {projectsPayload.isLoading ? (
-        <CircleProgress size="2xl" />
+        <CircleProgress size="lg" />
       ) : (
         <div className="bg-white mb-4 rounded-md shadow-md p-4 gap-2 flex flex-col">
           {(!projectsPayload.result || projectsPayload.result.length === 0) ? (
