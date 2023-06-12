@@ -112,6 +112,7 @@ public class ProjectController : Controller
                                 tickets = p.Tickets.Select(t => new
                                 {
                                     createdAt = t.CreatedAt,
+                                    id = t.Id,
                                     creator = new
                                     {
                                         firstName = t.Creator.FirstName,

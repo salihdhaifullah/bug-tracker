@@ -22,10 +22,11 @@ interface ITicket {
   createdAt: string;
   creator: IUser;
   assignedTo: IUser | null;
-  title: string;
+  name: string;
   priority: string;
   status: string;
   type: string;
+  id: string;
 }
 
 interface IActivity {
@@ -64,7 +65,9 @@ const Ticket = ({ ticket }: { ticket: ITicket }) => {
   return (
     <div className="p-4 border rounded-lg shadow-sm">
 
-      <h3 className="text-lg font-bold">{ticket.title}</h3>
+      <Link to={`/tickets/${ticket.id}`} className="link">
+        {ticket.name}
+      </Link>
       <div className="flex flex-row gap-2">
         <p className="text-sm text-gray-600">Created by: </p>
         <User user={ticket.creator} />
@@ -117,8 +120,8 @@ const Project = () => {
         </div>
 
         <div className="grid grid-cols-2 gap-4">
-          {projectsPayload.result.tickets.map((ticket) => (
-            <Ticket key={ticket.title} ticket={ticket} />
+          {projectsPayload.result.tickets.map((ticket, index) => (
+            <Ticket key={index} ticket={ticket} />
           ))}
         </div>
 

@@ -113,20 +113,25 @@ public class TicketController : Controller
                                 {
                                     firstName = t.Creator.FirstName,
                                     lastName = t.Creator.LastName,
-                                    imageId = Helper.StorageUrl(t.Creator.ImageName),
+                                    imageUrl = Helper.StorageUrl(t.Creator.ImageName),
                                     id = t.Creator.Id,
                                 },
                                 assignedTo = t.AssignedTo != null ? new
                                 {
                                     firstName = t.AssignedTo.User.FirstName,
                                     lastName = t.AssignedTo.User.LastName,
-                                    imageId = Helper.StorageUrl(t.AssignedTo.User.ImageName),
+                                    imageUrl = Helper.StorageUrl(t.AssignedTo.User.ImageName),
                                     id = t.AssignedTo.User.Id,
                                 } : null,
                                 name = t.Name,
                                 priority = t.Priority.ToString(),
                                 status = t.Status.ToString(),
                                 type = t.Type.ToString(),
+                                contentId = t.Content.Id,
+                                comments = t.Comments.Select((c) => new {
+                                    ownerId = c.CommenterId,
+                                    contentId = c.Content.Id
+                                })
                             })
                             .FirstOrDefaultAsync();
 
