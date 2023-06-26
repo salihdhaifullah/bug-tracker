@@ -8,7 +8,7 @@ const AccountVerification = () => {
     const [isValidCode, setIsValidCode] = useState(false);
     const [code, setCode] = useState("");
 
-    const [payload, call] = useFetchApi<unknown, { code: string }>("POST", "auth/account-verification", []);
+    const [payload, call] = useFetchApi<any, { code: string }>("POST", "auth/account-verification", []);
 
     const handelSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();

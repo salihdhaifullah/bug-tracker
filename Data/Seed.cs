@@ -35,20 +35,23 @@ public class Seed
         var isData = JsonSerializer.Deserialize<Data>(json);
 
         if (isData is not null) _data = isData;
-        else _data = new Data(new List<UserSeed>());
+        else _data = new Data(new List<userSeed>(), new List<projectSeed>());
 
         _client = new HttpClient();
     }
 
     public async Task SeedAsync()
     {
-        await SeedUsersAsync();
+        await seedUsersAsync();
+        await seedProjectsAsync();
     }
 
-    private record UserSeed(string FirstName, string LastName, string Email, string? Image);
-    private record Data(List<UserSeed> Users);
+    private record member(string Role, string Email);
+    private record userSeed(string FirstName, string LastName, string Email, string? Image);
+    private record projectSeed(string Name, string Content, bool IsPrivate, List<member> Members);
+    private record Data(List<userSeed> Users, List<projectSeed> Projects);
 
-    private async Task SeedUsersAsync()
+    private async Task seedUsersAsync()
     {
         foreach (var item in _data.Users)
         {
@@ -65,15 +68,15 @@ public class Seed
             if (item.Image is not null)
             {
                 var imageBytes = await _client.GetByteArrayAsync(item.Image);
-                imageName = await _firebase.Upload(imageBytes, ContentTypes.jpeg);
+                imageName = await _firebase.Upload(imageBytes, ContentType.jpeg);
             }
             else
             {
                 var imageBytes = await _client.GetByteArrayAsync($"https://api.dicebear.com/6.x/identicon/svg?seed={userId.ToString()}");
-                imageName = await _firebase.Upload(imageBytes, ContentTypes.svg);
+                imageName = await _firebase.Upload(imageBytes, ContentType.svg);
             }
 
-            var content = await _ctx.Contents.AddAsync(new Content() { OwnerId = userId, Id = contentId });
+            var content = await _ctx.Contents.AddAsync(new Content() { Id = contentId });
             var user = await _ctx.Users.AddAsync(new User
             {
                 FirstName = item.FirstName,
@@ -85,6 +88,37 @@ public class Seed
                 ContentId = contentId,
                 ImageName = imageName
             });
+        }
+
+        await _ctx.SaveChangesAsync();
+    }
+
+    private async Task seedProjectsAsync()
+    {
+        foreach (var item in _data.Projects)
+        {
+            var contentId = Ulid.NewUlid().ToString();
+            var projectId = Ulid.NewUlid().ToString();
+            var activateId = Ulid.NewUlid().ToString();
+
+            await _ctx.Activities.AddAsync(new Activity() { ProjectId = projectId, Markdown = $"created project {item.Name}", Id = activateId });
+            await _ctx.Contents.AddAsync(new Content() { Id = contentId, Markdown = item.Content });
+            await _ctx.Projects.AddAsync(new Project()
+            {
+                Name = item.Name,
+                IsPrivate = item.IsPrivate,
+                Id = projectId,
+                ContentId = contentId
+            });
+
+            foreach (var member in item.Members)
+            {
+                var user = await _ctx.Users.Where(u => u.Email == member.Email).Select(u => new { Id = u.Id }).FirstOrDefaultAsync();
+                if (user is null) continue;
+                var memberId = Ulid.NewUlid().ToString();
+                var role = Enum.Parse<Role>(member.Role);
+                await _ctx.Members.AddAsync(new Member() { UserId = user.Id, Id = memberId, ProjectId = projectId, Role = role });
+            }
         }
 
         await _ctx.SaveChangesAsync();

@@ -1,8 +1,7 @@
 import { ChangeEventHandler, ForwardedRef, HTMLProps, ReactNode, forwardRef, useEffect, useId, useState } from "react";
 import { IconType } from "react-icons";
 
-const LABEL_FOCUS = "bottom-[95%] left-[12%] text-sm text-secondary";
-const LABEL = "text-base bottom-[20%] left-[20%] text-gray-600";
+
 
 
 export interface IValidate {
@@ -22,16 +21,30 @@ interface TextFiledProps {
     onFocus?: () => void
     onBlur?: () => void
     maxLength?: number
+    error?: string
 }
 
 
 const TextFiled = forwardRef((props: TextFiledProps, ref: ForwardedRef<HTMLDivElement>) => {
+    const LABEL_FOCUS = `bottom-[95%] ${props?.icon ? "left-[12%]" : "left-[2.4%]"}  text-sm text-secondary`;
+    const LABEL = `text-base ${props?.icon ? "left-[20%]" : "left-[4%]"} bottom-[20%]  text-gray-600`;
+
     const Id = useId();
     const [isFocus, setIsFocus] = useState(false);
     const [isError, setIsError] = useState(false);
     const [changing, setChanging] = useState(false);
     const [errorMassage, setErrorMassage] = useState("");
-    const [labelClassName, setLabelClassName] = useState("absolute z-10 font-extralight transition-all ease-in-out text-base bottom-[20%] left-[20%] text-gray-600");
+    const [labelClassName, setLabelClassName] = useState(`absolute z-10 font-extralight transition-all ease-in-out ${LABEL}`);
+
+    useEffect(() => {
+        if (props.error) {
+            setIsError(true)
+            setErrorMassage(props.error)
+        } else {
+            setIsError(false)
+            setErrorMassage("")
+        }
+    }, [props.error])
 
     useEffect(() => {
         if (props.value) setLabelClassName("sr-only");

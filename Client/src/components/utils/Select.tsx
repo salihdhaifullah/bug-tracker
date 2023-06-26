@@ -12,7 +12,7 @@ interface ISelectProps {
     validation?: IValidate[]
     icon?: IconType
 }
-
+ // validation for my custom select
 const Select = (props: ISelectProps) => {
     const [isOpen, setIsOpen] = useState(false);
     const [activeOption, setActiveOption] = useState(1);
@@ -22,13 +22,10 @@ const Select = (props: ISelectProps) => {
     const optionsRef = useRef<string[]>([]);
     const targetRef = useRef<HTMLDivElement>(null);
 
-
-
     useEffect(() => {
         optionsRef.current = props.options;
         setOptions(optionsRef.current);
     }, [props.options])
-
 
     useOnClickOutside(targetRef, () => setIsOpen(false));
 
@@ -49,6 +46,10 @@ const Select = (props: ISelectProps) => {
 
         setOptions(data);
     }, [search])
+
+    useEffect(() => {
+        document.getElementById(`option-${activeOption}`)?.scrollTo({ behavior: "smooth" });
+    }, [activeOption])
 
     const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
         if (e.key === "ArrowDown" && activeOption !== (options.length - 1)) {
@@ -88,6 +89,7 @@ const Select = (props: ISelectProps) => {
                 {options.map((option, index) => (
                     <option
                         key={option}
+                        id={`option-${index}`}
                         onClick={() => choseOption(index)}
                         className={`${index === activeOption ? "bg-slate-200 font-extrabold" : "bg-white"} block bg-slate-200 rounded-md text-gray-600 p-1 mb-1 text-base cursor-pointer`}
                         value={option}>

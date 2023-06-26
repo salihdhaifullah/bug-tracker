@@ -123,5 +123,237 @@
             "Email": "Hal.Schinner@gmail.com",
             "Image": "https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/577.jpg"
         }
+    ],
+    "Projects": [
+        {
+            "Name": "SEMrush",
+            "IsPrivate": false,
+            "Content": "# A digital marketing tool that helps users perform SEO, PPC, social media, content, and competitive research.",
+            "Members": [
+                {
+                    "Role": "owner",
+                    "Email": "salehwebdev2004@gmail.com"
+                },
+                {
+                    "Role": "tester",
+                    "Email": "Nina38@yahoo.com"
+                },
+                {
+                    "Role": "project_manger",
+                    "Email": "Hal.Schinner@gmail.com"
+                },
+                {
+                    "Role": "developer",
+                    "Email": "essika.Lowe2@hotmail.com"
+                }
+            ]
+        },
+        {
+            "Name": "Archilogic",
+            "IsPrivate": false,
+            "Content": "# A 3D visualization platform that allows users to create and explore interactive models of buildings and spaces.",
+            "Members": [
+                {
+                    "Role": "owner",
+                    "Email": "salehwebdev2004@gmail.com"
+                },
+                {
+                    "Role": "tester",
+                    "Email": "Nina38@yahoo.com"
+                },
+                {
+                    "Role": "project_manger",
+                    "Email": "Hal.Schinner@gmail.com"
+                },
+                {
+                    "Role": "developer",
+                    "Email": "essika.Lowe2@hotmail.com"
+                }
+            ]
+        },
+        {
+            "Name": "Sprout Social",
+            "IsPrivate": false,
+            "Content": "# A social media management tool that helps users plan, publish, engage, analyze, and report on their social media activities.",
+            "Members": [
+                {
+                    "Role": "owner",
+                    "Email": "salehwebdev2004@gmail.com"
+                },
+                {
+                    "Role": "tester",
+                    "Email": "Nina38@yahoo.com"
+                },
+                {
+                    "Role": "project_manger",
+                    "Email": "Hal.Schinner@gmail.com"
+                },
+                {
+                    "Role": "developer",
+                    "Email": "essika.Lowe2@hotmail.com"
+                }
+            ]
+        },
+        {
+            "Name": "Xero",
+            "IsPrivate": false,
+            "Content": "# An online accounting software that connects users with their bank accounts, invoices, bills, inventory, payroll, and more.",
+            "Members": [
+                {
+                    "Role": "owner",
+                    "Email": "salehwebdev2004@gmail.com"
+                },
+                {
+                    "Role": "tester",
+                    "Email": "Nina38@yahoo.com"
+                },
+                {
+                    "Role": "project_manger",
+                    "Email": "Hal.Schinner@gmail.com"
+                },
+                {
+                    "Role": "developer",
+                    "Email": "essika.Lowe2@hotmail.com"
+                }
+            ]
+        },
+        {
+            "Name": "Crello",
+            "IsPrivate": false,
+            "Content": "# A graphic design tool that helps users create stunning visuals for social media, web, print, and video.",
+            "Members": [
+                {
+                    "Role": "owner",
+                    "Email": "salehwebdev2004@gmail.com"
+                },
+                {
+                    "Role": "tester",
+                    "Email": "Nina38@yahoo.com"
+                },
+                {
+                    "Role": "project_manger",
+                    "Email": "Hal.Schinner@gmail.com"
+                },
+                {
+                    "Role": "developer",
+                    "Email": "essika.Lowe2@hotmail.com"
+                }
+            ]
+        },
+        {
+            "Name": "QuickBooks",
+            "IsPrivate": false,
+            "Content": "# An accounting software that helps users manage their finances, track income and expenses, create invoices and reports, and more.",
+            "Members": [
+                {
+                    "Role": "owner",
+                    "Email": "salehwebdev2004@gmail.com"
+                },
+                {
+                    "Role": "tester",
+                    "Email": "Nina38@yahoo.com"
+                },
+                {
+                    "Role": "project_manger",
+                    "Email": "Hal.Schinner@gmail.com"
+                },
+                {
+                    "Role": "developer",
+                    "Email": "essika.Lowe2@hotmail.com"
+                }
+            ]
+        },
+        {
+            "Name": "Office 365",
+            "IsPrivate": true,
+            "Content": "# A cloud-based suite of productivity tools that includes Microsoft Word, Excel, PowerPoint, Outlook, OneDrive, Teams, and more.",
+            "Members": [
+                {
+                    "Role": "owner",
+                    "Email": "salehwebdev2004@gmail.com"
+                },
+                {
+                    "Role": "tester",
+                    "Email": "Nina38@yahoo.com"
+                },
+                {
+                    "Role": "project_manger",
+                    "Email": "Hal.Schinner@gmail.com"
+                },
+                {
+                    "Role": "developer",
+                    "Email": "essika.Lowe2@hotmail.com"
+                }
+            ]
+        },
+        {
+            "Name": "Project.co",
+            "IsPrivate": true,
+            "Content": "# A client-facing project management system that makes it easy to bring teams and clients together to communicate, manage tasks, and manage payments.",
+            "Members": [
+                {
+                    "Role": "owner",
+                    "Email": "salehwebdev2004@gmail.com"
+                },
+                {
+                    "Role": "tester",
+                    "Email": "Nina38@yahoo.com"
+                },
+                {
+                    "Role": "project_manger",
+                    "Email": "Hal.Schinner@gmail.com"
+                },
+                {
+                    "Role": "developer",
+                    "Email": "essika.Lowe2@hotmail.com"
+                }
+            ]
+        },
+        {
+            "Name": "Square",
+            "IsPrivate": false,
+            "Content": "# A mobile payment system that enables users to accept credit card payments using a smartphone or tablet.",
+            "Members": [
+                {
+                    "Role": "owner",
+                    "Email": "salehwebdev2004@gmail.com"
+                },
+                {
+                    "Role": "tester",
+                    "Email": "Nina38@yahoo.com"
+                },
+                {
+                    "Role": "project_manger",
+                    "Email": "Hal.Schinner@gmail.com"
+                },
+                {
+                    "Role": "developer",
+                    "Email": "essika.Lowe2@hotmail.com"
+                }
+            ]
+        },
+        {
+            "Name": "SurveyMonkey",
+            "IsPrivate": false,
+            "Content": "# A web-based survey platform that allows users to create and distribute online surveys and analyze the results.",
+            "Members": [
+                {
+                    "Role": "owner",
+                    "Email": "salehwebdev2004@gmail.com"
+                },
+                {
+                    "Role": "tester",
+                    "Email": "Nina38@yahoo.com"
+                },
+                {
+                    "Role": "project_manger",
+                    "Email": "Hal.Schinner@gmail.com"
+                },
+                {
+                    "Role": "developer",
+                    "Email": "essika.Lowe2@hotmail.com"
+                }
+            ]
+        }
     ]
 }

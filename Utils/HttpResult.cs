@@ -92,7 +92,7 @@ public class HttpResult
         return helper(result, massage, body, redirectTo);
     }
 
-    public static IActionResult UnAuthorized(string? massage = null, object? body = null, string? redirectTo = null)
+    public static IActionResult UnAuthorized(string? massage = "your account not found please sing-up to continue", object? body = null, string? redirectTo = "/auth/sing-up")
     {
         var result = new HttpResult().IsOk(false).StatusCode(StatusCodes.Status401Unauthorized);
         return helper(result, massage, body, redirectTo);

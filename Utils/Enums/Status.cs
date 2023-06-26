@@ -1,6 +1,6 @@
 namespace Buegee.Utils.Enums;
 
-public enum TicketStatus {
+public enum Status {
     review,
     active,
     in_progress,

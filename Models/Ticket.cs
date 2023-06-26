@@ -21,11 +21,11 @@ public class Ticket
     [Required, Column("type"), EnumDataType(typeof(TicketType))]
     public TicketType Type { get; set; } = TicketType.bug;
 
-    [Required, Column("priority"), EnumDataType(typeof(TicketPriority))]
-    public TicketPriority Priority { get; set; } = TicketPriority.medium;
+    [Required, Column("priority"), EnumDataType(typeof(Priority))]
+    public Priority Priority { get; set; } = Priority.medium;
 
-    [Required, Column("status"), EnumDataType(typeof(TicketStatus))]
-    public TicketStatus Status { get; set; } = TicketStatus.review;
+    [Required, Column("status"), EnumDataType(typeof(Status))]
+    public Status Status { get; set; } = Status.review;
 
     [Required, Column("created_at")]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

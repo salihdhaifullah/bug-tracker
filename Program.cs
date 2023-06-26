@@ -1,6 +1,7 @@
 using Buegee.Data;
 using Buegee.Services.AuthService;
 using Buegee.Services.CryptoService;
+using Buegee.Services.DataService;
 using Buegee.Services.EmailService;
 using Buegee.Services.FirebaseService;
 using Buegee.Services.JWTService;
@@ -17,6 +18,7 @@ builder.Services.AddSingleton<IEmailService, EmailService>();
 builder.Services.AddSingleton<IRedisCacheService, RedisCacheService>();
 builder.Services.AddSingleton<IAuthService, AuthService>();
 builder.Services.AddSingleton<IFirebaseService, FirebaseService>();
+builder.Services.AddSingleton<IDataService, DataService>();
 
 var app = builder.Build();
 

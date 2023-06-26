@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Buegee.Utils.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace Buegee.Models;
@@ -24,4 +25,10 @@ public class Member
 
     [Column("joined_at")]
     public DateTime JoinedAt { get; set; } = DateTime.UtcNow;
+
+    [Column("role"), EnumDataType(typeof(Role))]
+    public Role Role { get; set; } = Role.developer;
+
+    [Column("is_joined")]
+    public bool IsJoined { get; set; } = false;
 }

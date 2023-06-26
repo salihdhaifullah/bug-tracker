@@ -21,10 +21,9 @@ interface ITicket {
     priority: string;
     status: string;
     type: string;
-    contentId: string;
     comments: {
-        ownerId: string;
-        contentId: string;
+        id: string;
+        commenterId: string;
     }[]
 }
 
@@ -32,7 +31,7 @@ interface ITicket {
 const Ticket = () => {
     const { ticketId } = useParams();
 
-    const [payload, call] = useFetchApi<ITicket, unknown>("GET", `ticket/${ticketId}`, []);
+    const [payload, call] = useFetchApi<ITicket>("GET", `ticket/${ticketId}`, []);
     useEffect(() => { call() }, [])
 
     return (!payload.result) || payload.isLoading ? <CircleProgress size="lg" /> : (
@@ -46,7 +45,7 @@ const Ticket = () => {
             <p className="text-gray-600">Comments:</p>
             <ul>
                 {payload.result.comments.map(comment => (
-                    <li key={comment.contentId}>{comment.contentId}</li>
+                    <li key={comment.id}>{comment.id}</li>
                 ))}
             </ul>
         </div>

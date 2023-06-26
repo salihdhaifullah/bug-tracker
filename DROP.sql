@@ -1,9 +1,13 @@
-DROP TABLE "__EFMigrationsHistory" CASCADE;
-DROP TABLE "user" CASCADE;
-DROP TABLE "comment" CASCADE;
-DROP TABLE "content" CASCADE;
-DROP TABLE "document" CASCADE;
-DROP TABLE "project" CASCADE;
-DROP TABLE "ticket" CASCADE;
-DROP TABLE "member" CASCADE;
-DROP TABLE "activity" CASCADE;
+-- DROP TABLE "__EFMigrationsHistory" CASCADE;
+-- DROP TABLE "user" CASCADE;
+-- DROP TABLE "comment" CASCADE;
+-- DROP TABLE "content" CASCADE;
+-- DROP TABLE "document" CASCADE;
+-- DROP TABLE "project" CASCADE;
+-- DROP TABLE "ticket" CASCADE;
+-- DROP TABLE "member" CASCADE;
+-- DROP TABLE "activity" CASCADE;
+
+
+DELETE FROM "member" WHERE id = '01H3TGRTNB8W3DAN4MSJB268BX';
+SELECT * FROM "member"

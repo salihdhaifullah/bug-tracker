@@ -53,32 +53,30 @@ public class AuthController : Controller
                 .Where(u => u.Email == dto.Email)
                 .Select(u => new
                 {
-                    PasswordHash = u.PasswordHash,
-                    PasswordSalt = u.PasswordSalt,
-                    Id = u.Id,
-                    ContentId = u.ContentId,
-                    ImageUrl = Helper.StorageUrl(u.ImageName),
-                    Email = u.Email,
-                    FullName = $"{u.FirstName} {u.LastName}",
+                    passwordHash = u.PasswordHash,
+                    passwordSalt = u.PasswordSalt,
+                    id = u.Id,
+                    imageUrl = Helper.StorageUrl(u.ImageName),
+                    email = u.Email,
+                    fullName = $"{u.FirstName} {u.LastName}",
                 })
                 .FirstOrDefaultAsync();
 
             if (isFound is null) return HttpResult.NotFound($"this {dto.Email} email dose not exist try sing-up", null, "/auth/sing-up");
 
-            _crypto.Compar(dto.Password, isFound.PasswordHash, isFound.PasswordSalt, out bool isMatch);
+            _crypto.Compar(dto.Password, isFound.passwordHash, isFound.passwordSalt, out bool isMatch);
 
             if (!isMatch) return HttpResult.BadRequest("wrong email or password");
 
-            _auth.LogIn(isFound.Id, HttpContext);
+            _auth.LogIn(isFound.id, HttpContext);
 
             // TODO || redirect to dashboard
             return HttpResult.Ok("logged in successfully", new
             {
-                id = isFound.Id,
-                imageUrl = isFound.ImageUrl,
-                email = isFound.Email,
-                fullName = isFound.FullName,
-                contentId = isFound.ContentId
+                id = isFound.id,
+                imageUrl = isFound.imageUrl,
+                email = isFound.email,
+                fullName = isFound.fullName,
             });
         }
         catch (Exception e)
@@ -105,7 +103,7 @@ public class AuthController : Controller
 
             await _auth.SetSessionAsync<SingUpSession>("sing-up-session", sessionTimeSpan, payload, HttpContext);
 
-            await _email.sendVerificationEmail(dto.Email, $"{dto.FirstName} {dto.LastName}", Code);
+            await _email.Verification(dto.Email, $"{dto.FirstName} {dto.LastName}", Code);
 
             return HttpResult.Ok("we have send to a 6 digits verification code", null, "/auth/account-verification");
         }
@@ -139,10 +137,10 @@ public class AuthController : Controller
             using (var client = new HttpClient())
             {
                 var imageBytes = await client.GetByteArrayAsync($"https://api.dicebear.com/6.x/identicon/svg?seed={userId}");
-                imageName = await _firebase.Upload(imageBytes, ContentTypes.svg);
+                imageName = await _firebase.Upload(imageBytes, ContentType.svg);
             }
 
-            var content = await _ctx.Contents.AddAsync(new Content() { OwnerId = userId, Id = contentId });
+            var content = await _ctx.Contents.AddAsync(new Content() { Id = contentId });
 
             var user = await _ctx.Users.AddAsync(new User
             {
@@ -175,7 +173,7 @@ public class AuthController : Controller
     {
         try
         {
-            var isFound = await _ctx.Users
+            var user = await _ctx.Users
                 .Where(u => u.Email == dto.Email)
                 .Select(u => new
                 {
@@ -186,17 +184,17 @@ public class AuthController : Controller
                 .FirstOrDefaultAsync();
 
 
-            if (isFound is null) return HttpResult.NotFound($"this {dto.Email} email dose not exist try sing-up", null, "/auth/sing-up");
+            if (user is null) return HttpResult.NotFound($"this {dto.Email} email dose not exist try sing-up", null, "/auth/sing-up");
 
             string code = Helper.RandomCode();
 
-            var payload = new ForgetPasswordSession(code, isFound.Email);
+            var payload = new ForgetPasswordSession(code, user.Email);
 
             await _auth.SetSessionAsync<ForgetPasswordSession>("reset-password-session", new TimeSpan(0, 30, 0), payload, HttpContext);
 
-            await _email.resetPasswordEmail(isFound.Email, $"{isFound.FirstName} {isFound.LastName}", code);
+            await _email.ResetPassword(user.Email, $"{user.FirstName} {user.LastName}", code);
 
-            return HttpResult.Ok("we have send to a 6 digits verification code", null, "/auth/reset-password");
+            return HttpResult.Ok("we have send to you a 6 digits verification code", null, "/auth/reset-password");
         }
          catch (Exception e)
         {

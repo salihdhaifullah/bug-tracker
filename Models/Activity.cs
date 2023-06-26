@@ -16,7 +16,6 @@ public class Activity
     public string ProjectId { get; set; } = null!;
     public Project Project { get; set; } = null!;
 
-    [Required, ForeignKey("Content"), Column("content_id"), StringLength(26)]
-    public string ContentId { get; set; } = null!;
-    public Content Content { get; set; } = null!;
+    [Required, Column("markdown")]
+    public string Markdown { get; set; } = null!;
 }

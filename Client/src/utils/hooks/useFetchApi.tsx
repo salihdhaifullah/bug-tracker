@@ -16,9 +16,9 @@ interface IPayload<T> {
 }
 
 
-export default function useFetchApi<R, B>
+export default function useFetchApi<R = undefined, B = undefined>
 (method: "POST" | "PATCH" | "GET" | "DELETE",
-url: string, deps: DependencyList,
+url: string, deps: DependencyList = [],
 callback?: (arg: R) => void): [payload: IPayload<R>, call: (body?: B) => void] {
 
     const dispatchNotification = useNotificationDispatch();

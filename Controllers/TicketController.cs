@@ -1,6 +1,7 @@
 using Buegee.Data;
 using Buegee.DTO;
 using Buegee.Models;
+using Buegee.Services.DataService;
 using Buegee.Utils;
 using Buegee.Utils.Attributes;
 using Buegee.Utils.Enums;
@@ -12,12 +13,14 @@ using Microsoft.EntityFrameworkCore;
 public class TicketController : Controller
 {
     private readonly DataContext _ctx;
+    private readonly IDataService _data;
     private readonly ILogger<TicketController> _logger;
 
-    public TicketController(DataContext ctx, ILogger<TicketController> logger)
+    public TicketController(DataContext ctx, ILogger<TicketController> logger, IDataService data)
     {
         _ctx = ctx;
         _logger = logger;
+        _data = data;
     }
 
     [HttpPost("{projectId}"), Validation, Authorized]
@@ -27,14 +30,10 @@ public class TicketController : Controller
         {
             var userId = (string)(HttpContext.Items["id"])!;
 
-            var isProjectFound = await _ctx.Projects.AnyAsync(p => p.Id == projectId && p.OwnerId == userId);
-
-            if (!isProjectFound) return HttpResult.NotFound("project not found");
-
             var contentId = Ulid.NewUlid().ToString();
             var ticketId = Ulid.NewUlid().ToString();
 
-            var content = await _ctx.Contents.AddAsync(new Content() { Id = contentId, OwnerId = userId });
+            var content = await _ctx.Contents.AddAsync(new Content() { Id = contentId });
             var ticket = await _ctx.Tickets.AddAsync(new Ticket()
             {
                 Name = dto.Name,
@@ -42,14 +41,14 @@ public class TicketController : Controller
                 ProjectId = projectId,
                 ContentId = contentId,
                 Type = Enum.Parse<TicketType>(dto.Type),
-                Status = Enum.Parse<TicketStatus>(dto.Status),
-                Priority = Enum.Parse<TicketPriority>(dto.Priority),
+                Status = Enum.Parse<Status>(dto.Status),
+                Priority = Enum.Parse<Priority>(dto.Priority),
                 Id = ticketId
             });
 
             if (dto.AssignedToEmail is not null)
             {
-                var isFound = await _ctx.Members.Where(m => m.User.Email == dto.AssignedToEmail).Select(m => new {Id = m.Id}).FirstOrDefaultAsync();
+                var isFound = await _ctx.Members.Where(m => m.User.Email == dto.AssignedToEmail).Select(m => new { Id = m.Id }).FirstOrDefaultAsync();
                 if (isFound is null) return HttpResult.NotFound("user is not found to assignee ticket to");
                 ticket.Entity.AssignedToId = isFound.Id;
             }
@@ -73,7 +72,7 @@ public class TicketController : Controller
             var userId = (string)(HttpContext.Items["id"])!;
 
             var projects = await _ctx.Projects
-                            .Where((p) => p.OwnerId == userId)
+                            .Where((p) => p.Members.Any(m => m.UserId == userId))
                             .OrderBy((p) => p.CreatedAt)
                             .Select((p) => new
                             {
@@ -127,10 +126,10 @@ public class TicketController : Controller
                                 priority = t.Priority.ToString(),
                                 status = t.Status.ToString(),
                                 type = t.Type.ToString(),
-                                contentId = t.Content.Id,
-                                comments = t.Comments.Select((c) => new {
-                                    ownerId = c.CommenterId,
-                                    contentId = c.Content.Id
+                                comments = t.Comments.Select((c) => new
+                                {
+                                    id = c.Id,
+                                    commenterId = c.CommenterId,
                                 })
                             })
                             .FirstOrDefaultAsync();
@@ -177,11 +176,70 @@ public class TicketController : Controller
         {
             var userId = (string)(HttpContext.Items["id"])!;
 
-            var projectsCount = await _ctx.Projects.Where((p) => p.OwnerId == userId).CountAsync();
+            var projectsCount = await _ctx.Projects
+            .Where((p) => p.Members.Any(m => m.UserId == userId))
+            .CountAsync();
 
             int pages = (int)Math.Ceiling((double)projectsCount / take);
 
             return HttpResult.Ok(null, pages);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.Message);
+            return HttpResult.InternalServerError();
+        }
+    }
+
+    [HttpPost("content/{ticketId}"), Authorized, Validation]
+    public async Task<IActionResult> Profile([FromBody] ContentDTO dto, [FromRoute] string ticketId)
+    {
+        try
+        {
+            var userId = (string)(HttpContext.Items["id"])!;
+
+            var isAllowed = await _ctx.Projects
+                    .AnyAsync(p => p.Tickets.Any(t => t.Id == ticketId) && p.Members.Any(m => m.UserId == userId
+                    && (m.Role == Role.owner || m.Role == Role.project_manger)));
+
+            if (!isAllowed) return HttpResult.Forbidden("you are not allowed to do this action", redirectTo: "/403");
+
+
+
+            var content = await _ctx.Tickets
+                          .Where(t => t.Id == ticketId)
+                          .Include(t => t.Content)
+                          .ThenInclude(c => c.Documents)
+                          .Select(t => t.Content)
+                          .FirstOrDefaultAsync();
+
+            if (content is null) return HttpResult.UnAuthorized();
+
+            await _data.EditContent(dto, content, _ctx);
+
+            return HttpResult.Ok("successfully changed content");
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.Message);
+            return HttpResult.InternalServerError();
+        }
+    }
+
+    [HttpGet("content/{ticketId}")]
+    public async Task<IActionResult> GetProfile([FromRoute] string ticketId)
+    {
+        try
+        {
+            var content = await _ctx.Tickets
+                    .Where(t => t.Id == ticketId)
+                    .Select(t => t.Content)
+                    .Include(c => c.Documents)
+                    .FirstOrDefaultAsync();
+
+            if (content is null) return HttpResult.NotFound("content not found");
+
+            return HttpResult.Ok(body: content);
         }
         catch (Exception e)
         {

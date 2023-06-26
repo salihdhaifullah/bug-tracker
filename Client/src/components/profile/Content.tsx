@@ -7,8 +7,9 @@ import Parser from "../utils/markdown/Parser";
 import CircleProgress from "../utils/CircleProgress";
 
 interface IContentProps {
-    contentId: string;
     isAllowedToEdit?: boolean;
+    getUrl: string
+    postUrl: string
 }
 
 const Content = (props: IContentProps) => {
@@ -16,8 +17,8 @@ const Content = (props: IContentProps) => {
     const [isEditing, setIsEditing] = useState(false);
     const files = useRef<{ base64: string, previewUrl: string }[]>([]);
 
-    const [_, call] = useFetchApi<unknown, { markdown: string, files: { base64: string, previewUrl: string }[] }>("POST", `content/${props.contentId}`, [])
-    const [payload, callGet] = useFetchApi<{ markdown: string }, unknown>("GET", `content/${props.contentId}`, [])
+    const [_, call] = useFetchApi<any, { markdown: string, files: { base64: string, previewUrl: string }[] }>("POST", props.postUrl, [])
+    const [payload, callGet] = useFetchApi<{ markdown: string }>("GET", props.getUrl, [])
 
     const handelSubmit = () => {
         for (const file of files.current) { URL.revokeObjectURL(file.previewUrl) };
@@ -33,10 +34,10 @@ const Content = (props: IContentProps) => {
     useEffect(() => { callGet() }, [])
 
     return (
-        <div className="flex flex-grow min-h-[60vh] my-2 h-fit w-full sm:px-4 md:px-8 lg:px-0 flex-col justify-center items-center">
-            <div className="flex flex-col w-full min-h-[50vh] h-full rounded-2xl justify-start items-start bg-white py-4">
+        <div className="flex flex-grow h-fit w-full flex-col">
+            <div className="flex flex-col w-full h-full rounded-2xl justify-start items-start bg-white">
                 {props.isAllowedToEdit !== false ? (
-                <div onClick={() => setIsEditing((prev) => !prev)} className="flex w-full h-10 justify-end cursor-pointer">
+                <div onClick={() => setIsEditing((prev) => !prev)} className="flex w-full h-8 justify-end cursor-pointer">
                     {isEditing ? <AiOutlineClose className="text-2xl mr-2 transition-all ease-in-out font-bold text-gray-600" />
                     : <MdOutlineModeEditOutline className="text-2xl mr-2 transition-all ease-in-out font-bold text-gray-600" />}
                 </div>
@@ -44,7 +45,7 @@ const Content = (props: IContentProps) => {
                 {isEditing ? (
                         <Editor md={md} onSubmit={handelSubmit} setMd={setMd} files={files} />
                 ) : payload.isLoading ? <CircleProgress size="lg" /> : (
-                        <div className="markdown flex flex-col p-2 w-full overflow-hidden h-full" dangerouslySetInnerHTML={{ __html: Parser(md) }}></div>
+                        <div className="markdown flex flex-col p-1 w-full overflow-hidden h-full" dangerouslySetInnerHTML={{ __html: Parser(md) }}></div>
                 )}
             </div>
         </div>

@@ -28,7 +28,7 @@ public class FirebaseService : IFirebaseService
         _logger = logger;
     }
 
-    public async Task<string> Upload(byte[] data, ContentTypes ContentType)
+    public async Task<string> Upload(byte[] data, ContentType ContentType)
     {
         var name = $"{Guid.NewGuid()}.{ContentType.ToString()}";
         await _storage.Child(name).PutAsync(new MemoryStream(data));
@@ -40,7 +40,7 @@ public class FirebaseService : IFirebaseService
         await _storage.Child(name).DeleteAsync();
     }
 
-    public async Task<string> Update(string oldName, ContentTypes ContentType, byte[] data)
+    public async Task<string> Update(string oldName, ContentType ContentType, byte[] data)
     {
         try
         {

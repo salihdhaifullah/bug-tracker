@@ -21,8 +21,8 @@ const take = 10;
 
 const Projects = () => {
   const [page, setPage] = useState(1)
-  const [projectsPayload, callProjects] = useFetchApi<IProject[], unknown>("GET", `project/projects/${page}/?take=${take}`, [page, take]);
-  const [PagesCountPayload, callPagesCount] = useFetchApi<number, unknown>("GET", `project/count/?take=${take}`, [take]);
+  const [projectsPayload, callProjects] = useFetchApi<IProject[]>("GET", `project/projects/${page}/?take=${take}`, [page, take]);
+  const [PagesCountPayload, callPagesCount] = useFetchApi<number>("GET", `project/count/?take=${take}`, [take]);
 
   useEffect(() => { callProjects() }, [page, take])
   useEffect(() => { callPagesCount() }, [take])

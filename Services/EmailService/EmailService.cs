@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Mail;
 using System.Text;
+using Buegee.Utils.Enums;
 
 namespace Buegee.Services.EmailService;
 public class EmailService : IEmailService
@@ -10,6 +11,7 @@ public class EmailService : IEmailService
     private SmtpClient _smtpClient;
     private readonly string _verificationEmailHtml;
     private readonly string _resetPasswordHtml;
+    private readonly string _invitationToProjectHtml;
 
     public EmailService(IConfiguration config)
     {
@@ -29,10 +31,11 @@ public class EmailService : IEmailService
 
         _verificationEmailHtml = File.ReadAllText("./Emails/verification-email.html");
         _resetPasswordHtml = File.ReadAllText("./Emails/reset-password.html");
+        _invitationToProjectHtml = File.ReadAllText("./Emails/invitation-to-project.html");
     }
 
 
-    public Task sendVerificationEmail(string to, string name, string code)
+    public Task Verification(string to, string name, string code)
     {
         var stringBuilder = new StringBuilder(_verificationEmailHtml);
         stringBuilder.Replace("${name}", name);
@@ -51,7 +54,7 @@ public class EmailService : IEmailService
         return _smtpClient.SendMailAsync(message);
     }
 
-    public Task resetPasswordEmail(string to, string name, string code)
+    public Task ResetPassword(string to, string name, string code)
     {
         var stringBuilder = new StringBuilder(_resetPasswordHtml);
 
@@ -62,6 +65,29 @@ public class EmailService : IEmailService
             from: "Team@Buegee.com",
             to: to,
             subject: "reset your password",
+            body: stringBuilder.ToString()
+        );
+
+        message.IsBodyHtml = true;
+        message.Priority = MailPriority.High;
+
+        return _smtpClient.SendMailAsync(message);
+    }
+
+    public Task Invitation(string to, string name, string projectName, Role role, string inventerName, string url)
+    {
+        var stringBuilder = new StringBuilder(_invitationToProjectHtml);
+
+        stringBuilder.Replace("${name}", name);
+        stringBuilder.Replace("${project_name}", projectName);
+        stringBuilder.Replace("${role}", role.ToString());
+        stringBuilder.Replace("${inventer}", inventerName);
+        stringBuilder.Replace("${url}", url);
+
+        var message = new MailMessage(
+            from: "Team@Buegee.com",
+            to: to,
+            subject: "invitation to project",
             body: stringBuilder.ToString()
         );
 

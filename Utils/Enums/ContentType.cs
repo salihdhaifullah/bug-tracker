@@ -1,5 +1,5 @@
 namespace Buegee.Utils.Enums;
-public enum ContentTypes
+public enum ContentType
 {
     jpeg,
     png,

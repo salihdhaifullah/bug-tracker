@@ -37,7 +37,7 @@ public class AuthService : IAuthService
 
         string? jsonSession = await _cache.Redis.StringGetAsync(sessionId);
 
-        if (jsonSession is null) return null;
+        if (String.IsNullOrEmpty(jsonSession)) return null;
 
         return JsonSerializer.Deserialize<T>(jsonSession);
     }

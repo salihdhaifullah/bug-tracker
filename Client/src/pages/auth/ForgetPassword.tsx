@@ -8,7 +8,7 @@ const ForgetPassword = () => {
     const [isValidEmail, setIsValidEmail] = useState(false);
     const [email, setEmail] = useState("");
 
-    const [payload, call] = useFetchApi<unknown, { email: string }>("POST", "auth/forget-password", []);
+    const [payload, call] = useFetchApi<any, { email: string }>("POST", "auth/forget-password", []);
 
     const handelSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();

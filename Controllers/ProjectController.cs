@@ -1,8 +1,10 @@
 using Buegee.Data;
 using Buegee.DTO;
 using Buegee.Models;
+using Buegee.Services.DataService;
 using Buegee.Utils;
 using Buegee.Utils.Attributes;
+using Buegee.Utils.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,12 +13,14 @@ using Microsoft.EntityFrameworkCore;
 public class ProjectController : Controller
 {
     private readonly DataContext _ctx;
+    private readonly IDataService _data;
     private readonly ILogger<ProjectController> _logger;
 
-    public ProjectController(DataContext ctx, ILogger<ProjectController> logger)
+    public ProjectController(DataContext ctx, ILogger<ProjectController> logger, IDataService data)
     {
         _ctx = ctx;
         _logger = logger;
+        _data = data;
     }
 
     [HttpPost, Validation, Authorized]
@@ -26,21 +30,18 @@ public class ProjectController : Controller
         {
             var userId = (string)(HttpContext.Items["id"])!;
 
-            var isFoundSameName = await _ctx.Projects.AnyAsync(p => p.OwnerId == userId && p.Name == dto.Name);
-
-            if (isFoundSameName) return HttpResult.BadRequest("project name is already exist please chose another name");
-
             var contentId = Ulid.NewUlid().ToString();
             var projectId = Ulid.NewUlid().ToString();
             var memberId = Ulid.NewUlid().ToString();
+            var activateId = Ulid.NewUlid().ToString();
 
-            var member = await _ctx.Members.AddAsync(new Member() { UserId = userId, Id = memberId, ProjectId = projectId });
-            var content = await _ctx.Contents.AddAsync(new Content() { OwnerId = userId, Id = contentId });
-            var project = await _ctx.Projects.AddAsync(new Project()
+            await _ctx.Activities.AddAsync(new Activity() { ProjectId = projectId, Markdown = $"created project {dto.Name}", Id = activateId });
+            await _ctx.Members.AddAsync(new Member() { UserId = userId, Id = memberId, ProjectId = projectId, Role = Role.owner });
+            await _ctx.Contents.AddAsync(new Content() { Id = contentId });
+            await _ctx.Projects.AddAsync(new Project()
             {
                 Name = dto.Name,
                 IsPrivate = dto.IsPrivate,
-                OwnerId = userId,
                 Id = projectId,
                 ContentId = contentId
             });
@@ -64,7 +65,7 @@ public class ProjectController : Controller
             var userId = (string)(HttpContext.Items["id"])!;
 
             var projects = await _ctx.Projects
-                            .Where((p) => p.OwnerId == userId)
+                            .Where((p) => p.Members.Any(m => m.UserId == userId))
                             .OrderBy((p) => p.CreatedAt)
                             .Select((p) => new
                             {
@@ -104,9 +105,8 @@ public class ProjectController : Controller
                                 activities = p.Activities.Select(a => new
                                 {
                                     createdAt = a.CreatedAt,
-                                    markdown = a.Content.Markdown
+                                    markdown = a.Markdown
                                 }),
-                                contentId = p.ContentId,
                                 createdAt = p.CreatedAt,
                                 descriptionMarkdown = p.Content != null ? p.Content.Markdown : null,
                                 tickets = p.Tickets.Select(t => new
@@ -132,19 +132,22 @@ public class ProjectController : Controller
                                     status = t.Status.ToString(),
                                     type = t.Type.ToString(),
                                 }),
-                                owner = new
+                                owner = p.Members.Where(m => m.Role == Role.owner)
+                                .Select(m => new
                                 {
-                                    firstName = p.Owner.FirstName,
-                                    lastName = p.Owner.LastName,
-                                    imageUrl = Helper.StorageUrl(p.Owner.ImageName),
-                                    id = p.Owner.Id,
-                                },
-                                members = p.Members.Select(m =>
-                                new
+                                    firstName = m.User.FirstName,
+                                    lastName = m.User.LastName,
+                                    imageUrl = Helper.StorageUrl(m.User.ImageName),
+                                    id = m.UserId,
+                                }).FirstOrDefault(),
+                                members = p.Members.Where(m => m.IsJoined)
+                                .Select(m => new
                                 {
                                     joinedAt = m.JoinedAt,
                                     firstName = m.User.FirstName,
                                     lastName = m.User.LastName,
+                                    email = m.User.Email,
+                                    role = m.Role.ToString(),
                                     imageUrl = Helper.StorageUrl(m.User.ImageName),
                                     id = m.User.Id
                                 }),
@@ -170,7 +173,9 @@ public class ProjectController : Controller
         {
             var userId = (string)(HttpContext.Items["id"])!;
 
-            var project = await _ctx.Projects.Where((p) => p.Id == projectId && p.OwnerId == userId).FirstOrDefaultAsync();
+            var project = await _ctx.Projects
+            .Where((p) => p.Id == projectId && p.Members.Any(m => m.UserId == userId && m.Role == Role.owner))
+            .FirstOrDefaultAsync();
 
             if (project is null) return HttpResult.NotFound("sorry, project not found");
 
@@ -194,11 +199,67 @@ public class ProjectController : Controller
         {
             var userId = (string)(HttpContext.Items["id"])!;
 
-            var projectsCount = await _ctx.Projects.Where((p) => p.OwnerId == userId).CountAsync();
+            var projectsCount = await _ctx.Projects.Where((p) => p.Members.Any(m => m.UserId == userId)).CountAsync();
 
             int pages = (int)Math.Ceiling((double)projectsCount / take);
 
             return HttpResult.Ok(null, pages);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.Message);
+            return HttpResult.InternalServerError();
+        }
+    }
+
+    [HttpPost("content/{projectId}"), Authorized, Validation]
+    public async Task<IActionResult> Profile([FromBody] ContentDTO dto, [FromRoute] string projectId)
+    {
+        try
+        {
+            var userId = (string)(HttpContext.Items["id"])!;
+
+            var isAllowed = await _ctx.Projects
+                    .AnyAsync(p => p.Id == projectId && p.Members.Any(m => m.UserId == userId
+                    && (m.Role == Role.owner || m.Role == Role.project_manger)));
+
+            if (!isAllowed) return HttpResult.Forbidden("you are not allowed to do this action", redirectTo: "/403");
+
+
+
+            var content = await _ctx.Projects
+                          .Where(p => p.Id == projectId)
+                          .Include(p => p.Content)
+                          .ThenInclude(c => c.Documents)
+                          .Select(p => p.Content)
+                          .FirstOrDefaultAsync();
+
+            if (content is null) return HttpResult.UnAuthorized();
+
+            await _data.EditContent(dto, content, _ctx);
+
+            return HttpResult.Ok("successfully changed content");
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.Message);
+            return HttpResult.InternalServerError();
+        }
+    }
+
+    [HttpGet("content/{projectId}")]
+    public async Task<IActionResult> GetProfile([FromRoute] string projectId)
+    {
+        try
+        {
+            var content = await _ctx.Projects
+                        .Where(p => p.Id == projectId)
+                        .Select(p => new { markdown = p.Content.Markdown })
+                        .FirstOrDefaultAsync();
+
+            if (content is null) return HttpResult.NotFound("content not found");
+
+            return HttpResult.Ok(body: content);
         }
         catch (Exception e)
         {

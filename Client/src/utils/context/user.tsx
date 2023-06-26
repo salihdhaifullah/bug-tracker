@@ -10,7 +10,6 @@ type IUserAction = {
 
 export interface IUser {
     id: string;
-    contentId: string;
     email: string;
     fullName: string;
     imageUrl: string;

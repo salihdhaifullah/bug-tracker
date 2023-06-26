@@ -12,9 +12,6 @@ public class Content
     [Required, Column("markdown")]
     public string Markdown { get; set; } = string.Empty;
 
-    [Required, Column("owner_id"), StringLength(26)]
-    public string OwnerId { get; set; } = null!;
-
     [Column("documents")]
     public List<Document> Documents { get; set; } = new List<Document>();
 }

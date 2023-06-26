@@ -1,6 +1,6 @@
 namespace Buegee.Utils.Enums;
 
-public enum TicketPriority
+public enum Priority
 {
     low,
     medium,

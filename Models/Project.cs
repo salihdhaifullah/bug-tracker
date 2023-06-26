@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Buegee.Models;
 
 [Table("project")]
-[Index(nameof(Name), nameof(OwnerId), IsUnique = true)]
+[Index(nameof(Name))]
 public class Project
 {
     [Key, Column("id"), StringLength(26)]
@@ -19,10 +19,6 @@ public class Project
 
     [Required, Column("is_private")]
     public bool IsPrivate { get; set; } = false;
-
-    [Required, ForeignKey("Owner"), Column("owner_id"), StringLength(26)]
-    public string OwnerId { get; set; } = null!;
-    public User Owner { get; set; } = null!;
 
     [Required, ForeignKey("Content"), Column("content_id"), StringLength(26)]
     public string ContentId { get; set; } = null!;

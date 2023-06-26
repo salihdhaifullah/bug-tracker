@@ -21,7 +21,9 @@ const MyProfile = () => {
                     <hr className="bg-gray-500 w-full h-[2px] rounded-md" />
                 </div>
             </div>
-            <Content contentId={user.contentId} />
+            <div className="bg-white rounded-lg shadow-lg p-2 w-full flex-grow min-h-[200px] lg:m-3 mb-3 flex flex-col">
+                <Content getUrl={`user/profile/${user.id}`} postUrl={`user/profile`} />
+            </div>
         </section>
     )
 }

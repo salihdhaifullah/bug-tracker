@@ -1,5 +1,6 @@
 using Buegee.Data;
 using Buegee.DTO;
+using Buegee.Services.DataService;
 using Buegee.Services.FirebaseService;
 using Buegee.Utils;
 using Buegee.Utils.Attributes;
@@ -15,13 +16,15 @@ public class UserController : Controller
 {
     private readonly DataContext _ctx;
     private readonly IFirebaseService _firebase;
+    private readonly IDataService _data;
     private readonly ILogger<UserController> _logger;
 
-    public UserController(DataContext ctx, IFirebaseService firebase, ILogger<UserController> logger)
+    public UserController(DataContext ctx, IFirebaseService firebase, ILogger<UserController> logger, IDataService data)
     {
         _ctx = ctx;
         _firebase = firebase;
         _logger = logger;
+        _data = data;
     }
 
     [HttpPost("avatar"), Authorized, Validation]
@@ -31,13 +34,13 @@ public class UserController : Controller
         {
             var userId = (string)(HttpContext.Items["id"])!;
 
-            var contentType = (ContentTypes)Enum.Parse(typeof(ContentTypes), dto.ContentType);
+            var contentType = (ContentType)Enum.Parse(typeof(ContentType), dto.ContentType);
 
             var user = await _ctx.Users.Where(u => u.Id == userId).FirstOrDefaultAsync();
 
-            if (user is null) return HttpResult.UnAuthorized(massage: "your account not found please sing-up to continue", redirectTo: "/auth/sing-up");
+            if (user is null) return HttpResult.UnAuthorized();
 
-            var newImageName = await _firebase.Update(user.ImageName, ContentTypes.webp, Convert.FromBase64String(dto.Data));
+            var newImageName = await _firebase.Update(user.ImageName, ContentType.webp, Convert.FromBase64String(dto.Data));
 
             user.ImageName = newImageName;
 
@@ -45,7 +48,7 @@ public class UserController : Controller
 
             return HttpResult.Ok("successfully changed profile image", new { imageUrl = Helper.StorageUrl(newImageName) });
         }
-         catch (Exception e)
+        catch (Exception e)
         {
             _logger.LogError(e.Message);
             return HttpResult.InternalServerError();
@@ -53,7 +56,7 @@ public class UserController : Controller
     }
 
 
-    [HttpGet("bio/{userId?}")]
+    [HttpGet("bio/{userId}")]
     public async Task<IActionResult> GetBio([FromRoute] string userId)
     {
         try
@@ -68,7 +71,7 @@ public class UserController : Controller
             return HttpResult.Ok(null, isFound);
 
         }
-         catch (Exception e)
+        catch (Exception e)
         {
             _logger.LogError(e.Message);
             return HttpResult.InternalServerError();
@@ -84,7 +87,7 @@ public class UserController : Controller
 
             var isFound = await _ctx.Users.Where(u => u.Id == userId).FirstOrDefaultAsync();
 
-            if (isFound is null) return HttpResult.UnAuthorized(massage: "your account not found please sing-up to continue", redirectTo: "/auth/sing-up");
+            if (isFound is null) return HttpResult.UnAuthorized();
 
             isFound.Bio = dto.Bio;
 
@@ -92,11 +95,84 @@ public class UserController : Controller
 
             return HttpResult.Ok("successfully changed bio");
         }
-         catch (Exception e)
+        catch (Exception e)
         {
             _logger.LogError(e.Message);
             return HttpResult.InternalServerError();
         }
     }
 
+    [HttpPost("profile"), Authorized, Validation]
+    public async Task<IActionResult> Profile([FromBody] ContentDTO dto)
+    {
+        try
+        {
+            var userId = (string)(HttpContext.Items["id"])!;
+
+            var profile = await _ctx.Users
+                    .Where(u => u.Id == userId)
+                    .Include(u => u.Content)
+                    .ThenInclude(c => c.Documents)
+                    .Select(u => u.Content)
+                    .FirstOrDefaultAsync();
+
+            if (profile is null) return HttpResult.UnAuthorized();
+
+            await _data.EditContent(dto, profile, _ctx);
+
+            return HttpResult.Ok("successfully changed profile");
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.Message);
+            return HttpResult.InternalServerError();
+        }
+    }
+
+    [HttpGet("profile/{userId}")]
+    public async Task<IActionResult> GetProfile([FromRoute] string userId)
+    {
+        try
+        {
+            var content = await _ctx.Users
+                        .Where(u => u.Id == userId)
+                        .Select(u => new { markdown = u.Content.Markdown })
+                        .FirstOrDefaultAsync();
+
+            if (content is null) return HttpResult.NotFound("content not found");
+
+            return HttpResult.Ok(body: content);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.Message);
+            return HttpResult.InternalServerError();
+        }
+    }
+
+    [HttpGet("users-to-invent/{projectId}"), Authorized]
+    public async Task<IActionResult> SearchUser([FromQuery] string email, [FromRoute] string projectId)
+    {
+        try
+        {
+            var users = await _ctx.Users
+                        .Where(u => EF.Functions.ILike(u.Email, $"{email}%") && !u.MemberShips.Any(m => m.ProjectId == projectId && m.IsJoined))
+                        .OrderBy((u) => u.CreatedAt)
+                        .Select(u => new {
+                            imageUrl = Helper.StorageUrl(u.ImageName),
+                            email = u.Email,
+                            fullName = $"{u.FirstName} {u.LastName}",
+                            id = u.Id,
+                         })
+                        .Take(10)
+                        .ToListAsync();
+
+            return HttpResult.Ok(body: users);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.Message);
+            return HttpResult.InternalServerError();
+        }
+    }
 }

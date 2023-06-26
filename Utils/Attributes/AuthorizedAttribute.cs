@@ -17,7 +17,7 @@ public class AuthorizedAttribute : Attribute, IAsyncActionFilter
 
         if (!context.HttpContext.Request.Cookies.TryGetValue("auth", out var token) || String.IsNullOrEmpty(token))
         {
-            context.Result = HttpResult.UnAuthorized("you need to login to do this action");
+            context.Result = HttpResult.UnAuthorized();
             return;
         }
 
@@ -27,7 +27,7 @@ public class AuthorizedAttribute : Attribute, IAsyncActionFilter
 
             if (!data.TryGetValue("id", out var id) || String.IsNullOrEmpty(id) || id.Length != 26)
             {
-                context.Result = HttpResult.UnAuthorized("you need to login to do this action");
+                context.Result = HttpResult.UnAuthorized();
                 return;
             }
 
@@ -35,7 +35,7 @@ public class AuthorizedAttribute : Attribute, IAsyncActionFilter
         }
         catch (Exception)
         {
-            context.Result = HttpResult.UnAuthorized("you need to login to do this action");
+            context.Result = HttpResult.UnAuthorized();
             return;
         }
 

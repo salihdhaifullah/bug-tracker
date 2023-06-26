@@ -14,7 +14,7 @@ const ResetPassword = () => {
     const [isValidPassword, setIsValidPassword] = useState(false);
     const [isValidCode, setIsValidCode] = useState(false);
 
-    const [payload, call] = useFetchApi<unknown, { code: string, newPassword: string }>("POST", "auth/reset-password", []);
+    const [payload, call] = useFetchApi<any, { code: string, newPassword: string }>("POST", "auth/reset-password", []);
 
     const handelSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();

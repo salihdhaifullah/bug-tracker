@@ -13,9 +13,9 @@ const Bio = () => {
     const iconRef = useRef<null | HTMLDivElement>(null);
     const user = useUser() as IUser;
 
-    const [updateBioPayload, call] = useFetchApi<unknown, { bio: string }>("POST", "user/bio", []);
+    const [updateBioPayload, call] = useFetchApi<any, { bio: string }>("POST", "user/bio", []);
 
-    const [getBioPayload, callGetBio] = useFetchApi<{ bio: string }, unknown>("GET", `user/bio/${user.id}`, []);
+    const [getBioPayload, callGetBio] = useFetchApi<{ bio: string }>("GET", `user/bio/${user.id}`, []);
 
     useEffect(() => { callGetBio() }, [])
 
