@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>Buegee — invitation to project</title>
+    <title>Buegee — assigned ticket</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -39,6 +39,13 @@
             margin-bottom: 20px;
             color: #363636;
         }
+        .info {
+            font-size: 16px;
+            text-align: tart;
+            line-height: 1.5em;
+            margin-bottom: -8px;
+            color: #6b6a6a;
+        }
         a {
             text-decoration: none;
             text-align: center;
@@ -70,13 +77,15 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>You had been invited</h1>
+            <h1>ticket had been assigned to you</h1>
         </div>
         <div class="content">
             <p class="title">Hello, ${name}</p>
-            <p class="message">You had been invited to ${project_name} project as ${role} by ${inventer}.</p>
-            <div class="link"> <a href="${url}">Accept</a> </div>
-            <p class="message">Invitation will expiry after seven days.</p>
+            <p class="message">ticket ${ticket_name} had been assigned to you.</p>
+            <p class="title">ticket information</p>
+            <p class="info">ticket type ${ticket_type}.</p>
+            <p class="info">ticket priority ${ticket_priority}.</p>
+            <p class="info">ticket status ${ticket_status}.</p>
             <p class="end">date ${date}<br> Sincerely,<br>Buegee Team.</p>
         </div>
     </div>

@@ -7,7 +7,7 @@ namespace Buegee.Models;
 public class Content
 {
     [Key, Column("id"), StringLength(26)]
-    public string Id { get; set; } = null!;
+    public required string Id { get; set; } = null!;
 
     [Required, Column("markdown")]
     public string Markdown { get; set; } = string.Empty;

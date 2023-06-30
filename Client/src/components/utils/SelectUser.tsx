@@ -1,19 +1,28 @@
 import { useEffect, useRef, useState, KeyboardEvent } from "react";
-import { Option } from ".";
 import useOnClickOutside from "../../utils/hooks/useOnClickOutside";
 import useFetchApi from "../../utils/hooks/useFetchApi";
-import TextFiled from "../utils/TextFiled";
-import CircleProgress from "../utils/CircleProgress";
-import { useParams } from "react-router-dom";
+import TextFiled from "./TextFiled";
+import CircleProgress from "./CircleProgress";
 
 interface ISelectToInventProps {
     setId: (value: string) => void;
     id: string;
+    route: string;
+    required?: boolean;
+    label: string;
+    setIsValid: (bool: boolean) => void;
 }
 
-const SelectToInvent = (props: ISelectToInventProps) => {
+interface Option {
+    imageUrl: string
+    email: string
+    fullName: string;
+    id: string;
+}
+
+
+const SelectUser = (props: ISelectToInventProps) => {
     const [isOpen, setIsOpen] = useState(false);
-    const { projectId } = useParams();
     const [activeOption, setActiveOption] = useState(1);
     const [search, setSearch] = useState("");
 
@@ -23,9 +32,9 @@ const SelectToInvent = (props: ISelectToInventProps) => {
 
     useOnClickOutside(targetRef, () => setIsOpen(false));
 
-    const [payload, call] = useFetchApi<Option[]>("GET", `user/users-to-invent/${projectId}?email=${search}`, [search]);
+    const [payload, call] = useFetchApi<Option[]>("GET", `user/${props.route}?email=${search}`, [search]);
 
-    useEffect(() => { if (search.trim().length >= 1) call(); }, [search])
+    useEffect(() => { call(); }, [search])
 
     useEffect(() => { if (payload.result) setOptions(payload.result); }, [payload.result])
 
@@ -53,6 +62,7 @@ const SelectToInvent = (props: ISelectToInventProps) => {
         }
     }
 
+    useEffect(() => { props.setIsValid(Boolean(props.id)); }, [props.id])
 
     return (
         <div
@@ -66,9 +76,9 @@ const SelectToInvent = (props: ISelectToInventProps) => {
                     onKeyDown: handleKeyDown
                 }}
                 value={search}
-                error={props.id.length === 26 ? undefined : "please select user to invent"}
+                error={props.required ? ( props.id.length ? undefined : "please select user" ) : undefined}
                 onChange={(e) => setSearch(e.target.value)}
-                label="chose user to invent to this project"
+                label={props.label}
             />
 
             <datalist
@@ -93,4 +103,4 @@ const SelectToInvent = (props: ISelectToInventProps) => {
     )
 }
 
-export default SelectToInvent;
+export default SelectUser;

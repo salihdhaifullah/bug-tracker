@@ -37,10 +37,3 @@ export interface IProject {
     activities: IActivity[];
     members: IMember[]
 }
-
-export interface Option {
-    imageUrl: string
-    email: string
-    fullName: string;
-    id: string;
-}

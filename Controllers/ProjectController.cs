@@ -33,9 +33,7 @@ public class ProjectController : Controller
             var contentId = Ulid.NewUlid().ToString();
             var projectId = Ulid.NewUlid().ToString();
             var memberId = Ulid.NewUlid().ToString();
-            var activateId = Ulid.NewUlid().ToString();
 
-            await _ctx.Activities.AddAsync(new Activity() { ProjectId = projectId, Markdown = $"created project {dto.Name}", Id = activateId });
             await _ctx.Members.AddAsync(new Member() { UserId = userId, Id = memberId, ProjectId = projectId, Role = Role.owner });
             await _ctx.Contents.AddAsync(new Content() { Id = contentId });
             await _ctx.Projects.AddAsync(new Project()
@@ -45,6 +43,8 @@ public class ProjectController : Controller
                 Id = projectId,
                 ContentId = contentId
             });
+
+            await _data.CreateProjectActivity(projectId, dto.Name, _ctx);
 
             await _ctx.SaveChangesAsync();
 

@@ -4,19 +4,26 @@ using Buegee.Utils.Enums;
 using Buegee.Models;
 using Microsoft.EntityFrameworkCore;
 using Buegee.Services.FirebaseService;
+using Buegee.Services.DataService;
 
 namespace Buegee.Data;
 
 public class Seed
 {
     private readonly DataContext _ctx;
-    private readonly Data _data;
+    private readonly Data _dataSeed;
     private readonly ICryptoService _crypto;
     private readonly HttpClient _client;
     private readonly IFirebaseService _firebase;
+    private readonly IDataService _data;
 
-    public Seed(DataContext ctx, ICryptoService crypto, IFirebaseService firebase)
+    public Seed(IServiceScope scope)
     {
+        var ctx = scope.ServiceProvider.GetRequiredService<DataContext>();
+        var data = scope.ServiceProvider.GetRequiredService<IDataService>();
+        var crypto = scope.ServiceProvider.GetRequiredService<ICryptoService>();
+        var firebase = scope.ServiceProvider.GetRequiredService<IFirebaseService>();
+
         Console.WriteLine("\n ************************************************************** \n");
         Console.WriteLine("************************************************************** \n");
         Console.WriteLine("************************************************************** \n");
@@ -28,14 +35,14 @@ public class Seed
         _ctx = ctx;
         _crypto = crypto;
         _firebase = firebase;
+        _data = data;
 
         var json = File.ReadAllText("data.json");
         if (json is null) throw new Exception("data.json is not found");
 
         var isData = JsonSerializer.Deserialize<Data>(json);
 
-        if (isData is not null) _data = isData;
-        else _data = new Data(new List<userSeed>(), new List<projectSeed>());
+        _dataSeed = (isData is not null ? isData : new Data(new List<userSeed>(), new List<projectSeed>()));
 
         _client = new HttpClient();
     }
@@ -46,14 +53,14 @@ public class Seed
         await seedProjectsAsync();
     }
 
-    private record member(string Role, string Email);
+    private record memberSeed(string Role, string Email);
     private record userSeed(string FirstName, string LastName, string Email, string? Image);
-    private record projectSeed(string Name, string Content, bool IsPrivate, List<member> Members);
+    private record projectSeed(string Name, string Content, bool IsPrivate, List<memberSeed> Members);
     private record Data(List<userSeed> Users, List<projectSeed> Projects);
 
     private async Task seedUsersAsync()
     {
-        foreach (var item in _data.Users)
+        foreach (var item in _dataSeed.Users)
         {
             var isFound = await _ctx.Users.AnyAsync(u => u.Email == item.Email);
 
@@ -95,13 +102,12 @@ public class Seed
 
     private async Task seedProjectsAsync()
     {
-        foreach (var item in _data.Projects)
+        foreach (var item in _dataSeed.Projects)
         {
             var contentId = Ulid.NewUlid().ToString();
             var projectId = Ulid.NewUlid().ToString();
-            var activateId = Ulid.NewUlid().ToString();
 
-            await _ctx.Activities.AddAsync(new Activity() { ProjectId = projectId, Markdown = $"created project {item.Name}", Id = activateId });
+            await _data.CreateProjectActivity(projectId, item.Name, _ctx);
             await _ctx.Contents.AddAsync(new Content() { Id = contentId, Markdown = item.Content });
             await _ctx.Projects.AddAsync(new Project()
             {

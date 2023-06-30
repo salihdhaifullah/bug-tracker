@@ -9,10 +9,10 @@ namespace Buegee.Models;
 public class Project
 {
     [Key, Column("id"), StringLength(26)]
-    public string Id { get; set; } = null!;
+    public required string Id { get; set; } = null!;
 
     [Required, StringLength(100), Column("name")]
-    public string Name { get; set; } = null!;
+    public required string Name { get; set; } = null!;
 
     [Required, Column("created_at")]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
@@ -21,7 +21,7 @@ public class Project
     public bool IsPrivate { get; set; } = false;
 
     [Required, ForeignKey("Content"), Column("content_id"), StringLength(26)]
-    public string ContentId { get; set; } = null!;
+    public required string ContentId { get; set; } = null!;
     public Content Content { get; set; } = null!;
 
     [Column("activities")]

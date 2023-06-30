@@ -7,41 +7,64 @@ using Buegee.Models;
 
 namespace Buegee.Services.DataService;
 
-public class DataService : IDataService {
+public class DataService : IDataService
+{
     private readonly IFirebaseService _firebase;
 
-    public DataService(IFirebaseService firebase) {
+    public DataService(IFirebaseService firebase)
+    {
         _firebase = firebase;
     }
 
-    public async Task EditContent(ContentDTO dto, Content content, DataContext ctx) {
+    public async Task EditContent(ContentDTO dto, Content content, DataContext ctx)
+    {
 
-            for (var i = 0; i < content.Documents.Count; i++)
+        for (var i = 0; i < content.Documents.Count; i++)
+        {
+            var document = content.Documents[i];
+
+            if (!dto.Markdown.Contains(document.Name))
             {
-                var document = content.Documents[i];
-
-                if (!dto.Markdown.Contains(document.Name))
-                {
-                    await _firebase.Delete(document.Name);
-                    ctx.Documents.Remove(document);
-                }
+                await _firebase.Delete(document.Name);
+                ctx.Documents.Remove(document);
             }
+        }
 
-            for (var i = 0; i < dto.Files.Count; i++)
+        for (var i = 0; i < dto.Files.Count; i++)
+        {
+            var file = dto.Files[i];
+
+            if (dto.Markdown.Contains(file.PreviewUrl))
             {
-                var file = dto.Files[i];
-
-                if (dto.Markdown.Contains(file.PreviewUrl))
-                {
-                    var imageName = await _firebase.Upload(Convert.FromBase64String(file.Base64), ContentType.webp);
-                    var document = await ctx.Documents.AddAsync(new Document() { Name = imageName, Id = Ulid.NewUlid().ToString() });
-                    content.Documents.Add(document.Entity);
-                    dto.Markdown = dto.Markdown.Replace(file.PreviewUrl, Helper.StorageUrl(imageName));
-                }
+                var imageName = await _firebase.Upload(Convert.FromBase64String(file.Base64), ContentType.webp);
+                var document = await ctx.Documents.AddAsync(new Document() { Name = imageName, Id = Ulid.NewUlid().ToString(), ContentId = content.Id });
+                dto.Markdown = dto.Markdown.Replace(file.PreviewUrl, Helper.StorageUrl(imageName));
             }
+        }
 
-            content.Markdown = dto.Markdown;
+        content.Markdown = dto.Markdown;
 
-            await ctx.SaveChangesAsync();
+        await ctx.SaveChangesAsync();
+    }
+
+    private async Task addActivity(string projectId, string markdown, DataContext ctx)
+    {
+        var activityId = Ulid.NewUlid().ToString();
+        var activity = new Activity() { Id = activityId, ProjectId = projectId, Markdown = markdown };
+        await ctx.Activities.AddAsync(activity);
+    }
+
+    public Task JoinProjectActivity(string projectId, string userName, DataContext ctx) {
+        return addActivity(projectId, $"user {userName} joined the project", ctx);
+    }
+
+    public Task CreateProjectActivity(string projectId, string projectName, DataContext ctx) {
+        return addActivity(projectId, $"created project {projectName}", ctx);
+    }
+
+    public Task CreateTicketActivity(string projectId, string ticketName, TicketType type, Status status, string? assignedToName, Priority Priority,  DataContext ctx) {
+       var assignedToText = assignedToName is not null ? $" assigned to {assignedToName}" : "";
+
+        return addActivity(projectId, $"created ticket {ticketName} of type {type.ToString()}{assignedToText}, status is {status.ToString()} and priority is {Priority.ToString()}", ctx);
     }
 }

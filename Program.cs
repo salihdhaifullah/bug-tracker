@@ -23,15 +23,7 @@ builder.Services.AddSingleton<IDataService, DataService>();
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment() && args.Contains("seed"))
-{
-    using (var scope = app.Services.CreateScope())
-    {
-        var dataContext = scope.ServiceProvider.GetRequiredService<DataContext>();
-        var cryptoService = scope.ServiceProvider.GetRequiredService<ICryptoService>();
-        var firebaseService = scope.ServiceProvider.GetRequiredService<IFirebaseService>();
-        await new Seed(dataContext, cryptoService, firebaseService).SeedAsync();
-    }
-}
+using (var scope = app.Services.CreateScope()) await new Seed(scope).SeedAsync();
 
 app.UseRouting();
 #pragma warning disable ASP0014

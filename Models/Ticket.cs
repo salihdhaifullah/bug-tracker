@@ -13,10 +13,10 @@ namespace Buegee.Models;
 public class Ticket
 {
     [Key, Column("id"), StringLength(26)]
-    public string Id { get; set; } = null!;
+    public required string Id { get; set; } = null!;
 
     [Required, Column("name"), StringLength(100)]
-    public string Name { get; set; } = null!;
+    public required string Name { get; set; } = null!;
 
     [Required, Column("type"), EnumDataType(typeof(TicketType))]
     public TicketType Type { get; set; } = TicketType.bug;
@@ -31,15 +31,15 @@ public class Ticket
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     [Required, ForeignKey("Project"), Column("project_id"), StringLength(26)]
-    public string ProjectId { get; set; } = null!;
+    public required string ProjectId { get; set; } = null!;
     public Project Project { get; set; } = null!;
 
     [Required, ForeignKey("Creator"), Column("creator_id"), StringLength(26)]
-    public string CreatorId { get; set; } = null!;
+    public required string CreatorId { get; set; } = null!;
     public User Creator { get; set; } = null!;
 
     [Required, ForeignKey("Content"), Column("content_id"), StringLength(26)]
-    public string ContentId { get; set; } = null!;
+    public required string ContentId { get; set; } = null!;
     public Content Content { get; set; } = null!;
 
     [ForeignKey("AssignedTo"), Column("assigned_to_id"), StringLength(26)]

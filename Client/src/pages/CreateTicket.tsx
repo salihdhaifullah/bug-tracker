@@ -4,6 +4,7 @@ import TextFiled from "../components/utils/TextFiled"
 import useFetchApi from "../utils/hooks/useFetchApi";
 import Button from "../components/utils/Button";
 import Select from "../components/utils/Select";
+import SelectUser from "../components/utils/SelectUser";
 
 const typeOptions = ["bug", "feature"];
 const priorityOptions = ["low", "medium", "high", "critical"];
@@ -14,18 +15,21 @@ const CreateTicket = () => {
   const [type, setType] = useState(typeOptions[0]);
   const [priority, setPriority] = useState(priorityOptions[1]);
   const [status, setStatus] = useState(statusOptions[0]);
-  const [assignedToEmail, setAssignedToEmail] = useState("");
+  const [memberId, setMemberId] = useState("");
 
   const { projectId } = useParams()
 
   const [isValidName, setIsValidName] = useState(false);
-  const [isValidAssignedToEmail, setIsValidAssignedToEmail] = useState(true);
+  const [isValidType, setIsValidType] = useState(true);
+  const [isValidPriority, setIsValidPriority] = useState(true);
+  const [isValidStatus, setIsValidStatus] = useState(true);
+  const [isValidMemberId, setIsValidMemberId] = useState(true);
 
-  const [payload, call] = useFetchApi<unknown, { name: string, type: string, priority: string, status: string, assignedToEmail?: string }>("POST", `ticket/${projectId}`, []);
+  const [payload, call] = useFetchApi<unknown, { name: string, type: string, priority: string, status: string, memberId?: string }>("POST", `ticket/${projectId}`, []);
 
   const handelSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    call({ name, type, priority, status, assignedToEmail: !assignedToEmail.length ? undefined : assignedToEmail })
+    call({ name, type, priority, status, memberId: !memberId.length ? undefined : memberId })
   }
 
 
@@ -51,6 +55,10 @@ const CreateTicket = () => {
           <Select
             value={type}
             options={typeOptions}
+            validation={[
+              { validate: (str: string) => typeOptions.includes(str), massage: "un-valid ticket type" }
+            ]}
+            setIsValid={setIsValidType}
             setValue={setType}
             label="ticket type"
           />
@@ -58,34 +66,32 @@ const CreateTicket = () => {
           <Select
             value={priority}
             options={priorityOptions}
+            validation={[
+              { validate: (str: string) => priorityOptions.includes(str), massage: "un-valid ticket priority" }
+            ]}
             setValue={setPriority}
+            setIsValid={setIsValidPriority}
             label="ticket priority"
           />
 
           <Select
             value={status}
             options={statusOptions}
+            validation={[
+              { validate: (str: string) => statusOptions.includes(str), massage: "un-valid ticket status" }
+            ]}
             setValue={setStatus}
+            setIsValid={setIsValidStatus}
             label="ticket status"
           />
 
-          <TextFiled
-            validation={[
-              { validate: (str: string) => (!str.length) || /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(str), massage: "un-valid email address" },
-              { validate: (str: string) => (!str.length) || str.length <= 100, massage: "max length of email address is 100 character" }
-            ]}
-            value={assignedToEmail}
-            onChange={(e) => setAssignedToEmail(e.target.value)}
-            label="ticket assigned to email"
-            setIsValid={setIsValidAssignedToEmail}
-          />
-
+          <SelectUser setIsValid={setIsValidMemberId} label="chose user to assign this ticket to" route={`members/${projectId}`} setId={setMemberId} id={memberId} />
 
           <div className="flex flex-col justify-center items-center w-full my-1">
             <Button
               buttonProps={{ type: "submit" }}
               isLoading={payload.isLoading}
-              isValid={isValidName && isValidAssignedToEmail}
+              isValid={isValidName && isValidType && isValidStatus && isValidPriority && isValidMemberId}
             >submit</Button>
           </div>
 

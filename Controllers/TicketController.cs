@@ -2,6 +2,7 @@ using Buegee.Data;
 using Buegee.DTO;
 using Buegee.Models;
 using Buegee.Services.DataService;
+using Buegee.Services.EmailService;
 using Buegee.Utils;
 using Buegee.Utils.Attributes;
 using Buegee.Utils.Enums;
@@ -14,13 +15,27 @@ public class TicketController : Controller
 {
     private readonly DataContext _ctx;
     private readonly IDataService _data;
+    private readonly IEmailService _email;
     private readonly ILogger<TicketController> _logger;
 
-    public TicketController(DataContext ctx, ILogger<TicketController> logger, IDataService data)
+    public TicketController(DataContext ctx, ILogger<TicketController> logger, IEmailService email, IDataService data)
     {
         _ctx = ctx;
         _logger = logger;
         _data = data;
+        _email = email;
+    }
+
+    record AssignedTo(string email, string name);
+
+    private async Task<AssignedTo?> getAssignedTo(string email)
+    {
+        var assignedTo = await _ctx.Members
+                    .Where(m => m.User.Email == email)
+                    .Select(m => new AssignedTo(m.User.Email, $"{m.User.FirstName} {m.User.LastName}"))
+                    .FirstOrDefaultAsync();
+
+        return assignedTo;
     }
 
     [HttpPost("{projectId}"), Validation, Authorized]
@@ -30,8 +45,24 @@ public class TicketController : Controller
         {
             var userId = (string)(HttpContext.Items["id"])!;
 
+            AssignedTo? assignedTo = null;
+
+            if (dto.MemberId is not null)
+            {
+                assignedTo = await getAssignedTo(dto.MemberId);
+                if (assignedTo is null) return HttpResult.NotFound("user is not found to assignee ticket to");
+            }
+
+            if (!await _ctx.Members.AnyAsync(m => m.ProjectId == projectId && m.UserId == userId
+            && (m.Role == Role.project_manger || m.Role == Role.owner)))
+                return HttpResult.Forbidden("you are not authorized to create a ticket in this project");
+
             var contentId = Ulid.NewUlid().ToString();
             var ticketId = Ulid.NewUlid().ToString();
+
+            var ticketType = Enum.Parse<TicketType>(dto.Type);
+            var ticketStatus = Enum.Parse<Status>(dto.Status);
+            var ticketPriority = Enum.Parse<Priority>(dto.Priority);
 
             var content = await _ctx.Contents.AddAsync(new Content() { Id = contentId });
             var ticket = await _ctx.Tickets.AddAsync(new Ticket()
@@ -40,20 +71,18 @@ public class TicketController : Controller
                 CreatorId = userId,
                 ProjectId = projectId,
                 ContentId = contentId,
-                Type = Enum.Parse<TicketType>(dto.Type),
-                Status = Enum.Parse<Status>(dto.Status),
-                Priority = Enum.Parse<Priority>(dto.Priority),
-                Id = ticketId
+                Type = ticketType,
+                Status = ticketStatus,
+                Priority = ticketPriority,
+                Id = ticketId,
+                AssignedToId = dto.MemberId
             });
 
-            if (dto.AssignedToEmail is not null)
-            {
-                var isFound = await _ctx.Members.Where(m => m.User.Email == dto.AssignedToEmail).Select(m => new { Id = m.Id }).FirstOrDefaultAsync();
-                if (isFound is null) return HttpResult.NotFound("user is not found to assignee ticket to");
-                ticket.Entity.AssignedToId = isFound.Id;
-            }
+            await _data.CreateTicketActivity(projectId, dto.Name, ticketType, ticketStatus, assignedTo?.name, ticketPriority, _ctx);
 
             await _ctx.SaveChangesAsync();
+
+            if (assignedTo is not null) await _email.TicketAssignation(assignedTo.email, assignedTo.name, dto.Name, ticketType, ticketStatus, ticketPriority);
 
             return HttpResult.Ok($"Ticket {dto.Name} successfully created", redirectTo: $"/project/{projectId}");
         }

@@ -12,7 +12,7 @@ interface ISelectProps {
     validation?: IValidate[]
     icon?: IconType
 }
- // validation for my custom select
+ // validation for custom select
 const Select = (props: ISelectProps) => {
     const [isOpen, setIsOpen] = useState(false);
     const [activeOption, setActiveOption] = useState(1);
@@ -48,7 +48,7 @@ const Select = (props: ISelectProps) => {
     }, [search])
 
     useEffect(() => {
-        document.getElementById(`option-${activeOption}`)?.scrollTo({ behavior: "smooth" });
+        document.getElementById(`option-${activeOption - 1}`)?.scrollIntoView({ behavior: "smooth" });
     }, [activeOption])
 
     const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {

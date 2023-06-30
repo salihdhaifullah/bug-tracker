@@ -102,7 +102,7 @@ public class UserController : Controller
         }
     }
 
-    [HttpPost("profile"), Authorized, Validation]
+    [HttpPost("profile/{userId}"), Authorized, Validation]
     public async Task<IActionResult> Profile([FromBody] ContentDTO dto)
     {
         try
@@ -150,20 +150,47 @@ public class UserController : Controller
         }
     }
 
-    [HttpGet("users-to-invent/{projectId}"), Authorized]
-    public async Task<IActionResult> SearchUser([FromQuery] string email, [FromRoute] string projectId)
+    [HttpGet("profile-page/{userId}")]
+    public async Task<IActionResult> GetProfilePage([FromRoute] string userId)
+    {
+        try
+        {
+            var userProfile = await _ctx.Users
+                        .Where(u => u.Id == userId)
+                        .Select(u => new
+                        {
+                            bio = u.Bio,
+                            fullName = $"{u.FirstName} {u.LastName}",
+                            imageUrl = Helper.StorageUrl(u.ImageName),
+                        })
+                        .FirstOrDefaultAsync();
+
+            if (userProfile is null) return HttpResult.NotFound("page not found");
+
+            return HttpResult.Ok(body: userProfile);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.Message);
+            return HttpResult.InternalServerError();
+        }
+    }
+
+    private async Task<IActionResult> searchUser(string email, string projectId, bool isMembers)
     {
         try
         {
             var users = await _ctx.Users
-                        .Where(u => EF.Functions.ILike(u.Email, $"{email}%") && !u.MemberShips.Any(m => m.ProjectId == projectId && m.IsJoined))
+                        .Where(u => EF.Functions.ILike(u.Email, $"{email}%")
+                        && isMembers == u.MemberShips.Any(m => m.ProjectId == projectId && m.IsJoined))
                         .OrderBy((u) => u.CreatedAt)
-                        .Select(u => new {
+                        .Select(u => new
+                        {
                             imageUrl = Helper.StorageUrl(u.ImageName),
                             email = u.Email,
                             fullName = $"{u.FirstName} {u.LastName}",
                             id = u.Id,
-                         })
+                        })
                         .Take(10)
                         .ToListAsync();
 
@@ -174,5 +201,17 @@ public class UserController : Controller
             _logger.LogError(e.Message);
             return HttpResult.InternalServerError();
         }
+    }
+
+    [HttpGet("not-members/{projectId}"), Authorized]
+    public async Task<IActionResult> SearchNotMembers([FromQuery] string email, [FromRoute] string projectId)
+    {
+        return await searchUser(email, projectId, false);
+    }
+
+    [HttpGet("members/{projectId}"), Authorized]
+    public async Task<IActionResult> SearchMember([FromQuery] string email, [FromRoute] string projectId)
+    {
+        return await searchUser(email, projectId, true);
     }
 }

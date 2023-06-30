@@ -7,19 +7,13 @@ const JoinProject = () => {
     const { sessionId } = useParams();
     const navigate = useNavigate();
 
-    useEffect(() => {
-        if (!sessionId) navigate("/");
-    }, []);
+    useEffect(() => { if (!sessionId) navigate("/"); }, []);
 
     const [_, call] = useFetchApi("GET", `member/${sessionId}`);
 
     useEffect(() => { call() }, [])
 
-    return (
-        <div className='flex flex-col justify-center items-center h-full min-h-[80vh] w-full'>
-            <CircleProgress size='lg' />
-        </div>
-    )
+    return <CircleProgress size='lg' />
 }
 
-export default JoinProject
+export default JoinProject;

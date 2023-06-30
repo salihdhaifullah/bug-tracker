@@ -10,32 +10,32 @@ namespace Buegee.Models;
 public class User
 {
     [Key, Column("id"), StringLength(26)]
-    public string Id { get; set; } = null!;
+    public required string Id { get; set; } = null!;
 
     [Required, Column("email"), StringLength(100), EmailAddress]
-    public string Email { get; set; } = null!;
+    public required string Email { get; set; } = null!;
 
     [Required, Column("first_name"), StringLength(50)]
-    public string FirstName { get; set; } = null!;
+    public required string FirstName { get; set; } = null!;
 
     [Required, Column("last_name"), StringLength(50)]
-    public string LastName { get; set; } = null!;
+    public required string LastName { get; set; } = null!;
 
     [Required, Column("password_hash")]
-    public byte[] PasswordHash { get; set; } = null!;
+    public required byte[] PasswordHash { get; set; } = null!;
 
     [Required, Column("password_salt")]
-    public byte[] PasswordSalt { get; set; } = null!;
+    public required byte[] PasswordSalt { get; set; } = null!;
 
     [Required, Column("created_at")]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     [Required, ForeignKey("Content"), Column("content_id"), StringLength(26)]
-    public string ContentId { get; set; } = null!;
+    public required string ContentId { get; set; } = null!;
     public Content Content { get; set; } = null!;
 
     [Required, Column("image_name")]
-    public string ImageName { get; set; } = null!;
+    public required string ImageName { get; set; } = null!;
 
     [Column("bio"), StringLength(100)]
     public string Bio { get; set; } = string.Empty;

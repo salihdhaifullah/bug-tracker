@@ -23,6 +23,6 @@ public class CreateTicketDTO {
     [RegularExpression(@"^(review|active|in_progress|resolved|closed)$", ErrorMessage = "un-valid ticket status")]
     public string Status { get; set; } = null!;
 
-    [JsonPropertyName("assignedToEmail"), EmailAddress(ErrorMessage = "un-valid email address"), StringLength(26)]
-    public string? AssignedToEmail {get; set;}
+    [JsonPropertyName("memberId"), EmailAddress(ErrorMessage = "un-valid email address"), StringLength(26)]
+    public string? MemberId {get; set;}
 }

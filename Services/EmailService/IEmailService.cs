@@ -7,4 +7,5 @@ public interface IEmailService
     public Task Verification(string to, string name, string code);
     public Task ResetPassword(string to, string name, string code);
     public Task Invitation(string to, string name, string projectName, Role role, string inventerName, string url);
+    public Task TicketAssignation(string to, string name, string ticketName, TicketType ticketType, Status ticketStatus, Priority ticketPriority);
 }

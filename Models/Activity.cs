@@ -7,15 +7,15 @@ namespace Buegee.Models;
 public class Activity
 {
     [Key, Column("id"), StringLength(26)]
-    public string Id { get; set; } = null!;
+    public required string Id { get; set; } = null!;
 
     [Required, Column("created_at")]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     [Required, ForeignKey("Project"), Column("project_id"), StringLength(26)]
-    public string ProjectId { get; set; } = null!;
+    public required string ProjectId { get; set; } = null!;
     public Project Project { get; set; } = null!;
 
     [Required, Column("markdown")]
-    public string Markdown { get; set; } = null!;
+    public required string Markdown { get; set; } = null!;
 }

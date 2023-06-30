@@ -1,9 +1,6 @@
 import { ChangeEventHandler, ForwardedRef, HTMLProps, ReactNode, forwardRef, useEffect, useId, useState } from "react";
 import { IconType } from "react-icons";
 
-
-
-
 export interface IValidate {
     validate: (str: string) => boolean;
     massage: string

@@ -10,14 +10,14 @@ namespace Buegee.Models;
 public class Member
 {
     [Key, Column("id"), StringLength(26)]
-    public string Id { get; set; } = null!;
+    public required string Id { get; set; } = null!;
 
     [Required, ForeignKey("User"), Column("user_id"), StringLength(26)]
-    public string UserId { get; set; } = null!;
+    public required string UserId { get; set; } = null!;
     public User User { get; set; } = null!;
 
     [Required, ForeignKey("Project"), Column("project_id"), StringLength(26)]
-    public string ProjectId { get; set; } = null!;
+    public required string ProjectId { get; set; } = null!;
     public Project Project { get; set; } = null!;
 
     [Column("assigned_to")]

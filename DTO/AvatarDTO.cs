@@ -12,8 +12,6 @@ public class AvatarDTO
 
     // base64
     [JsonPropertyName("data")]                     // 2mb in binary and 2.7mb in base64
-    [Required(ErrorMessage = "image is required"), MaxLength(2796202, ErrorMessage = "sorry, maximum size of profile image is 2.7 MB")]
+    [Required(ErrorMessage = "image is required"), MaxLength(2796202, ErrorMessage = "sorry, maximum size of profile image is 2.0 MB")]
     public string Data { get; set; } = null!;
 }
-
-

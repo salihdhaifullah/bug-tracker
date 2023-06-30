@@ -1,9 +1,9 @@
 import { Link, useParams } from "react-router-dom"
-import { useEffect } from "react";
+import { useLayoutEffect } from "react";
 import useFetchApi from "../utils/hooks/useFetchApi";
 import formatDate from "../utils/formatDate";
 import CircleProgress from "../components/utils/CircleProgress";
-import Content from "../components/profile/Content";
+import Content from "../components/utils/Content";
 import Button from "../components/utils/Button";
 import { useUser } from "../utils/context/user";
 import { IProject } from "../components/project";
@@ -16,11 +16,11 @@ const Project = () => {
   const { projectId } = useParams();
   const [projectPayload, callProjects] = useFetchApi<IProject>("GET", `project/${projectId}`, []);
 
-  useEffect(() => { callProjects() }, [])
+  useLayoutEffect(() => { callProjects() }, [])
 
   const user = useUser();
 
-  const isAllowedToEdit = () => {
+  const isEditable = () => {
     if (!projectPayload.result) return false;
 
     let isAllowed = false;
@@ -43,7 +43,7 @@ const Project = () => {
 
         <h1 className="text-2xl font-bold">{projectPayload.result.name}</h1>
 
-        <Content isAllowedToEdit={isAllowedToEdit()} getUrl={`project/content/${projectId}`} postUrl={`project/content/${projectId}`} />
+        <Content editable={isEditable()} url={`project/content/${projectId}`} />
 
         <div className="flex flex-col gap-2 justify-center items-start">
           <p className="text-sm text-gray-600">owner: </p>

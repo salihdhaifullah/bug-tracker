@@ -2,6 +2,7 @@ using System.Text.Json;
 using Buegee.Data;
 using Buegee.DTO;
 using Buegee.Models;
+using Buegee.Services.DataService;
 using Buegee.Services.EmailService;
 using Buegee.Services.JWTService;
 using Buegee.Services.RedisCacheService;
@@ -22,14 +23,16 @@ public class MemberController : Controller
     private readonly IJWTService _jwt;
     private readonly ILogger<MemberController> _logger;
     private readonly IRedisCacheService _cache;
+    private readonly IDataService _data;
 
-    public MemberController(DataContext ctx, ILogger<MemberController> logger, IEmailService email, IJWTService jwt, IRedisCacheService cache)
+    public MemberController(DataContext ctx, ILogger<MemberController> logger, IEmailService email, IJWTService jwt, IDataService data, IRedisCacheService cache)
     {
         _ctx = ctx;
         _logger = logger;
         _email = email;
         _jwt = jwt;
         _cache = cache;
+        _data = data;
     }
 
     private record Invention(string projectId, string userId, string userFullName);
@@ -110,9 +113,7 @@ public class MemberController : Controller
             member.IsJoined = true;
             member.JoinedAt = DateTime.UtcNow;
 
-            var activateId = Ulid.NewUlid().ToString();
-
-            await _ctx.Activities.AddAsync(new Activity() { ProjectId = data.projectId, Id = activateId, Markdown = $"user {data.userFullName} joined the project" });
+            await _data.JoinProjectActivity(data.projectId, data.userFullName, _ctx);
 
             await _ctx.SaveChangesAsync();
 

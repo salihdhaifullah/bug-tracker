@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useState } from "react"
+import { Fragment, useLayoutEffect, useState } from "react"
 import useFetchApi from "../utils/hooks/useFetchApi"
 import CircleProgress from "../components/utils/CircleProgress"
 import { Link } from "react-router-dom";
@@ -24,8 +24,8 @@ const Projects = () => {
   const [projectsPayload, callProjects] = useFetchApi<IProject[]>("GET", `project/projects/${page}/?take=${take}`, [page, take]);
   const [PagesCountPayload, callPagesCount] = useFetchApi<number>("GET", `project/count/?take=${take}`, [take]);
 
-  useEffect(() => { callProjects() }, [page, take])
-  useEffect(() => { callPagesCount() }, [take])
+  useLayoutEffect(() => { callProjects() }, [page, take])
+  useLayoutEffect(() => { callPagesCount() }, [take])
 
   return (
     <section className="flex flex-col w-full h-full my-10 p-2 flex-grow">
