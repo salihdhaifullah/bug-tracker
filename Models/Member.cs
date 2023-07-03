@@ -20,7 +20,7 @@ public class Member
     public required string ProjectId { get; set; } = null!;
     public Project Project { get; set; } = null!;
 
-    [Column("assigned_to")]
+    [InverseProperty("AssignedTo"), Column("assigned_to")]
     public List<Ticket> AssignedTo { get; set; } = new List<Ticket>();
 
     [Column("joined_at")]

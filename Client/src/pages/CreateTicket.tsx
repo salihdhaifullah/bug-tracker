@@ -23,7 +23,6 @@ const CreateTicket = () => {
   const [isValidType, setIsValidType] = useState(true);
   const [isValidPriority, setIsValidPriority] = useState(true);
   const [isValidStatus, setIsValidStatus] = useState(true);
-  const [isValidMemberId, setIsValidMemberId] = useState(true);
 
   const [payload, call] = useFetchApi<unknown, { name: string, type: string, priority: string, status: string, memberId?: string }>("POST", `ticket/${projectId}`, []);
 
@@ -31,7 +30,6 @@ const CreateTicket = () => {
     e.preventDefault();
     call({ name, type, priority, status, memberId: !memberId.length ? undefined : memberId })
   }
-
 
   return (
     <section className="flex flex-col  justify-center items-center flex-grow">
@@ -85,13 +83,13 @@ const CreateTicket = () => {
             label="ticket status"
           />
 
-          <SelectUser setIsValid={setIsValidMemberId} label="chose user to assign this ticket to" route={`members/${projectId}`} setId={setMemberId} id={memberId} />
+          <SelectUser label="chose user to assign this ticket to" route={`members/${projectId}`} setId={setMemberId} id={memberId} />
 
           <div className="flex flex-col justify-center items-center w-full my-1">
             <Button
               buttonProps={{ type: "submit" }}
               isLoading={payload.isLoading}
-              isValid={isValidName && isValidType && isValidStatus && isValidPriority && isValidMemberId}
+              isValid={isValidName && isValidType && isValidStatus && isValidPriority}
             >submit</Button>
           </div>
 

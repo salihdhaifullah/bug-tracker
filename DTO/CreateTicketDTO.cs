@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
+using Buegee.Utils.Attributes;
 
 namespace Buegee.DTO;
 
@@ -23,6 +24,6 @@ public class CreateTicketDTO {
     [RegularExpression(@"^(review|active|in_progress|resolved|closed)$", ErrorMessage = "un-valid ticket status")]
     public string Status { get; set; } = null!;
 
-    [JsonPropertyName("memberId"), EmailAddress(ErrorMessage = "un-valid email address"), StringLength(26)]
+    [JsonPropertyName("memberId"), IdValidation(ErrorMessage = "un-valid user id")]
     public string? MemberId {get; set;}
 }

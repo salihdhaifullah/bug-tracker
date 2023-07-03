@@ -37,7 +37,7 @@ public class MemberController : Controller
 
     private record Invention(string projectId, string userId, string userFullName);
 
-    [HttpPost("invent/{projectId}"), Validation, Authorized]
+    [HttpPost("invent/{projectId}"), BodyValidation, Authorized]
     public async Task<IActionResult> Invent([FromBody] InventDTO dto, [FromRoute] string projectId)
     {
         try
@@ -46,13 +46,13 @@ public class MemberController : Controller
 
             var user = await _ctx.Users
                     .Where(u => u.Id == dto.InventedId)
-                    .Select(u => new { fullName = $"{u.FirstName} {u.LastName}", email = u.Email })
+                    .Select(u => new { name = $"{u.FirstName} {u.LastName}", email = u.Email })
                     .FirstOrDefaultAsync();
 
             if (user is null) return HttpResult.BadRequest("user to invent is not exist");
 
             var inventer = await _ctx.Users.Where(u => u.Id == userId)
-                            .Select(u => new { fullName = $"{u.FirstName} {u.LastName}" })
+                            .Select(u => new { name = $"{u.FirstName} {u.LastName}" })
                             .FirstOrDefaultAsync();
 
             if (inventer is null) return HttpResult.UnAuthorized();
@@ -78,11 +78,11 @@ public class MemberController : Controller
 
             var sessionId = Guid.NewGuid().ToString();
 
-            await _cache.Redis.StringSetAsync(sessionId, JsonSerializer.Serialize<Invention>(new Invention(projectId, dto.InventedId, user.fullName)), age);
+            await _cache.Redis.StringSetAsync(sessionId, JsonSerializer.Serialize<Invention>(new Invention(projectId, dto.InventedId, user.name)), age);
 
-            await _email.Invitation(user.email, user.fullName, project.name, role, inventer.fullName, $"{Helper.BaseUrl(Request)}/join-project/{sessionId}");
+            _email.Invitation(user.email, user.name, project.name, role, inventer.name, $"{Helper.BaseUrl(Request)}/join-project/{sessionId}");
 
-            return HttpResult.Ok($"successfully invented user {user.fullName}");
+            return HttpResult.Ok($"successfully invented user {user.name}");
         }
         catch (Exception e)
         {
@@ -128,5 +128,83 @@ public class MemberController : Controller
         }
     }
 
+    [HttpGet("not-members/{projectId}"), Authorized]
+    public async Task<IActionResult> SearchNotMembers([FromQuery] string email, [FromRoute] string projectId)
+    {
+        try
+        {
+            var users = await _ctx.Users.Where(u => EF.Functions.ILike(u.Email, $"{email}%") && !u.MemberShips.Any(m => m.ProjectId == projectId && m.IsJoined))
+                            .OrderBy((u) => u.CreatedAt)
+                            .Select(u => new
+                            {
+                                imageUrl = Helper.StorageUrl(u.ImageName),
+                                email = u.Email,
+                                name = $"{u.FirstName} {u.LastName}",
+                                id = u.Id,
+                            })
+                            .Take(10)
+                            .ToListAsync();
 
+            return HttpResult.Ok(body: users);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.Message);
+            return HttpResult.InternalServerError();
+        }
+    }
+
+    [HttpGet("members/{projectId}"), Authorized]
+    public async Task<IActionResult> SearchMember([FromQuery] string email, [FromRoute] string projectId)
+    {
+        try
+        {
+            var members = await _ctx.Members.Where(m => EF.Functions.ILike(m.User.Email, $"{email}%") && m.ProjectId == projectId && m.IsJoined)
+                    .OrderBy((u) => u.JoinedAt)
+                    .Select(u => new
+                    {
+                        imageUrl = Helper.StorageUrl(u.User.ImageName),
+                        email = u.User.Email,
+                        name = $"{u.User.FirstName} {u.User.LastName}",
+                        id = u.Id,
+                    })
+                    .Take(10)
+                    .ToListAsync();
+
+            return HttpResult.Ok(body: members);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.Message);
+            return HttpResult.InternalServerError();
+        }
+    }
+
+    [HttpGet("members-table/{projectId}"), Authorized]
+    public async Task<IActionResult> MembersTable([FromRoute] string projectId)
+    {
+        try
+        {
+            var members = await _ctx.Members.Where(m => m.ProjectId == projectId && m.IsJoined)
+                    .OrderBy((m) => m.JoinedAt)
+                    .Select(m => new
+                    {
+                        imageUrl = Helper.StorageUrl(m.User.ImageName),
+                        email = m.User.Email,
+                        name = $"{m.User.FirstName} {m.User.LastName}",
+                        role = m.Role,
+                        joinedAt = m.JoinedAt,
+                        id = m.User.Id,
+                    })
+                    .Take(10)
+                    .ToListAsync();
+
+            return HttpResult.Ok(body: members);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.Message);
+            return HttpResult.InternalServerError();
+        }
+    }
 }

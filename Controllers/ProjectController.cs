@@ -23,7 +23,7 @@ public class ProjectController : Controller
         _data = data;
     }
 
-    [HttpPost, Validation, Authorized]
+    [HttpPost, BodyValidation, Authorized]
     public async Task<IActionResult> CreateProject([FromBody] CreateProjectDTO dto)
     {
         try
@@ -102,55 +102,15 @@ public class ProjectController : Controller
                             {
                                 name = p.Name,
                                 id = p.Id,
-                                activities = p.Activities.Select(a => new
-                                {
-                                    createdAt = a.CreatedAt,
-                                    markdown = a.Markdown
-                                }),
                                 createdAt = p.CreatedAt,
-                                descriptionMarkdown = p.Content != null ? p.Content.Markdown : null,
-                                tickets = p.Tickets.Select(t => new
+                                markdown = p.Content.Markdown,
+                                owner = p.Members.Where(m => m.Role == Role.owner).Select(m => new
                                 {
-                                    createdAt = t.CreatedAt,
-                                    id = t.Id,
-                                    creator = new
-                                    {
-                                        firstName = t.Creator.FirstName,
-                                        lastName = t.Creator.LastName,
-                                        imageUrl = Helper.StorageUrl(t.Creator.ImageName),
-                                        id = t.Creator.Id,
-                                    },
-                                    assignedTo = t.AssignedTo != null ? new
-                                    {
-                                        firstName = t.AssignedTo.User.FirstName,
-                                        lastName = t.AssignedTo.User.LastName,
-                                        imageUrl = Helper.StorageUrl(t.AssignedTo.User.ImageName),
-                                        id = t.AssignedTo.User.Id,
-                                    } : null,
-                                    name = t.Name,
-                                    priority = t.Priority.ToString(),
-                                    status = t.Status.ToString(),
-                                    type = t.Type.ToString(),
-                                }),
-                                owner = p.Members.Where(m => m.Role == Role.owner)
-                                .Select(m => new
-                                {
-                                    firstName = m.User.FirstName,
-                                    lastName = m.User.LastName,
+                                    name = $"{m.User.FirstName} {m.User.LastName}",
                                     imageUrl = Helper.StorageUrl(m.User.ImageName),
                                     id = m.UserId,
-                                }).FirstOrDefault(),
-                                members = p.Members.Where(m => m.IsJoined)
-                                .Select(m => new
-                                {
-                                    joinedAt = m.JoinedAt,
-                                    firstName = m.User.FirstName,
-                                    lastName = m.User.LastName,
-                                    email = m.User.Email,
-                                    role = m.Role.ToString(),
-                                    imageUrl = Helper.StorageUrl(m.User.ImageName),
-                                    id = m.User.Id
-                                }),
+                                })
+                                .FirstOrDefault(),
                             })
                             .FirstOrDefaultAsync();
 
@@ -212,7 +172,7 @@ public class ProjectController : Controller
         }
     }
 
-    [HttpPost("content/{projectId}"), Authorized, Validation]
+    [HttpPost("content/{projectId}"), Authorized, BodyValidation]
     public async Task<IActionResult> Profile([FromBody] ContentDTO dto, [FromRoute] string projectId)
     {
         try

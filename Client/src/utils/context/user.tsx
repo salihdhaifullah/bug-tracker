@@ -11,7 +11,7 @@ type IUserAction = {
 export interface IUser {
     id: string;
     email: string;
-    fullName: string;
+    name: string;
     imageUrl: string;
 }
 

@@ -27,7 +27,7 @@ public class UserController : Controller
         _data = data;
     }
 
-    [HttpPost("avatar"), Authorized, Validation]
+    [HttpPost("avatar"), Authorized, BodyValidation]
     public async Task<IActionResult> Avatar([FromBody] AvatarDTO dto)
     {
         try
@@ -78,7 +78,7 @@ public class UserController : Controller
         }
     }
 
-    [HttpPost("bio"), Authorized, Validation]
+    [HttpPost("bio"), Authorized, BodyValidation]
     public async Task<IActionResult> EditBio([FromBody] BioDTO dto)
     {
         try
@@ -102,7 +102,7 @@ public class UserController : Controller
         }
     }
 
-    [HttpPost("profile/{userId}"), Authorized, Validation]
+    [HttpPost("profile/{userId}"), Authorized, BodyValidation]
     public async Task<IActionResult> Profile([FromBody] ContentDTO dto)
     {
         try
@@ -160,7 +160,7 @@ public class UserController : Controller
                         .Select(u => new
                         {
                             bio = u.Bio,
-                            fullName = $"{u.FirstName} {u.LastName}",
+                            name = $"{u.FirstName} {u.LastName}",
                             imageUrl = Helper.StorageUrl(u.ImageName),
                         })
                         .FirstOrDefaultAsync();
@@ -174,44 +174,5 @@ public class UserController : Controller
             _logger.LogError(e.Message);
             return HttpResult.InternalServerError();
         }
-    }
-
-    private async Task<IActionResult> searchUser(string email, string projectId, bool isMembers)
-    {
-        try
-        {
-            var users = await _ctx.Users
-                        .Where(u => EF.Functions.ILike(u.Email, $"{email}%")
-                        && isMembers == u.MemberShips.Any(m => m.ProjectId == projectId && m.IsJoined))
-                        .OrderBy((u) => u.CreatedAt)
-                        .Select(u => new
-                        {
-                            imageUrl = Helper.StorageUrl(u.ImageName),
-                            email = u.Email,
-                            fullName = $"{u.FirstName} {u.LastName}",
-                            id = u.Id,
-                        })
-                        .Take(10)
-                        .ToListAsync();
-
-            return HttpResult.Ok(body: users);
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e.Message);
-            return HttpResult.InternalServerError();
-        }
-    }
-
-    [HttpGet("not-members/{projectId}"), Authorized]
-    public async Task<IActionResult> SearchNotMembers([FromQuery] string email, [FromRoute] string projectId)
-    {
-        return await searchUser(email, projectId, false);
-    }
-
-    [HttpGet("members/{projectId}"), Authorized]
-    public async Task<IActionResult> SearchMember([FromQuery] string email, [FromRoute] string projectId)
-    {
-        return await searchUser(email, projectId, true);
     }
 }

@@ -48,7 +48,7 @@ public class EmailService : IEmailService
         var message = new MailMessage(
             from: "Team@Buegee.com",
             to: to,
-            subject: "activate your account",
+            subject: subject,
             body: stringBuilder.ToString()
         );
 
@@ -58,25 +58,25 @@ public class EmailService : IEmailService
         return _smtpClient.SendMailAsync(message);
     }
 
-    public Task Verification(string to, string name, string code)
+    public void Verification(string to, string name, string code)
     {
         var items = new List<Item>(2);
         items.Add(new Item("${name}", name));
         items.Add(new Item("${code}", code));
 
-        return mail(to, "activate your account", _verificationEmailHtml, items);
+        mail(to, "activate your account", _verificationEmailHtml, items);
     }
 
-    public Task ResetPassword(string to, string name, string code)
+    public void ResetPassword(string to, string name, string code)
     {
         var items = new List<Item>(2);
         items.Add(new Item("${name}", name));
         items.Add(new Item("${code}", code));
 
-        return mail(to, "reset your password", _resetPasswordHtml, items);
+        mail(to, "reset your password", _resetPasswordHtml, items);
     }
 
-    public Task Invitation(string to, string name, string projectName, Role role, string inventerName, string url)
+    public void Invitation(string to, string name, string projectName, Role role, string inventerName, string url)
     {
         var items = new List<Item>(5);
         items.Add(new Item("${name}", name));
@@ -85,10 +85,10 @@ public class EmailService : IEmailService
         items.Add(new Item("${inventer}", inventerName));
         items.Add(new Item("${url}", url));
 
-        return mail(to, "invitation to project", _invitationToProjectHtml, items);
+        mail(to, "invitation to project", _invitationToProjectHtml, items);
     }
 
-    public Task TicketAssignation(string to, string name, string ticketName, TicketType ticketType, Status ticketStatus, Priority ticketPriority)
+    public void TicketAssignation(string to, string name, string ticketName, TicketType ticketType, Status ticketStatus, Priority ticketPriority)
     {
         var items = new List<Item>(5);
         items.Add(new Item("${name}", name));
@@ -97,6 +97,6 @@ public class EmailService : IEmailService
         items.Add(new Item("${ticket_status}", ticketStatus.ToString()));
         items.Add(new Item("${ticket_priority}", ticketPriority.ToString()));
 
-        return mail(to, "ticket assigned to you", _ticketAssignedToYouHtml, items);
+        mail(to, "ticket assigned to you", _ticketAssignedToYouHtml, items);
     }
 }

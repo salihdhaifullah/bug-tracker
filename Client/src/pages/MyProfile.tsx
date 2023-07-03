@@ -16,7 +16,7 @@ const MyProfile = () => {
             <div className="flex flex-col w-full lg:w-fit lg:h-[60vh] h-auto justify-center items-center lg:justify-start my-2">
                 <div className="flex flex-col h-auto w-fit px-2 sm:px-4 md:px-8 lg:px-2 gap-2 rounded-2xl justify-center items-center bg-white py-2">
                     <Image />
-                    <h1 className="text-gray-800 font-medium text-2xl">{user.fullName}</h1>
+                    <h1 className="text-gray-800 font-medium text-2xl">{user.name}</h1>
                     <Bio />
                 </div>
             </div>

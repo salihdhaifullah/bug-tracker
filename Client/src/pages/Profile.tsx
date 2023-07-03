@@ -7,7 +7,7 @@ import CircleProgress from "../components/utils/CircleProgress";
 interface IProfilePageResult {
   bio: string;
   imageUrl: string;
-  fullName: string;
+  name: string;
 }
 
 const Profile = () => {
@@ -24,9 +24,9 @@ const Profile = () => {
             title="change image"
             className="rounded-full cursor-pointer shadow-md w-60 h-60 object-contain"
             src={payload.result.imageUrl}
-            alt={payload.result.fullName} />
+            alt={payload.result.name} />
 
-          <h1 className="text-gray-800 font-medium text-2xl">{payload.result.fullName}</h1>
+          <h1 className="text-gray-800 font-medium text-2xl">{payload.result.name}</h1>
 
           <div className="w-80 h-fit grid grid-flow-col gap-1 text-center justify-center items-center">
             <p className="text-lg text-gray-800 flex break-all text-center grid-cols-3">

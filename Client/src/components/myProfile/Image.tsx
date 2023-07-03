@@ -37,7 +37,7 @@ const Image = () => {
                     title="change image"
                     className="rounded-full cursor-pointer shadow-md w-60 h-60 object-contain"
                     src={user.imageUrl}
-                    alt={user.fullName} />
+                    alt={user.name} />
             </label>
         </>
     )

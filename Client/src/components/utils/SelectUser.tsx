@@ -9,14 +9,14 @@ interface ISelectToInventProps {
     id: string;
     route: string;
     required?: boolean;
+    setIsValid?: (bool: boolean) => void;
     label: string;
-    setIsValid: (bool: boolean) => void;
 }
 
 interface Option {
     imageUrl: string
     email: string
-    fullName: string;
+    name: string;
     id: string;
 }
 
@@ -32,7 +32,7 @@ const SelectUser = (props: ISelectToInventProps) => {
 
     useOnClickOutside(targetRef, () => setIsOpen(false));
 
-    const [payload, call] = useFetchApi<Option[]>("GET", `user/${props.route}?email=${search}`, [search]);
+    const [payload, call] = useFetchApi<Option[]>("GET", `member/${props.route}?email=${search}`, [search]);
 
     useEffect(() => { call(); }, [search])
 
@@ -62,7 +62,7 @@ const SelectUser = (props: ISelectToInventProps) => {
         }
     }
 
-    useEffect(() => { props.setIsValid(Boolean(props.id)); }, [props.id])
+    useEffect(() => { props?.setIsValid && props.setIsValid(Boolean(props.id)); }, [props.id])
 
     return (
         <div
@@ -92,8 +92,8 @@ const SelectUser = (props: ISelectToInventProps) => {
                     >
 
                         <div className="flex flex-row w-full gap-4">
-                            <img className="rounded-full flex shadow-md w-10 h-10 object-contain" src={option.imageUrl} alt={option.fullName} />
-                            <p className="font-bold">{option.fullName}</p>
+                            <img className="rounded-full flex shadow-md w-10 h-10 object-contain" src={option.imageUrl} alt={option.name} />
+                            <p className="font-bold">{option.name}</p>
                         </div>
                         <p className="text-sm font-light -mt-2 -ml-8">{option.email}</p>
                     </div>

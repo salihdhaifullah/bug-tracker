@@ -36,7 +36,7 @@ public class Ticket
 
     [Required, ForeignKey("Creator"), Column("creator_id"), StringLength(26)]
     public required string CreatorId { get; set; } = null!;
-    public User Creator { get; set; } = null!;
+    public Member Creator { get; set; } = null!;
 
     [Required, ForeignKey("Content"), Column("content_id"), StringLength(26)]
     public required string ContentId { get; set; } = null!;

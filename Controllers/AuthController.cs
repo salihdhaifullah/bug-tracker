@@ -44,7 +44,7 @@ public class AuthController : Controller
     public record SingUpSession(string Code, string FirstName, string LastName, string Email, string Password);
     public record ForgetPasswordSession(string Code, string Email);
 
-    [HttpPost("login"), Validation]
+    [HttpPost("login"), BodyValidation]
     public async Task<IActionResult> Login([FromBody] LoginDTO dto)
     {
         try
@@ -58,7 +58,7 @@ public class AuthController : Controller
                     id = u.Id,
                     imageUrl = Helper.StorageUrl(u.ImageName),
                     email = u.Email,
-                    fullName = $"{u.FirstName} {u.LastName}",
+                    name = $"{u.FirstName} {u.LastName}",
                 })
                 .FirstOrDefaultAsync();
 
@@ -76,7 +76,7 @@ public class AuthController : Controller
                 id = isFound.id,
                 imageUrl = isFound.imageUrl,
                 email = isFound.email,
-                fullName = isFound.fullName,
+                name = isFound.name,
             });
         }
         catch (Exception e)
@@ -86,7 +86,7 @@ public class AuthController : Controller
         }
     }
 
-    [HttpPost("sing-up"), Validation]
+    [HttpPost("sing-up"), BodyValidation]
     public async Task<IActionResult> SingUp([FromBody] SingUpDTO dto)
     {
         try
@@ -103,7 +103,7 @@ public class AuthController : Controller
 
             await _auth.SetSessionAsync<SingUpSession>("sing-up-session", sessionTimeSpan, payload, HttpContext);
 
-            await _email.Verification(dto.Email, $"{dto.FirstName} {dto.LastName}", Code);
+            _email.Verification(dto.Email, $"{dto.FirstName} {dto.LastName}", Code);
 
             return HttpResult.Ok("we have send to a 6 digits verification code", null, "/auth/account-verification");
         }
@@ -114,7 +114,7 @@ public class AuthController : Controller
         }
     }
 
-    [HttpPost("account-verification"), Validation]
+    [HttpPost("account-verification"), BodyValidation]
     public async Task<IActionResult> AccountVerification([FromBody] AccountVerificationDTO dto)
     {
         try
@@ -168,7 +168,7 @@ public class AuthController : Controller
         }
     }
 
-    [HttpPost("forget-password"), Validation]
+    [HttpPost("forget-password"), BodyValidation]
     public async Task<IActionResult> ForgetPassword([FromBody] ForgetPasswordDTO dto)
     {
         try
@@ -192,7 +192,7 @@ public class AuthController : Controller
 
             await _auth.SetSessionAsync<ForgetPasswordSession>("reset-password-session", new TimeSpan(0, 30, 0), payload, HttpContext);
 
-            await _email.ResetPassword(user.Email, $"{user.FirstName} {user.LastName}", code);
+            _email.ResetPassword(user.Email, $"{user.FirstName} {user.LastName}", code);
 
             return HttpResult.Ok("we have send to you a 6 digits verification code", null, "/auth/reset-password");
         }
@@ -204,7 +204,7 @@ public class AuthController : Controller
     }
 
 
-    [HttpPost("reset-password"), Validation]
+    [HttpPost("reset-password"), BodyValidation]
     public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDTO dto)
     {
         try
