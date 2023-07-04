@@ -1,8 +1,7 @@
 import { Link, useParams } from "react-router-dom"
 import formatDate from "../../utils/formatDate"
 import Button from "../utils/Button";
-import Invent from "./Invent";
-import { useLayoutEffect, useState } from "react";
+import { useLayoutEffect } from "react";
 import useFetchApi from "../../utils/hooks/useFetchApi";
 import CircleProgress from "../utils/CircleProgress";
 
@@ -16,21 +15,23 @@ interface IMember {
 }
 
 const Members = () => {
-    const [openInvite, setOpenInvite] = useState(false);
-
     const { projectId } = useParams();
     const [payload, call] = useFetchApi<IMember[]>("GET", `member/members-table/${projectId}`);
 
     useLayoutEffect(() => { call() }, [])
 
     return (
-        <div className="relative overflow-x-auto sm:rounded-lg my-10">
-            <Invent openInvite={openInvite} setOpenInvite={setOpenInvite} />
+        <div className="my-10">
 
-            <h2 className="text-3xl font-bold w-full text-center">Members</h2>
+            <h2 className="text-3xl font-bold w-full mb-10 text-center">Members</h2>
+            <div className="w-full overflow-x-auto bg-white border border-gray-500 shadow-md rounded-md justify-center items-center flex flex-col p-2">
+
             <div className="flex flex-row gap-4 mt-4 items-center pb-4 p-2 bg-white justify-between">
 
-                <Button onClick={() => setOpenInvite(true)}>invite member</Button>
+
+                <Link to={`/project/${projectId}/invent`}>
+                    <Button>invite member</Button>
+                </Link>
 
                 <div className="flex items-center justify-center">
                     <label htmlFor="table-search-users" className="sr-only">Search</label>
@@ -43,52 +44,51 @@ const Members = () => {
                 </div>
             </div>
 
+            {payload.isLoading || !payload.result ? <CircleProgress size="md" /> : (
 
-            <table className="w-full text-sm text-left text-gray-500">
-                {payload.isLoading || !payload.result ? <CircleProgress size="md" /> : (
-                    <>
-                        <thead className="text-xs text-gray-700 uppercase bg-gray-50">
+                <table className="w-full text-sm text-left text-gray-500">
+                    <thead className="text-xs text-gray-700 uppercase bg-white">
 
-                            <tr>
-                                <th scope="col" className="px-6 py-3">  </th>
-                                <th scope="col" className="px-6 py-3"> role </th>
-                                <th scope="col" className="px-6 py-3"> full name </th>
-                                <th scope="col" className="px-6 py-3"> email </th>
-                                <th scope="col" className="px-6 py-3"> joined at </th>
-                                <th scope="col" className="px-6 py-3"> action </th>
+                        <tr>
+                            <th scope="col" className="px-6 py-3">  </th>
+                            <th scope="col" className="px-6 py-3"> role </th>
+                            <th scope="col" className="px-6 py-3"> full name </th>
+                            <th scope="col" className="px-6 py-3"> email </th>
+                            <th scope="col" className="px-6 py-3"> joined at </th>
+                            <th scope="col" className="px-6 py-3"> action </th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+                        {payload.result.map((member, index) => (
+                            <tr className="bg-white border-b hover:bg-gray-50" key={index}>
+
+                                <td className="flex items-center px-6 py-4 text-gray-900 whitespace-nowrap">
+                                    <Link to={`/profile/${member.id}`}>
+                                        <img className="rounded-full shadow-md w-10 h-10 object-contain" src={member.imageUrl} alt={`${member.name}`} />
+                                    </Link>
+                                </td>
+
+                                <td className="px-6 py-4"> {member.role} </td>
+
+                                <td className="px-6 py-4"> {member.name} </td>
+
+                                <td className="px-6 py-4"> {member.email} </td>
+
+                                <td className="px-6 py-4"> {formatDate(member.joinedAt)} </td>
+
+                                <td className="px-6 py-4">
+                                    {member.role === "owner" ? null : <Button>delete member</Button>}
+                                </td>
+
                             </tr>
+                        ))}
+                    </tbody>
 
-                        </thead>
-
-                        <tbody>
-                            {payload.result.map((member, index) => (
-                                <tr className="bg-white border-b hover:bg-gray-50" key={index}>
-
-                                    <td className="flex items-center px-6 py-4 text-gray-900 whitespace-nowrap">
-                                        <Link to={`/profile/${member.id}`}>
-                                            <img className="rounded-full shadow-md w-10 h-10 object-contain" src={member.imageUrl} alt={`${member.name}`} />
-                                        </Link>
-                                    </td>
-
-                                    <td className="px-6 py-4"> {member.role} </td>
-
-                                    <td className="px-6 py-4"> {member.name} </td>
-
-                                    <td className="px-6 py-4"> {member.email} </td>
-
-                                    <td className="px-6 py-4"> {formatDate(member.joinedAt)} </td>
-
-                                    <td className="px-6 py-4">
-                                        {member.role === "owner" ? null : <Button>delete member</Button>}
-                                    </td>
-
-                                </tr>
-                            ))}
-                        </tbody>
-                    </>
-                )}
-
-            </table>
+                </table>
+            )}
+        </div>
         </div>
     )
 }

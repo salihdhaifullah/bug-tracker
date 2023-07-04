@@ -7,7 +7,7 @@ interface IStack<T> {
 }
 
 export default class Stack<T> implements IStack<T> {
-    private storage: T[] = [];
+    storage: T[] = [];
 
     constructor(init?: T[]) {
         if(init) this.storage = init;

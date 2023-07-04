@@ -23,35 +23,37 @@ const Tickets = () => {
     useLayoutEffect(() => { call() }, [])
 
     return (
-        <div className="relative overflow-x-auto sm:rounded-lg my-10">
+        <div className="my-10">
 
-            <h2 className="text-3xl font-bold w-full text-center">Tickets</h2>
-            <div className="flex flex-row gap-4 mt-4 items-center pb-4 p-2 bg-white justify-between">
+            <h2 className="text-3xl font-bold w-full mb-10 text-center">Tickets</h2>
+            <div className="w-full overflow-x-auto bg-white border border-gray-500 shadow-md rounded-md justify-center items-center flex flex-col p-2">
 
-                <div className="flex flex-row gap-4 mt-4 items-center">
-                    <h2 className="text-xl font-bold">Tickets</h2>
-                    <Link to={`/project/${projectId}/create-ticket`}>
-                        <Button size="sm">create ticket</Button>
-                    </Link>
-                </div>
+                <div className="flex flex-row gap-4 mt-4 items-center pb-4 p-2 bg-white justify-between">
 
-                <div className="flex items-center justify-center">
-                    <label htmlFor="table-search-users" className="sr-only">Search</label>
-                    <div className="relative">
-                        <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                            <svg className="w-5 h-5 text-gray-500" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd"></path></svg>
-                        </div>
-                        <input type="text" id="table-search-users" className="block p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500" placeholder="Search for users" />
+                    <div className="flex flex-row gap-4 mt-4 items-center">
+                        <h2 className="text-xl font-bold">Tickets</h2>
+                        <Link to={`/project/${projectId}/create-ticket`}>
+                            <Button size="sm">create ticket</Button>
+                        </Link>
                     </div>
+
+                    <div className="flex items-center justify-center">
+                        <label htmlFor="table-search-users" className="sr-only">Search</label>
+                        <div className="relative">
+                            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                <svg className="w-5 h-5 text-gray-500" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd"></path></svg>
+                            </div>
+                            <input type="text" id="table-search-users" className="block p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500" placeholder="Search for users" />
+                        </div>
+                    </div>
+
                 </div>
 
-            </div>
-
-
-            <table className="w-full text-sm text-left text-gray-500">
                 {payload.isLoading || !payload.result ? <CircleProgress size="md" /> : (
-                    <>
-                        <thead className="text-xs text-gray-700 uppercase bg-gray-50">
+
+                    <table className="w-full text-sm text-left text-gray-500">
+
+                        <thead className="text-xs text-gray-700 uppercase bg-white">
 
                             <tr>
                                 <th scope="col" className="px-6 py-3"> name </th>
@@ -97,10 +99,9 @@ const Tickets = () => {
                                 </tr>
                             ))}
                         </tbody>
-                    </>
+                    </table>
                 )}
-
-            </table>
+            </div>
         </div>
     )
 }

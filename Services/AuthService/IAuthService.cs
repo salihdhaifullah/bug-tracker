@@ -6,5 +6,6 @@ public interface IAuthService
     public Task SetSessionAsync<T>(string sessionName, TimeSpan sessionTimeSpan, T payload, HttpContext ctx);
     public Task<T?> GetSessionAsync<T>(string sessionName, HttpContext ctx) where T : class;
     public Task DeleteSessionAsync(string sessionName, HttpContext ctx);
-
+    public bool TryGetId(HttpRequest request, out string? Id);
+    public string GetId(HttpRequest request);
 }

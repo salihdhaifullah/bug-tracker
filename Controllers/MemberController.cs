@@ -2,6 +2,7 @@ using System.Text.Json;
 using Buegee.Data;
 using Buegee.DTO;
 using Buegee.Models;
+using Buegee.Services.AuthService;
 using Buegee.Services.DataService;
 using Buegee.Services.EmailService;
 using Buegee.Services.JWTService;
@@ -24,8 +25,9 @@ public class MemberController : Controller
     private readonly ILogger<MemberController> _logger;
     private readonly IRedisCacheService _cache;
     private readonly IDataService _data;
+    private readonly IAuthService _auth;
 
-    public MemberController(DataContext ctx, ILogger<MemberController> logger, IEmailService email, IJWTService jwt, IDataService data, IRedisCacheService cache)
+    public MemberController(DataContext ctx, ILogger<MemberController> logger, IEmailService email, IJWTService jwt, IDataService data, IRedisCacheService cache, IAuthService auth)
     {
         _ctx = ctx;
         _logger = logger;
@@ -33,6 +35,7 @@ public class MemberController : Controller
         _jwt = jwt;
         _cache = cache;
         _data = data;
+        _auth = auth;
     }
 
     private record Invention(string projectId, string userId, string userFullName);
@@ -42,7 +45,7 @@ public class MemberController : Controller
     {
         try
         {
-            var userId = (string)(HttpContext.Items["id"])!;
+            var userId = _auth.GetId(Request);
 
             var user = await _ctx.Users
                     .Where(u => u.Id == dto.InventedId)
@@ -96,7 +99,7 @@ public class MemberController : Controller
     {
         try
         {
-            var userId = (string)(HttpContext.Items["id"])!;
+            var userId = _auth.GetId(Request);
 
             string? json = await _cache.Redis.StringGetAsync(sessionId);
 

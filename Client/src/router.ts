@@ -19,6 +19,7 @@ import MyProfile from "./pages/MyProfile";
 import CreateTicket from "./pages/CreateTicket";
 import Ticket from "./pages/Ticket";
 import JoinProject from "./pages/JoinProject";
+import Invent from "./pages/Invent";
 
 const router = createBrowserRouter([{
     path: "/",
@@ -37,6 +38,7 @@ const router = createBrowserRouter([{
         { path: "project/:projectId", Component: Project },
         { path: "join-project/:sessionId", Component: JoinProject },
         { path: "project/:projectId/create-ticket", Component: CreateTicket },
+        { path: "project/:projectId/invent", Component: Invent },
         { path: "tickets/:ticketId", Component: Ticket },
         { path: "500", Component: InternalServerError },
         { path: "403", Component: Forbidden },

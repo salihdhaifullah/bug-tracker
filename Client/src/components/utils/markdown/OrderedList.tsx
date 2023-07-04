@@ -1,15 +1,12 @@
 import { BiListOl } from "react-icons/bi";
 import { useCallback, useEffect, useRef } from "react";
-import { setRange } from ".";
+import { setRange, useTextarea } from "./util";
 
-interface IOrderedListProps {
-    textarea: HTMLTextAreaElement;
-    setMdAndSaveChanges: (md: string) => void;
-}
 
-const OrderedList = (props: IOrderedListProps) => {
+const OrderedList = () => {
     let isOrderedListMode = useRef(false);
     let orderedListCount = useRef(1);
+    const textarea = useTextarea();
 
     const resetState = () => {
         isOrderedListMode.current = false;
@@ -17,62 +14,63 @@ const OrderedList = (props: IOrderedListProps) => {
     }
 
     const addItem = () => {
-        let text = props.textarea.value;
-        const start = props.textarea.selectionStart;
-        const end = props.textarea.selectionEnd;
-        const inner = `${orderedListCount.current}. `;
-        text = `${text.slice(0, start)}${inner}${text.slice(end)}`;
-        props.textarea.value = text;
-        props.setMdAndSaveChanges(text);
+        const text = textarea.value;
+        const start = textarea.selectionStart;
+        const currentLine = text.slice(0, start).split("\n").at(-1)!.trim();
+        const char = Number(currentLine.split(".")[0][0]);
 
-        setRange(props.textarea, start + inner.length);
+        if ((Number.isNaN(char) || !Number.isInteger(char)) && isOrderedListMode.current) resetState();
+
+        const inner = `${currentLine.length === 0 ? "" : "\n"}${orderedListCount.current}. `;
+
+        setRange(textarea, start);
+        document.execCommand("insertText", false, inner);
+        setRange(textarea, start + inner.length);
+
         orderedListCount.current++;
+        isOrderedListMode.current = true;
     };
 
 
     const enterOrderedListMode = () => {
-        isOrderedListMode.current = true;
         addItem();
+    }
+
+    const undo = () => {
+        const start = textarea.selectionStart;
+        setRange(textarea, start);
+        document.execCommand("undo");
     }
 
     const keydownListener = useCallback((e: KeyboardEvent) => {
         if (e.key !== "Enter" || !isOrderedListMode.current) return;
 
         e.preventDefault();
-        let text = props.textarea.value;
-        const start = props.textarea.selectionStart;
-        const end = props.textarea.selectionEnd;
-        const currentLines = text.slice(0, start).split("\n");
-        const currentLine = currentLines[currentLines.length - 1];
-        const part2 = text.slice(end);
+        const text = textarea.value;
+        const start = textarea.selectionStart;
+        const currentLineParts = text.slice(0, start).split("\n").at(-1)!.trim().split(".");
 
-        const currentLineParts = currentLine.trim().split(".");
+        const char = Number(currentLineParts[0][0]);
 
-        if (currentLineParts[0].match(/\d/) && currentLineParts[1] && currentLineParts[1].length > 0) {
-            const slicedText = currentLines.slice(0, currentLines.length).join("\n");
-            const inner = (slicedText.trim().length ? "\n" : "") + orderedListCount.current + ". ";
-            text = `${slicedText}${inner}${part2}`;
-            props.textarea.value = text;
-            props.setMdAndSaveChanges(text);
-
-            setRange(props.textarea,  start + inner.length);
-            orderedListCount.current++;
-        }
-        else if (currentLineParts[0].match(/\d/)) {
+        if (Number.isNaN(char) || !Number.isInteger(char)) {
             resetState();
-            const slicedText = currentLines.slice(0, currentLines.length - 1).join("\n");
-            const inner = slicedText.trim().length ? "\n" : "";
-            text = `${slicedText}${inner}${part2}`;
-            props.textarea.value = text;
-            props.setMdAndSaveChanges(text);
-            setRange(props.textarea, start - currentLine.length);
+            undo();
+            return;
+        }
+
+        if (currentLineParts[1] && currentLineParts[1].length > 0) {
+            addItem();
+        }
+        else {
+            resetState();
+            undo();
         }
     }, []);
 
 
     useEffect(() => {
-        props.textarea.addEventListener("keydown", keydownListener);
-        return () => props.textarea.removeEventListener("keydown", keydownListener);
+        textarea.addEventListener("keydown", keydownListener);
+        return () => textarea.removeEventListener("keydown", keydownListener);
     }, []);
 
     return (

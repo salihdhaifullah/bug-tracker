@@ -50,4 +50,25 @@ public class AuthService : IAuthService
 
         await _cache.Redis.KeyDeleteAsync(sessionId);
     }
+
+    public bool TryGetId(HttpRequest request, out string? Id)
+    {
+        Id = null;
+        try
+        {
+            Id = GetId(request);
+            return true;
+        }
+        catch (Exception)
+        {
+            return false;
+        }
+    }
+
+    public string GetId(HttpRequest request)
+    {
+        if (!request.Cookies.TryGetValue("auth", out var token) || String.IsNullOrEmpty(token)) throw new Exception("token is not found");
+        if (!_jwt.VerifyJwt(token).TryGetValue("id", out var id) || String.IsNullOrEmpty(id) || id.Length != 26) throw new Exception("un-valid token");
+        return id;
+    }
 }

@@ -1,5 +1,6 @@
 using Buegee.Data;
 using Buegee.DTO;
+using Buegee.Services.AuthService;
 using Buegee.Services.DataService;
 using Buegee.Services.FirebaseService;
 using Buegee.Utils;
@@ -17,14 +18,17 @@ public class UserController : Controller
     private readonly DataContext _ctx;
     private readonly IFirebaseService _firebase;
     private readonly IDataService _data;
+    private readonly IAuthService _auth;
     private readonly ILogger<UserController> _logger;
 
-    public UserController(DataContext ctx, IFirebaseService firebase, ILogger<UserController> logger, IDataService data)
+
+    public UserController(DataContext ctx, IFirebaseService firebase, ILogger<UserController> logger, IAuthService auth, IDataService data)
     {
         _ctx = ctx;
         _firebase = firebase;
         _logger = logger;
         _data = data;
+        _auth = auth;
     }
 
     [HttpPost("avatar"), Authorized, BodyValidation]
@@ -32,7 +36,7 @@ public class UserController : Controller
     {
         try
         {
-            var userId = (string)(HttpContext.Items["id"])!;
+            var userId = _auth.GetId(Request);
 
             var contentType = (ContentType)Enum.Parse(typeof(ContentType), dto.ContentType);
 
@@ -83,7 +87,7 @@ public class UserController : Controller
     {
         try
         {
-            var userId = (string)(HttpContext.Items["id"])!;
+            var userId = _auth.GetId(Request);
 
             var isFound = await _ctx.Users.Where(u => u.Id == userId).FirstOrDefaultAsync();
 
@@ -107,7 +111,7 @@ public class UserController : Controller
     {
         try
         {
-            var userId = (string)(HttpContext.Items["id"])!;
+            var userId = _auth.GetId(Request);
 
             var profile = await _ctx.Users
                     .Where(u => u.Id == userId)

@@ -1,78 +1,42 @@
 import { BiHeading } from "react-icons/bi";
-import { setRange } from ".";
+import { findWordBoundaries, setRange, useTextarea } from "./util";
+import { useRef, useState } from "react";
+import useOnClickOutside from "../../../utils/hooks/useOnClickOutside";
 
-const NEWLINE = "\n";
-const SPACE = " ";
+const Heading = () => {
+    const textarea = useTextarea();
 
-interface IHeadingProps {
-    textarea: HTMLTextAreaElement;
-    setMdAndSaveChanges: (md: string) => void;
-}
+    const headingRef = useRef<HTMLDivElement | null>(null);
+    const [isOpen, setIsOpen] = useState(false);
 
-const Heading = (props: IHeadingProps) => {
-
-    const findWordBoundaries = (text: string, index: number): { boundaryStart: number, boundaryEnd: number } => {
-        let boundaryStart = index > 0 ? (text[index - 1] !== NEWLINE ? index - 1 : index) : index;
-        let boundaryEnd = index + 1;
-
-        while (boundaryStart > 0) {
-            const char = text[boundaryStart];
-            if (char === SPACE || char === NEWLINE || !char) break;
-            boundaryStart--;
-        }
-
-        while (boundaryEnd < text.length) {
-            const char = text[boundaryEnd];
-            if (char === SPACE || char === NEWLINE || !char) break;
-            boundaryEnd++;
-        }
-
-        return { boundaryStart, boundaryEnd };
-    };
-
+    useOnClickOutside(headingRef, () => { setIsOpen(false) });
 
     const insertHeading = (headingType: number) => {
-        let text = props.textarea.value;
-        const start = props.textarea.selectionStart;
-        const end = props.textarea.selectionEnd;
+        const text = textarea.value;
+        let start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
 
-        if (end !== start) {
-            const part1 = text.slice(0, start);
-            const part2 = text.slice(end);
-            const selectedText = text.slice(start, end);
+        if (start === end) start = findWordBoundaries(text, start).boundaryStart;
 
-            text = `${part1} ${"#".repeat(headingType)} ${selectedText} ${part2}`;
-
-            props.textarea.value = text;
-            props.setMdAndSaveChanges(text);
-
-            setRange(props.textarea, headingType + end + 3);
-        } else {
-            const { boundaryStart, boundaryEnd } = findWordBoundaries(text, start);
-
-            const part1 = text.slice(0, boundaryStart);
-            const word = text.slice(boundaryStart, boundaryEnd);
-            const part2 = text.slice(boundaryEnd, text.length);
-
-            text = `${part1} ${"#".repeat(headingType)} ${word} ${part2}`;
-
-            props.textarea.value = text;
-            props.setMdAndSaveChanges(text);
-
-            setRange(props.textarea, headingType + end + 3);
-        }
+        setRange(textarea, start);
+        document.execCommand("insertText", false, ` ${"#".repeat(headingType)} `);
+        setRange(textarea, headingType + end + 3);
     };
 
     return (
-        <div className="flex group flex-row gap-2 items-center relative">
-            <BiHeading className="text-gray-700 text-xl rounded-sm hover:bg-gray-200 hover:text-secondary cursor-pointer" />
+        <div ref={headingRef} className="flex flex-row gap-2 items-center">
+            <BiHeading onClick={() => setIsOpen(true)} className="text-gray-700 text-xl rounded-sm hover:bg-gray-200 hover:text-secondary cursor-pointer" />
 
-            <div className="group-hover:h-auto group-hover:w-auto w-0 h-0 max-h-40 -left-8 top-4 absolute transition-all ease-in-out bg-white group-hover:p-2 rounded-md group-hover:shadow-md">
+            <div className={`${isOpen ? "h-auto w-auto p-2 shadow-md" : ""} w-0 h-0 max-h-40 left-[30%] top-4 absolute transition-all ease-in-out bg-white rounded-md`}>
+
                 {["text-2xl", "text-xl", "text-lg", "text-base", "text-sm", "text-xs"].map(
                     (textType, index) => (
                         <p key={index}
                             className={`text-gray-700 p-1 flex justify-center items-center rounded-sm hover:bg-gray-200 hover:text-secondary cursor-pointer ${textType} `}
-                            onClick={() => insertHeading(index + 1)}>
+                            onClick={() => {
+                                setIsOpen(false)
+                                insertHeading(index + 1)
+                            }}>
                             <BiHeading />
                         </p>
                     )

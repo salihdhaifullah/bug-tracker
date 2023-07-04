@@ -1,16 +1,15 @@
 import { BsFileEarmarkImage } from "react-icons/bs";
 import toWEBPImage from "../../../utils/toWEBPImage";
-import { setRange } from ".";
 import { MutableRefObject } from "react";
+import { setRange, useTextarea } from "./util";
 
 interface IImageProps {
-    textarea: HTMLTextAreaElement
-    setMdAndSaveChanges: (md: string) => void
     files: MutableRefObject<{base64: string; previewUrl: string;}[]>
 }
 
 
 const Image = (props: IImageProps) => {
+    const textarea = useTextarea();
 
     const insertImage = async (file: File | null) => {
         if (file === null) return;
@@ -19,22 +18,11 @@ const Image = (props: IImageProps) => {
         const base64 = await toWEBPImage(file);
         props.files.current.push({base64, previewUrl});
 
+        const start = textarea.selectionStart;
+        setRange(textarea, start);
+        document.execCommand("insertText", false, `\n![${file.name}](${previewUrl})\n`);
 
-        let text = props.textarea.value;
-        const start = props.textarea.selectionStart;
-        const end = props.textarea.selectionEnd;
-
-        const part1 = text.slice(0, start);
-        const part2 = text.slice(end);
-
-        const image = `\n![${file.name}](${previewUrl})\n`;
-
-        text = `${part1}${image}${part2}`;
-
-        props.textarea.value = text;
-        props.setMdAndSaveChanges(text);
-
-        setRange(props.textarea, start + 5 + file.name.length + previewUrl.length);
+        setRange(textarea, start + 5 + file.name.length + previewUrl.length);
     }
 
     return (

@@ -1,21 +1,17 @@
-import { useEffect, useState } from "react";
-import Modal from "../utils/Model";
-import Select from "../utils/Select";
-import Button from "../utils/Button";
-import useFetchApi from "../../utils/hooks/useFetchApi";
-import { useParams } from "react-router-dom";
-import SelectUser from "../utils/SelectUser";
+import { useState } from "react";
+import Select from "../components/utils/Select";
+import Button from "../components/utils/Button";
+import useFetchApi from "../utils/hooks/useFetchApi";
+import { useNavigate, useParams } from "react-router-dom";
+import SelectUser from "../components/utils/SelectUser";
 
-interface IInventProps {
-    openInvite: boolean;
-    setOpenInvite: (bool: boolean) => void;
-}
+const roles = ["tester", "project_manger", "developer"];
 
-const Invent = (props: IInventProps) => {
+const Invent = () => {
     const [inventedId, setInventedId] = useState("");
     const [role, setRole] = useState("developer");
-    const roles = ["tester", "project_manger", "developer"];
     const { projectId } = useParams();
+    const navigate = useNavigate();
 
     const [isValidRole, setIsValidRole] = useState(true);
     const [isValidId, setIsValidId] = useState(true);
@@ -24,17 +20,13 @@ const Invent = (props: IInventProps) => {
 
     const handelInvent = () => {
         call({ inventedId, role });
-        props.setOpenInvite(false)
+        navigate(`/project/${projectId}`);
     }
 
-    useEffect(() => {
-        setRole("developer");
-        setInventedId("");
-    }, [props.openInvite])
-
     return (
-        <Modal isOpen={props.openInvite} setIsOpen={props.setOpenInvite}>
-            <div className="w-[350px] flex justify-center items-center gap-2 p-2 flex-col">
+        <section className="flex flex-col justify-center items-center flex-grow">
+            <div className="rounded-xl bg-white flex flex-col gap-4 py-6 w-80 p-2 items-center justify-center shadow-xl">
+                <h1 className="text-primary font-bold text-2xl text-center">invent member</h1>
                 <SelectUser setIsValid={setIsValidId} required label="chose user to invent to this project" route={`not-members/${projectId}`} setId={setInventedId} id={inventedId} />
                 <Select
                     label="role for user to invent"
@@ -48,7 +40,7 @@ const Invent = (props: IInventProps) => {
                     <Button isValid={isValidRole && isValidId} onClick={handelInvent}>Invent</Button>
                 </div>
             </div>
-        </Modal>
+        </section>
     )
 }
 

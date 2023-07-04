@@ -1,29 +1,16 @@
 import { BiLink } from "react-icons/bi";
-import { setRange } from ".";
-
-interface ILinkProps {
-    textarea: HTMLTextAreaElement
-    setMdAndSaveChanges: (md: string) => void
-}
+import { setRange, useTextarea } from "./util";
 
 const LINK = "[](https://)";
 
-const Link = (props: ILinkProps) => {
+const Link = () => {
+    const textarea = useTextarea();
 
     const insertLink = () => {
-        let text = props.textarea.value;
-        const start = props.textarea.selectionStart;
-        const end = props.textarea.selectionEnd;
-
-        const part1 = text.slice(0, start);
-        const part2 = text.slice(end);
-
-        text = `${part1} ${LINK} ${part2}`;
-
-        props.textarea.value = text;
-        props.setMdAndSaveChanges(text);
-
-        setRange(props.textarea, start + 2);
+        const start = textarea.selectionStart;
+        setRange(textarea, start);
+        document.execCommand("insertText", false, ` ${LINK} `);
+        setRange(textarea, start + 2);
     }
 
     return (

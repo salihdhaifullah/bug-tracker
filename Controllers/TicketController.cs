@@ -1,6 +1,7 @@
 using Buegee.Data;
 using Buegee.DTO;
 using Buegee.Models;
+using Buegee.Services.AuthService;
 using Buegee.Services.DataService;
 using Buegee.Services.EmailService;
 using Buegee.Utils;
@@ -16,14 +17,16 @@ public class TicketController : Controller
     private readonly DataContext _ctx;
     private readonly IDataService _data;
     private readonly IEmailService _email;
+    private readonly IAuthService _auth;
     private readonly ILogger<TicketController> _logger;
 
-    public TicketController(DataContext ctx, ILogger<TicketController> logger, IEmailService email, IDataService data)
+    public TicketController(DataContext ctx, ILogger<TicketController> logger, IEmailService email, IDataService data, IAuthService auth)
     {
         _ctx = ctx;
         _logger = logger;
         _data = data;
         _email = email;
+        _auth = auth;
     }
 
     record AssignedTo(string email, string name);
@@ -43,7 +46,7 @@ public class TicketController : Controller
     {
         try
         {
-            var userId = (string)(HttpContext.Items["id"])!;
+            var userId = _auth.GetId(Request);
 
             AssignedTo? assignedTo = null;
 
@@ -188,7 +191,7 @@ public class TicketController : Controller
     {
         try
         {
-            var userId = (string)(HttpContext.Items["id"])!;
+            var userId = _auth.GetId(Request);
 
             var ticket = await _ctx.Tickets.Where((t) => t.Id == ticketId && t.Creator.Id == userId).FirstOrDefaultAsync();
 

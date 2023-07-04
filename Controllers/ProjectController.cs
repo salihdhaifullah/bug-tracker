@@ -1,6 +1,7 @@
 using Buegee.Data;
 using Buegee.DTO;
 using Buegee.Models;
+using Buegee.Services.AuthService;
 using Buegee.Services.DataService;
 using Buegee.Utils;
 using Buegee.Utils.Attributes;
@@ -14,13 +15,15 @@ public class ProjectController : Controller
 {
     private readonly DataContext _ctx;
     private readonly IDataService _data;
+    private readonly IAuthService _auth;
     private readonly ILogger<ProjectController> _logger;
 
-    public ProjectController(DataContext ctx, ILogger<ProjectController> logger, IDataService data)
+    public ProjectController(DataContext ctx, ILogger<ProjectController> logger, IDataService data, IAuthService auth)
     {
         _ctx = ctx;
         _logger = logger;
         _data = data;
+        _auth = auth;
     }
 
     [HttpPost, BodyValidation, Authorized]
@@ -28,7 +31,7 @@ public class ProjectController : Controller
     {
         try
         {
-            var userId = (string)(HttpContext.Items["id"])!;
+            var userId = _auth.GetId(Request);
 
             var contentId = Ulid.NewUlid().ToString();
             var projectId = Ulid.NewUlid().ToString();
@@ -62,7 +65,7 @@ public class ProjectController : Controller
     {
         try
         {
-            var userId = (string)(HttpContext.Items["id"])!;
+            var userId = _auth.GetId(Request);
 
             var projects = await _ctx.Projects
                             .Where((p) => p.Members.Any(m => m.UserId == userId))
@@ -96,6 +99,13 @@ public class ProjectController : Controller
     {
         try
         {
+            var isAllowedToEditContent = false;
+
+            if (_auth.TryGetId(Request, out string? userId) || !string.IsNullOrEmpty(userId))
+            {
+                isAllowedToEditContent = await _ctx.Projects.AnyAsync(p => p.Id == projectId && p.Members.Any(m => m.UserId == userId && (m.Role == Role.owner || m.Role == Role.project_manger)));
+            }
+
             var project = await _ctx.Projects
                             .Where((p) => p.Id == projectId)
                             .Select((p) => new
@@ -104,6 +114,7 @@ public class ProjectController : Controller
                                 id = p.Id,
                                 createdAt = p.CreatedAt,
                                 markdown = p.Content.Markdown,
+                                isAllowedToEditContent = isAllowedToEditContent,
                                 owner = p.Members.Where(m => m.Role == Role.owner).Select(m => new
                                 {
                                     name = $"{m.User.FirstName} {m.User.LastName}",
@@ -131,7 +142,7 @@ public class ProjectController : Controller
     {
         try
         {
-            var userId = (string)(HttpContext.Items["id"])!;
+            var userId = _auth.GetId(Request);
 
             var project = await _ctx.Projects
             .Where((p) => p.Id == projectId && p.Members.Any(m => m.UserId == userId && m.Role == Role.owner))
@@ -157,7 +168,7 @@ public class ProjectController : Controller
     {
         try
         {
-            var userId = (string)(HttpContext.Items["id"])!;
+            var userId = _auth.GetId(Request);
 
             var projectsCount = await _ctx.Projects.Where((p) => p.Members.Any(m => m.UserId == userId)).CountAsync();
 
@@ -177,15 +188,13 @@ public class ProjectController : Controller
     {
         try
         {
-            var userId = (string)(HttpContext.Items["id"])!;
+            var userId = _auth.GetId(Request);
 
             var isAllowed = await _ctx.Projects
                     .AnyAsync(p => p.Id == projectId && p.Members.Any(m => m.UserId == userId
                     && (m.Role == Role.owner || m.Role == Role.project_manger)));
 
             if (!isAllowed) return HttpResult.Forbidden("you are not allowed to do this action", redirectTo: "/403");
-
-
 
             var content = await _ctx.Projects
                           .Where(p => p.Id == projectId)

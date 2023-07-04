@@ -1,13 +1,8 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { AiOutlineTable } from "react-icons/ai"
 import NumberFiled from "../NumberFiled";
-import { setRange } from ".";
-
-interface ITableProps {
-    textarea: HTMLTextAreaElement
-    setMdAndSaveChanges: (md: string) => void
-}
-
+import { setRange, useTextarea } from "./util";
+import useOnClickOutside from "../../../utils/hooks/useOnClickOutside";
 
 const makeTable = (rows: number, cols: number) => {
     let result = "";
@@ -33,38 +28,45 @@ const makeTable = (rows: number, cols: number) => {
     return result;
 };
 
-const Table = (props: ITableProps) => {
+const Table = () => {
     const [rows, setRows] = useState(3);
     const [cols, setCols] = useState(3);
+    const textarea = useTextarea();
+
+    const tableRef = useRef<HTMLDivElement | null>(null);
+    const [isOpen, setIsOpen] = useState(false);
+
+    useOnClickOutside(tableRef, () => { setIsOpen(false) });
 
     const insertTable = () => {
         const table = makeTable(rows, cols);
 
-        let text = props.textarea.value;
-        const start = props.textarea.selectionStart;
-        const end = props.textarea.selectionEnd;
-
-        const part1 = text.slice(0, start);
-        const part2 = text.slice(end);
-
-        text = `${part1}\n${table}\n${part2}`;
-
-        props.textarea.value = text;
-        props.setMdAndSaveChanges(text);
-
-        setRange(props.textarea, start + 2 + table.length);
+        const start = textarea.selectionStart;
+        setRange(textarea, start);
+        document.execCommand("insertText", false, `\n${table}\n`);
+        setRange(textarea, start + 2 + table.length);
     }
 
     return (
-        <div className="flex group flex-row gap-2 items-center relative">
-            <AiOutlineTable className="text-gray-700 text-xl rounded-sm hover:bg-gray-200 hover:text-secondary cursor-pointer" />
+        <div ref={tableRef} className="flex flex-row gap-2 items-center">
+            <AiOutlineTable onClick={() => setIsOpen(true)} className="text-gray-700 text-xl rounded-sm hover:bg-gray-200 hover:text-secondary cursor-pointer" />
 
-            <div className="group-hover:h-auto group-hover:w-[160px] gap-1 flex flex-col items-center justify-center w-0 h-0 -left-12 top-4 absolute transition-all ease-in-out bg-white group-hover:p-2 rounded-md shadow-md">
-                <div className="hidden group-hover:flex -gap-2 flex-col">
+            <div
+                className={`${isOpen ? "h-auto p-2 w-[160px]" : "hidden"}
+                    gap-1 flex flex-col items-center justify-center left-[30%] top-4 absolute transition-all
+                    ease-in-out bg-white rounded-md shadow-md`}>
+
+                <div className="flex -gap-2 flex-col">
                     <NumberFiled value={rows} onChange={(e) => setRows(Number(e.target.value))} label="table rows" />
                     <NumberFiled value={cols} onChange={(e) => setCols(Number(e.target.value))} label="table columns" />
                 </div>
-                <button onClick={() => insertTable()} className="hidden group-hover:flex w-fit px-1 rounded-md hover:shadow-md bg-secondary text-primary text-base">add table</button>
+
+                <button
+                    onClick={() => {
+                        insertTable();
+                        setIsOpen(false);
+                    }}
+                    className="flex w-fit px-1 rounded-md hover:shadow-md bg-secondary text-primary text-base">add table</button>
             </div>
         </div>
     )

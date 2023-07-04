@@ -210,3 +210,27 @@ footer {
 .markdown table thead tr th {
     @apply gap-1 min-w-[4rem] text-center w-auto bg-slate-100 border flex p-1 flex-col
 }
+
+
+.thin-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: #c5c5c5 #f6f6f6;
+}
+
+.thin-scrollbar::-webkit-scrollbar-corner { background: rgba(0,0,0,0.5); }
+
+.thin-scrollbar::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+}
+
+.thin-scrollbar::-webkit-scrollbar-track {
+    background: #f6f6f6;
+    border-radius: 20px;
+ }
+
+.thin-scrollbar::-webkit-scrollbar-thumb {
+    background-color: #c5c5c5;
+    border-radius: 20px;
+    border: 3px solid #f6f6f6;
+}

@@ -8,12 +8,7 @@ public class AuthorizedAttribute : Attribute, IAsyncActionFilter
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
         var jwt = context.HttpContext.RequestServices.GetService<IJWTService>();
-
-        if (jwt is null)
-        {
-            context.Result = HttpResult.InternalServerError();
-            return;
-        }
+        if (jwt is null) throw new NullReferenceException("IJWTService is null");
 
         if (!context.HttpContext.Request.Cookies.TryGetValue("auth", out var token) || String.IsNullOrEmpty(token))
         {
@@ -23,15 +18,11 @@ public class AuthorizedAttribute : Attribute, IAsyncActionFilter
 
         try
         {
-            var data = jwt.VerifyJwt(token);
-
-            if (!data.TryGetValue("id", out var id) || String.IsNullOrEmpty(id) || id.Length != 26)
+            if (!jwt.VerifyJwt(token).TryGetValue("id", out var id) || String.IsNullOrEmpty(id) || id.Length != 26)
             {
                 context.Result = HttpResult.UnAuthorized();
                 return;
             }
-
-            context.HttpContext.Items["id"] = id;
         }
         catch (Exception)
         {
@@ -41,5 +32,4 @@ public class AuthorizedAttribute : Attribute, IAsyncActionFilter
 
         await next();
     }
-
 }

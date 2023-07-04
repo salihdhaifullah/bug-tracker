@@ -1,31 +1,16 @@
 import { AiOutlineLine } from "react-icons/ai"
-import { setRange } from ".";
+import { setRange, useTextarea } from "./util";
 
-interface ILineBreakProps {
-    textarea: HTMLTextAreaElement
-    setMdAndSaveChanges: (md: string) => void
-}
+const LINE_BREAK = "___";
 
-const LINE_BREAK = "___\n";
+const LineBreak = () => {
+    const textarea = useTextarea();
 
-const LineBreak = (props: ILineBreakProps) => {
     const insertLineBreak = () => {
-        let text = props.textarea.value;
-        const start = props.textarea.selectionStart;
-        const end = props.textarea.selectionEnd;
-
-        const part1 = text.slice(0, start);
-        const part2 = text.slice(end);
-        const currentLines = part1.split("\n");
-        const currentLine = currentLines[currentLines.length - 1];
-        const isAddNewLine = currentLine.trim().length >= 1;
-
-        text = `${part1}${isAddNewLine ? "\n" : ""} ${LINE_BREAK} ${part2}`;
-
-        props.textarea.value = text;
-        props.setMdAndSaveChanges(text);
-
-        setRange(props.textarea, (isAddNewLine ? 1 : 0) + start + 2 + LINE_BREAK.length);
+        const start = textarea.selectionStart;
+        setRange(textarea, start);
+        document.execCommand("insertText", false, `\n${LINE_BREAK}\n`);
+        setRange(textarea, start + 5);
     }
 
     return (
