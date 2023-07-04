@@ -24,7 +24,7 @@ const Heading = () => {
     };
 
     return (
-        <div ref={headingRef} className="flex flex-row gap-2 items-center">
+        <div ref={headingRef} title="Headings" className="flex flex-row gap-2 items-center">
             <BiHeading onClick={() => setIsOpen(true)} className="text-gray-700 text-xl rounded-sm hover:bg-gray-200 hover:text-secondary cursor-pointer" />
 
             <div className={`${isOpen ? "h-auto w-auto p-2 shadow-md" : ""} w-0 h-0 max-h-40 left-[30%] top-4 absolute transition-all ease-in-out bg-white rounded-md`}>

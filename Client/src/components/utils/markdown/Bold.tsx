@@ -26,7 +26,7 @@ const Bold = () => {
   };
 
   return (
-    <div className="flex justify-center items-center" onClick={() => insertBold()}>
+    <div title="Bold" className="flex justify-center items-center" onClick={() => insertBold()}>
       <BiBold className="text-gray-700 text-xl rounded-sm hover:bg-gray-200 hover:text-secondary cursor-pointer" />
     </div>
   );

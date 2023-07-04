@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import useFetchApi from "../../utils/hooks/useFetchApi";
 import { AiOutlineClose } from "react-icons/ai";
 import Editor from "./markdown";
@@ -32,12 +32,16 @@ const Content = (props: ContentProps) => {
         setIsEditing(false);
     }
 
-    useEffect(() => {
+    useLayoutEffect(() => { callGet() }, [])
+
+    useLayoutEffect(() => {
         if (!payload.isLoading && payload.result) setMd(payload.result.markdown);
     }, [payload.isLoading])
 
-    useEffect(() => { callGet() }, [])
-
+    const handelCancel = () => {
+        if (!payload.isLoading && payload.result) setMd(payload.result.markdown);
+        setIsEditing(false)
+    }
 
     return (
         <div className="flex flex-col h-auto w-full">
@@ -51,7 +55,7 @@ const Content = (props: ContentProps) => {
                             </div>
                         )}
 
-                        {isEditing ? <Editor md={md} onSubmit={handelSubmit} setMd={setMd} files={files} />
+                        {isEditing ? <Editor md={md} onSubmit={handelSubmit} onCancel={handelCancel} setMd={setMd} files={files} />
                         : <div id="parser" className="markdown flex flex-col p-1 w-full overflow-hidden h-full" dangerouslySetInnerHTML={{ __html: Parser(md) }}></div>}
                     </>
                 )}

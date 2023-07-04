@@ -5,7 +5,7 @@ import Italic from "./Italic";
 import CodeBlock from "./CodeBlock";
 import BlockQuote from "./BlockQuote";
 import Link from "./Link";
-import CodeLangues from "./CodeLangues";
+import CodeLanguage from "./CodeLanguage";
 import Image from "./Image";
 import UnOrderedList from "./UnOrderedList";
 import OrderedList from "./OrderedList";
@@ -24,7 +24,7 @@ interface IEditorProps {
     onCancel?: () => void;
 }
 
-const Editor = ({ md, setMd, files, onSubmit }: IEditorProps) => {
+const Editor = ({ md, setMd, files, onSubmit, onCancel }: IEditorProps) => {
     const [isPreview, setIsPreview] = useState(false);
     const [textarea, setTextarea] = useState<HTMLTextAreaElement | null>(null);
 
@@ -40,24 +40,24 @@ const Editor = ({ md, setMd, files, onSubmit }: IEditorProps) => {
                     </div>
 
                     <div className="flex h-auto max-w-[250px] w-fit overflow-hidden items-center relative">
-                    <div className="flex flex-row gap-2 w-full thin-scrollbar overflow-x-auto overflow-y-hidden items-center">
-                        {textarea === null ? null : (
-                            <TextareaProvider textarea={textarea}>
-                                <Heading />
-                                <Bold />
-                                <Italic />
-                                <CodeBlock />
-                                <BlockQuote />
-                                <Link />
-                                <CodeLangues />
-                                <Image files={files} />
-                                <Table />
-                                <LineBreak />
-                                <UnOrderedList />
-                                <OrderedList />
-                            </TextareaProvider>
-                        )}
-                    </div>
+                        <div className="flex flex-row gap-2 w-full thin-scrollbar overflow-x-auto overflow-y-hidden items-center">
+                            {textarea === null ? null : (
+                                <TextareaProvider textarea={textarea}>
+                                    <Heading />
+                                    <Bold />
+                                    <Italic />
+                                    <CodeBlock />
+                                    <BlockQuote />
+                                    <Link />
+                                    <CodeLanguage />
+                                    <Image files={files} />
+                                    <Table />
+                                    <LineBreak />
+                                    <UnOrderedList />
+                                    <OrderedList />
+                                </TextareaProvider>
+                            )}
+                        </div>
                     </div>
                 </div>
 
@@ -73,7 +73,11 @@ const Editor = ({ md, setMd, files, onSubmit }: IEditorProps) => {
                     </div>
                 )}
 
-                {!onSubmit || isPreview ? null : <div className="justify-end mt-2 inline-flex w-full"> <Button onClick={onSubmit}>submit</Button> </div>}
+                <div className="justify-end mt-2 gap-2 inline-flex w-full">
+                    {!onSubmit || isPreview ? null : <Button onClick={onSubmit}>submit</Button>}
+                    {!onCancel ? null : <Button onClick={onCancel}>cancel</Button>}
+                </div>
+
             </div>
         </div>
     )

@@ -65,7 +65,7 @@ const UnOrderedList = () => {
     }, []);
 
     return (
-        <div className="flex justify-center items-center" onClick={() => enterUnOrderedListMode()}>
+        <div title="Unordered list" className="flex justify-center items-center" onClick={() => enterUnOrderedListMode()}>
             <BiListUl className="text-gray-700 text-xl rounded-sm hover:bg-gray-200 hover:text-secondary cursor-pointer" />
         </div>
     );

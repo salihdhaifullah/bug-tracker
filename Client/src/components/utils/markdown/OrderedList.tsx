@@ -74,7 +74,7 @@ const OrderedList = () => {
     }, []);
 
     return (
-        <div className="flex justify-center items-center" onClick={() => enterOrderedListMode()}>
+        <div title="Ordered list" className="flex justify-center items-center" onClick={() => enterOrderedListMode()}>
             <BiListOl className="text-gray-700 text-xl rounded-sm hover:bg-gray-200 hover:text-secondary cursor-pointer" />
         </div>
     );

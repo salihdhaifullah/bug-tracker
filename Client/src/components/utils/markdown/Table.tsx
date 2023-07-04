@@ -48,7 +48,7 @@ const Table = () => {
     }
 
     return (
-        <div ref={tableRef} className="flex flex-row gap-2 items-center">
+        <div title="Table" ref={tableRef} className="flex flex-row gap-2 items-center">
             <AiOutlineTable onClick={() => setIsOpen(true)} className="text-gray-700 text-xl rounded-sm hover:bg-gray-200 hover:text-secondary cursor-pointer" />
 
             <div

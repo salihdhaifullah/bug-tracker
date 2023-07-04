@@ -4,7 +4,7 @@ import { TbBrandCSharp, TbBrandCpp, TbBrandGolang, TbSql } from "react-icons/tb"
 import { DiFsharp, DiJavascript1 } from "react-icons/di";
 import { FaCss3, FaDocker, FaHtml5, FaJava, FaRust } from "react-icons/fa";
 
-const programmingLangues: { name: string, icon: IconType, color: string }[] = [
+const programmingLanguages: { name: string, icon: IconType, color: string }[] = [
     { name: "bash", icon: SiGnubash, color: "#4EAA25" },
     { name: "c", icon: SiC, color: "#A8B9CC" },
     { name: "csharp", icon: TbBrandCSharp, color: "#9A4993" },
@@ -30,4 +30,4 @@ const programmingLangues: { name: string, icon: IconType, color: string }[] = [
     { name: "typescript", icon: SiTypescript, color: "#3178C6" }
 ];
 
-export default programmingLangues;
+export default programmingLanguages;

@@ -14,7 +14,7 @@ const LineBreak = () => {
     }
 
     return (
-        <div className="flex justify-center items-center"
+        <div title="Line break" className="flex justify-center items-center"
             onClick={() => insertLineBreak()}>
             <AiOutlineLine className="text-gray-700 text-xl rounded-sm hover:bg-gray-200 hover:text-secondary cursor-pointer" />
         </div>
