@@ -29,7 +29,7 @@ public class ActivityController : Controller
                         .OrderBy(a => a.CreatedAt)
                         .Select(a => new
                         {
-                            description = a.Markdown,
+                            content = a.Content,
                             createdAt = a.CreatedAt,
                         })
                         .ToListAsync();

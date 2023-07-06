@@ -15,7 +15,7 @@ const Italic = () => {
         if (start === end) {
           const {boundaryStart, boundaryEnd} = findWordBoundaries(text, start);
           start = boundaryStart;
-          end = boundaryEnd + 2;
+          end = boundaryEnd + 1;
         }
 
         setRange(textarea, start);

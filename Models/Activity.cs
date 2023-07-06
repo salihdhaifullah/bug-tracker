@@ -16,6 +16,6 @@ public class Activity
     public required string ProjectId { get; set; } = null!;
     public Project Project { get; set; } = null!;
 
-    [Required, Column("markdown")]
-    public required string Markdown { get; set; } = null!;
+    [Required, Column("content")]
+    public required string Content { get; set; } = null!;
 }

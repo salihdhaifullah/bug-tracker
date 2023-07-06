@@ -63,7 +63,7 @@ const Sidebar = () => {
                     <Button
                         onClick={callLogout}
                         isLoading={logoutPayload.isLoading}
-                        className="text-primary hover:bg-slate-200 transition-all ease-in-out rounded-md text-xl p-2 flex-row flex gap-2 items-center">
+                        className="!text-primary !bg-white hover:!bg-slate-200 !shadow-none font-normal text-xl p-2 flex-row flex gap-2 items-center">
                         <BiLogOut />
                         <p>logout</p>
                     </Button>

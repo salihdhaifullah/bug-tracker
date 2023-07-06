@@ -15,9 +15,9 @@ interface IProject {
   markdown: string;
   isAllowedToEditContent: boolean;
   owner: {
-      imageUrl: string;
-      name: string;
-      id: string;
+    imageUrl: string;
+    name: string;
+    id: string;
   };
 }
 
@@ -36,8 +36,7 @@ const Project = () => {
 
         <Content editable={payload.result.isAllowedToEditContent} url={`project/content/${projectId}`} />
 
-        <div className="flex flex-col gap-2 justify-center items-start">
-          <p className="text-sm text-gray-600">owner: </p>
+        <div title="owner" className="flex flex-row justify-start items-center">
           <Link to={`/profile/${payload.result.owner.id}`}>
             <div className="flex items-center">
               <img

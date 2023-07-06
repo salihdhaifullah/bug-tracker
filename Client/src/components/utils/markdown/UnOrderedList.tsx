@@ -1,6 +1,6 @@
 import { BiListUl } from "react-icons/bi";
 import { useCallback, useEffect, useRef } from "react";
-import { setRange, useTextarea } from "./util";
+import { getCurrentLine, setRange, useTextarea } from "./util";
 
 const UnOrderedList = () => {
     let isUnOrderedListMode = useRef(false);
@@ -14,7 +14,7 @@ const UnOrderedList = () => {
     const addItem = () => {
         const text = textarea.value;
         const start = textarea.selectionStart;
-        const currentLine = text.slice(0, start).split("\n").at(-1)!.trim();
+        const currentLine = getCurrentLine(start, text);
 
         if (currentLine.split(".")[0][0] !== "-" && isUnOrderedListMode.current) resetState();
 
@@ -44,7 +44,7 @@ const UnOrderedList = () => {
         e.preventDefault();
         const text = textarea.value;
         const start = textarea.selectionStart;
-        const currentLine = text.slice(0, start).split("\n").at(-1)!.trim();
+        const currentLine = getCurrentLine(start, text);
 
         if (!currentLine.startsWith("-")) {
             resetState();

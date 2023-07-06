@@ -117,13 +117,16 @@ public class Seed
                 ContentId = contentId
             });
 
+            await _data.CreateProjectActivity(projectId, item.Name, _ctx);
+
             foreach (var member in item.Members)
             {
-                var user = await _ctx.Users.Where(u => u.Email == member.Email).Select(u => new { Id = u.Id }).FirstOrDefaultAsync();
+                var user = await _ctx.Users.Where(u => u.Email == member.Email).Select(u => new { Id = u.Id, fullName = $"{u.FirstName} {u.LastName}" }).FirstOrDefaultAsync();
                 if (user is null) continue;
                 var memberId = Ulid.NewUlid().ToString();
                 var role = Enum.Parse<Role>(member.Role);
-                await _ctx.Members.AddAsync(new Member() { UserId = user.Id, Id = memberId, ProjectId = projectId, Role = role });
+                await _data.JoinProjectActivity(projectId, user.fullName, _ctx);
+                await _ctx.Members.AddAsync(new Member() { UserId = user.Id, Id = memberId, ProjectId = projectId, Role = role, IsJoined = true });
             }
         }
 

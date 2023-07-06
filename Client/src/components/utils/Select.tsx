@@ -12,7 +12,7 @@ interface ISelectProps {
     validation?: IValidate[]
     icon?: IconType
 }
- // validation for custom select
+
 const Select = (props: ISelectProps) => {
     const [isOpen, setIsOpen] = useState(false);
     const [activeOption, setActiveOption] = useState(1);

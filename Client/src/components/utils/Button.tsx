@@ -1,10 +1,9 @@
 import { HTMLProps, ReactElement } from 'react';
 import CircleProgress from './CircleProgress'
 
+type Size = "sm" | "md" | "lg" | "xl" | "2xl";
 
-type Size = "sm" | "md" | "lg" | "xl" | "2xl" | undefined;
-
-function getSize(size: Size) {
+function getSize(size?: Size) {
     let sizeClass = "";
 
     switch (size) {
@@ -47,16 +46,13 @@ const Button = (props: IButtonProps) => {
         <button
             {...(props.isValid === false ? {} : props.buttonProps)}
             disabled={props.isValid === false || props.isLoading}
-
-            onClick={() => props.onClick && props.onClick()}
-            className={`
-                ${getSize(props.size)}
-                ${props.isValid === false ? "bg-gray-300 cursor-not-allowed" : !props.className ? "bg-secondary" : ""}
-                ${props.isLoading ? "cursor-wait" : "cursor-pointer"}
-                ${props.className || "rounded-md border-0 font-bold text-primary text-center transition-all ease-in-out shadow-lg hover:shadow-xl hover:border-gray-600 hover:text-white"}
+            onClick={props.onClick}
+            className={`${getSize(props.size)} ${props.isLoading ? "cursor-wait !px-4" : "cursor-pointer"}
+                ${props.isValid === false ? "bg-gray-300 cursor-not-allowed" : "bg-secondary"}
+                ${props.className || ""} rounded-md border-0 font-bold text-primary text-center transition-all ease-in-out shadow-md hover:shadow-lg hover:border-gray-600 hover:text-white
             `}>
 
-            {props.isLoading ? <CircleProgress size="md" /> : props.children}
+            {props.isLoading ? <CircleProgress size="xm" /> : props.children}
         </button>
     )
 }

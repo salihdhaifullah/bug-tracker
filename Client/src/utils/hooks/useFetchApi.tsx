@@ -2,7 +2,6 @@ import { useState, useCallback, DependencyList } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useNotificationDispatch } from '../context/notification';
 
-
 interface IResult<T> {
     type: "ok" | "error"
     body?: T

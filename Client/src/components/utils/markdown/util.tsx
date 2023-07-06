@@ -22,6 +22,10 @@ export const findWordBoundaries = (text: string, index: number): { boundaryStart
     return { boundaryStart, boundaryEnd };
 };
 
+export const getCurrentLine = (start: number, text: string): string => {
+    const currentLines = text.slice(0, start).split("\n");
+    return currentLines[currentLines.length - 1]?.trim() || "";
+}
 
 export const setRange = (input: HTMLTextAreaElement, start: number, end?: number) => {
     input.setSelectionRange(start, end ? end : start);

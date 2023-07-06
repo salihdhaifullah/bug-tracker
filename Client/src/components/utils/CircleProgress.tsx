@@ -1,4 +1,4 @@
-type Size = "sm" | "md" | "lg" | "xl" | "2xl" | undefined;
+type Size = "sm" | "xm" | "md" | "lg" | "xl" | "2xl" | undefined;
 
 function getSize(size: Size) {
     let sizeClass = "";
@@ -6,6 +6,9 @@ function getSize(size: Size) {
     switch (size) {
         case "sm":
             sizeClass = "w-4 h-4";
+            break;
+        case "xm":
+            sizeClass = "w-6 h-6";
             break;
         case "md":
             sizeClass = "w-8 h-8";

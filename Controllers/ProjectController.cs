@@ -236,4 +236,24 @@ public class ProjectController : Controller
             return HttpResult.InternalServerError();
         }
     }
+
+    [HttpGet("is-owner/{projectId}")]
+    public async Task<IActionResult> IsOwner([FromRoute] string projectId)
+    {
+        try
+        {
+            var isOwner = false;
+
+            if (_auth.TryGetId(Request, out string? userId)) {
+                isOwner = await _ctx.Members.AnyAsync(m => m.ProjectId == projectId && m.UserId == userId && m.Role == Role.owner);
+            }
+
+            return HttpResult.Ok(body: isOwner);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.Message);
+            return HttpResult.InternalServerError();
+        }
+    }
 }

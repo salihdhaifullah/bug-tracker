@@ -50,21 +50,33 @@ public class DataService : IDataService
     private async Task addActivity(string projectId, string markdown, DataContext ctx)
     {
         var activityId = Ulid.NewUlid().ToString();
-        var activity = new Activity() { Id = activityId, ProjectId = projectId, Markdown = markdown };
+        var activity = new Activity() { Id = activityId, ProjectId = projectId, Content = markdown };
         await ctx.Activities.AddAsync(activity);
     }
 
-    public Task JoinProjectActivity(string projectId, string userName, DataContext ctx) {
+    public Task JoinProjectActivity(string projectId, string userName, DataContext ctx)
+    {
         return addActivity(projectId, $"user {userName} joined the project", ctx);
     }
 
-    public Task CreateProjectActivity(string projectId, string projectName, DataContext ctx) {
+    public Task CreateProjectActivity(string projectId, string projectName, DataContext ctx)
+    {
         return addActivity(projectId, $"created project {projectName}", ctx);
     }
 
-    public Task CreateTicketActivity(string projectId, string ticketName, TicketType type, Status status, string? assignedToName, Priority Priority,  DataContext ctx) {
-       var assignedToText = assignedToName is not null ? $" assigned to {assignedToName}" : "";
+    public Task CreateTicketActivity(string projectId, string ticketName, TicketType type, Status status, string? assignedToName, Priority Priority, DataContext ctx)
+    {
+        var assignedToText = assignedToName is not null ? $" assigned to {assignedToName}" : "";
 
         return addActivity(projectId, $"created ticket {ticketName} of type {type.ToString()}{assignedToText}, status is {status.ToString()} and priority is {Priority.ToString()}", ctx);
+    }
+    public Task DeleteMemberActivity(string projectId, string memberName, DataContext ctx)
+    {
+        return addActivity(projectId, $"the member {memberName} deleted from the project", ctx);
+    }
+
+    public Task ChangeMemberRoleActivity(string projectId, string memberName, Role oldRole, Role newRole, DataContext ctx)
+    {
+        return addActivity(projectId, $"the member {memberName} role had been changed from {oldRole.ToString()} to {newRole.ToString()}", ctx);
     }
 }

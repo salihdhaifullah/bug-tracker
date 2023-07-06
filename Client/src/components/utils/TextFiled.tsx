@@ -19,6 +19,8 @@ interface TextFiledProps {
     onBlur?: () => void
     maxLength?: number
     error?: string
+    small?: boolean
+    className?: string
 }
 
 
@@ -88,18 +90,18 @@ const TextFiled = forwardRef((props: TextFiledProps, ref: ForwardedRef<HTMLDivEl
     }
 
     return (
-        <div ref={ref} className="flex flex-col justify-center items-center p-2 px-6 w-full gap-2">
+        <div ref={ref} className={`flex flex-col justify-center items-center ${props.small ? "p-1 px-3" : "p-2 px-6"} w-full gap-2 ${props.className || ""}`}>
             <div className="flex flex-row gap-2 w-full justify-center items-center relative">
                 <label
                     htmlFor={Id}
                     className={labelClassName}>
                     {props.label}
                 </label>
-                {!props?.icon ? null : <props.icon className="text-gray-600 text-xl font-bold" />}
+                {!props?.icon ? null : <props.icon className="text-gray-600 text-2xl font-bold" />}
                 {!props?.InElement ? null : props.InElement}
                 <input
                     {...props.inputProps}
-                    className={`p-2 border h-fit rounded-sm w-full ${isError ? "border-red-500 hover:border-red-700 focus:outline-red-600" : "border-gray-400 hover:border-gray-900 focus:outline-secondary"} `}
+                    className={`${props.small ? "p-1" : "p-2"} border h-fit rounded-sm w-full ${isError ? "border-red-500 hover:border-red-700 focus:outline-red-600" : "border-gray-400 hover:border-gray-900 focus:outline-secondary"} `}
                     id={Id}
                     value={props.value}
                     onFocus={onFocus}

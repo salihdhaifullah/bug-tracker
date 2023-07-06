@@ -1,9 +1,16 @@
 import { Link, useParams } from "react-router-dom"
 import formatDate from "../../utils/formatDate"
 import Button from "../utils/Button";
-import { useLayoutEffect } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import useFetchApi from "../../utils/hooks/useFetchApi";
 import CircleProgress from "../utils/CircleProgress";
+import TextFiled from "../utils/TextFiled";
+import { AiOutlineSearch } from "react-icons/ai";
+import SelectButton from "../utils/SelectButton";
+import { roles } from "../../pages/Invent";
+import { FiMoreVertical } from "react-icons/fi";
+import useOnClickOutside from "../../utils/hooks/useOnClickOutside";
+import Modal from "../utils/Model";
 
 interface IMember {
     imageUrl: string;
@@ -14,81 +21,189 @@ interface IMember {
     id: string;
 }
 
+interface IActionProps {
+    member: IMember
+    call: () => void;
+}
+
+const Action = (props: IActionProps) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
+    const [isOpenRoleModal, setIsOpenRoleModal] = useState(false);
+    const { projectId } = useParams();
+    const [role, setRole] = useState("");
+
+    const [payload, callDelete] = useFetchApi("DELETE", `member/delete-member/${projectId}/${props.member.id}`, [], () => {
+        props.call();
+    })
+
+    const handelDelete = () => {
+        callDelete();
+    }
+
+    const targetRef = useRef<HTMLDivElement>(null);
+
+    useOnClickOutside(targetRef, () => setIsOpen(false));
+
+    return (
+        <div ref={targetRef} className="flex w-fit relative">
+            <Button onClick={() => setIsOpen(!isOpen)} className="p-1 px-1 shadow-sm font-normal">
+                <FiMoreVertical />
+            </Button>
+
+            <div className={`${isOpen ? "flex" : "hidden"} flex flex-col px-2 py-4 justify-center items-center gap-4 w-40 absolute right-[50%] bottom-[50%] z-50 bg-white rounded shadow-md`}>
+                <Button onClick={() => setIsOpenDeleteModal(true)} className="w-full shadow-sm">delete member</Button>
+                <Button onClick={() => setIsOpenRoleModal(true)} className="w-full shadow-sm">change role</Button>
+            </div>
+
+            <Modal isOpen={isOpenDeleteModal} setIsOpen={setIsOpenDeleteModal}>
+                <div className="flex flex-col justify-center  items-center pt-4 pb-2 px-4 w-full h-full">
+                    <h1 className="text-xl font-bold text-primary">are you sure you want to delete this member</h1>
+
+                    <div className="w-full justify-center gap-4 pl-2 my-3 items-start flex flex-col">
+                        <Link to={`/profile/${props.member.id}`}>
+                            <img className="rounded-full shadow-md w-10 h-10 object-contain" src={props.member.imageUrl} alt={props.member.name} />
+                        </Link>
+
+                        <p className="flex flex-row gap-2">
+                            <span>role: </span>
+                            <span className="font-bold text-primary">
+                                {props.member.role}
+                            </span>
+                        </p>
+                        <p className="flex flex-row gap-2">
+                            <span>name: </span>
+                            <span className="font-bold text-primary">
+                                {props.member.name}
+                            </span>
+                        </p>
+                        <p className="flex flex-row gap-2">
+                            <span>email: </span>
+                            <span className="font-bold text-primary">
+                                {props.member.email}
+                            </span>
+                        </p>
+                    </div>
+
+                    <div className="flex flex-row items-center mt-4  justify-between w-full px-4">
+                        <Button onClick={() => setIsOpenDeleteModal(false)}>cancel</Button>
+                        <Button isLoading={payload.isLoading} onClick={() => handelDelete()} className="!bg-red-500">delete</Button>
+                    </div>
+                </div>
+            </Modal>
+
+            <Modal isOpen={isOpenRoleModal} setIsOpen={setIsOpenRoleModal}>
+                <div className="flex flex-col justify-center items-center pt-4 pb-2 px-4 w-full h-full">
+                    <h1 className="text-xl font-bold text-primary">are you sure you want to delete this member</h1>
+
+                    <div className="w-full justify-center gap-4 pl-2 my-3 items-start flex flex-col">
+                        <Link to={`/profile/${props.member.id}`}>
+                            <img className="rounded-full shadow-md w-10 h-10 object-contain" src={props.member.imageUrl} alt={props.member.name} />
+                        </Link>
+
+                        <p className="flex flex-row gap-2">
+                            <span>role: </span>
+                            <span className="font-bold text-primary">
+                                {props.member.role}
+                            </span>
+                        </p>
+                        <p className="flex flex-row gap-2">
+                            <span>name: </span>
+                            <span className="font-bold text-primary">
+                                {props.member.name}
+                            </span>
+                        </p>
+                        <p className="flex flex-row gap-2">
+                            <span>email: </span>
+                            <span className="font-bold text-primary">
+                                {props.member.email}
+                            </span>
+                        </p>
+                    </div>
+
+                    <div className="flex flex-row items-center mt-4  justify-between w-full px-4">
+                        <Button onClick={() => setIsOpenDeleteModal(false)}>cancel</Button>
+                        <Button onClick={() => handelDelete()} className="!bg-red-500">delete</Button>
+                    </div>
+                </div>
+            </Modal>
+        </div>
+    )
+}
+
 const Members = () => {
     const { projectId } = useParams();
+    const [search, setSearch] = useState("");
+    const [roleFilter, setRoleFilter] = useState("all");
+
+    const [isOwnerPayload, callIsOwner] = useFetchApi<boolean>("GET", `project/is-owner/${projectId}`);
     const [payload, call] = useFetchApi<IMember[]>("GET", `member/members-table/${projectId}`);
 
-    useLayoutEffect(() => { call() }, [])
+    useLayoutEffect(() => {
+        call();
+        callIsOwner();
+    }, [])
 
     return (
         <div className="my-10">
-
             <h2 className="text-3xl font-bold w-full mb-10 text-center">Members</h2>
-            <div className="w-full overflow-x-auto bg-white border border-gray-500 shadow-md rounded-md justify-center items-center flex flex-col p-2">
+            <div className="w-full bg-white border border-gray-500 shadow-md rounded-md justify-center items-center flex flex-col p-2">
 
-            <div className="flex flex-row gap-4 mt-4 items-center pb-4 p-2 bg-white justify-between">
+                <div className="flex flex-row gap-4 w-full flex-wrap items-center pb-4 p-2 bg-white justify-between">
+                    <Link to={`/project/${projectId}/invent`}>
+                        <Button>invite member</Button>
+                    </Link>
 
+                    <div className="flex items-center justify-center w-full sm:w-auto">
 
-                <Link to={`/project/${projectId}/invent`}>
-                    <Button>invite member</Button>
-                </Link>
-
-                <div className="flex items-center justify-center">
-                    <label htmlFor="table-search-users" className="sr-only">Search</label>
-                    <div className="relative">
-                        <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                            <svg className="w-5 h-5 text-gray-500" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd"></path></svg>
+                        <div className="max-w-[400px]">
+                            <TextFiled small icon={AiOutlineSearch} label="Search for members" value={search} onChange={(e) => setSearch(e.target.value)} />
                         </div>
-                        <input type="text" id="table-search-users" className="block p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500" placeholder="Search for users" />
+
+                        <SelectButton label="role" setValue={setRoleFilter} value={roleFilter} options={[...roles, "owner", "all"]} />
                     </div>
                 </div>
+
+                <div className="overflow-x-scroll w-full">
+                    {payload.isLoading || !payload.result ? <CircleProgress size="md" /> : (
+                        <table className="text-sm text-left text-gray-500 w-full">
+                            <thead className="text-xs text-gray-700 uppercase bg-white">
+                                <tr>
+                                    <th scope="col" className="px-6 py-3 min-w-[150px]">  </th>
+                                    <th scope="col" className="px-6 py-3 min-w-[150px]"> role </th>
+                                    <th scope="col" className="px-6 py-3 min-w-[150px]"> full name </th>
+                                    <th scope="col" className="px-6 py-3 min-w-[150px]"> email </th>
+                                    <th scope="col" className="px-6 py-3 min-w-[150px]"> joined at </th>
+                                    {isOwnerPayload.result ? <th scope="col" className="px-6 py-3  min-w-[150px]"> action </th> : null}
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                {payload.result.map((member, index) => (
+                                    <tr className="bg-white border-b hover:bg-gray-50" key={index}>
+
+                                        <td className="flex items-center px-6 py-4 min-w-[150px] justify-center text-gray-900 whitespace-nowrap">
+                                            <Link to={`/profile/${member.id}`}>
+                                                <img className="rounded-full shadow-md w-10 h-10 object-contain" src={member.imageUrl} alt={member.name} />
+                                            </Link>
+                                        </td>
+
+                                        <td className="px-6 py-4 min-w-[150px]"> {member.role} </td>
+
+                                        <td className="px-6 py-4 min-w-[150px]"> {member.name} </td>
+
+                                        <td className="px-6 py-4 min-w-[150px]"> {member.email} </td>
+
+                                        <td className="px-6 py-4 min-w-[150px]"> {formatDate(member.joinedAt)} </td>
+
+                                        {isOwnerPayload.result ? <td className="px-6 py-4 min-w-[150px]"> {member.role === "owner" ? null : <Action call={call} member={member} />} </td> : null}
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    )}
+                </div>
             </div>
-
-            {payload.isLoading || !payload.result ? <CircleProgress size="md" /> : (
-
-                <table className="w-full text-sm text-left text-gray-500">
-                    <thead className="text-xs text-gray-700 uppercase bg-white">
-
-                        <tr>
-                            <th scope="col" className="px-6 py-3">  </th>
-                            <th scope="col" className="px-6 py-3"> role </th>
-                            <th scope="col" className="px-6 py-3"> full name </th>
-                            <th scope="col" className="px-6 py-3"> email </th>
-                            <th scope="col" className="px-6 py-3"> joined at </th>
-                            <th scope="col" className="px-6 py-3"> action </th>
-                        </tr>
-
-                    </thead>
-
-                    <tbody>
-                        {payload.result.map((member, index) => (
-                            <tr className="bg-white border-b hover:bg-gray-50" key={index}>
-
-                                <td className="flex items-center px-6 py-4 text-gray-900 whitespace-nowrap">
-                                    <Link to={`/profile/${member.id}`}>
-                                        <img className="rounded-full shadow-md w-10 h-10 object-contain" src={member.imageUrl} alt={`${member.name}`} />
-                                    </Link>
-                                </td>
-
-                                <td className="px-6 py-4"> {member.role} </td>
-
-                                <td className="px-6 py-4"> {member.name} </td>
-
-                                <td className="px-6 py-4"> {member.email} </td>
-
-                                <td className="px-6 py-4"> {formatDate(member.joinedAt)} </td>
-
-                                <td className="px-6 py-4">
-                                    {member.role === "owner" ? null : <Button>delete member</Button>}
-                                </td>
-
-                            </tr>
-                        ))}
-                    </tbody>
-
-                </table>
-            )}
-        </div>
         </div>
     )
 }

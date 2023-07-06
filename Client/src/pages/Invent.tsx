@@ -5,7 +5,7 @@ import useFetchApi from "../utils/hooks/useFetchApi";
 import { useNavigate, useParams } from "react-router-dom";
 import SelectUser from "../components/utils/SelectUser";
 
-const roles = ["tester", "project_manger", "developer"];
+export const roles = ["tester", "project_manger", "developer"];
 
 const Invent = () => {
     const [inventedId, setInventedId] = useState("");

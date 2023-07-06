@@ -183,11 +183,36 @@ public class MemberController : Controller
         }
     }
 
+    // TODO pagination
     [HttpGet("members-table/{projectId}"), Authorized]
     public async Task<IActionResult> MembersTable([FromRoute] string projectId)
     {
         try
         {
+            var users = await _ctx.Users
+                    .Where(u => !u.MemberShips.Any(m => m.ProjectId == projectId && m.IsJoined))
+                    .Select(u => new { id = u.Id })
+                    .ToListAsync();
+            Random r = new Random();
+
+            for (var i = 0; i < users.Count; i++)
+            {
+                var id = Ulid.NewUlid().ToString();
+
+                var member = new Member()
+                {
+                    Id = id,
+                    Role = Role.developer,
+                    UserId = users[i].id,
+                    ProjectId = projectId,
+                    IsJoined = true
+                };
+
+                await _ctx.Members.AddAsync(member);
+            }
+
+            await _ctx.SaveChangesAsync();
+
             var members = await _ctx.Members.Where(m => m.ProjectId == projectId && m.IsJoined)
                     .OrderBy((m) => m.JoinedAt)
                     .Select(m => new
@@ -195,7 +220,7 @@ public class MemberController : Controller
                         imageUrl = Helper.StorageUrl(m.User.ImageName),
                         email = m.User.Email,
                         name = $"{m.User.FirstName} {m.User.LastName}",
-                        role = m.Role,
+                        role = m.Role.ToString(),
                         joinedAt = m.JoinedAt,
                         id = m.User.Id,
                     })
@@ -203,6 +228,82 @@ public class MemberController : Controller
                     .ToListAsync();
 
             return HttpResult.Ok(body: members);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.Message);
+            return HttpResult.InternalServerError();
+        }
+    }
+
+    // TODO redirect to the error page for each error
+    [HttpDelete("delete-member/{projectId}/{memberId}"), Authorized]
+    public async Task<IActionResult> DeleteMember([FromRoute] string projectId, [FromRoute] string memberId)
+    {
+        try
+        {
+            var userId = _auth.GetId(Request);
+
+            var isOwner = await _ctx.Members.AnyAsync(m => m.ProjectId == projectId && m.IsJoined && m.UserId == userId && m.Role == Role.owner);
+
+            if (!isOwner) return HttpResult.Forbidden("you are not authorized to delete a member");
+
+            var member = await _ctx.Members
+                    .Where(m => m.ProjectId == projectId && m.IsJoined && m.UserId == memberId)
+                    .Include(m => m.User)
+                    .FirstOrDefaultAsync();
+
+            if (member is null) return HttpResult.NotFound("the member to delete is not found");
+
+            var name = $"{member.User.FirstName} {member.User.LastName}";
+
+            await _data.DeleteMemberActivity(projectId, name, _ctx);
+
+            _ctx.Members.Remove(member);
+
+            await _ctx.SaveChangesAsync();
+
+            return HttpResult.Ok($"member {name} successfully deleted form project");
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.Message);
+            return HttpResult.InternalServerError();
+        }
+    }
+
+
+    [HttpPatch("change-role/{projectId}"), Authorized, BodyValidation]
+    public async Task<IActionResult> ChangeMemberRole([FromRoute] string projectId, [FromBody] ChangeRoleDTO dto)
+    {
+        try
+        {
+            var userId = _auth.GetId(Request);
+
+            var isOwner = await _ctx.Members.AnyAsync(m => m.ProjectId == projectId && m.IsJoined && m.UserId == userId && m.Role == Role.owner);
+
+            if (!isOwner) return HttpResult.Forbidden("you are not authorized to edit members roles in this project");
+
+            var member = await _ctx.Members
+                    .Where(m => m.ProjectId == projectId && m.IsJoined && m.UserId == dto.MemberId)
+                    .Include(m => m.User)
+                    .FirstOrDefaultAsync();
+
+            if (member is null) return HttpResult.NotFound("the member is not found");
+
+            var newRole = Enum.Parse<Role>(dto.Role);
+
+            var name = $"{member.User.FirstName} {member.User.LastName}";
+
+            var massage = $"member {name} role successfully changed from {member.Role.ToString()} to {newRole.ToString()}";
+
+            await _data.ChangeMemberRoleActivity(projectId, name, member.Role, newRole, _ctx);
+
+            member.Role = newRole;
+
+            await _ctx.SaveChangesAsync();
+
+            return HttpResult.Ok(massage);
         }
         catch (Exception e)
         {

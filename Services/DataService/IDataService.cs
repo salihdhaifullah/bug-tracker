@@ -10,4 +10,6 @@ public interface IDataService {
     public Task JoinProjectActivity(string projectId, string userName, DataContext ctx);
     public Task CreateProjectActivity(string projectId, string projectName, DataContext ctx);
     public Task CreateTicketActivity(string projectId, string ticketName, TicketType TicketType, Status status, string? assignedToName, Priority Priority,  DataContext ctx);
+    public Task DeleteMemberActivity(string projectId, string memberName, DataContext ctx);
+    public Task ChangeMemberRoleActivity(string projectId, string memberName, Role oldRole, Role newRole, DataContext ctx);
 }

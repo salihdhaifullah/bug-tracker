@@ -7,3 +7,6 @@
 -- DROP TABLE "ticket" CASCADE;
 -- DROP TABLE "member" CASCADE;
 -- DROP TABLE "activity" CASCADE;
+
+
+SELECT * FROM "member" WHERE "project_id" = '01H4GYTP4J1VXV0D9WCR93FQKS';

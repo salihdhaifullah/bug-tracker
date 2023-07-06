@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import useOnClickOutside from '../../utils/hooks/useOnClickOutside';
 
 interface IModalProps {
-    children: ReactElement[] | ReactElement;
+    children: ReactElement[] | ReactElement | string;
     isOpen: boolean;
     setIsOpen: (bool: boolean) => void;
 }
@@ -20,21 +20,22 @@ const Modal = (props: IModalProps) => {
     }, [])
 
     const openCallback = useCallback(() => {
-        props.setIsOpen(true);
         rootRef.current.className = "blur-sm";
         htmlRef.current.className = "overflow-y-hidden";
     }, [])
 
     useEffect(() => {
-        if (props.isOpen) openCallback();
-        else closeCallback();
+            if (props.isOpen) openCallback();
+            else closeCallback();
     }, [props.isOpen])
 
-    useOnClickOutside(modalRef, () => { closeCallback() })
+    useOnClickOutside(modalRef, () => {
+        if (props.isOpen) closeCallback();
+    })
 
-    return ReactDOM.createPortal(
-        !props.isOpen ? null : (
-            <div className="p-2 fixed w-fit top-0 border border-gray-900 shadow-2xl left-0 right-0 bottom-0 m-auto h-[35vh] bg-white rounded-md flex flex-col" ref={modalRef}>
+    return !props.isOpen ? null : ReactDOM.createPortal(
+        (
+            <div className="p-2 fixed w-fit top-0 border border-gray-900 shadow-2xl left-0 right-0 bottom-0 m-auto min-h-[35vh] h-fit bg-white rounded-md flex flex-col" ref={modalRef}>
                 {props.children}
             </div>
         ),

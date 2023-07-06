@@ -60,6 +60,7 @@ public class TicketController : Controller
             && (m.Role == Role.project_manger || m.Role == Role.owner)))
                 return HttpResult.Forbidden("you are not authorized to create a ticket in this project");
 
+
             var contentId = Ulid.NewUlid().ToString();
             var ticketId = Ulid.NewUlid().ToString();
 

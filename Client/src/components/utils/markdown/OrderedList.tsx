@@ -1,6 +1,6 @@
 import { BiListOl } from "react-icons/bi";
 import { useCallback, useEffect, useRef } from "react";
-import { setRange, useTextarea } from "./util";
+import { getCurrentLine, setRange, useTextarea } from "./util";
 
 
 const OrderedList = () => {
@@ -16,7 +16,7 @@ const OrderedList = () => {
     const addItem = () => {
         const text = textarea.value;
         const start = textarea.selectionStart;
-        const currentLine = text.slice(0, start).split("\n").at(-1)!.trim();
+        const currentLine = getCurrentLine(start, text);
         const char = Number(currentLine.split(".")[0][0]);
 
         if ((Number.isNaN(char) || !Number.isInteger(char)) && isOrderedListMode.current) resetState();
@@ -48,7 +48,7 @@ const OrderedList = () => {
         e.preventDefault();
         const text = textarea.value;
         const start = textarea.selectionStart;
-        const currentLineParts = text.slice(0, start).split("\n").at(-1)!.trim().split(".");
+        const currentLineParts = getCurrentLine(start, text).split(".");
 
         const char = Number(currentLineParts[0][0]);
 
