@@ -184,48 +184,29 @@ public class MemberController : Controller
     }
 
     // TODO pagination
+    // TODO filter by email & name
     [HttpGet("members-table/{projectId}"), Authorized]
-    public async Task<IActionResult> MembersTable([FromRoute] string projectId)
+    public async Task<IActionResult> MembersTable([FromRoute] string projectId, [FromQuery(Name = "role")] string? roleQuery)
     {
         try
         {
-            var users = await _ctx.Users
-                    .Where(u => !u.MemberShips.Any(m => m.ProjectId == projectId && m.IsJoined))
-                    .Select(u => new { id = u.Id })
-                    .ToListAsync();
-            Random r = new Random();
+            Role? role = null;
 
-            for (var i = 0; i < users.Count; i++)
-            {
-                var id = Ulid.NewUlid().ToString();
+            if (!string.IsNullOrEmpty(roleQuery) && Enum.TryParse<Role>(roleQuery, out Role parsedRole)) role = parsedRole;
 
-                var member = new Member()
-                {
-                    Id = id,
-                    Role = Role.developer,
-                    UserId = users[i].id,
-                    ProjectId = projectId,
-                    IsJoined = true
-                };
-
-                await _ctx.Members.AddAsync(member);
-            }
-
-            await _ctx.SaveChangesAsync();
-
-            var members = await _ctx.Members.Where(m => m.ProjectId == projectId && m.IsJoined)
-                    .OrderBy((m) => m.JoinedAt)
-                    .Select(m => new
-                    {
-                        imageUrl = Helper.StorageUrl(m.User.ImageName),
-                        email = m.User.Email,
-                        name = $"{m.User.FirstName} {m.User.LastName}",
-                        role = m.Role.ToString(),
-                        joinedAt = m.JoinedAt,
-                        id = m.User.Id,
-                    })
-                    .Take(10)
-                    .ToListAsync();
+            var members = await _ctx.Members.Where(m => m.ProjectId == projectId && m.IsJoined && (role == null || m.Role == role))
+                        .OrderBy((m) => m.JoinedAt)
+                        .Select(m => new
+                        {
+                            imageUrl = Helper.StorageUrl(m.User.ImageName),
+                            email = m.User.Email,
+                            name = $"{m.User.FirstName} {m.User.LastName}",
+                            role = m.Role.ToString(),
+                            joinedAt = m.JoinedAt,
+                            id = m.User.Id,
+                        })
+                        .Take(10)
+                        .ToListAsync();
 
             return HttpResult.Ok(body: members);
         }

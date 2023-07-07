@@ -70,24 +70,26 @@ const TextFiled = forwardRef((props: TextFiledProps, ref: ForwardedRef<HTMLDivEl
         setIsFocus(true)
         setIsError(false)
         setChanging(!changing)
+    }
 
+    useEffect(() => {
         if (
             !props?.validation ||
             props?.validation.length === 0 ||
-            !e.target.value
+            !props.value
         ) return;
 
         for (let i = 0; i < props?.validation.length; i++) {
             const item = props?.validation[i];
-            if (!item.validate(e.target.value)) {
+            if (!item.validate(props.value)) {
                 setErrorMassage(item.massage)
                 setIsError(true)
-                props?.setIsValid && props.setIsValid(false);
+                if (props?.setIsValid !== undefined) props.setIsValid(false);
                 continue;
             }
-            props?.setIsValid && props.setIsValid(true);
+            if (props?.setIsValid !== undefined) props.setIsValid(true);
         }
-    }
+    }, [props.value])
 
     return (
         <div ref={ref} className={`flex flex-col justify-center items-center ${props.small ? "p-1 px-3" : "p-2 px-6"} w-full gap-2 ${props.className || ""}`}>

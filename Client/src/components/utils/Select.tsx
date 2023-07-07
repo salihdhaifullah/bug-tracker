@@ -93,7 +93,7 @@ const Select = (props: ISelectProps) => {
                         onClick={() => choseOption(index)}
                         className={`${index === activeOption ? "bg-slate-200 font-extrabold" : "bg-white"} block bg-slate-200 rounded-md text-gray-600 p-1 mb-1 text-base cursor-pointer`}
                         value={option}>
-                            {option}
+                        {option}
                     </option>
                 ))}
             </datalist>

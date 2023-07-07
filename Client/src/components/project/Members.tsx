@@ -11,6 +11,7 @@ import { roles } from "../../pages/Invent";
 import { FiMoreVertical } from "react-icons/fi";
 import useOnClickOutside from "../../utils/hooks/useOnClickOutside";
 import Modal from "../utils/Model";
+import Select from "../utils/Select";
 
 interface IMember {
     imageUrl: string;
@@ -34,12 +35,27 @@ const Action = (props: IActionProps) => {
     const { projectId } = useParams();
     const [role, setRole] = useState("");
 
-    const [payload, callDelete] = useFetchApi("DELETE", `member/delete-member/${projectId}/${props.member.id}`, [], () => {
+    const [payloadDelete, callDelete] = useFetchApi("DELETE", `member/delete-member/${projectId}/${props.member.id}`, [], () => {
         props.call();
     })
 
-    const handelDelete = () => {
-        callDelete();
+    interface IChangeRole {
+        memberId: string;
+        role: string
+    }
+
+    const [payloadRole, callRole] = useFetchApi<any, IChangeRole>("PATCH", `member/change-role/${projectId}`, [], () => {
+        props.call();
+    })
+
+    const [isValidRole, setIsValidRole] = useState(false);
+
+
+    const handelRole = () => {
+        callRole({
+            role,
+            memberId: props.member.id
+        });
     }
 
     const targetRef = useRef<HTMLDivElement>(null);
@@ -57,8 +73,8 @@ const Action = (props: IActionProps) => {
                 <Button onClick={() => setIsOpenRoleModal(true)} className="w-full shadow-sm">change role</Button>
             </div>
 
-            <Modal id={`${props.member.email}-the-first`} isOpen={isOpenDeleteModal} setIsOpen={setIsOpenDeleteModal}>
-                <div className="flex flex-col justify-center  items-center pt-4 pb-2 px-4 w-full h-full">
+            <Modal isOpen={isOpenDeleteModal} setIsOpen={setIsOpenDeleteModal}>
+                <div className="flex flex-col justify-center  items-center pt-4 pb-2 px-4 w-[400px] text-center h-full">
                     <h1 className="text-xl font-bold text-primary">are you sure you want to delete this member</h1>
 
                     <div className="w-full justify-center gap-4 pl-2 my-3 items-start flex flex-col">
@@ -88,43 +104,29 @@ const Action = (props: IActionProps) => {
 
                     <div className="flex flex-row items-center mt-4  justify-between w-full px-4">
                         <Button onClick={() => setIsOpenDeleteModal(false)}>cancel</Button>
-                        <Button isLoading={payload.isLoading} onClick={() => handelDelete()} className="!bg-red-500">delete</Button>
+                        <Button isLoading={payloadDelete.isLoading} onClick={() => callDelete()} className="!bg-red-500">delete</Button>
                     </div>
                 </div>
             </Modal>
 
-            <Modal id={`${props.member.email}-the-seconded`} isOpen={isOpenRoleModal} setIsOpen={setIsOpenRoleModal}>
-                <div className="flex flex-col justify-center items-center pt-4 pb-2 px-4 w-full h-full">
-                    <h1 className="text-xl font-bold text-primary">are you sure you want to delete this member</h1>
+            <Modal isOpen={isOpenRoleModal} setIsOpen={setIsOpenRoleModal}>
+                <div className="flex flex-col justify-center items-center pt-4 pb-2 px-4 w-[400px] text-center h-full">
+                    <h1 className="text-xl font-bold text-primary">change member role from {props.member.role} to {role}</h1>
 
-                    <div className="w-full justify-center gap-4 pl-2 my-3 items-start flex flex-col">
-                        <Link to={`/profile/${props.member.id}`}>
-                            <img className="rounded-full shadow-md w-10 h-10 object-contain" src={props.member.imageUrl} alt={props.member.name} />
-                        </Link>
-
-                        <p className="flex flex-row gap-2">
-                            <span>role: </span>
-                            <span className="font-bold text-primary">
-                                {props.member.role}
-                            </span>
-                        </p>
-                        <p className="flex flex-row gap-2">
-                            <span>name: </span>
-                            <span className="font-bold text-primary">
-                                {props.member.name}
-                            </span>
-                        </p>
-                        <p className="flex flex-row gap-2">
-                            <span>email: </span>
-                            <span className="font-bold text-primary">
-                                {props.member.email}
-                            </span>
-                        </p>
+                    <div className="w-full justify-center pl-2 mt-3 items-start flex flex-col">
+                        <Select
+                            options={roles.filter((r) => r !== props.member.role)}
+                            setValue={setRole}
+                            value={role}
+                            validation={[ {validate: (str) => roles.includes(str), massage: "un-valid member role"} ]}
+                            label="select new role"
+                            setIsValid={setIsValidRole}
+                        />
                     </div>
 
                     <div className="flex flex-row items-center mt-4  justify-between w-full px-4">
-                        <Button onClick={() => setIsOpenDeleteModal(false)}>cancel</Button>
-                        <Button onClick={() => handelDelete()} className="!bg-red-500">delete</Button>
+                        <Button onClick={() => setIsOpenRoleModal(false)}>cancel</Button>
+                        <Button isLoading={payloadRole.isLoading} isValid={isValidRole} onClick={() => handelRole()}>change</Button>
                     </div>
                 </div>
             </Modal>
@@ -135,15 +137,13 @@ const Action = (props: IActionProps) => {
 const Members = () => {
     const { projectId } = useParams();
     const [search, setSearch] = useState("");
-    const [roleFilter, setRoleFilter] = useState("all");
+    const [role, setRole] = useState("all");
 
     const [isOwnerPayload, callIsOwner] = useFetchApi<boolean>("GET", `project/is-owner/${projectId}`);
-    const [payload, call] = useFetchApi<IMember[]>("GET", `member/members-table/${projectId}`);
+    const [payload, call] = useFetchApi<IMember[]>("GET", `member/members-table/${projectId}?role=${role}`, [role]);
 
-    useLayoutEffect(() => {
-        call();
-        callIsOwner();
-    }, [])
+    useLayoutEffect(() => { callIsOwner() }, [])
+    useLayoutEffect(() => { call() }, [role])
 
     return (
         <div className="my-10">
@@ -161,7 +161,7 @@ const Members = () => {
                             <TextFiled small icon={AiOutlineSearch} label="Search for members" value={search} onChange={(e) => setSearch(e.target.value)} />
                         </div>
 
-                        <SelectButton label="role" setValue={setRoleFilter} value={roleFilter} options={[...roles, "owner", "all"]} />
+                        <SelectButton label="role" setValue={setRole} value={role} options={[...roles, "owner", "all"]} />
                     </div>
                 </div>
 
