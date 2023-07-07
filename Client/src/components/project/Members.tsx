@@ -28,6 +28,7 @@ interface IActionProps {
 
 const Action = (props: IActionProps) => {
     const [isOpen, setIsOpen] = useState(false);
+
     const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
     const [isOpenRoleModal, setIsOpenRoleModal] = useState(false);
     const { projectId } = useParams();
@@ -56,7 +57,7 @@ const Action = (props: IActionProps) => {
                 <Button onClick={() => setIsOpenRoleModal(true)} className="w-full shadow-sm">change role</Button>
             </div>
 
-            <Modal isOpen={isOpenDeleteModal} setIsOpen={setIsOpenDeleteModal}>
+            <Modal id={`${props.member.email}-the-first`} isOpen={isOpenDeleteModal} setIsOpen={setIsOpenDeleteModal}>
                 <div className="flex flex-col justify-center  items-center pt-4 pb-2 px-4 w-full h-full">
                     <h1 className="text-xl font-bold text-primary">are you sure you want to delete this member</h1>
 
@@ -92,7 +93,7 @@ const Action = (props: IActionProps) => {
                 </div>
             </Modal>
 
-            <Modal isOpen={isOpenRoleModal} setIsOpen={setIsOpenRoleModal}>
+            <Modal id={`${props.member.email}-the-seconded`} isOpen={isOpenRoleModal} setIsOpen={setIsOpenRoleModal}>
                 <div className="flex flex-col justify-center items-center pt-4 pb-2 px-4 w-full h-full">
                     <h1 className="text-xl font-bold text-primary">are you sure you want to delete this member</h1>
 
