@@ -184,17 +184,18 @@ public class MemberController : Controller
     }
 
     // TODO pagination
-    // TODO filter by email & name
     [HttpGet("members-table/{projectId}"), Authorized]
-    public async Task<IActionResult> MembersTable([FromRoute] string projectId, [FromQuery(Name = "role")] string? roleQuery)
+    public async Task<IActionResult> MembersTable([FromRoute] string projectId, [FromQuery(Name = "role")] string? roleQuery, [FromQuery] string? search, [FromQuery] int take = 10, [FromQuery] int page = 1)
     {
         try
         {
             Role? role = null;
-
             if (!string.IsNullOrEmpty(roleQuery) && Enum.TryParse<Role>(roleQuery, out Role parsedRole)) role = parsedRole;
 
-            var members = await _ctx.Members.Where(m => m.ProjectId == projectId && m.IsJoined && (role == null || m.Role == role))
+            var count = await _ctx.Members.Where(m => m.ProjectId == projectId && m.IsJoined && (role == null || m.Role == role) && (EF.Functions.ILike(m.User.Email, $"{search}%") || EF.Functions.ILike(m.User.FirstName, $"{search}%") || EF.Functions.ILike(m.User.LastName, $"{search}%"))).CountAsync();
+
+            var members = await _ctx.Members
+                        .Where(m => m.ProjectId == projectId && m.IsJoined && (role == null || m.Role == role) && (EF.Functions.ILike(m.User.Email, $"{search}%") || EF.Functions.ILike(m.User.FirstName, $"{search}%") || EF.Functions.ILike(m.User.LastName, $"{search}%")))
                         .OrderBy((m) => m.JoinedAt)
                         .Select(m => new
                         {
@@ -205,10 +206,11 @@ public class MemberController : Controller
                             joinedAt = m.JoinedAt,
                             id = m.User.Id,
                         })
-                        .Take(10)
+                        .Skip((page - 1) * take)
+                        .Take(take)
                         .ToListAsync();
 
-            return HttpResult.Ok(body: members);
+            return HttpResult.Ok(body: new { members, count });
         }
         catch (Exception e)
         {

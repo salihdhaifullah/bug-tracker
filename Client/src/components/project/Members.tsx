@@ -1,11 +1,11 @@
 import { Link, useParams } from "react-router-dom"
 import formatDate from "../../utils/formatDate"
 import Button from "../utils/Button";
-import { useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import useFetchApi from "../../utils/hooks/useFetchApi";
 import CircleProgress from "../utils/CircleProgress";
 import TextFiled from "../utils/TextFiled";
-import { AiOutlineSearch } from "react-icons/ai";
+import { AiOutlineArrowLeft, AiOutlineArrowRight, AiOutlineSearch } from "react-icons/ai";
 import SelectButton from "../utils/SelectButton";
 import { roles } from "../../pages/Invent";
 import { FiMoreVertical } from "react-icons/fi";
@@ -118,7 +118,7 @@ const Action = (props: IActionProps) => {
                             options={roles.filter((r) => r !== props.member.role)}
                             setValue={setRole}
                             value={role}
-                            validation={[ {validate: (str) => roles.includes(str), massage: "un-valid member role"} ]}
+                            validation={[{ validate: (str) => roles.includes(str), massage: "un-valid member role" }]}
                             label="select new role"
                             setIsValid={setIsValidRole}
                         />
@@ -138,13 +138,18 @@ const Members = () => {
     const { projectId } = useParams();
     const [search, setSearch] = useState("");
     const [role, setRole] = useState("all");
+    const [take, setTake] = useState(10);
+    const [page, setPage] = useState(1);
 
     const [isOwnerPayload, callIsOwner] = useFetchApi<boolean>("GET", `project/is-owner/${projectId}`);
-    const [payload, call] = useFetchApi<IMember[]>("GET", `member/members-table/${projectId}?role=${role}`, [role]);
+    const [payload, call] = useFetchApi<{ members: IMember[], count: number }>("GET", `member/members-table/${projectId}?take=${take}&page=${page}&role=${role}&search=${search}`, [take, page, role, search]);
 
     useLayoutEffect(() => { callIsOwner() }, [])
-    useLayoutEffect(() => { call() }, [role])
+    useLayoutEffect(() => { call() }, [take, page, role, search])
 
+    useEffect(() => {
+        console.log("page is " + page)
+    }, [page])
     return (
         <div className="my-10">
             <h2 className="text-3xl font-bold w-full mb-10 text-center">Members</h2>
@@ -165,45 +170,65 @@ const Members = () => {
                     </div>
                 </div>
 
-                <div className="overflow-x-scroll w-full">
-                    {payload.isLoading || !payload.result ? <CircleProgress size="md" /> : (
-                        <table className="text-sm text-left text-gray-500 w-full">
-                            <thead className="text-xs text-gray-700 uppercase bg-white">
-                                <tr>
-                                    <th scope="col" className="px-6 py-3 min-w-[150px]">  </th>
-                                    <th scope="col" className="px-6 py-3 min-w-[150px]"> role </th>
-                                    <th scope="col" className="px-6 py-3 min-w-[150px]"> full name </th>
-                                    <th scope="col" className="px-6 py-3 min-w-[150px]"> email </th>
-                                    <th scope="col" className="px-6 py-3 min-w-[150px]"> joined at </th>
-                                    {isOwnerPayload.result ? <th scope="col" className="px-6 py-3  min-w-[150px]"> action </th> : null}
-                                </tr>
-                            </thead>
+                <div className="flex flex-col justify-center items-center w-full gap-4">
+                    {payload.isLoading || !payload.result ? <CircleProgress size="lg" className="mb-4" /> : (
+                        <>
+                            <div className="overflow-x-scroll overflow-y-hidden w-full">
+                                <table className="text-sm text-left text-gray-500 w-full">
+                                    <thead className="text-xs text-gray-700 uppercase bg-white">
+                                        <tr>
+                                            <th scope="col" className="px-6 py-3 min-w-[150px]">  </th>
+                                            <th scope="col" className="px-6 py-3 min-w-[150px]"> role </th>
+                                            <th scope="col" className="px-6 py-3 min-w-[150px]"> full name </th>
+                                            <th scope="col" className="px-6 py-3 min-w-[150px]"> email </th>
+                                            <th scope="col" className="px-6 py-3 min-w-[150px]"> joined at </th>
+                                            {isOwnerPayload.result ? <th scope="col" className="px-6 py-3  min-w-[150px]"> action </th> : null}
+                                        </tr>
+                                    </thead>
 
-                            <tbody>
-                                {payload.result.map((member, index) => (
-                                    <tr className="bg-white border-b hover:bg-gray-50" key={index}>
+                                    <tbody>
+                                        {payload.result.members.map((member, index) => (
+                                            <tr className="bg-white border-b hover:bg-gray-50" key={index}>
 
-                                        <td className="flex items-center px-6 py-4 min-w-[150px] justify-center text-gray-900 whitespace-nowrap">
-                                            <Link to={`/profile/${member.id}`}>
-                                                <img className="rounded-full shadow-md w-10 h-10 object-contain" src={member.imageUrl} alt={member.name} />
-                                            </Link>
-                                        </td>
+                                                <td className="flex items-center px-6 py-4 min-w-[150px] justify-center text-gray-900 whitespace-nowrap">
+                                                    <Link to={`/profile/${member.id}`}>
+                                                        <img className="rounded-full shadow-md w-10 h-10 object-contain" src={member.imageUrl} alt={member.name} />
+                                                    </Link>
+                                                </td>
 
-                                        <td className="px-6 py-4 min-w-[150px]"> {member.role} </td>
+                                                <td className="px-6 py-4 min-w-[150px]"> {member.role} </td>
 
-                                        <td className="px-6 py-4 min-w-[150px]"> {member.name} </td>
+                                                <td className="px-6 py-4 min-w-[150px]"> {member.name} </td>
 
-                                        <td className="px-6 py-4 min-w-[150px]"> {member.email} </td>
+                                                <td className="px-6 py-4 min-w-[150px]"> {member.email} </td>
 
-                                        <td className="px-6 py-4 min-w-[150px]"> {formatDate(member.joinedAt)} </td>
+                                                <td className="px-6 py-4 min-w-[150px]"> {formatDate(member.joinedAt)} </td>
 
-                                        {isOwnerPayload.result ? <td className="px-6 py-4 min-w-[150px]"> {member.role === "owner" ? null : <Action call={call} member={member} />} </td> : null}
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                                {isOwnerPayload.result ? <td className="px-6 py-4 min-w-[150px]"> {member.role === "owner" ? null : <Action call={call} member={member} />} </td> : null}
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div className="flex w-full justify-end items-center flex-row gap-2">
+
+                                <p>{((page * take) - take) + 1} to {payload.result.members.length + ((page * take) - take) + 1} out of {payload.result.count}</p>
+
+                                <SelectButton options={[5, 10, 15, 20, 100]} label="take" setValue={setTake} value={take} />
+
+                                <AiOutlineArrowLeft
+                                    onClick={() => { if (page > 1) setPage((prev) => prev - 1) }}
+                                    className={`${page === 1 ? "" : "hover:bg-slate-200 cursor-pointer"} p-2 rounded-xl shadow-md text-4xl`} />
+
+                                <AiOutlineArrowRight
+                                    onClick={() => { if (!(page * take >= payload.result.count)) setPage((prev) => prev + 1) }}
+                                    className={`${page * take >= payload.result.count ? "" : "hover:bg-slate-200 cursor-pointer"} p-2 rounded-xl shadow-md text-4xl`} />
+                            </div>
+                        </>
                     )}
                 </div>
+
             </div>
         </div>
     )

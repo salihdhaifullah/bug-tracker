@@ -1,23 +1,24 @@
-import { SetStateAction, useEffect, useRef, useState } from "react";
+import { KeyboardEvent, useEffect, useRef, useState } from "react";
 import { IconType } from "react-icons";
 import useOnClickOutside from "../../utils/hooks/useOnClickOutside";
 import Button from "./Button";
 import { AiOutlineArrowDown } from "react-icons/ai";
 
-interface ISelectButtonProps {
-    value: string
-    setValue: (value: SetStateAction<string>) => void
+interface ISelectButtonProps<T extends number | string> {
+    value: T
+    setValue: (value: T) => void
     label: string
-    options: string[]
+    options: T[]
     icon?: IconType
     className?: string
 }
 
-const SelectButton = (props: ISelectButtonProps) => {
+function SelectButton<T extends number | string>(props: ISelectButtonProps<T>) {
     const [isOpen, setIsOpen] = useState(false);
-    const [options, setOptions] = useState<string[]>([]);
+    const [options, setOptions] = useState<T[]>([]);
+    const [activeOption, setActiveOption] = useState(1);
 
-    const optionsRef = useRef<string[]>([]);
+    const optionsRef = useRef<T[]>([]);
     const targetRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -36,8 +37,26 @@ const SelectButton = (props: ISelectButtonProps) => {
         setIsOpen(!isOpen)
     }
 
+    useEffect(() => {
+        document.getElementById(`option-${activeOption - 1}`)?.scrollIntoView({ behavior: "smooth" });
+    }, [activeOption])
+
+    const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === "ArrowDown" && activeOption !== (options.length - 1)) {
+            setActiveOption((prev) => prev + 1);
+        }
+
+        if (e.key === "Enter") choseOption(activeOption)
+    }
+
+    const handleKeyUp = (e: KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === "ArrowUp" && activeOption !== 0) {
+            setActiveOption((prev) => prev - 1);
+        }
+    }
+
     return (
-        <div ref={targetRef} className="w-fit relative">
+        <div ref={targetRef} onKeyDown={handleKeyDown} onKeyUp={handleKeyUp} className="w-fit relative">
 
             <Button onClick={handelClick} className={`flex flex-row justify-center items-center gap-1 ${props.className || ""}`}>
                 <p>{props.label}</p>
@@ -50,7 +69,7 @@ const SelectButton = (props: ISelectButtonProps) => {
                     <option
                         key={option}
                         onClick={() => choseOption(index)}
-                        className={`${option === props.value ? "bg-slate-200" : ""} block hover:bg-slate-200 rounded-md text-gray-600 p-1 mb-1 text-base cursor-pointer`}
+                        className={`${index === activeOption ? "bg-slate-200 font-extrabold" : "bg-white"} block bg-slate-200 rounded-md text-gray-600 p-1 mb-1 text-base cursor-pointer`}
                         value={option}>
                         {option}
                     </option>

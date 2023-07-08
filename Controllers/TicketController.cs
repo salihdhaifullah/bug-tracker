@@ -108,6 +108,7 @@ public class TicketController : Controller
         {
             var tickets = await _ctx.Tickets.Where(t => t.ProjectId == projectId)
                         .OrderBy(t => t.Priority)
+                        .ThenBy(t => t.CreatedAt)
                         .Select(t => new
                         {
                             name = t.Name,
