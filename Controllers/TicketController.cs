@@ -102,11 +102,27 @@ public class TicketController : Controller
     }
 
     [HttpGet("tickets-table/{projectId}"), Authorized]
-    public async Task<IActionResult> TicketsTable([FromRoute] string projectId)
+    public async Task<IActionResult> TicketsTable([FromRoute] string projectId, [FromQuery(Name = "status")] string? statusQuery, [FromQuery(Name = "type")] string? typeQuery, [FromQuery(Name = "priority")] string? priorityQuery, [FromQuery] string? search, [FromQuery] int take = 10, [FromQuery] int page = 1)
     {
         try
         {
-            var tickets = await _ctx.Tickets.Where(t => t.ProjectId == projectId)
+            Status? status = null;
+            if (!string.IsNullOrEmpty(statusQuery) && Enum.TryParse<Status>(statusQuery, out Status parsedStatus)) status = parsedStatus;
+            TicketType? type = null;
+            if (!string.IsNullOrEmpty(typeQuery) && Enum.TryParse<TicketType>(typeQuery, out TicketType parsedType)) type = parsedType;
+            Priority? priority = null;
+            if (!string.IsNullOrEmpty(priorityQuery) && Enum.TryParse<Priority>(priorityQuery, out Priority parsedPriority)) priority = parsedPriority;
+
+
+            var query = _ctx.Tickets.Where(t => t.ProjectId == projectId
+                                            && (status == null || t.Status == status)
+                                            && (type == null || t.Type == type)
+                                            && (priority == null || t.Priority == priority)
+                                            && EF.Functions.ILike(t.Name, $"{search}%"));
+
+            var count = await query.CountAsync();
+
+            var tickets = await query
                         .OrderBy(t => t.Priority)
                         .ThenBy(t => t.CreatedAt)
                         .Select(t => new
@@ -124,14 +140,15 @@ public class TicketController : Controller
                                 name = $"{t.AssignedTo.User.FirstName} {t.AssignedTo.User.LastName}",
                             },
                             id = t.Id,
-                            priority = t.Priority,
-                            status = t.Status,
-                            type = t.Type,
+                            priority = t.Priority.ToString(),
+                            status = t.Status.ToString(),
+                            type = t.Type.ToString(),
                         })
-                        .Take(10)
+                        .Skip((page - 1) * take)
+                        .Take(take)
                         .ToListAsync();
 
-            return HttpResult.Ok(body: tickets);
+            return HttpResult.Ok(body: new { tickets, count });
         }
         catch (Exception e)
         {
@@ -195,15 +212,61 @@ public class TicketController : Controller
         {
             var userId = _auth.GetId(Request);
 
-            var ticket = await _ctx.Tickets.Where((t) => t.Id == ticketId && t.Creator.Id == userId).FirstOrDefaultAsync();
+            var ticket = await _ctx.Tickets.Where((t) => t.Id == ticketId && t.Creator.UserId == userId).FirstOrDefaultAsync();
 
             if (ticket is null) return HttpResult.NotFound("sorry, ticket not found");
 
             _ctx.Tickets.Remove(ticket);
 
+            await _data.DeleteTicketActivity(ticket.ProjectId, ticket.Name, $"{ticket.Creator.User.FirstName} {ticket.Creator.User.LastName}", _ctx);
+
             await _ctx.SaveChangesAsync();
 
             return HttpResult.Ok($"ticket \"{ticket.Name}\" successfully deleted");
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.Message);
+            return HttpResult.InternalServerError();
+        }
+    }
+
+    [HttpPatch("{ticketId}"), BodyValidation, Authorized]
+    public async Task<IActionResult> UpdateTicket([FromBody] CreateTicketDTO dto, [FromRoute] string ticketId)
+    {
+        try
+        {
+            var userId = _auth.GetId(Request);
+
+            var ticket = await _ctx.Tickets.Where((t) => t.Id == ticketId && t.Creator.UserId == userId).FirstOrDefaultAsync();
+
+            if (ticket is null) return HttpResult.NotFound("sorry, ticket not found");
+
+            AssignedTo? assignedTo = null;
+
+            if (dto.MemberId is not null)
+            {
+                assignedTo = await getAssignedTo(dto.MemberId, ticket.ProjectId);
+                if (assignedTo is null) return HttpResult.NotFound("user to assignee ticket to is not found");
+            }
+
+            var ticketType = Enum.Parse<TicketType>(dto.Type);
+            var ticketStatus = Enum.Parse<Status>(dto.Status);
+            var ticketPriority = Enum.Parse<Priority>(dto.Priority);
+
+            await _data.UpdateTicketActivity(ticket.ProjectId, ticket.Name, ticket.Type, ticket.Status, ticket.AssignedTo != null ? $"{ticket.AssignedTo.User.FirstName} {ticket.AssignedTo.User.LastName}" : null, ticket.Priority, dto.Name, ticketType, ticketStatus, assignedTo != null ? assignedTo.name : null, ticketPriority, _ctx);
+
+            ticket.AssignedToId = dto.MemberId;
+            ticket.Name = dto.Name;
+            ticket.Type = ticketType;
+            ticket.Status = ticketStatus;
+            ticket.Priority = ticketPriority;
+
+            await _ctx.SaveChangesAsync();
+
+            if (assignedTo is not null) _email.TicketAssignation(assignedTo.email, assignedTo.name, dto.Name, ticketType, ticketStatus, ticketPriority);
+
+            return HttpResult.Ok($"Ticket {dto.Name} successfully updated", redirectTo: $"/project/{ticket.ProjectId}");
         }
         catch (Exception e)
         {

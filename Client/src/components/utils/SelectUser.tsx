@@ -9,6 +9,7 @@ interface ISelectToInventProps {
     id: string;
     route: string;
     required?: boolean;
+    search?: string;
     setIsValid?: (bool: boolean) => void;
     label: string;
 }
@@ -20,11 +21,10 @@ interface Option {
     id: string;
 }
 
-
 const SelectUser = (props: ISelectToInventProps) => {
     const [isOpen, setIsOpen] = useState(false);
     const [activeOption, setActiveOption] = useState(1);
-    const [search, setSearch] = useState("");
+    const [search, setSearch] = useState(props.search || "");
 
     const [options, setOptions] = useState<Option[]>([]);
 
@@ -76,7 +76,7 @@ const SelectUser = (props: ISelectToInventProps) => {
                     onKeyDown: handleKeyDown
                 }}
                 value={search}
-                error={props.required ? ( props.id.length ? undefined : "please select user" ) : undefined}
+                error={props.required ? (props.id.length ? undefined : "please select user") : undefined}
                 onChange={(e) => setSearch(e.target.value)}
                 label={props.label}
             />

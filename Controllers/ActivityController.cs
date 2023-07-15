@@ -20,23 +20,27 @@ public class ActivityController : Controller
     }
 
     [HttpGet("activities-table/{projectId}")]
-    public async Task<IActionResult> ActivitiesTable([FromRoute] string projectId)
+    public async Task<IActionResult> ActivitiesTable([FromRoute] string projectId, [FromQuery] int take = 10, [FromQuery] int page = 1, [FromQuery] string sort = "oldest")
     {
         try
         {
-            var activities = await _ctx.Activities
-                        .Where(a => a.Id == projectId)
-                        .OrderBy(a => a.CreatedAt)
-                        .Select(a => new
-                        {
-                            content = a.Content,
-                            createdAt = a.CreatedAt,
-                        })
-                        .ToListAsync();
+            var count = await _ctx.Activities.Where(a => a.ProjectId == projectId).CountAsync();
 
-            if (activities is null) return HttpResult.NotFound("page not found");
+            var query = _ctx.Activities.Where(a => a.ProjectId == projectId);
 
-            return HttpResult.Ok(body: activities);
+            if (sort == "latest") query = query.OrderByDescending(a => a.CreatedAt);
+            else query = query.OrderBy(a => a.CreatedAt);
+
+            var activities = await query.Select(a => new
+            {
+                content = a.Content,
+                createdAt = a.CreatedAt,
+            })
+            .Skip((page - 1) * take)
+            .Take(take)
+            .ToListAsync();
+
+            return HttpResult.Ok(body: new { activities, count });
         }
         catch (Exception e)
         {

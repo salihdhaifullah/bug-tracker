@@ -2,8 +2,17 @@ import { Link, useParams } from "react-router-dom"
 import formatDate from "../../utils/formatDate"
 import Button from "../utils/Button";
 import useFetchApi from "../../utils/hooks/useFetchApi";
-import { useLayoutEffect } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import CircleProgress from "../utils/CircleProgress";
+import TextFiled from "../utils/TextFiled";
+import { AiOutlineArrowLeft, AiOutlineArrowRight, AiOutlineSearch } from "react-icons/ai";
+import SelectButton from "../utils/SelectButton";
+import useOnClickOutside from "../../utils/hooks/useOnClickOutside";
+import { FiMoreVertical } from "react-icons/fi";
+import Modal from "../utils/Model";
+import { priorityOptions, statusOptions, typeOptions } from "../../pages/CreateTicket";
+import Select from "../utils/Select";
+import SelectUser from "../utils/SelectUser";
 
 interface ITicket {
     name: string;
@@ -16,92 +25,279 @@ interface ITicket {
     id: string;
 }
 
-const Tickets = () => {
-    const { projectId } = useParams();
-    const [payload, call] = useFetchApi<ITicket[]>("GET", `ticket/tickets-table/${projectId}`);
+interface IActionProps {
+    ticket: ITicket
+    call: () => void;
+}
 
-    useLayoutEffect(() => { call() }, [])
+const Action = (props: IActionProps) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
+    const [name, setName] = useState(props.ticket.name);
+    const [type, setType] = useState(props.ticket.type);
+    const [priority, setPriority] = useState(props.ticket.priority);
+    const [status, setStatus] = useState(props.ticket.status);
+    const [memberId, setMemberId] = useState(props.ticket.assignedTo?.id || "");
+    const [isValidName, setIsValidName] = useState(true);
+    const [isValidType, setIsValidType] = useState(true);
+    const [isValidPriority, setIsValidPriority] = useState(true);
+    const [isValidStatus, setIsValidStatus] = useState(true);
+    const { projectId } = useParams();
+
+    const [deleteTicketPayload, callDeleteTicket] = useFetchApi("DELETE", `ticket/${props.ticket.id}`, [], () => {
+        props.call()
+    })
+
+    const [isOpenUpdateModal, setIsOpenUpdateModal] = useState(false);
+    const targetRef = useRef<HTMLDivElement>(null);
+    useOnClickOutside(targetRef, () => setIsOpen(false));
+
+    const [updateTicketPayload, callUpdateTicket] = useFetchApi<unknown, { name: string, type: string, priority: string, status: string, memberId?: string }>("PATCH", `ticket/${props.ticket.id}`, [], () => {
+        props.call()
+    });
 
     return (
-        <div className="my-10">
+        <div ref={targetRef} className="flex w-fit relative">
+            <Button onClick={() => setIsOpen(!isOpen)} className="p-1 px-1 shadow-sm font-normal">
+                <FiMoreVertical />
+            </Button>
 
-            <h2 className="text-3xl font-bold w-full mb-10 text-center">Tickets</h2>
-            <div className="w-full overflow-x-auto bg-white border border-gray-500 shadow-md rounded-md justify-center items-center flex flex-col p-2">
+            <div className={`${isOpen ? "flex" : "hidden"} flex flex-col px-2 py-4 justify-center items-center gap-4 w-40 absolute right-[50%] bottom-[50%] z-50 bg-white rounded shadow-md`}>
+                <Button onClick={() => setIsOpenDeleteModal(true)} className="w-full shadow-sm">delete ticket</Button>
+                <Button onClick={() => setIsOpenUpdateModal(true)} className="w-full shadow-sm">update ticket</Button>
+            </div>
 
-                <div className="flex flex-row gap-4 mt-4 items-center pb-4 p-2 bg-white justify-between">
+            <Modal isOpen={isOpenDeleteModal} setIsOpen={setIsOpenDeleteModal}>
+                <div className="flex flex-col justify-center items-center pt-4 pb-2 px-4 w-[400px] text-center h-full">
+                    <h1 className="text-xl font-bold text-primary">are you sure you want to delete this ticket</h1>
 
-                    <div className="flex flex-row gap-4 mt-4 items-center">
-                        <h2 className="text-xl font-bold">Tickets</h2>
-                        <Link to={`/project/${projectId}/create-ticket`}>
-                            <Button size="sm">create ticket</Button>
-                        </Link>
+                    <div className="w-full justify-center gap-4 pl-2 my-3 items-start flex flex-col">
+                        <p className="flex flex-row gap-2">
+                            <span>name: </span>
+                            <span className="font-bold text-primary">
+                                {props.ticket.name}
+                            </span>
+                        </p>
+
+                        <p className="flex flex-row gap-2">
+                            <span>priority: </span>
+                            <span className="font-bold text-primary">
+                                {props.ticket.priority}
+                            </span>
+                        </p>
+
+                        <p className="flex flex-row gap-2">
+                            <span>status: </span>
+                            <span className="font-bold text-primary">
+                                {props.ticket.status}
+                            </span>
+                        </p>
+
+                        <p className="flex flex-row gap-2">
+                            <span>type: </span>
+                            <span className="font-bold text-primary">
+                                {props.ticket.type}
+                            </span>
+                        </p>
                     </div>
 
-                    <div className="flex items-center justify-center">
-                        <label htmlFor="table-search-users" className="sr-only">Search</label>
-                        <div className="relative">
-                            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                                <svg className="w-5 h-5 text-gray-500" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd"></path></svg>
-                            </div>
-                            <input type="text" id="table-search-users" className="block p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500" placeholder="Search for users" />
+                    <div className="flex flex-row items-center mt-4  justify-between w-full px-4">
+                        <Button onClick={() => setIsOpenDeleteModal(false)}>cancel</Button>
+                        <Button isLoading={deleteTicketPayload.isLoading} onClick={() => callDeleteTicket()} className="!bg-red-500">delete</Button>
+                    </div>
+                </div>
+            </Modal>
+
+            <Modal isOpen={isOpenUpdateModal} setIsOpen={setIsOpenUpdateModal}>
+                <div className="rounded-xl bg-white flex flex-col gap-4 w-80 p-2 pt-6 items-center justify-center">
+                    <h1 className="text-primary font-bold text-2xl text-center">update ticket</h1>
+
+                    <div className="flex-col flex w-full justify-center items-center">
+
+                        <TextFiled
+                            validation={[
+                                { validate: (str: string) => str.length <= 100, massage: "max length of ticket name is 100 characters" },
+                                { validate: (str: string) => str.length >= 3, massage: "min length of ticket name is 3 characters" }
+                            ]}
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            label="ticket name"
+                            setIsValid={setIsValidName}
+                        />
+
+                        <Select
+                            value={type}
+                            options={typeOptions}
+                            validation={[
+                                { validate: (str: string) => typeOptions.includes(str), massage: "un-valid ticket type" }
+                            ]}
+                            setIsValid={setIsValidType}
+                            setValue={setType}
+                            label="ticket type"
+                        />
+
+                        <Select
+                            value={priority}
+                            options={priorityOptions}
+                            validation={[
+                                { validate: (str: string) => priorityOptions.includes(str), massage: "un-valid ticket priority" }
+                            ]}
+                            setValue={setPriority}
+                            setIsValid={setIsValidPriority}
+                            label="ticket priority"
+                        />
+
+                        <Select
+                            value={status}
+                            options={statusOptions}
+                            validation={[
+                                { validate: (str: string) => statusOptions.includes(str), massage: "un-valid ticket status" }
+                            ]}
+                            setValue={setStatus}
+                            setIsValid={setIsValidStatus}
+                            label="ticket status"
+                        />
+
+                        <SelectUser search={props.ticket.assignedTo?.name} label="chose user to assign this ticket to" route={`members/${projectId}`} setId={setMemberId} id={memberId} />
+
+                        <div className="flex flex-row items-center mt-4  justify-between w-full px-4">
+                            <Button onClick={() => setIsOpenUpdateModal(false)}>cancel</Button>
+                            <Button isValid={isValidName && isValidType && isValidStatus && isValidPriority} isLoading={updateTicketPayload.isLoading} onClick={() =>  callUpdateTicket({ name, type, priority, status, memberId: !memberId.length ? undefined : memberId })}>update</Button>
                         </div>
+
                     </div>
 
                 </div>
+            </Modal>
+        </div>
+    )
+}
 
-                {payload.isLoading || !payload.result ? <CircleProgress size="md" /> : (
+const Tickets = () => {
+    const { projectId } = useParams();
+    const [take, setTake] = useState(10);
+    const [page, setPage] = useState(1);
+    const [search, setSearch] = useState("");
+    const [ticketType, setTicketType] = useState("all");
+    const [ticketStatus, setTicketStatus] = useState("all");
+    const [ticketPriority, setTicketPriority] = useState("all");
+    const [payload, call] = useFetchApi<{ tickets: ITicket[], count: number }>("GET", `ticket/tickets-table/${projectId}?page=${page}&take=${take}&search=${search}&type=${ticketType}&status=${ticketStatus}&priority=${ticketPriority}`, [page, take, search, ticketType, ticketStatus, ticketPriority]);
 
-                    <table className="w-full text-sm text-left text-gray-500">
+    const [isOwnerPayload, callIsOwner] = useFetchApi<boolean>("GET", `project/is-owner-or-manger/${projectId}`);
 
-                        <thead className="text-xs text-gray-700 uppercase bg-white">
+    useLayoutEffect(() => { callIsOwner() }, [])
+    useLayoutEffect(() => { call() }, [page, take, search, ticketType, ticketStatus, ticketPriority])
 
-                            <tr>
-                                <th scope="col" className="px-6 py-3"> name </th>
-                                <th scope="col" className="px-6 py-3"> created by </th>
-                                <th scope="col" className="px-6 py-3"> assigned to </th>
-                                <th scope="col" className="px-6 py-3"> created at </th>
-                                <th scope="col" className="px-6 py-3"> priority </th>
-                                <th scope="col" className="px-6 py-3"> status </th>
-                                <th scope="col" className="px-6 py-3"> type </th>
-                            </tr>
+    const handelPrevPage = () => {
+        if (page > 1) setPage((prev) => prev - 1)
+    }
 
-                        </thead>
+    const handelNextPage = () => {
+        if (payload.result && !(page * take >= payload.result.count)) setPage((prev) => prev + 1)
+    }
 
-                        <tbody>
-                            {payload.result.map((ticket, index) => (
-                                <tr className="bg-white border-b hover:bg-gray-50" key={index}>
+    // update options
+    return (
+        <div className="my-10">
+            <h2 className="text-3xl font-bold w-full mb-10 text-center">Tickets</h2>
+            <div className="w-full bg-white border border-gray-500 shadow-md rounded-md justify-center items-center flex flex-col p-2">
 
-                                    <td>
-                                        <Link to={`/tickets/${ticket.id}`} className="link">
-                                            {ticket.name}
-                                        </Link>
-                                    </td>
+                <div className="flex flex-row gap-4 w-full flex-wrap items-center pb-4 p-2 bg-white justify-between">
+                    <Link to={`/project/${projectId}/create-ticket`}>
+                        <Button>create ticket</Button>
+                    </Link>
 
-                                    <td className="flex items-center px-6 py-4 text-gray-900 whitespace-nowrap">
-                                        <Link to={`/profile/${ticket.creator.id}`} className="link">
-                                            {ticket.creator.name}
-                                        </Link>
-                                    </td>
+                    <div className="flex items-center justify-center w-full sm:w-auto">
+                        <div className="max-w-[400px]">
+                            <TextFiled small icon={AiOutlineSearch} label="Search for tickets" value={search} onChange={(e) => setSearch(e.target.value)} />
+                        </div>
 
-                                    <td className="flex items-center px-6 py-4 text-gray-900 whitespace-nowrap">
-                                        {ticket.assignedTo ?
-                                            <Link to={`/profile/${ticket.assignedTo.id}`} className="link">
-                                                {ticket.assignedTo.name}
-                                            </Link>
-                                            : 'None'}
-                                    </td>
+                        <div className="flex gap-1 flex-row flex-wrap">
+                            <SelectButton value={ticketPriority} setValue={setTicketPriority} label="priority" options={["all", ...priorityOptions]} />
+                            <SelectButton value={ticketStatus} setValue={setTicketStatus} label="status" options={["all", ...statusOptions]} />
+                            <SelectButton value={ticketType} setValue={setTicketType} label="type" options={["all", ...typeOptions]} />
+                        </div>
+                    </div>
+                </div>
 
-                                    <td className="px-6 py-4">{formatDate(ticket.createdAt)}</td>
-                                    <td className="px-6 py-4">{ticket.priority}</td>
-                                    <td className="px-6 py-4">{ticket.status}</td>
-                                    <td className="px-6 py-4">{ticket.type}</td>
+                <div className="flex flex-col justify-center items-center w-full gap-4">
+                    {payload.isLoading || payload.result === null ? <CircleProgress size="lg" className="mb-4" /> : (
+                        <>
+                            <div className="overflow-x-scroll overflow-y-hidden w-full">
+                                <table className="text-sm text-left text-gray-500 w-full">
+                                    <thead className="text-xs text-gray-700 uppercase bg-white">
+                                        <tr>
+                                            <th scope="col" className="px-6 py-3 min-w-[150px]"> name </th>
+                                            <th scope="col" className="px-6 py-3 min-w-[150px]"> created by </th>
+                                            <th scope="col" className="px-6 py-3 min-w-[150px]"> assigned to </th>
+                                            <th scope="col" className="px-6 py-3 min-w-[150px]"> created at </th>
+                                            <th scope="col" className="px-6 py-3 min-w-[150px]"> priority </th>
+                                            <th scope="col" className="px-6 py-3 min-w-[150px]"> status </th>
+                                            <th scope="col" className="px-6 py-3 min-w-[150px]"> type </th>
+                                            {isOwnerPayload.result ? <th scope="col" className="px-6 py-3  min-w-[150px]"> action </th> : null}
+                                        </tr>
+                                    </thead>
 
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                )}
+                                    <tbody>
+                                        {payload.result.tickets.map((ticket, index) => (
+                                            <tr className="bg-white border-b hover:bg-gray-50" key={index}>
+
+                                                <td className="px-6 py-4 min-w-[150px]">
+                                                    <Link to={`/tickets/${ticket.id}`} className="link">
+                                                        {ticket.name}
+                                                    </Link>
+                                                </td>
+
+                                                <td className="px-6 py-4 min-w-[150px]">
+                                                    <Link to={`/profile/${ticket.creator.id}`} className="link">
+                                                        {ticket.creator.name}
+                                                    </Link>
+                                                </td>
+
+                                                <td className="px-6 py-4 min-w-[150px]">
+                                                    {ticket.assignedTo ?
+                                                        <Link to={`/profile/${ticket.assignedTo.id}`} className="link">
+                                                            {ticket.assignedTo.name}
+                                                        </Link>
+                                                        : 'None'}
+                                                </td>
+
+                                                <td className="px-6 py-4 min-w-[150px]">{formatDate(ticket.createdAt)}</td>
+                                                <td className="px-6 py-4 min-w-[150px]">{ticket.priority}</td>
+                                                <td className="px-6 py-4 min-w-[150px]">{ticket.status}</td>
+                                                <td className="px-6 py-4 min-w-[150px]">{ticket.type}</td>
+
+                                                {isOwnerPayload.result ?
+                                                    <td className="px-6 py-4 min-w-[150px]">
+                                                        <Action call={call} ticket={ticket} />
+                                                    </td>
+                                                    : null}
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div className="flex w-full justify-end items-center flex-row gap-2">
+
+                                <p>{((page * take) - take) + 1} to {payload.result.tickets.length === take ? (payload.result.tickets.length + ((page * take) - take)) : payload.result.tickets.length} out of {payload.result.count}</p>
+
+                                <SelectButton options={[5, 10, 15, 20, 100]} label="take" setValue={setTake} value={take} />
+
+                                <AiOutlineArrowLeft
+                                    onClick={handelPrevPage}
+                                    className={`${page === 1 ? "" : "hover:bg-slate-200 cursor-pointer"} p-2 rounded-xl shadow-md text-4xl`} />
+
+                                <AiOutlineArrowRight
+                                    onClick={handelNextPage}
+                                    className={`${page * take >= payload.result.count ? "" : "hover:bg-slate-200 cursor-pointer"} p-2 rounded-xl shadow-md text-4xl`} />
+                            </div>
+                        </>
+                    )}
+                </div>
             </div>
+
+
         </div>
     )
 }

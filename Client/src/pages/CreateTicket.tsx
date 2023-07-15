@@ -6,9 +6,9 @@ import Button from "../components/utils/Button";
 import Select from "../components/utils/Select";
 import SelectUser from "../components/utils/SelectUser";
 
-const typeOptions = ["bug", "feature"];
-const priorityOptions = ["low", "medium", "high", "critical"];
-const statusOptions = ["review", "active", "in_progress", "resolved", "closed"];
+export const typeOptions = ["bug", "feature"];
+export const priorityOptions = ["low", "medium", "high", "critical"];
+export const statusOptions = ["review", "active", "in_progress", "resolved", "closed"];
 
 const CreateTicket = () => {
   const [name, setName] = useState("");

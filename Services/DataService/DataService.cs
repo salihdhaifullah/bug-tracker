@@ -4,6 +4,7 @@ using Buegee.Services.FirebaseService;
 using Buegee.Utils;
 using Buegee.Utils.Enums;
 using Buegee.Models;
+using System.Text;
 
 namespace Buegee.Services.DataService;
 
@@ -64,12 +65,36 @@ public class DataService : IDataService
         return addActivity(projectId, $"created project {projectName}", ctx);
     }
 
-    public Task CreateTicketActivity(string projectId, string ticketName, TicketType type, Status status, string? assignedToName, Priority Priority, DataContext ctx)
+    public Task CreateTicketActivity(string projectId, string name, TicketType type, Status status, string? assignedTo, Priority priority, DataContext ctx)
     {
-        var assignedToText = assignedToName is not null ? $" assigned to {assignedToName}" : "";
+        var assignedToText = assignedTo != null ? $" assigned to {assignedTo}" : "";
 
-        return addActivity(projectId, $"created ticket {ticketName} of type {type.ToString()}{assignedToText}, status is {status.ToString()} and priority is {Priority.ToString()}", ctx);
+        return addActivity(projectId, $"created ticket {name} of type {type.ToString()}{assignedToText}, status is {status.ToString()} and priority is {priority.ToString()}", ctx);
     }
+
+    public Task UpdateTicketActivity(string projectId, string name, TicketType type, Status status, string? assignedTo, Priority priority, string? newName, TicketType? newType, Status? newStatus, string? newAssignedTo, Priority? newPriority, DataContext ctx)
+    {
+        var sb = new StringBuilder($"updated ticket {name}");
+
+        AppendChange(sb, "name", name, newName);
+        AppendChange(sb, "assignation", assignedTo ?? "None", newAssignedTo ?? "None");
+        AppendChange(sb, "type", type.ToString(), newType?.ToString());
+        AppendChange(sb, "status", status.ToString(), newStatus?.ToString());
+        AppendChange(sb, "priority", priority.ToString(), newPriority?.ToString());
+
+        return addActivity(projectId, sb.ToString(), ctx);
+    }
+
+    private void AppendChange(StringBuilder sb, string property, string oldValue, string? newValue)
+    {
+        if (newValue != null && newValue != oldValue) sb.Append($", ticket {property} changed from {oldValue} to {newValue}");
+    }
+
+    public Task DeleteTicketActivity(string projectId, string name, string by, DataContext ctx)
+    {
+        return addActivity(projectId, $"ticket {name} deleted by {by}", ctx);
+    }
+
     public Task DeleteMemberActivity(string projectId, string memberName, DataContext ctx)
     {
         return addActivity(projectId, $"the member {memberName} deleted from the project", ctx);

@@ -15,21 +15,17 @@ interface ISelectButtonProps<T extends number | string> {
 
 function SelectButton<T extends number | string>(props: ISelectButtonProps<T>) {
     const [isOpen, setIsOpen] = useState(false);
-    const [options, setOptions] = useState<T[]>([]);
-    const [activeOption, setActiveOption] = useState(1);
-
-    const optionsRef = useRef<T[]>([]);
     const targetRef = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {
-        optionsRef.current = props.options;
-        setOptions(optionsRef.current);
-    }, [props.options])
+    const [activeOption, setActiveOption] = useState(() => {
+        const temp = props.options.indexOf(props.value)
+        return temp > -1 ? temp : 0
+    });
 
     useOnClickOutside(targetRef, () => setIsOpen(false));
 
     const choseOption = (optionIndex: number) => {
-        props.setValue(options[optionIndex])
+        props.setValue(props.options[optionIndex])
+        setActiveOption(optionIndex)
         setIsOpen(false);
     }
 
@@ -38,15 +34,18 @@ function SelectButton<T extends number | string>(props: ISelectButtonProps<T>) {
     }
 
     useEffect(() => {
-        document.getElementById(`option-${activeOption - 1}`)?.scrollIntoView({ behavior: "smooth" });
+        document.getElementById(`option-${activeOption}`)?.scrollIntoView({ behavior: "smooth" });
     }, [activeOption])
 
     const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === "ArrowDown" && activeOption !== (options.length - 1)) {
+        if (e.key === "ArrowDown" && activeOption !== (props.options.length - 1)) {
             setActiveOption((prev) => prev + 1);
         }
 
-        if (e.key === "Enter") choseOption(activeOption)
+        if (e.key === "Enter") {
+            choseOption(activeOption)
+            setIsOpen(false)
+        }
     }
 
     const handleKeyUp = (e: KeyboardEvent<HTMLInputElement>) => {
@@ -64,12 +63,14 @@ function SelectButton<T extends number | string>(props: ISelectButtonProps<T>) {
             </Button>
 
             <datalist
-                className={`${isOpen ? "block" : "none"} absolute w-auto shadow-lg z-40 h-auto right-0 top-[100%] bg-white no-scrollbar border rounded-md border-t-0 p-2 overflow-y-scroll`}>
-                {options.map((option, index) => (
+                className={`${isOpen ? "block" : "none"} absolute w-auto shadow-lg z-40 h-auto right-0 top-[100%] bg-white no-scrollbar border rounded-md border-t-0 p-2 overflow-y-scroll`}
+            >
+                {props.options.map((option, index) => (
                     <option
+                        id={`option-${index}`}
                         key={option}
                         onClick={() => choseOption(index)}
-                        className={`${index === activeOption ? "bg-slate-200 font-extrabold" : "bg-white"} block bg-slate-200 rounded-md text-gray-600 p-1 mb-1 text-base cursor-pointer`}
+                        className={`${activeOption === index ? "bg-slate-200 font-extrabold" : "bg-white"} block bg-slate-200 rounded-md text-gray-600 p-1 mb-1 text-base cursor-pointer`}
                         value={option}>
                         {option}
                     </option>

@@ -136,7 +136,7 @@ public class MemberController : Controller
     {
         try
         {
-            var users = await _ctx.Users.Where(u => EF.Functions.ILike(u.Email, $"{email}%") && !u.MemberShips.Any(m => m.ProjectId == projectId && m.IsJoined))
+            var users = await _ctx.Users.Where(u => (EF.Functions.ILike(u.Email, $"{email}%")) && !u.MemberShips.Any(m => m.ProjectId == projectId && m.IsJoined))
                             .OrderBy((u) => u.CreatedAt)
                             .Select(u => new
                             {
@@ -162,7 +162,8 @@ public class MemberController : Controller
     {
         try
         {
-            var members = await _ctx.Members.Where(m => EF.Functions.ILike(m.User.Email, $"{email}%") && m.ProjectId == projectId && m.IsJoined)
+            var emailParts = string.IsNullOrEmpty(email) ? null : email.Split(" ");
+            var members = await _ctx.Members.Where(m =>  ((!(emailParts == null || emailParts.Length < 2) && (m.User.FirstName == emailParts[0] && m.User.LastName == emailParts[1])) || EF.Functions.ILike(m.User.Email, $"{email}%") || EF.Functions.ILike(m.User.FirstName, $"{email}%") || EF.Functions.ILike(m.User.LastName, $"{email}%")) && m.ProjectId == projectId && m.IsJoined)
                     .OrderBy((u) => u.JoinedAt)
                     .Select(u => new
                     {
@@ -195,7 +196,8 @@ public class MemberController : Controller
             var count = await _ctx.Members.Where(m => m.ProjectId == projectId && m.IsJoined && (role == null || m.Role == role) && (EF.Functions.ILike(m.User.Email, $"{search}%") || EF.Functions.ILike(m.User.FirstName, $"{search}%") || EF.Functions.ILike(m.User.LastName, $"{search}%"))).CountAsync();
 
             var members = await _ctx.Members
-                        .Where(m => m.ProjectId == projectId && m.IsJoined && (role == null || m.Role == role) && (EF.Functions.ILike(m.User.Email, $"{search}%") || EF.Functions.ILike(m.User.FirstName, $"{search}%") || EF.Functions.ILike(m.User.LastName, $"{search}%")))
+                        .Where(m => m.ProjectId == projectId && m.IsJoined && (role == null || m.Role == role) &&
+                        (EF.Functions.ILike(m.User.Email, $"{search}%") || EF.Functions.ILike(m.User.FirstName, $"{search}%") || EF.Functions.ILike(m.User.LastName, $"{search}%")))
                         .OrderBy((m) => m.JoinedAt)
                         .Select(m => new
                         {

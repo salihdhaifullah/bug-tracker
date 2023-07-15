@@ -1,7 +1,7 @@
 import { Link, useParams } from "react-router-dom"
 import formatDate from "../../utils/formatDate"
 import Button from "../utils/Button";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import useFetchApi from "../../utils/hooks/useFetchApi";
 import CircleProgress from "../utils/CircleProgress";
 import TextFiled from "../utils/TextFiled";
@@ -28,11 +28,10 @@ interface IActionProps {
 }
 
 const Action = (props: IActionProps) => {
+    const { projectId } = useParams();
     const [isOpen, setIsOpen] = useState(false);
-
     const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
     const [isOpenRoleModal, setIsOpenRoleModal] = useState(false);
-    const { projectId } = useParams();
     const [role, setRole] = useState("");
 
     const [payloadDelete, callDelete] = useFetchApi("DELETE", `member/delete-member/${projectId}/${props.member.id}`, [], () => {
@@ -147,9 +146,14 @@ const Members = () => {
     useLayoutEffect(() => { callIsOwner() }, [])
     useLayoutEffect(() => { call() }, [take, page, role, search])
 
-    useEffect(() => {
-        console.log("page is " + page)
-    }, [page])
+    const handelPrevPage = () => {
+        if (page > 1) setPage((prev) => prev - 1)
+    }
+
+    const handelNextPage = () => {
+        if (payload.result && !(page * take >= payload.result.count)) setPage((prev) => prev + 1)
+    }
+
     return (
         <div className="my-10">
             <h2 className="text-3xl font-bold w-full mb-10 text-center">Members</h2>
@@ -171,7 +175,7 @@ const Members = () => {
                 </div>
 
                 <div className="flex flex-col justify-center items-center w-full gap-4">
-                    {payload.isLoading || !payload.result ? <CircleProgress size="lg" className="mb-4" /> : (
+                    {payload.isLoading || payload.result === null ? <CircleProgress size="lg" className="mb-4" /> : (
                         <>
                             <div className="overflow-x-scroll overflow-y-hidden w-full">
                                 <table className="text-sm text-left text-gray-500 w-full">
@@ -213,16 +217,16 @@ const Members = () => {
 
                             <div className="flex w-full justify-end items-center flex-row gap-2">
 
-                                <p>{((page * take) - take) + 1} to {payload.result.members.length + ((page * take) - take) + 1} out of {payload.result.count}</p>
+                                <p>{((page * take) - take) + 1} to {payload.result.members.length === take ? (payload.result.members.length + ((page * take) - take)) : payload.result.members.length} out of {payload.result.count}</p>
 
                                 <SelectButton options={[5, 10, 15, 20, 100]} label="take" setValue={setTake} value={take} />
 
                                 <AiOutlineArrowLeft
-                                    onClick={() => { if (page > 1) setPage((prev) => prev - 1) }}
+                                    onClick={handelPrevPage}
                                     className={`${page === 1 ? "" : "hover:bg-slate-200 cursor-pointer"} p-2 rounded-xl shadow-md text-4xl`} />
 
                                 <AiOutlineArrowRight
-                                    onClick={() => { if (!(page * take >= payload.result.count)) setPage((prev) => prev + 1) }}
+                                    onClick={handelNextPage}
                                     className={`${page * take >= payload.result.count ? "" : "hover:bg-slate-200 cursor-pointer"} p-2 rounded-xl shadow-md text-4xl`} />
                             </div>
                         </>
@@ -233,6 +237,5 @@ const Members = () => {
         </div>
     )
 }
-
 
 export default Members;

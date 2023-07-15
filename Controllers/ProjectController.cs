@@ -237,6 +237,7 @@ public class ProjectController : Controller
         }
     }
 
+
     [HttpGet("is-owner/{projectId}")]
     public async Task<IActionResult> IsOwner([FromRoute] string projectId)
     {
@@ -249,6 +250,46 @@ public class ProjectController : Controller
             }
 
             return HttpResult.Ok(body: isOwner);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.Message);
+            return HttpResult.InternalServerError();
+        }
+    }
+
+    [HttpGet("role/{projectId}")]
+    public async Task<IActionResult> GetRole([FromRoute] string projectId)
+    {
+        try
+        {
+            var role = "";
+
+            if (_auth.TryGetId(Request, out string? userId)) {
+                role = await _ctx.Members.Where(m => m.ProjectId == projectId && m.UserId == userId).Select(m => m.Role.ToString()).FirstOrDefaultAsync();
+            }
+
+            return HttpResult.Ok(body: role);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.Message);
+            return HttpResult.InternalServerError();
+        }
+    }
+
+    [HttpGet("is-owner-or-manger/{projectId}")]
+    public async Task<IActionResult> IsOwnerOrManger([FromRoute] string projectId)
+    {
+        try
+        {
+            var isOwnerOrManger = false;
+
+            if (_auth.TryGetId(Request, out string? userId)) {
+                isOwnerOrManger = await _ctx.Members.AnyAsync(m => m.ProjectId == projectId && m.UserId == userId && (m.Role == Role.owner || m.Role == Role.project_manger));
+            }
+
+            return HttpResult.Ok(body: isOwnerOrManger);
         }
         catch (Exception e)
         {
