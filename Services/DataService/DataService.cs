@@ -5,6 +5,7 @@ using Buegee.Utils;
 using Buegee.Utils.Enums;
 using Buegee.Models;
 using System.Text;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace Buegee.Services.DataService;
 
@@ -38,14 +39,34 @@ public class DataService : IDataService
             if (dto.Markdown.Contains(file.PreviewUrl))
             {
                 var imageName = await _firebase.Upload(Convert.FromBase64String(file.Base64), ContentType.webp);
-                var document = await ctx.Documents.AddAsync(new Document() { Name = imageName, Id = Ulid.NewUlid().ToString(), ContentId = content.Id });
+                await ctx.Documents.AddAsync(new Document() { Name = imageName, Id = Ulid.NewUlid().ToString(), ContentId = content.Id });
                 dto.Markdown = dto.Markdown.Replace(file.PreviewUrl, Helper.StorageUrl(imageName));
             }
         }
 
         content.Markdown = dto.Markdown;
-
         await ctx.SaveChangesAsync();
+    }
+
+    public async Task<EntityEntry<Content>> CreateContent(ContentDTO dto, DataContext ctx)
+    {
+        var content = await ctx.Contents.AddAsync(new Content() { Id = Ulid.NewUlid().ToString() });
+
+        for (var i = 0; i < dto.Files.Count; i++)
+        {
+            var file = dto.Files[i];
+
+            if (dto.Markdown.Contains(file.PreviewUrl))
+            {
+                var imageName = await _firebase.Upload(Convert.FromBase64String(file.Base64), ContentType.webp);
+                await ctx.Documents.AddAsync(new Document() { Name = imageName, Id = Ulid.NewUlid().ToString(), ContentId = content.Entity.Id });
+                dto.Markdown = dto.Markdown.Replace(file.PreviewUrl, Helper.StorageUrl(imageName));
+            }
+        }
+
+        content.Entity.Markdown = dto.Markdown;
+
+        return content;
     }
 
     private async Task addActivity(string projectId, string markdown, DataContext ctx)

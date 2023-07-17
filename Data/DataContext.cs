@@ -25,12 +25,4 @@ public class DataContext : DbContext
 
         optionsBuilder.UseNpgsql(isFound);
     }
-
-    // protected override void OnModelCreating(ModelBuilder modelBuilder)
-    // {
-    //     modelBuilder.Entity<Member>()
-    //                 .Property(m => m.AssignedTo)
-    //                 .
-    // }
-
 }

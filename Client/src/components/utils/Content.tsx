@@ -5,18 +5,16 @@ import Editor from "./markdown";
 import { MdOutlineModeEditOutline } from "react-icons/md";
 import Parser from "./markdown/Parser";
 import CircleProgress from "./CircleProgress";
+import { MdDeleteForever } from "react-icons/md";
 
-class ContentProps {
-    editable?: boolean;
+interface IContentProps {
     url: string;
-
-    constructor(url: string, editable: boolean = false) {
-        this.url = url;
-        this.editable = editable;
-    }
+    form?: boolean;
+    editable?: boolean;
+    handelDelete?: () => void
 }
 
-const Content = (props: ContentProps) => {
+const Content = (props: IContentProps) => {
     const [md, setMd] = useState("");
     const [isEditing, setIsEditing] = useState(false);
     const files = useRef<{ base64: string, previewUrl: string }[]>([]);
@@ -48,15 +46,16 @@ const Content = (props: ContentProps) => {
             <div className="flex flex-col w-full h-fit min-h-[200px] rounded-2xl justify-start items-start bg-white">
                 {payload.isLoading ? <CircleProgress size="lg" /> : (
                     <>
-                        {!props.editable ? null : (
-                            <div onClick={() => setIsEditing((prev) => !prev)} className="flex w-full h-8 justify-end cursor-pointer">
-                                {isEditing ? <AiOutlineClose className="text-2xl mr-2 transition-all ease-in-out font-bold text-gray-600" />
-                                    : <MdOutlineModeEditOutline className="text-2xl mr-2 transition-all ease-in-out font-bold text-gray-600" />}
+                        {!props.editable || props.form ? null : (
+                            <div className="flex w-full h-8 justify-end items-center gap-2">
+                                {(props.handelDelete && props.editable) && <MdDeleteForever className="text-2xl text-red-600 mr-2 transition-all ease-in-out cursor-pointer font-bold"  onClick={() => props.handelDelete!()} /> }
+                                {isEditing ? <AiOutlineClose onClick={() => setIsEditing(false)} className="text-2xl mr-2 transition-all ease-in-out cursor-pointer font-bold text-gray-600" />
+                                    : <MdOutlineModeEditOutline onClick={() => setIsEditing(true)} className="text-2xl mr-2 transition-all ease-in-out cursor-pointer font-bold text-gray-600" />}
                             </div>
                         )}
 
-                        {isEditing ? <Editor md={md} onSubmit={handelSubmit} onCancel={handelCancel} setMd={setMd} files={files} />
-                        : <div id="parser" className="markdown flex flex-col p-1 w-full overflow-hidden h-full" dangerouslySetInnerHTML={{ __html: Parser(md) }}></div>}
+                        {isEditing || props.form ? <Editor md={md} onSubmit={handelSubmit} onCancel={props.form ? undefined : handelCancel} setMd={setMd} files={files} />
+                            : <div id="parser" className="markdown flex flex-col p-1 w-full overflow-hidden h-full" dangerouslySetInnerHTML={{ __html: Parser(md) }}></div>}
                     </>
                 )}
             </div>

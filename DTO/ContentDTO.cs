@@ -2,7 +2,6 @@ using System.Text.Json.Serialization;
 
 namespace Buegee.DTO;
 
-
 public class ContentDTO {
 
     [JsonPropertyName("markdown")]

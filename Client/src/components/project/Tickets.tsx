@@ -30,6 +30,7 @@ interface IActionProps {
     call: () => void;
 }
 
+
 const Action = (props: IActionProps) => {
     const [isOpen, setIsOpen] = useState(false);
     const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
@@ -196,7 +197,6 @@ const Tickets = () => {
         if (payload.result && !(page * take >= payload.result.count)) setPage((prev) => prev + 1)
     }
 
-    // update options
     return (
         <div className="my-10">
             <h2 className="text-3xl font-bold w-full mb-10 text-center">Tickets</h2>

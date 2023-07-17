@@ -170,27 +170,20 @@ public class TicketController : Controller
                                 createdAt = t.CreatedAt,
                                 creator = new
                                 {
-                                    firstName = t.Creator.User.FirstName,
-                                    lastName = t.Creator.User.LastName,
+                                    name = $"{t.Creator.User.FirstName} {t.Creator.User.LastName}",
                                     imageUrl = Helper.StorageUrl(t.Creator.User.ImageName),
                                     id = t.Creator.Id,
                                 },
                                 assignedTo = t.AssignedTo != null ? new
                                 {
-                                    firstName = t.AssignedTo.User.FirstName,
-                                    lastName = t.AssignedTo.User.LastName,
+                                    name = $"{t.AssignedTo.User.FirstName} {t.AssignedTo.User.LastName}",
                                     imageUrl = Helper.StorageUrl(t.AssignedTo.User.ImageName),
                                     id = t.AssignedTo.User.Id,
                                 } : null,
                                 name = t.Name,
                                 priority = t.Priority.ToString(),
                                 status = t.Status.ToString(),
-                                type = t.Type.ToString(),
-                                comments = t.Comments.Select((c) => new
-                                {
-                                    id = c.Id,
-                                    commenterId = c.CommenterId,
-                                })
+                                type = t.Type.ToString()
                             })
                             .FirstOrDefaultAsync();
 
@@ -267,6 +260,52 @@ public class TicketController : Controller
             if (assignedTo is not null) _email.TicketAssignation(assignedTo.email, assignedTo.name, dto.Name, ticketType, ticketStatus, ticketPriority);
 
             return HttpResult.Ok($"Ticket {dto.Name} successfully updated", redirectTo: $"/project/{ticket.ProjectId}");
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.Message);
+            return HttpResult.InternalServerError();
+        }
+    }
+
+    [HttpPost("content/{ticketId}"), Authorized, BodyValidation]
+    public async Task<IActionResult> EditTicketContent([FromBody] ContentDTO dto, [FromRoute] string ticketId)
+    {
+        try
+        {
+            var isAllowed = await _ctx.Tickets.AnyAsync(t => t.Creator.UserId == _auth.GetId(Request));
+           if (!isAllowed) return HttpResult.Forbidden("you are not allowed to do this action", redirectTo: "/403");
+
+            var content = await _ctx.Tickets
+                          .Where(t => t.Id == ticketId)
+                          .Include(t => t.Content)
+                          .ThenInclude(c => c.Documents)
+                          .Select(t => t.Content)
+                          .FirstOrDefaultAsync();
+
+            if (content is null) return HttpResult.UnAuthorized();
+
+            await _data.EditContent(dto, content, _ctx);
+
+            return HttpResult.Ok("successfully changed content");
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.Message);
+            return HttpResult.InternalServerError();
+        }
+    }
+
+    [HttpGet("content/{ticketId}")]
+    public async Task<IActionResult> GetTicketContent([FromRoute] string ticketId)
+    {
+        try
+        {
+            var content = await _ctx.Tickets.Where(t => t.Id == ticketId).Select(t => new { markdown = t.Content.Markdown }).FirstOrDefaultAsync();
+
+            if (content is null) return HttpResult.NotFound("content not found");
+
+            return HttpResult.Ok(body: content);
         }
         catch (Exception e)
         {

@@ -217,7 +217,7 @@ public class ProjectController : Controller
     }
 
     [HttpGet("content/{projectId}")]
-    public async Task<IActionResult> GetProfile([FromRoute] string projectId)
+    public async Task<IActionResult> GetProjectContent([FromRoute] string projectId)
     {
         try
         {
@@ -236,7 +236,6 @@ public class ProjectController : Controller
             return HttpResult.InternalServerError();
         }
     }
-
 
     [HttpGet("is-owner/{projectId}")]
     public async Task<IActionResult> IsOwner([FromRoute] string projectId)

@@ -70,7 +70,6 @@ public class AuthController : Controller
 
             _auth.LogIn(isFound.id, HttpContext);
 
-            // TODO || redirect to dashboard
             return HttpResult.Ok("logged in successfully", new
             {
                 id = isFound.id,
@@ -158,7 +157,6 @@ public class AuthController : Controller
 
             _auth.LogIn(userId, HttpContext);
 
-            // TODO || redirect to dashboard
             return HttpResult.Created("successfully verified your account", null, "/auth/login");
         }
          catch (Exception e)

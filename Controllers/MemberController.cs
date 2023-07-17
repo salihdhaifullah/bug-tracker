@@ -184,7 +184,6 @@ public class MemberController : Controller
         }
     }
 
-    // TODO pagination
     [HttpGet("members-table/{projectId}"), Authorized]
     public async Task<IActionResult> MembersTable([FromRoute] string projectId, [FromQuery(Name = "role")] string? roleQuery, [FromQuery] string? search, [FromQuery] int take = 10, [FromQuery] int page = 1)
     {
@@ -221,7 +220,6 @@ public class MemberController : Controller
         }
     }
 
-    // TODO redirect to the error page for each error
     [HttpDelete("delete-member/{projectId}/{memberId}"), Authorized]
     public async Task<IActionResult> DeleteMember([FromRoute] string projectId, [FromRoute] string memberId)
     {

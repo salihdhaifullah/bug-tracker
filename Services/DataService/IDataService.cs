@@ -2,11 +2,13 @@ using Buegee.Data;
 using Buegee.DTO;
 using Buegee.Models;
 using Buegee.Utils.Enums;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace Buegee.Services.DataService;
 
 public interface IDataService {
     public Task EditContent(ContentDTO dto, Content content, DataContext ctx);
+    public Task<EntityEntry<Content>> CreateContent(ContentDTO dto, DataContext ctx);
     public Task JoinProjectActivity(string projectId, string userName, DataContext ctx);
     public Task CreateProjectActivity(string projectId, string projectName, DataContext ctx);
     public Task CreateTicketActivity(string projectId, string name, TicketType type, Status status, string? assignedTo, Priority priority, DataContext ctx);
