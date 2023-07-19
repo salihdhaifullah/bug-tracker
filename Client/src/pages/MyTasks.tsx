@@ -1,48 +1,71 @@
-import { useEffect, useLayoutEffect, useState } from "react"
+import { useEffect, MouseEvent as ReactMouseEvent, TouchEvent as ReactTouchEvent, useRef, useState, ReactElement } from "react"
 
-const X = ({ children }: any) => {
+const Draggable = ({ children }: {children: ReactElement[] | ReactElement | string}) => {
     const [isDragging, setIsDragging] = useState(false);
     const [xTranslate, setXTranslate] = useState(0);
     const [yTranslate, setYTranslate] = useState(0);
-    const [initialMousePosition, setInitialMousePosition] = useState<any>({});
+    const [initialMousePosition, setInitialMousePosition] = useState({x: 0, y: 0});
+    const initialWidth = useRef<number>(0);
 
-    const onMouseDown = ({ clientX, clientY }: any) => {
-        setInitialMousePosition({ x: clientX, y: clientY });
+    const onMouseDown = (e: ReactMouseEvent<HTMLDivElement, MouseEvent>) => {
+        setInitialMousePosition({ x: e.clientX, y: e.clientY });
         setIsDragging(true);
     };
 
-    useLayoutEffect(() => {
-        const onMouseMove = (e: any) => {
-            setXTranslate(xTranslate + e.clientX - initialMousePosition.x);
-            setYTranslate(yTranslate + e.clientY - initialMousePosition.y);
-        };
+    const onTouchStart = (e: ReactTouchEvent<HTMLDivElement>) => {
+        setInitialMousePosition({ x: e.touches[0].clientX, y: e.touches[0].clientY });
+        setIsDragging(true);
+    };
+
+    const onMouseMove = (e: MouseEvent) => {
+        setXTranslate(xTranslate + e.clientX - initialMousePosition.x);
+        setYTranslate(yTranslate + e.clientY - initialMousePosition.y);
+    };
+
+    const onTouchMove = (e: TouchEvent) => {
+        setXTranslate(xTranslate + e.touches[0].clientX - initialMousePosition.x);
+        setYTranslate(yTranslate + e.touches[0].clientY - initialMousePosition.y);
+    };
+
+    useEffect(() => {
         if (isDragging) {
             window.addEventListener("mousemove", onMouseMove);
+            window.addEventListener("touchmove", onTouchMove);
         }
-        return () => window.removeEventListener("mousemove", onMouseMove);
+        return () => {
+            window.removeEventListener("mousemove", onMouseMove);
+            window.removeEventListener("touchmove", onTouchMove);
+        }
     }, [isDragging, initialMousePosition]);
 
     useEffect(() => {
-        const onMouseUp = () => setIsDragging(false);
-        window.addEventListener("mouseup", onMouseUp);
-        return () => window.removeEventListener("mouseup", onMouseUp);
+        window.addEventListener("mouseup", () => setIsDragging(false));
+        window.addEventListener("touchend", () => setIsDragging(false));
+        return () => {
+            window.removeEventListener("mouseup", () => setIsDragging(false));
+            window.removeEventListener("touchend", () => setIsDragging(false));
+        }
     }, []);
-
 
     useEffect(() => {
         setXTranslate(0);
         setYTranslate(0);
     }, [isDragging])
-  /// TODO fix little space in the parent
-    return (
-        <div style={{position: "relative"}} className={`${isDragging ? "h-0" : ""}`}>
 
-        <div
-            style={{ transform: isDragging ? `translate(${xTranslate}px,${yTranslate}px)` : "none", position: isDragging ? "absolute" : "static" }}
-            onMouseDown={onMouseDown}
-            className={`${isDragging ? "cursor-grabbing absolute w-[150px]" : "transition-all cursor-grab w-full"} flex justify-center items-center text-xl font-bold text-primary p-2 shadow-md border bg-slate-50`}>
-            {" "} {children}
-        </div>
+    return (
+        <div style={{ position: "relative" }}>
+            <div
+                style={isDragging ? {
+                    width: initialWidth.current + "px",
+                    transform: `translate(${xTranslate}px,${yTranslate}px)`,
+                    position: "absolute"
+                } : undefined}
+                onMouseDown={onMouseDown}
+                onTouchStart={onTouchStart}
+                ref={(z) => initialWidth.current = z?.offsetWidth!}
+                className={`${isDragging ? "cursor-grabbing absolute" : "transition-all cursor-grab"} static w-full flex justify-center items-center text-xl font-bold text-primary p-2 shadow-md border bg-slate-50`}>
+                {" "} {children}
+            </div>
         </div>
     );
 }
@@ -56,44 +79,33 @@ const MyTasks = () => {
         <div className="flex  prevent-select flex-row justify-between bg-white shadow-md p-4 gap-4">
             <div className="flex flex-col bg-white rounded-md p-2 shadow-md gap-2 border border-primary w-full">
                 <h2 className="text-2xl font-bold text-center text-secondary">row-1</h2>
-                <div id="row-1" className="flex gap-2 flex-col w-full h-full"
-                    onMouseUp={console.log}
-                    onDragOver={(event) => {
-                        event.stopPropagation();
-                        event.preventDefault();
-                    }} onDrop={console.log}>
+                <div id="row-1" className="flex gap-2 flex-col w-full h-full" onMouseUp={console.log}>
                     {data1.map((item, index) => (
-                        <X key={index}>
+                        <Draggable key={index}>
                             <p>{item}</p>
-                        </X>
+                        </Draggable>
                     ))}
                 </div>
             </div>
 
             <div className="flex flex-col bg-white rounded-md p-2 shadow-md gap-2 border border-primary w-full">
                 <h2 className="text-2xl font-bold text-center text-secondary">row-2</h2>
-                <div id="row-2" className="flex gap-2 flex-col w-full h-full" onDragOver={(event) => {
-                    event.stopPropagation();
-                    event.preventDefault();
-                }} onDrop={console.log}>
+                <div id="row-2" className="flex gap-2 flex-col w-full h-full" onMouseUp={console.log}>
                     {data2.map((item, index) => (
-                        <X key={index}>
+                        <Draggable key={index}>
                             <p>{item}</p>
-                        </X>
+                        </Draggable>
                     ))}
                 </div>
             </div >
 
             <div className="flex flex-col bg-white rounded-md p-2 shadow-md gap-2 border border-primary w-full">
                 <h2 className="text-2xl font-bold text-center text-secondary">row-3</h2>
-                <div id="row-3" className="flex gap-2 flex-col w-full h-full" onDragOver={(event) => {
-                    event.stopPropagation();
-                    event.preventDefault();
-                }} onDrop={console.log}>
+                <div id="row-3" className="flex gap-2 flex-col w-full h-full" onMouseUp={console.log}>
                     {data3.map((item, index) => (
-                        <X key={index}>
+                        <Draggable key={index}>
                             <p>{item}</p>
-                        </X>
+                        </Draggable>
                     ))}
                 </div>
             </div >
