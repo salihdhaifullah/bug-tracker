@@ -8,6 +8,7 @@ import { useUser, useUserDispatch } from "../../utils/context/user"
 import useFetchApi from "../../utils/hooks/useFetchApi";
 import { GrProjects } from 'react-icons/gr';
 import Button from '../../components/utils/Button';
+import { FaTasks } from 'react-icons/fa';
 
 const Sidebar = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -59,6 +60,12 @@ const Sidebar = () => {
                         <GrProjects /> <p>your projects</p>
                     </Link>
 
+                    <Link
+                        to="/my-tasks"
+                        onClick={() => setIsOpen(false)}
+                        className="text-primary hover:bg-slate-200 transition-all ease-in-out rounded-md text-xl p-2 flex-row flex gap-2 items-center ">
+                        <FaTasks /> <p>your tasks</p>
+                    </Link>
 
                     <Button
                         onClick={callLogout}
