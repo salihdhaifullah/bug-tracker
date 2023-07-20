@@ -1,20 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
 </head>
+<style>
+    #drag {
+        width: 100px;
+        height: 100px;
+        background: green;
+        color: white;
+        text-align: center;
+        line-height: 100px;
+    }
+
+    #drop {
+        width: 200px;
+        height: 200px;
+        background: blue;
+        color: white;
+        text-align: center;
+        line-height: 200px;
+    }
+</style>
+</head>
 
 <body>
-    <a href="hello" id="hello">hello</a>
-</body>
+    <div id="drag" draggable="true" onmousedown="handleDrag(event)">Drag me</div>
+    <div id="drop" ondragover="handleDragOver(event)" ondrop="handleDrop(event)">Drop here</div>
+    <script>
+        function handleDrag(event) {
+            var dataTransfer = new DataTransfer();
+            dataTransfer.setData("text/plain", event.target.textContent);
+            event.dataTransfer = dataTransfer;
+        }
 
-<script defer>
-    document.getElementById("hello").addEventListener("click", (e) => {
-        e.preventDefault();
-        console.log("link clicked")
-    })
-</script>
+        function handleDragOver(event) {
+            event.preventDefault();
+        }
+
+        function handleDrop(event) {
+            var data = event.dataTransfer.getData("text/plain");
+            event.target.textContent += " " + data;
+        }
+    </script>
+</body>
 
 </html>
