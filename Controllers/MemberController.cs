@@ -162,8 +162,8 @@ public class MemberController : Controller
     {
         try
         {
-            var emailParts = string.IsNullOrEmpty(email) ? null : email.Split(" ");
-            var members = await _ctx.Members.Where(m =>  ((!(emailParts == null || emailParts.Length < 2) && (m.User.FirstName == emailParts[0] && m.User.LastName == emailParts[1])) || EF.Functions.ILike(m.User.Email, $"{email}%") || EF.Functions.ILike(m.User.FirstName, $"{email}%") || EF.Functions.ILike(m.User.LastName, $"{email}%")) && m.ProjectId == projectId && m.IsJoined)
+            var nameParts = string.IsNullOrEmpty(email) ? null : email.Split(" ");
+            var members = await _ctx.Members.Where(m =>  ((!(nameParts  == null || nameParts.Length < 2) && (m.User.FirstName == nameParts[0] && m.User.LastName == nameParts[1])) || EF.Functions.ILike(m.User.Email, $"{email}%") || EF.Functions.ILike(m.User.FirstName, $"{email}%") || EF.Functions.ILike(m.User.LastName, $"{email}%")) && m.ProjectId == projectId && m.IsJoined)
                     .OrderBy((u) => u.JoinedAt)
                     .Select(u => new
                     {

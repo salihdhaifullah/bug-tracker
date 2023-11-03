@@ -1,7 +1,7 @@
 import { HTMLProps, ReactElement } from 'react';
 import CircleProgress from './CircleProgress'
 
-type Size = "sm" | "md" | "lg" | "xl" | "2xl";
+type Size = "xs" | "sm" | "md" | "lg" | "xl" | "2xl";
 
 function getSize(size?: Size) {
     let sizeClass = "";
@@ -47,9 +47,9 @@ const Button = (props: IButtonProps) => {
             {...(props.isValid === false ? {} : props.buttonProps)}
             disabled={props.isValid === false || props.isLoading}
             onClick={props.onClick}
-            className={`${getSize(props.size)} ${props.isLoading ? "cursor-wait !px-4" : "cursor-pointer"}
+            className={`${getSize(props.size)} ${props.isLoading ? "cursor-wait" : "cursor-pointer"}
                 ${props.isValid === false ? "bg-gray-300 cursor-not-allowed" : "bg-secondary"}
-                ${props.className || ""} rounded-md border-0 outline-none font-bold text-primary text-center transition-all ease-in-out shadow-md hover:shadow-lg hover:border-gray-600 hover:text-white
+                ${props.className || ""} rounded-md border-0  outline-none whitespace-nowrap font-bold text-primary text-center transition-all ease-in-out shadow-md hover:shadow-lg hover:border-gray-600 w-fit h-fit hover:text-white
             `}>
 
             {props.isLoading ? <CircleProgress size="xm" /> : props.children}

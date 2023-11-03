@@ -37,7 +37,7 @@ public class ProjectController : Controller
             var projectId = Ulid.NewUlid().ToString();
             var memberId = Ulid.NewUlid().ToString();
 
-            await _ctx.Members.AddAsync(new Member() { UserId = userId, Id = memberId, ProjectId = projectId, Role = Role.owner });
+            await _ctx.Members.AddAsync(new Member() { UserId = userId, Id = memberId, ProjectId = projectId, Role = Role.owner, IsJoined = true });
             await _ctx.Contents.AddAsync(new Content() { Id = contentId });
             await _ctx.Projects.AddAsync(new Project()
             {
@@ -112,6 +112,9 @@ public class ProjectController : Controller
                             {
                                 name = p.Name,
                                 id = p.Id,
+                                isPrivate = p.IsPrivate,
+                                members = p.Members.Count,
+                                tickets = p.Tickets.Count,
                                 createdAt = p.CreatedAt,
                                 markdown = p.Content.Markdown,
                                 isAllowedToEditContent = isAllowedToEditContent,
@@ -244,7 +247,8 @@ public class ProjectController : Controller
         {
             var isOwner = false;
 
-            if (_auth.TryGetId(Request, out string? userId)) {
+            if (_auth.TryGetId(Request, out string? userId))
+            {
                 isOwner = await _ctx.Members.AnyAsync(m => m.ProjectId == projectId && m.UserId == userId && m.Role == Role.owner);
             }
 
@@ -264,7 +268,8 @@ public class ProjectController : Controller
         {
             var role = "";
 
-            if (_auth.TryGetId(Request, out string? userId)) {
+            if (_auth.TryGetId(Request, out string? userId))
+            {
                 role = await _ctx.Members.Where(m => m.ProjectId == projectId && m.UserId == userId).Select(m => m.Role.ToString()).FirstOrDefaultAsync();
             }
 
@@ -284,7 +289,8 @@ public class ProjectController : Controller
         {
             var isOwnerOrManger = false;
 
-            if (_auth.TryGetId(Request, out string? userId)) {
+            if (_auth.TryGetId(Request, out string? userId))
+            {
                 isOwnerOrManger = await _ctx.Members.AnyAsync(m => m.ProjectId == projectId && m.UserId == userId && (m.Role == Role.owner || m.Role == Role.project_manger));
             }
 
