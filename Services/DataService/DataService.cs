@@ -106,6 +106,12 @@ public class DataService : IDataService
         return addActivity(projectId, sb.ToString(), ctx);
     }
 
+    public Task UpdateTicketStatusActivity(string projectId, string name, Status status, Status? newStatus, DataContext ctx) 
+    {
+        if (status != newStatus) return addActivity(projectId, $"updated ticket status from {status} to {newStatus}", ctx);
+        return Task.CompletedTask; 
+    }
+
     private void AppendChange(StringBuilder sb, string property, string oldValue, string? newValue)
     {
         if (newValue != null && newValue != oldValue) sb.Append($", ticket {property} changed from {oldValue} to {newValue}");

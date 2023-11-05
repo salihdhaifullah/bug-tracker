@@ -1,4 +1,7 @@
 import { useEffect, MouseEvent as ReactMouseEvent, TouchEvent as ReactTouchEvent, useRef, useState, ReactElement, MutableRefObject } from "react"
+import useFetchApi from "../utils/hooks/useFetchApi";
+import { Priority, Status, Type } from "../types";
+import CircleProgress from "../components/utils/CircleProgress";
 
 interface IDraggableProps {
     children: ReactElement[] | ReactElement | string;
@@ -7,25 +10,35 @@ interface IDraggableProps {
 }
 
 interface IItem {
-    data: string;
-    row: number;
+    name: string;
+    id: string;
+    priority: Priority;
+    status: Status;
+    type: Type;
 }
 
 interface IDroppableProps {
-    items: IItem[];
-    row: number;
+    items: IItem[] | null;
+    col: string;
     Dragged: MutableRefObject<number | null>;
 }
 
 const Droppable = (props: IDroppableProps) => {
+
     return (
-        <div id={`droppable-${props.row}`} className="flex flex-col min-h-80 h-auto bg-white rounded-md p-2 shadow-md gap-2 border border-primary w-full">
-            <h2 className="text-2xl font-bold text-center text-secondary">row-{props.row}</h2>
+        <div id={`droppable-${props.col}`} className="flex flex-col h-screen bg-white rounded-md p-2 shadow-md gap-2 border border-primary w-full">
+            <h2 className="text-2xl font-bold text-center text-secondary">{props.col}</h2>
             <div className="flex gap-2 flex-col w-full h-full">
-                {props.items.map((item, index) => {
-                    if (item.row === props.row) return (
+                {props.items && props.items.map((item, index) => {
+                    if (item.status === props.col) return (
                         <Draggable Dragged={props.Dragged} index={index} key={index}>
-                            <p>{item.data}</p>
+                            <div className="flex flex-col text-xs ">
+                                <p>{item.priority}</p>
+                                <p>{item.status}</p>
+                                <p>{item.name}</p>
+                                <p>{item.type}</p>
+                                <p>{item.id}</p>
+                            </div>
                         </Draggable>
                     )
                 })}
@@ -111,56 +124,63 @@ const Draggable = (props: IDraggableProps) => {
 }
 
 const MyTasks = () => {
-    const Dragged = useRef<number | null>(null);
-    const [data, setData] = useState<IItem[]>([
-        { row: 1, data: "item-1" },
-        { row: 1, data: "item-2" },
-        { row: 1, data: "item-3" },
-        { row: 1, data: "item-4" },
-        { row: 2, data: "item-5" },
-        { row: 2, data: "item-6" },
-        { row: 1, data: "item-7" }
-    ]);
+    const [data, setData] = useState<IItem[]>([])
 
-    const getElementId = (ele: Element | null): number | null => {
+    const [_, callUpdate] = useFetchApi<unknown, { id: string, status: Status }>("PATCH", "ticket/status", [])
+    const [tasksPayload, callTasks] = useFetchApi<IItem[], unknown>("GET", "ticket/my-tickets", [], (result) => { setData(result) })
+
+    useEffect(() => { callTasks() }, [])
+
+    const Dragged = useRef<number | null>(null);
+
+    const getElementId = (ele: Element | null): string | null => {
         if (ele === null || ele.id === "root") return null;
-        if (ele.id.startsWith("droppable-")) return Number(ele.id.split("-")[1]);
+        if (ele.id.startsWith("droppable-")) return ele.id.split("-")[1];
         return getElementId(ele.parentElement);
     }
 
     const handelDrop = (x: number, y: number) => {
-        const element = document.elementFromPoint(x, y);
-        const id = getElementId(element);
-        if (id === null || Dragged.current === null || ![1, 2, 3].includes(id)) return;
-        if (![1, 2, 3].includes(id)) return;
+        const status = getElementId(document.elementFromPoint(x, y)) as Status;
+        if (status === null || Dragged.current === null || !(status in Status)) return;
+        if (data[Dragged.current].status === status) return;
+        
         const dataCopy = Array.from(data);
-        dataCopy[Dragged.current].row = id;
+        callUpdate({ id: dataCopy[Dragged.current].id, status })
+        dataCopy[Dragged.current].status = status;
         setData(dataCopy);
     }
 
     const handelMouseUp = (e: MouseEvent) => {
-        handelDrop(e.screenX, e.screenY/2);
+        handelDrop(e.screenX, (e.screenY - 49) / 2);
     }
 
     const handelTouchEnd = (e: TouchEvent) => {
-        console.log(e)
-        handelDrop(e.changedTouches[0].screenX, e.changedTouches[0].screenY/2);
+        handelDrop(e.changedTouches[0].screenX, (e.changedTouches[0].screenY - 49) / 2);
     }
 
     useEffect(() => {
+        if (!data.length) return;
         window.addEventListener("mouseup", handelMouseUp, { capture: true });
         window.addEventListener("touchend", handelTouchEnd, { capture: true });
         return () => {
             window.removeEventListener("mouseup", handelMouseUp, { capture: true });
             window.removeEventListener("touchend", handelTouchEnd, { capture: true });
         }
-        }, [])
+    }, [data])
 
     return (
         <div className="flex prevent-select py-10 my-10 flex-row justify-between bg-white shadow-md p-4 gap-4">
-            <Droppable Dragged={Dragged} items={data} row={1} />
-            <Droppable Dragged={Dragged} items={data} row={2} />
-            <Droppable Dragged={Dragged} items={data} row={3} />
+            {!tasksPayload.isLoading && data.length ? (
+                <>
+                    <Droppable Dragged={Dragged} items={data} col={Status.review} />
+                    <Droppable Dragged={Dragged} items={data} col={Status.active} />
+                    <Droppable Dragged={Dragged} items={data} col={Status.in_progress} />
+                    <Droppable Dragged={Dragged} items={data} col={Status.resolved} />
+                    <Droppable Dragged={Dragged} items={data} col={Status.closed} />
+                </>
+            ) : (
+                <CircleProgress size="md" />
+            )}
         </div>
     )
 }

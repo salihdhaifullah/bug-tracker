@@ -101,6 +101,36 @@ public class TicketController : Controller
         }
     }
 
+    [HttpGet("my-tickets"), Authorized]
+    public async Task<IActionResult> TicketsTable()
+    {
+        try
+        {
+            var userId = _auth.GetId(Request);
+            var tickets = await _ctx.Tickets
+                        .Where(t => t.AssignedTo != null && t.AssignedTo.UserId == userId)
+                        .OrderBy(t => t.Priority)
+                        .ThenBy(t => t.CreatedAt)
+                        .Select(t => new
+                        {
+                            name = t.Name,
+                            id = t.Id,
+                            priority = t.Priority.ToString(),
+                            status = t.Status.ToString(),
+                            type = t.Type.ToString(),
+                        })
+                        .ToListAsync();
+
+            return HttpResult.Ok(body: tickets);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.Message);
+            return HttpResult.InternalServerError();
+        }
+    }
+
+
     [HttpGet("tickets-table/{projectId}"), Authorized]
     public async Task<IActionResult> TicketsTable([FromRoute] string projectId, [FromQuery(Name = "status")] string? statusQuery, [FromQuery(Name = "type")] string? typeQuery, [FromQuery(Name = "priority")] string? priorityQuery, [FromQuery] string? search, [FromQuery] int take = 10, [FromQuery] int page = 1)
     {
@@ -224,6 +254,35 @@ public class TicketController : Controller
         }
     }
 
+    [HttpPatch("status"), BodyValidation, Authorized]
+    public async Task<IActionResult> UpdateTicketStatus([FromBody] TicketStatusDTO dto)
+    {
+        try
+        {
+            var userId = _auth.GetId(Request);
+
+            var ticket = await _ctx.Tickets.Where((t) => t.Id == dto.TicketId && t.Creator.UserId == userId).FirstOrDefaultAsync();
+
+            if (ticket is null) return HttpResult.NotFound("sorry, ticket not found");
+
+            var ticketStatus = Enum.Parse<Status>(dto.Status);
+
+            await _data.UpdateTicketStatusActivity(ticket.ProjectId, ticket.Name, ticket.Status, ticketStatus, _ctx);
+
+            ticket.Status = ticketStatus;
+
+            await _ctx.SaveChangesAsync();
+
+            return HttpResult.Ok($"Ticket {ticket.Name} successfully updated");
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.Message);
+            return HttpResult.InternalServerError();
+        }
+    }
+
+
     [HttpPatch("{ticketId}"), BodyValidation, Authorized]
     public async Task<IActionResult> UpdateTicket([FromBody] CreateTicketDTO dto, [FromRoute] string ticketId)
     {
@@ -274,7 +333,7 @@ public class TicketController : Controller
         try
         {
             var isAllowed = await _ctx.Tickets.AnyAsync(t => t.Creator.UserId == _auth.GetId(Request));
-           if (!isAllowed) return HttpResult.Forbidden("you are not allowed to do this action", redirectTo: "/403");
+            if (!isAllowed) return HttpResult.Forbidden("you are not allowed to do this action", redirectTo: "/403");
 
             var content = await _ctx.Tickets
                           .Where(t => t.Id == ticketId)
