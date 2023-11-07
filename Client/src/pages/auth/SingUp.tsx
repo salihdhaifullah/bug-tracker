@@ -35,7 +35,7 @@ const SingUp = () => {
       <div className="rounded-xl bg-white flex flex-col gap-4 w-80 p-2 items-center justify-center shadow-xl">
 
         <div className="flex relative w-full items-center justify-center h-auto">
-          <img src="/logo.png" className="w-60 h-40 object-contain" alt="logo" />
+          <img src="/logo.svg" className="w-60 h-40 object-contain" alt="logo" />
         </div>
 
 

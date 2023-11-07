@@ -37,13 +37,13 @@ const Droppable = (props: IDroppableProps) => {
     };
 
     return (
-        <div className="flex flex-col h-screen bg-white rounded-md p-2 shadow-md gap-2 border border-primary w-full">
+        <div className="flex flex-col min-h-screen h-auto bg-white rounded-md p-2 shadow-md gap-2 border border-primary w-60">
             <h2 className="text-2xl font-bold text-center text-secondary">{props.col}</h2>
-            <div ref={ref} onDragOver={dragOverHandler} onDrop={dropHandler} id={`droppable-${props.col}`} className="flex gap-2 justify-start flex-col w-full h-full">
+            <div ref={ref} onDragOver={dragOverHandler} onDrop={dropHandler} id={`droppable-${props.col}`} className="flex gap-2 justify-start flex-col flex-1">
                 {props.items && props.items.map((item, index) => {
                     if (item.status === props.col) return (
                         <Draggable index={index} key={index}>
-                            <div className="flex flex-col text-xs w-full whitespace-normal">
+                            <div className="flex flex-col text-xs w-full">
                                 <p>{item.priority}</p>
                                 <p>{item.status}</p>
                                 <p>{item.name}</p>
@@ -118,7 +118,7 @@ const MyTasks = () => {
     }
 
     return (
-        <div className="py-10 my-10 flex flex-wrap overflow-scroll min-w-[100vw] flex-row justify-between bg-white shadow-md p-4 gap-4">
+        <div className="py-10 my-10 flex flex-wrap min-w-[100vw] flex-row justify-center items-start bg-white shadow-md p-2 gap-2">
             {!tasksPayload.isLoading && data.length ? (
                 <>
                     <Droppable handelDrop={handelDrop} items={data} col={Status.review} />

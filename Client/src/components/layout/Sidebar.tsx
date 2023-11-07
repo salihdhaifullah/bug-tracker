@@ -25,16 +25,15 @@ const Sidebar = () => {
                 <HiBars3 onClick={() => setIsOpen(true)} className="text-4xl text-gray-600 p-1 cursor-pointer rounded-md hover:text-gray-700 hover:bg-slate-200" />
             </div>
 
-            <div className={`${isOpen ? "right-0" : "-right-60"} fixed top-0 transition-all p-2 ease-in-out bg-white rounded-sm shadow-md h-screen w-60`}>
+            <div className={`${isOpen ? "left-0" : "-left-60"} fixed top-0 transition-all p-2 ease-in-out bg-white rounded-sm shadow-md h-screen w-60`}>
                 <div className='w-full h-fit flex justify-between items-center'>
 
-                    <img
-                        className="rounded-full shadow-md w-10 h-10 object-contain"
-                        src={user.imageUrl}
-                        alt={user.name} />
+                <Link to="/" className="flex flex-row justify-center items-center">
+                    <img src="/logo.svg" alt="Buegee" title="Buegee" className="w-20 h-10 object-contain" />
+                    <p className="text-primary text-xl font-bold">Buegee</p>
+                </Link>
 
                     <MdClose onClick={() => setIsOpen(false)} className="text-4xl text-gray-600 p-1 cursor-pointer rounded-md hover:text-gray-700 hover:bg-slate-200" />
-
                 </div>
 
 

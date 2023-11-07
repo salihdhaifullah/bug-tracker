@@ -108,7 +108,7 @@ public class DataService : IDataService
 
     public Task UpdateTicketStatusActivity(string projectId, string name, Status status, Status? newStatus, DataContext ctx) 
     {
-        if (status != newStatus) return addActivity(projectId, $"updated ticket status from {status} to {newStatus}", ctx);
+        if (status != newStatus) return addActivity(projectId, $"updated ticket \"{name}\" status from {status} to {newStatus}", ctx);
         return Task.CompletedTask; 
     }
 
