@@ -1,11 +1,10 @@
-import { useEffect, MouseEvent as ReactMouseEvent, TouchEvent as ReactTouchEvent, useRef, useState, ReactElement, MutableRefObject } from "react"
+import { useEffect, useRef, useState, ReactElement, DragEvent, useMemo } from "react"
 import useFetchApi from "../utils/hooks/useFetchApi";
 import { Priority, Status, Type } from "../types";
 import CircleProgress from "../components/utils/CircleProgress";
 
 interface IDraggableProps {
     children: ReactElement[] | ReactElement | string;
-    Dragged: MutableRefObject<number | null>;
     index: number;
 }
 
@@ -20,19 +19,31 @@ interface IItem {
 interface IDroppableProps {
     items: IItem[] | null;
     col: string;
-    Dragged: MutableRefObject<number | null>;
+    handelDrop: (index: number, col: string) => void;
 }
 
 const Droppable = (props: IDroppableProps) => {
+    const ref = useRef<HTMLDivElement>(null);
+
+    const dragOverHandler = (event: DragEvent<HTMLDivElement>) => {
+        event.preventDefault();
+        event.dataTransfer.dropEffect = "move";
+    };
+
+    const dropHandler = (event: DragEvent<HTMLDivElement>) => {
+        event.preventDefault();
+        const itemIndex = Number(event.dataTransfer.getData("text/plain"));
+        props.handelDrop(itemIndex, props.col)
+    };
 
     return (
-        <div id={`droppable-${props.col}`} className="flex flex-col h-screen bg-white rounded-md p-2 shadow-md gap-2 border border-primary w-full">
+        <div className="flex flex-col h-screen bg-white rounded-md p-2 shadow-md gap-2 border border-primary w-full">
             <h2 className="text-2xl font-bold text-center text-secondary">{props.col}</h2>
-            <div className="flex gap-2 flex-col w-full h-full">
+            <div ref={ref} onDragOver={dragOverHandler} onDrop={dropHandler} id={`droppable-${props.col}`} className="flex gap-2 justify-start flex-col w-full h-full">
                 {props.items && props.items.map((item, index) => {
                     if (item.status === props.col) return (
-                        <Draggable Dragged={props.Dragged} index={index} key={index}>
-                            <div className="flex flex-col text-xs ">
+                        <Draggable index={index} key={index}>
+                            <div className="flex flex-col text-xs w-full whitespace-normal">
                                 <p>{item.priority}</p>
                                 <p>{item.status}</p>
                                 <p>{item.name}</p>
@@ -48,75 +59,21 @@ const Droppable = (props: IDroppableProps) => {
 }
 
 const Draggable = (props: IDraggableProps) => {
-    const [isDragging, setIsDragging] = useState(false);
-    const [xTranslate, setXTranslate] = useState(0);
-    const [yTranslate, setYTranslate] = useState(0);
-    const [initialMousePosition, setInitialMousePosition] = useState({ x: 0, y: 0 });
-    const initialWidth = useRef<number>(0);
+    const ref = useRef<HTMLDivElement>(null);
 
-    const onMouseDown = (e: ReactMouseEvent<HTMLDivElement, MouseEvent>) => {
-        setInitialMousePosition({ x: e.clientX, y: e.clientY });
-        setIsDragging(true);
+    const dragStartHandler = (event: DragEvent<HTMLDivElement>) => {
+        event.dataTransfer.setData("text/plain", event.currentTarget.id);
     };
-
-    const onTouchStart = (e: ReactTouchEvent<HTMLDivElement>) => {
-        setInitialMousePosition({ x: e.touches[0].clientX, y: e.touches[0].clientY });
-        setIsDragging(true);
-    };
-
-    const onMouseMove = (e: MouseEvent) => {
-        setXTranslate(xTranslate + e.clientX - initialMousePosition.x);
-        setYTranslate(yTranslate + e.clientY - initialMousePosition.y);
-    };
-
-    const onTouchMove = (e: TouchEvent) => {
-        setXTranslate(xTranslate + e.touches[0].clientX - initialMousePosition.x);
-        setYTranslate(yTranslate + e.touches[0].clientY - initialMousePosition.y);
-    };
-
-    useEffect(() => {
-        if (isDragging) props.Dragged.current = props.index;
-        else props.Dragged.current = null;
-    }, [isDragging])
-
-    useEffect(() => {
-        if (isDragging) {
-            window.addEventListener("mousemove", onMouseMove);
-            window.addEventListener("touchmove", onTouchMove);
-        }
-        return () => {
-            window.removeEventListener("mousemove", onMouseMove);
-            window.removeEventListener("touchmove", onTouchMove);
-        }
-    }, [isDragging, initialMousePosition]);
-
-    useEffect(() => {
-        window.addEventListener("mouseup", () => setIsDragging(false));
-        window.addEventListener("touchend", () => setIsDragging(false));
-        return () => {
-            window.removeEventListener("mouseup", () => setIsDragging(false));
-            window.removeEventListener("touchend", () => setIsDragging(false));
-        }
-    }, []);
-
-    useEffect(() => {
-        setXTranslate(0);
-        setYTranslate(0);
-    }, [isDragging])
 
     return (
-        <div className="relative">
+        <div
+            id={props.index.toString()}
+            ref={ref}
+            draggable={true}
+            onDragStart={dragStartHandler}
+        >
             <div
-                style={isDragging ? {
-                    width: initialWidth.current + "px",
-                    zIndex: 1000,
-                    transform: `translate(${xTranslate}px,${yTranslate}px)`,
-                    position: "absolute"
-                } : undefined}
-                onMouseDown={onMouseDown}
-                onTouchStart={onTouchStart}
-                ref={(e) => initialWidth.current = e?.offsetWidth!}
-                className={`${isDragging ? "cursor-grabbing absolute" : "transition-all cursor-grab"} static w-full flex justify-center items-center text-xl font-bold text-primary p-2 shadow-md border bg-slate-50`}>
+                className="static w-full flex justify-center items-center text-xl font-bold text-primary p-2 shadow-md border bg-slate-50">
                 {" "} {props.children}
             </div>
         </div>
@@ -131,7 +88,18 @@ const MyTasks = () => {
 
     useEffect(() => { callTasks() }, [])
 
-    const Dragged = useRef<number | null>(null);
+    const realScreenHeightOffset = useMemo(() => window.screen.height*0.3, [window.screen.height]);
+    const realScreenHeightScroll = useMemo(() => window.screen.height*0.01, [window.screen.height]);
+
+    const DragOverListener = (e: globalThis.DragEvent) => {
+        if ((e.screenY + realScreenHeightOffset) >= window.screen.height) window.scrollBy(0, realScreenHeightScroll+((e.screenY + realScreenHeightOffset) - window.screen.height));
+        if ((e.screenY - realScreenHeightOffset) <= 0) window.scrollBy(0, -realScreenHeightScroll+(e.screenY - realScreenHeightOffset));
+    }
+
+    useEffect(() => {
+        document.addEventListener("drag", DragOverListener);
+        return () => document.removeEventListener("drag", DragOverListener)
+    }, [])
 
     const getElementId = (ele: Element | null): string | null => {
         if (ele === null || ele.id === "root") return null;
@@ -139,44 +107,25 @@ const MyTasks = () => {
         return getElementId(ele.parentElement);
     }
 
-    const handelDrop = (x: number, y: number) => {
-        const status = getElementId(document.elementFromPoint(x, y)) as Status;
-        if (status === null || Dragged.current === null || !(status in Status)) return;
-        if (data[Dragged.current].status === status) return;
-        
+    const handelDrop = (index: number, col: string) => {
+        if (!(col in Status)) return;
+        if (data[index].status === col) return;
         const dataCopy = Array.from(data);
-        callUpdate({ id: dataCopy[Dragged.current].id, status })
-        dataCopy[Dragged.current].status = status;
+
+        callUpdate({ id: dataCopy[index].id, status: col as Status })
+        dataCopy[index].status = col as Status;
         setData(dataCopy);
     }
 
-    const handelMouseUp = (e: MouseEvent) => {
-        handelDrop(e.screenX, (e.screenY - 49) / 2);
-    }
-
-    const handelTouchEnd = (e: TouchEvent) => {
-        handelDrop(e.changedTouches[0].screenX, (e.changedTouches[0].screenY - 49) / 2);
-    }
-
-    useEffect(() => {
-        if (!data.length) return;
-        window.addEventListener("mouseup", handelMouseUp, { capture: true });
-        window.addEventListener("touchend", handelTouchEnd, { capture: true });
-        return () => {
-            window.removeEventListener("mouseup", handelMouseUp, { capture: true });
-            window.removeEventListener("touchend", handelTouchEnd, { capture: true });
-        }
-    }, [data])
-
     return (
-        <div className="flex prevent-select py-10 my-10 flex-row justify-between bg-white shadow-md p-4 gap-4">
+        <div className="py-10 my-10 flex flex-wrap overflow-scroll min-w-[100vw] flex-row justify-between bg-white shadow-md p-4 gap-4">
             {!tasksPayload.isLoading && data.length ? (
                 <>
-                    <Droppable Dragged={Dragged} items={data} col={Status.review} />
-                    <Droppable Dragged={Dragged} items={data} col={Status.active} />
-                    <Droppable Dragged={Dragged} items={data} col={Status.in_progress} />
-                    <Droppable Dragged={Dragged} items={data} col={Status.resolved} />
-                    <Droppable Dragged={Dragged} items={data} col={Status.closed} />
+                    <Droppable handelDrop={handelDrop} items={data} col={Status.review} />
+                    <Droppable handelDrop={handelDrop} items={data} col={Status.active} />
+                    <Droppable handelDrop={handelDrop} items={data} col={Status.in_progress} />
+                    <Droppable handelDrop={handelDrop} items={data} col={Status.resolved} />
+                    <Droppable handelDrop={handelDrop} items={data} col={Status.closed} />
                 </>
             ) : (
                 <CircleProgress size="md" />

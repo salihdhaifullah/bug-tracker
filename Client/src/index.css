@@ -56,11 +56,11 @@ body {
 }
 
 body {
-    @apply flex flex-col bg-indigo-200
+    @apply flex flex-col bg-indigo-200 
 }
 
 main {
-    @apply flex flex-col min-h-[85vh] mt-[8vh] mb-[6vh] h-auto
+    @apply flex flex-col min-h-[85vh] mt-[8vh] mb-[6vh] h-auto 
 }
 
 header {
