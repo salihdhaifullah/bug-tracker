@@ -56,7 +56,7 @@ body {
 }
 
 body {
-    @apply flex flex-col bg-indigo-200 
+    @apply flex flex-col bg-sky-200 
 }
 
 .link {
