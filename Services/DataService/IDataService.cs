@@ -17,4 +17,7 @@ public interface IDataService {
     public Task DeleteMemberActivity(string projectId, string memberName, DataContext ctx);
     public Task ChangeMemberRoleActivity(string projectId, string memberName, Role oldRole, Role newRole, DataContext ctx);
     public Task UpdateTicketStatusActivity(string projectId, string name, Status status, Status? newStatus, DataContext ctx); 
+    public Task TransferOwnershipActivity(string projectId, string projectName, string currentOwner, string newOwner, DataContext ctx); 
+    public Task ChangeVisibilityActivity(string projectId, string projectName, bool currentState, DataContext ctx); 
+    public Task ArchiveProjectActivity(string projectId, string projectName, bool currentState, DataContext ctx);
 }

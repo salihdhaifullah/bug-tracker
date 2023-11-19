@@ -54,19 +54,22 @@ public class MemberController : Controller
 
             if (user is null) return HttpResult.BadRequest("user to invent is not exist");
 
-            var inventer = await _ctx.Users.Where(u => u.Id == userId)
+            var invited = await _ctx.Users.Where(u => u.Id == userId)
                             .Select(u => new { name = $"{u.FirstName} {u.LastName}" })
                             .FirstOrDefaultAsync();
 
-            if (inventer is null) return HttpResult.UnAuthorized();
+            if (invited is null) return HttpResult.UnAuthorized();
 
             var project = await _ctx.Projects
                     .Where(p => p.Id == projectId && p.Members.Any(m => m.User.Id == userId && m.Role == Role.owner))
-                    .Select(p => new { name = p.Name })
+                    .Select(p => new { name = p.Name, p.IsReadOnly })
                     .FirstOrDefaultAsync();
+
 
             if (project is null) return HttpResult.Forbidden(massage: "you are not authorized to invent users", redirectTo: "/403");
 
+            if (project.IsReadOnly) return HttpResult.BadRequest("this project is archived");
+            
             var role = Enum.Parse<Role>(dto.Role);
 
             var memberId = Ulid.NewUlid().ToString();
@@ -83,7 +86,7 @@ public class MemberController : Controller
 
             await _cache.Redis.StringSetAsync(sessionId, JsonSerializer.Serialize<Invention>(new Invention(projectId, dto.InventedId, user.name)), age);
 
-            _email.Invitation(user.email, user.name, project.name, role, inventer.name, $"{Helper.BaseUrl(Request)}/join-project/{sessionId}");
+            _email.Invitation(user.email, user.name, project.name, role, invited.name, $"{Helper.BaseUrl(Request)}/join-project/{sessionId}");
 
             return HttpResult.Ok($"successfully invented user {user.name}");
         }
@@ -231,6 +234,10 @@ public class MemberController : Controller
 
             if (!isOwner) return HttpResult.Forbidden("you are not authorized to delete a member");
 
+            var isReadOnly = await _ctx.Projects.AnyAsync(p => p.Id == projectId && p.IsReadOnly);
+
+            if (isReadOnly) return HttpResult.BadRequest("this project is archived");
+
             var member = await _ctx.Members
                     .Where(m => m.ProjectId == projectId && m.IsJoined && m.UserId == memberId)
                     .Include(m => m.User)
@@ -267,6 +274,10 @@ public class MemberController : Controller
 
             if (!isOwner) return HttpResult.Forbidden("you are not authorized to edit members roles in this project");
 
+            var isReadOnly = await _ctx.Projects.AnyAsync(p => p.Id == projectId && p.IsReadOnly);
+
+            if (isReadOnly) return HttpResult.BadRequest("this project is archived");
+            
             var member = await _ctx.Members
                     .Where(m => m.ProjectId == projectId && m.IsJoined && m.UserId == dto.MemberId)
                     .Include(m => m.User)

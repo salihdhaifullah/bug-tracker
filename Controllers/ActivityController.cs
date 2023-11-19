@@ -1,4 +1,5 @@
 using Buegee.Data;
+using Buegee.Services.AuthService;
 using Buegee.Utils;
 using Buegee.Utils.Attributes;
 using Microsoft.AspNetCore.Mvc;
@@ -11,22 +12,24 @@ namespace Buegee.Controllers;
 public class ActivityController : Controller
 {
     private readonly DataContext _ctx;
+    private readonly IAuthService _auth;
     private readonly ILogger<ActivityController> _logger;
 
-    public ActivityController(DataContext ctx, ILogger<ActivityController> logger)
+    public ActivityController(DataContext ctx, ILogger<ActivityController> logger, IAuthService auth)
     {
         _ctx = ctx;
         _logger = logger;
+        _auth = auth;
     }
 
-    [HttpGet("activities-table/{projectId}")]
-    public async Task<IActionResult> ActivitiesTable([FromRoute] string projectId, [FromQuery] int take = 10, [FromQuery] int page = 1, [FromQuery] string sort = "oldest")
+    [HttpGet("activities/{projectId}")]
+    public async Task<IActionResult> Activities([FromRoute] string projectId, [FromQuery] int take = 10, [FromQuery] int page = 1, [FromQuery] string sort = "oldest")
     {
         try
         {
-            var count = await _ctx.Activities.Where(a => a.ProjectId == projectId).CountAsync();
-
-            var query = _ctx.Activities.Where(a => a.ProjectId == projectId);
+            _auth.TryGetId(Request, out string? userId);
+            
+            var query = _ctx.Activities.Where(a => a.ProjectId == projectId && (!a.Project.IsPrivate || a.Project.Members.Any(m => userId != null && m.UserId == userId && m.IsJoined)));
 
             if (sort == "latest") query = query.OrderByDescending(a => a.CreatedAt);
             else query = query.OrderBy(a => a.CreatedAt);
@@ -40,7 +43,7 @@ public class ActivityController : Controller
             .Take(take)
             .ToListAsync();
 
-            return HttpResult.Ok(body: new { activities, count });
+            return HttpResult.Ok(body: activities);
         }
         catch (Exception e)
         {
@@ -48,4 +51,23 @@ public class ActivityController : Controller
             return HttpResult.InternalServerError();
         }
     }
+
+    [HttpGet("activities-count/{projectId}")]
+    public async Task<IActionResult> ActivitiesCount([FromRoute] string projectId)
+    {
+        try
+        {
+            _auth.TryGetId(Request, out string? userId);
+
+            var count = await _ctx.Activities.Where(a => a.ProjectId == projectId && (!a.Project.IsPrivate || a.Project.Members.Any(m => userId != null && m.UserId == userId && m.IsJoined))).CountAsync();
+
+            return HttpResult.Ok(body: count);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.Message);
+            return HttpResult.InternalServerError();
+        }
+    }
+
 }

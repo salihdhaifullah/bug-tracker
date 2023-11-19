@@ -20,6 +20,9 @@ public class Project
     [Required, Column("is_private")]
     public bool IsPrivate { get; set; } = false;
 
+    [Required, Column("is-read-only")]
+    public bool IsReadOnly { get; set; } = false;
+    
     [Required, ForeignKey("Content"), Column("content_id"), StringLength(26)]
     public required string ContentId { get; set; } = null!;
     public Content Content { get; set; } = null!;

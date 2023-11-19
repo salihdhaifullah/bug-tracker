@@ -99,15 +99,16 @@ public class ProjectController : Controller
     {
         try
         {
+
             var isAllowedToEditContent = false;
 
             if (_auth.TryGetId(Request, out string? userId) || !string.IsNullOrEmpty(userId))
             {
                 isAllowedToEditContent = await _ctx.Projects.AnyAsync(p => p.Id == projectId && p.Members.Any(m => m.UserId == userId && (m.Role == Role.owner || m.Role == Role.project_manger)));
             }
-
+ 
             var project = await _ctx.Projects
-                            .Where((p) => p.Id == projectId)
+                            .Where((p) => p.Id == projectId && (!p.IsPrivate || p.Members.Any(m => userId != null && m.UserId == userId && m.IsJoined)))
                             .Select((p) => new
                             {
                                 name = p.Name,
@@ -153,6 +154,8 @@ public class ProjectController : Controller
 
             if (project is null) return HttpResult.NotFound("sorry, project not found");
 
+            if (project.IsReadOnly) return HttpResult.BadRequest("this project is archived");
+
             _ctx.Projects.Remove(project);
 
             await _ctx.SaveChangesAsync();
@@ -192,12 +195,16 @@ public class ProjectController : Controller
         try
         {
             var userId = _auth.GetId(Request);
-
+            
             var isAllowed = await _ctx.Projects
                     .AnyAsync(p => p.Id == projectId && p.Members.Any(m => m.UserId == userId
                     && (m.Role == Role.owner || m.Role == Role.project_manger)));
 
             if (!isAllowed) return HttpResult.Forbidden("you are not allowed to do this action", redirectTo: "/403");
+
+            var isArchived = await  _ctx.Projects.AnyAsync(p => p.Id == projectId && p.IsReadOnly);
+
+            if (isArchived) return HttpResult.BadRequest("this project is archived");
 
             var content = await _ctx.Projects
                           .Where(p => p.Id == projectId)
@@ -219,13 +226,122 @@ public class ProjectController : Controller
         }
     }
 
+    [HttpGet("change-visibility/{projectId}"), Authorized]
+    public async Task<IActionResult> ChangeVisibility([FromRoute, IdValidation] string projectId)
+    {
+        try
+        {
+            var userId = _auth.GetId(Request);
+
+            var isOwner = await _ctx.Members.AnyAsync(m => m.ProjectId == projectId && m.UserId == userId && m.Role == Role.owner && m.IsJoined);
+
+            if (!isOwner) return HttpResult.Forbidden("you are not allowed to do this action");
+
+            var project = await _ctx.Projects.Where(p => p.Id == projectId).FirstOrDefaultAsync();
+
+            if (project == null) return HttpResult.NotFound("project not found");
+            
+            if (project.IsReadOnly) return HttpResult.BadRequest("this project is archived");
+            
+           await _data.ChangeVisibilityActivity(projectId, project.Name, project.IsPrivate, _ctx);
+
+            project.IsPrivate = !project.IsPrivate;
+
+            await _ctx.SaveChangesAsync();
+
+            return HttpResult.Ok($"successfully changed project visibility");
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.Message);
+            return HttpResult.InternalServerError();
+        }
+    }
+
+    [HttpGet("archive/{projectId}"), Authorized]
+    public async Task<IActionResult> Archive([FromRoute, IdValidation] string projectId)
+    {
+        try
+        {
+            var userId = _auth.GetId(Request);
+
+            var isOwner = await _ctx.Members.AnyAsync(m => m.ProjectId == projectId && m.UserId == userId && m.Role == Role.owner && m.IsJoined);
+
+            if (!isOwner) return HttpResult.Forbidden("you are not allowed to do this action");
+
+            var project = await _ctx.Projects.Where(p => p.Id == projectId).FirstOrDefaultAsync();
+
+            if (project == null) return HttpResult.NotFound("project not found");
+            
+           await _data.ArchiveProjectActivity(projectId, project.Name, project.IsReadOnly, _ctx);
+
+            project.IsReadOnly = !project.IsReadOnly;
+
+            await _ctx.SaveChangesAsync();
+
+            return HttpResult.Ok($"successfully changed project status");
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.Message);
+            return HttpResult.InternalServerError();
+        }
+    }
+
+
+    [HttpPost("transfer-ownership"), Authorized, BodyValidation]
+    public async Task<IActionResult> TransferProjectOwnerShip([FromBody] TransferProjectOwnerShipDTO dto)
+    {
+        try
+        {
+            var newOwner = await _ctx.Members
+                .Where(m => m.IsJoined && m.ProjectId == dto.ProjectId && m.Role != Role.owner && m.Id == dto.MemberId)
+                .Include(m => m.User)
+                .FirstOrDefaultAsync();
+
+            if (newOwner == null) return HttpResult.NotFound("user not found to transfer project to");
+
+            var userId = _auth.GetId(Request);
+
+            var currentOwner = await _ctx.Members
+                .Where(m => m.ProjectId == dto.ProjectId && m.UserId == userId && m.Role == Role.owner && m.IsJoined)
+                .Include(m => m.User)
+                .FirstOrDefaultAsync();
+
+            if (currentOwner == null) return HttpResult.Forbidden("you are not allowed to do this action");
+
+            var project = await _ctx.Projects.Where(p => p.Id == dto.ProjectId).Select(p => new { p.Name, p.IsReadOnly }).FirstOrDefaultAsync();
+
+            if (project == null) return HttpResult.NotFound("project not found");
+            
+            if (project.IsReadOnly) return HttpResult.BadRequest("this project is archived");
+
+            _ctx.Members.Remove(currentOwner);
+
+            newOwner.Role = Role.owner;
+
+            await _data.TransferOwnershipActivity(dto.ProjectId, project.Name, $"{currentOwner.User.FirstName} {currentOwner.User.LastName}", $"{newOwner.User.FirstName} {newOwner.User.LastName}", _ctx);
+            
+            await _ctx.SaveChangesAsync();
+
+            return HttpResult.Ok($"successfully trasfered project");
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.Message);
+            return HttpResult.InternalServerError();
+        }
+    }
+
     [HttpGet("content/{projectId}")]
     public async Task<IActionResult> GetProjectContent([FromRoute] string projectId)
     {
         try
         {
+            _auth.TryGetId(Request, out string? userId);
+
             var content = await _ctx.Projects
-                        .Where(p => p.Id == projectId)
+                        .Where(p => p.Id == projectId && (!p.IsPrivate || p.Members.Any(m => userId != null && m.UserId == userId && m.IsJoined)))
                         .Select(p => new { markdown = p.Content.Markdown })
                         .FirstOrDefaultAsync();
 

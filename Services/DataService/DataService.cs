@@ -106,10 +106,10 @@ public class DataService : IDataService
         return addActivity(projectId, sb.ToString(), ctx);
     }
 
-    public Task UpdateTicketStatusActivity(string projectId, string name, Status status, Status? newStatus, DataContext ctx) 
+    public Task UpdateTicketStatusActivity(string projectId, string name, Status status, Status? newStatus, DataContext ctx)
     {
         if (status != newStatus) return addActivity(projectId, $"updated ticket \"{name}\" status from {status} to {newStatus}", ctx);
-        return Task.CompletedTask; 
+        return Task.CompletedTask;
     }
 
     private void AppendChange(StringBuilder sb, string property, string oldValue, string? newValue)
@@ -131,4 +131,26 @@ public class DataService : IDataService
     {
         return addActivity(projectId, $"the member {memberName} role had been changed from {oldRole.ToString()} to {newRole.ToString()}", ctx);
     }
+
+    public Task TransferOwnershipActivity(string projectId, string projectName, string currentOwner, string newOwner, DataContext ctx)
+    {
+        return addActivity(projectId, $"trasfered project {projectName} from {currentOwner} to {newOwner}", ctx);
+    }
+
+
+    delegate string GetStatus(bool val);
+    public Task ChangeVisibilityActivity(string projectId, string projectName, bool currentState, DataContext ctx)
+    {
+        GetStatus getStatus = val => val ? "private" : "public";
+
+        return addActivity(projectId, $"project {projectName} visibility changed from {getStatus(currentState)} to {getStatus(!currentState)}", ctx);
+    }
+
+    public Task ArchiveProjectActivity(string projectId, string projectName, bool currentState, DataContext ctx) {
+
+        GetStatus getStatus = val => val ? "archived" : "unarchived";
+
+        return addActivity(projectId, $"project {projectName} {getStatus}", ctx);
+    }
+
 }

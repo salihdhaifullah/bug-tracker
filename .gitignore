@@ -1,6 +1,7 @@
 firebase-sdk.json
 data.json
 DROP.sql
+COPY.sql
 .env
 appsettings.json
 .vscode

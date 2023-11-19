@@ -18,27 +18,29 @@ const Activities = () => {
     const [page, setPage] = useState(1);
     const [sort, setSort] = useState("oldest");
 
-    const [payload, call] = useFetchApi<{ activities: IActivity[], count: number }>("GET", `activity/activities-table/${projectId}?page=${page}&take=${take}&sort=${sort}`, [take, page, sort]);
+    const [activitiesPayload, callActivities] = useFetchApi<IActivity[]>("GET", `activity/activities/${projectId}?page=${page}&take=${take}&sort=${sort}`, [take, page, sort]);
+    const [countPayload, callCount] = useFetchApi<number>("GET", "activity/activities-count/${projectId}");
 
-    useLayoutEffect(() => { call() }, [take, page, sort])
+    useLayoutEffect(() => { callActivities() }, [take, page, sort])
+    useLayoutEffect(() => { callCount() }, [])
 
     useMemo(() => {
-        if (!payload.result) return;
+        if (!activitiesPayload.result) return;
 
         setText(`${((page * take) - take) + 1} to
-        ${payload.result.activities.length === take
-                ? (payload.result.activities.length + ((page * take) - take))
-                : payload.result.activities.length}
-        out of ${payload.result.count}`)
+        ${activitiesPayload.result.length === take
+                ? (activitiesPayload.result.length + ((page * take) - take))
+                : activitiesPayload.result.length}
+        out of ${countPayload.result}`)
 
-    }, [payload.result, take, page])
+    }, [activitiesPayload.result, take, page])
 
     const handelPrevPage = () => {
         if (page > 1) setPage((prev) => prev - 1)
     }
 
     const handelNextPage = () => {
-        if (payload.result && !(page * take >= payload.result.count)) setPage((prev) => prev + 1)
+        if (countPayload.result && !(page * take >= countPayload.result)) setPage((prev) => prev + 1)
     }
 
     return (
@@ -51,7 +53,7 @@ const Activities = () => {
                 </div>
 
                 <div className="flex flex-col justify-center items-center w-full gap-4">
-                    {payload.isLoading || payload.result === null ? <CircleProgress size="lg" className="mb-4" /> : (
+                    {activitiesPayload.isLoading || countPayload.isLoading || !countPayload.result || !activitiesPayload.result ? <CircleProgress size="lg" className="mb-4" /> : (
                         <>
                             <div className="overflow-x-scroll overflow-y-hidden w-full">
                                 <table className="text-sm text-left text-gray-500 w-full">
@@ -63,7 +65,7 @@ const Activities = () => {
                                     </thead>
 
                                     <tbody>
-                                        {payload.result.activities.map((activity, index) => (
+                                        {activitiesPayload.result.map((activity, index) => (
                                             <tr className="bg-white border-b hover:bg-gray-50" key={index}>
                                                 <td className="px-6 py-4 min-w-[150px]">{activity.content}</td>
                                                 <td className="px-6 py-4 min-w-[150px]">{formatDate(activity.createdAt, true)}</td>
@@ -84,7 +86,7 @@ const Activities = () => {
 
                                 <AiOutlineArrowRight
                                     onClick={handelNextPage}
-                                    className={`${page * take >= payload.result.count ? "" : "hover:bg-slate-200 cursor-pointer"} p-2 rounded-xl shadow-md text-4xl`} />
+                                    className={`${page * take >= countPayload.result ? "" : "hover:bg-slate-200 cursor-pointer"} p-2 rounded-xl shadow-md text-4xl`} />
                             </div>
                         </>
                     )}
