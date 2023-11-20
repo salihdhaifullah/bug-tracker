@@ -13,6 +13,7 @@ import Modal from "../utils/Model";
 import { priorityOptions, statusOptions, typeOptions } from "../../pages/CreateTicket";
 import Select from "../utils/Select";
 import SelectUser from "../utils/SelectUser";
+import labelsColors from "../../utils/lablesColors";
 
 interface ITicket {
     name: string;
@@ -197,26 +198,6 @@ const Tickets = () => {
         if (payload.result && !(page * take >= payload.result.count)) setPage((prev) => prev + 1)
     }
 
-    const labelsColors = {
-        PRIORITY: {
-            low: "bg-green-500",
-            medium: "bg-yellow-500",
-            high: "bg-orange-500",
-            critical: "bg-red-500",
-        },
-        STATUS: {
-            review: "bg-indigo-500",
-            active: "bg-blue-500",
-            in_progress: "bg-cyan-500",
-            resolved: "bg-emerald-500",
-            closed: "bg-gray-500",
-        },
-        TYPE: {
-            bug: "bg-rose-500",
-            feature: "bg-lime-500",
-        },
-    };
-
     return (
         <div className="my-10">
             <h2 className="text-3xl font-bold w-full mb-10 text-center">Tickets</h2>
@@ -284,13 +265,13 @@ const Tickets = () => {
 
                                                 <td className="px-6 py-4 min-w-[150px]">{formatDate(ticket.createdAt)}</td>
                                                 <td className="px-6 py-4 min-w-[150px]">
-                                                    <p className={`rounded-md font-bold border-black w-fit p-1 text-white ${labelsColors.PRIORITY[ticket.priority]}`}>{ticket.priority}</p>
+                                                    <p className={`rounded-md font-bold border-black w-fit p-1 text-white ${(labelsColors.PRIORITY as any)[ticket.priority]}`}>{ticket.priority}</p>
                                                 </td>
                                                 <td className="px-6 py-4 min-w-[150px]">
-                                                    <p className={`rounded-md font-bold border-black w-fit p-1 text-white ${labelsColors.STATUS[ticket.status]}`}>{ticket.status}</p>
+                                                    <p className={`rounded-md font-bold border-black w-fit p-1 text-white ${(labelsColors.STATUS as any)[ticket.status]}`}>{ticket.status}</p>
                                                 </td>
                                                 <td className="px-6 py-4 min-w-[150px]">
-                                                    <p className={`rounded-md font-bold border-black w-fit p-1 text-white ${labelsColors.TYPE[ticket.type]}`}>{ticket.type}</p>
+                                                    <p className={`rounded-md font-bold border-black w-fit p-1 text-white ${(labelsColors.TYPE as any)[ticket.type]}`}>{ticket.type}</p>
                                                 </td>
 
                                                 {isOwnerPayload.result ?

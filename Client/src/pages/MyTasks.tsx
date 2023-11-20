@@ -2,6 +2,8 @@ import { useEffect, useRef, useState, ReactElement, DragEvent, useMemo } from "r
 import useFetchApi from "../utils/hooks/useFetchApi";
 import { Priority, Status, Type } from "../types";
 import CircleProgress from "../components/utils/CircleProgress";
+import labelsColors from "../utils/lablesColors";
+import { Link } from "react-router-dom";
 
 interface IDraggableProps {
     children: ReactElement[] | ReactElement | string;
@@ -37,18 +39,21 @@ const Droppable = (props: IDroppableProps) => {
     };
 
     return (
-        <div className="flex flex-col min-h-screen h-auto bg-white rounded-md p-2 shadow-md gap-2 border border-primary w-60">
-            <h2 className="text-2xl font-bold text-center text-secondary">{props.col}</h2>
+        <div className="flex flex-col min-h-screen h-auto bg-white rounded-md p-2 gap-2 w-60">
+            <h2 className="text-xl font-bold text-center text-primary rounded-sm hover:bg-slate-200 w-full p-2">{props.col}</h2>
             <div ref={ref} onDragOver={dragOverHandler} onDrop={dropHandler} id={`droppable-${props.col}`} className="flex gap-2 justify-start flex-col flex-1">
                 {props.items && props.items.map((item, index) => {
                     if (item.status === props.col) return (
                         <Draggable index={index} key={index}>
-                            <div className="flex flex-col text-xs w-full">
-                                <p>{item.priority}</p>
-                                <p>{item.status}</p>
-                                <p>{item.name}</p>
-                                <p>{item.type}</p>
-                                <p>{item.id}</p>
+                            <div className="flex flex-col gap-2 w-full">
+
+                                <Link className="link text-base" to={`/tickets/${item.id}`}>{item.name}</Link>
+
+                                <div className="flex text-sm flex-row justify-start gap-1 flex-wrap">
+                                    <span title="type" className={`rounded-sm font-bold border-black w-fit p-1 text-white ${(labelsColors.TYPE as any)[item.type]}`}>{item.type}</span>
+                                    <span title="priority" className={`rounded-sm font-bold border-black w-fit p-1 text-white ${(labelsColors.PRIORITY as any)[item.priority]}`}>{item.priority}</span>
+                                </div>
+
                             </div>
                         </Draggable>
                     )
@@ -88,12 +93,12 @@ const MyTasks = () => {
 
     useEffect(() => { callTasks() }, [])
 
-    const realScreenHeightOffset = useMemo(() => window.screen.height*0.3, [window.screen.height]);
-    const realScreenHeightScroll = useMemo(() => window.screen.height*0.01, [window.screen.height]);
+    const realScreenHeightOffset = useMemo(() => window.screen.height * 0.3, [window.screen.height]);
+    const realScreenHeightScroll = useMemo(() => window.screen.height * 0.01, [window.screen.height]);
 
     const DragOverListener = (e: globalThis.DragEvent) => {
-        if ((e.screenY + realScreenHeightOffset) >= window.screen.height) window.scrollBy(0, realScreenHeightScroll+((e.screenY + realScreenHeightOffset) - window.screen.height));
-        if ((e.screenY - realScreenHeightOffset) <= 0) window.scrollBy(0, -realScreenHeightScroll+(e.screenY - realScreenHeightOffset));
+        if ((e.screenY + realScreenHeightOffset) >= window.screen.height) window.scrollBy(0, realScreenHeightScroll + ((e.screenY + realScreenHeightOffset) - window.screen.height));
+        if ((e.screenY - realScreenHeightOffset) <= 0) window.scrollBy(0, -realScreenHeightScroll + (e.screenY - realScreenHeightOffset));
     }
 
     useEffect(() => {

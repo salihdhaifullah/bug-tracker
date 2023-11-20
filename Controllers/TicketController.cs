@@ -130,7 +130,6 @@ public class TicketController : Controller
         }
     }
 
-
     [HttpGet("tickets-table/{projectId}"), Authorized]
     public async Task<IActionResult> TicketsTable([FromRoute] string projectId, [FromQuery(Name = "status")] string? statusQuery, [FromQuery(Name = "type")] string? typeQuery, [FromQuery(Name = "priority")] string? priorityQuery, [FromQuery] string? search, [FromQuery] int take = 10, [FromQuery] int page = 1)
     {
@@ -153,7 +152,9 @@ public class TicketController : Controller
             var count = await query.CountAsync();
 
             var tickets = await query
-                        .OrderBy(t => t.Priority)
+                        .OrderBy(t => t.Status)
+                        .ThenByDescending(t => t.Priority)
+                        .ThenBy(t => t.Type)
                         .ThenBy(t => t.CreatedAt)
                         .Select(t => new
                         {
@@ -235,7 +236,7 @@ public class TicketController : Controller
         {
             var userId = _auth.GetId(Request);
 
-            var ticket = await _ctx.Tickets.Where((t) => t.Id == ticketId && t.Creator.UserId == userId).FirstOrDefaultAsync();
+            var ticket = await _ctx.Tickets.Where((t) => t.Id == ticketId && t.Creator.UserId == userId).Include(t => t.Creator).ThenInclude(c => c.User).FirstOrDefaultAsync();
 
             if (ticket is null) return HttpResult.NotFound("sorry, ticket not found");
 

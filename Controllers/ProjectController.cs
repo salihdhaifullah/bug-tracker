@@ -317,7 +317,7 @@ public class ProjectController : Controller
             
             if (project.IsReadOnly) return HttpResult.BadRequest("this project is archived");
 
-            _ctx.Members.Remove(currentOwner);
+            currentOwner.Role = Role.project_manger;
 
             newOwner.Role = Role.owner;
 
