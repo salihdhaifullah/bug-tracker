@@ -21,6 +21,7 @@ import Ticket from "./pages/Ticket";
 import JoinProject from "./pages/JoinProject";
 import Invent from "./pages/Invent";
 import MyTasks from "./pages/MyTasks";
+import Dashboard from "./pages/Dashboard";
 
 const router = createBrowserRouter([{
     path: "/",
@@ -34,6 +35,7 @@ const router = createBrowserRouter([{
         { path: "auth/account-verification", Component: AccountVerification },
         { path: "create-project", Component: CreateProject },
         { path: "my-profile", Component: MyProfile },
+        { path: "dashboard", Component: Dashboard },
         { path: "profile/:userId", Component: Profile },
         { path: "projects", Component: Projects },
         { path: "project/:projectId", Component: Project },
