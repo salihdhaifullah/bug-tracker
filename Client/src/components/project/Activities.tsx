@@ -19,7 +19,7 @@ const Activities = () => {
     const [sort, setSort] = useState("oldest");
 
     const [activitiesPayload, callActivities] = useFetchApi<IActivity[]>("GET", `activity/activities/${projectId}?page=${page}&take=${take}&sort=${sort}`, [take, page, sort]);
-    const [countPayload, callCount] = useFetchApi<number>("GET", "activity/activities-count/${projectId}");
+    const [countPayload, callCount] = useFetchApi<number>("GET", `activity/activities-count/${projectId}`);
 
     useLayoutEffect(() => { callActivities() }, [take, page, sort])
     useLayoutEffect(() => { callCount() }, [])
@@ -33,7 +33,7 @@ const Activities = () => {
                 : activitiesPayload.result.length}
         out of ${countPayload.result}`)
 
-    }, [activitiesPayload.result, take, page])
+    }, [countPayload.result, activitiesPayload.result, take, page])
 
     const handelPrevPage = () => {
         if (page > 1) setPage((prev) => prev - 1)

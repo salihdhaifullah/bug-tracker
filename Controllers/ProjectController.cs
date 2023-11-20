@@ -113,7 +113,8 @@ public class ProjectController : Controller
                             {
                                 name = p.Name,
                                 id = p.Id,
-                                isPrivate = p.IsPrivate,
+                                isPrivate = p.IsPrivate, 
+                                isReadOnly = p.IsReadOnly,
                                 members = p.Members.Count,
                                 tickets = p.Tickets.Count,
                                 createdAt = p.CreatedAt,
@@ -226,8 +227,8 @@ public class ProjectController : Controller
         }
     }
 
-    [HttpGet("change-visibility/{projectId}"), Authorized]
-    public async Task<IActionResult> ChangeVisibility([FromRoute, IdValidation] string projectId)
+    [HttpGet("visibility/{projectId}"), Authorized]
+    public async Task<IActionResult> Visibility([FromRoute] string projectId)
     {
         try
         {
@@ -249,7 +250,7 @@ public class ProjectController : Controller
 
             await _ctx.SaveChangesAsync();
 
-            return HttpResult.Ok($"successfully changed project visibility");
+            return HttpResult.Ok($"successfully changed project visibility to {(project.IsPrivate ? "private" : "public")}");
         }
         catch (Exception e)
         {
@@ -259,7 +260,7 @@ public class ProjectController : Controller
     }
 
     [HttpGet("archive/{projectId}"), Authorized]
-    public async Task<IActionResult> Archive([FromRoute, IdValidation] string projectId)
+    public async Task<IActionResult> Archive([FromRoute] string projectId)
     {
         try
         {
@@ -279,7 +280,7 @@ public class ProjectController : Controller
 
             await _ctx.SaveChangesAsync();
 
-            return HttpResult.Ok($"successfully changed project status");
+            return HttpResult.Ok($"successfully {(project.IsReadOnly ? "archived" : "unarchived")} project");
         }
         catch (Exception e)
         {
@@ -289,7 +290,7 @@ public class ProjectController : Controller
     }
 
 
-    [HttpPost("transfer-ownership"), Authorized, BodyValidation]
+    [HttpPost("transfer"), Authorized, BodyValidation]
     public async Task<IActionResult> TransferProjectOwnerShip([FromBody] TransferProjectOwnerShipDTO dto)
     {
         try

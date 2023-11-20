@@ -161,12 +161,14 @@ public class MemberController : Controller
     }
 
     [HttpGet("members/{projectId}"), Authorized]
-    public async Task<IActionResult> SearchMember([FromQuery] string email, [FromRoute] string projectId)
+    public async Task<IActionResult> SearchMember([FromRoute] string projectId, [FromQuery] string email, [FromQuery(Name = "not-me")] bool notMe = false)
     {
         try
         {
+            var userId = _auth.GetId(Request);
+
             var nameParts = string.IsNullOrEmpty(email) ? null : email.Split(" ");
-            var members = await _ctx.Members.Where(m =>  ((!(nameParts  == null || nameParts.Length < 2) && (m.User.FirstName == nameParts[0] && m.User.LastName == nameParts[1])) || EF.Functions.ILike(m.User.Email, $"{email}%") || EF.Functions.ILike(m.User.FirstName, $"{email}%") || EF.Functions.ILike(m.User.LastName, $"{email}%")) && m.ProjectId == projectId && m.IsJoined)
+            var members = await _ctx.Members.Where(m =>  ((!(nameParts  == null || nameParts.Length < 2) && (m.User.FirstName == nameParts[0] && m.User.LastName == nameParts[1])) || EF.Functions.ILike(m.User.Email, $"{email}%") || EF.Functions.ILike(m.User.FirstName, $"{email}%") || EF.Functions.ILike(m.User.LastName, $"{email}%")) && m.ProjectId == projectId && m.IsJoined && (!notMe || m.UserId != userId))
                     .OrderBy((u) => u.JoinedAt)
                     .Select(u => new
                     {

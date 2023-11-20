@@ -14,6 +14,7 @@ interface IProject {
     createdAt: string;
     name: string;
     isPrivate: boolean;
+    isReadOnly: boolean;
     members: number;
     tickets: number;
     markdown: string;
@@ -37,6 +38,15 @@ const Project = () => {
             <div className="bg-white mb-4 rounded-md shadow-md p-4 gap-2 flex flex-col">
 
                 <h1 className="text-2xl font-bold">{payload.result.name}</h1>
+                
+                {payload.result.isReadOnly ? (
+                <div className="flex  flex-col justify-center w-full">
+                        <div className="flex rounded-md bg-yellow-300 bg-opacity-80 border-black border p-2 w-fit">
+                            <p className="text-center text-gray-900 text-lg font-bold">this project is archived</p> 
+                        </div>
+                </div>
+                ) : null}
+
 
                 <Content editable={payload.result.isAllowedToEditContent} url={`project/content/${projectId}`} />
 

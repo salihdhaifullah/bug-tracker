@@ -9,6 +9,7 @@ interface ISelectToInventProps {
     id: string;
     route: string;
     required?: boolean;
+    notMe?: boolean;
     search?: string;
     setIsValid?: (bool: boolean) => void;
     label: string;
@@ -26,21 +27,17 @@ const SelectUser = (props: ISelectToInventProps) => {
     const [activeOption, setActiveOption] = useState(1);
     const [search, setSearch] = useState(props.search || "");
 
-    const [options, setOptions] = useState<Option[]>([]);
-
     const targetRef = useRef<HTMLDivElement>(null);
 
     useOnClickOutside(targetRef, () => setIsOpen(false));
 
-    const [payload, call] = useFetchApi<Option[]>("GET", `member/${props.route}?email=${search}`, [search]);
+    const [payload, call] = useFetchApi<Option[]>("GET", `member/${props.route}?email=${search}&not-me=${props.notMe || false}`, [search]);
 
     useEffect(() => { call(); }, [search])
 
-    useEffect(() => { if (payload.result) setOptions(payload.result); }, [payload.result])
-
     const choseOption = (optionIndex: number) => {
-        props.setId(options[optionIndex].id)
-        setSearch(options[optionIndex].email)
+        setSearch(payload.result![optionIndex].email);
+        props.setId(payload.result![optionIndex].id);
         setIsOpen(false);
     }
 
@@ -49,10 +46,9 @@ const SelectUser = (props: ISelectToInventProps) => {
     }, [activeOption])
 
     const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === "ArrowDown" && activeOption !== (options.length - 1)) {
+        if (e.key === "ArrowDown" && activeOption !== (payload.result!.length - 1)) {
             setActiveOption((prev) => prev + 1);
         }
-
         if (e.key === "Enter") choseOption(activeOption)
     }
 
@@ -82,8 +78,8 @@ const SelectUser = (props: ISelectToInventProps) => {
             />
 
             <datalist
-                className={`${isOpen && options.length ? "block" : "none"} absolute w-full shadow-lg z-40 max-h-40 top-[100%] bg-white no-scrollbar border rounded-md border-t-0 p-2 overflow-y-scroll`}>
-                {payload.isLoading ? <CircleProgress size="md" /> : options.map((option, index) => (
+                className={`${isOpen && payload.result && payload.result.length ? "block" : "none"} absolute w-full shadow-lg z-40 max-h-40 top-[100%] bg-white no-scrollbar border rounded-md border-t-0 p-2 overflow-y-scroll`}>
+                {payload.isLoading || !payload.result ? <CircleProgress size="md" /> : payload.result.map((option, index) => (
                     <div
                         key={index}
                         id={`option-${index}`}
