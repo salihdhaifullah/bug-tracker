@@ -39,7 +39,7 @@ const Droppable = (props: IDroppableProps) => {
     };
 
     return (
-        <div className="flex flex-col min-h-screen h-auto bg-white rounded-md p-2 gap-2 w-60">
+        <div className="flex flex-col min-h-screen h-auto rounded-md p-2 gap-2 w-60">
             <h2 className="text-xl font-bold text-center text-primary rounded-sm hover:bg-slate-200 w-full p-2">{props.col}</h2>
             <div ref={ref} onDragOver={dragOverHandler} onDrop={dropHandler} id={`droppable-${props.col}`} className="flex gap-2 justify-start flex-col flex-1">
                 {props.items && props.items.map((item, index) => {
@@ -123,7 +123,7 @@ const MyTasks = () => {
     }
 
     return (
-        <div className="py-10 my-10 flex flex-wrap min-w-[100vw] flex-row justify-center items-start bg-white shadow-md p-2 gap-2">
+        <div className="py-10 my-10 flex flex-wrap min-w-[100vw] flex-row justify-center items-start p-2 gap-2">
             {!tasksPayload.isLoading && data.length ? (
                 <>
                     <Droppable handelDrop={handelDrop} items={data} col={Status.review} />

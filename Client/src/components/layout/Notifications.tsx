@@ -29,7 +29,7 @@ const Notification = ({ notification }: { notification: INotification }) => {
 
     setTimeout(() => deleteNotification(), 5000);
 
-    let intervalID: number;
+    let intervalID:  NodeJS.Timeout;
 
     const startTimer = useCallback(() => {
         intervalID = setInterval(() => setWidth((prev) => (prev + 1)), 25);
@@ -42,27 +42,27 @@ const Notification = ({ notification }: { notification: INotification }) => {
     useEffect(() => startTimer(), [])
 
     return (
-        <div className="flex notification-animation max-w-[70vw] h-auto flex-col rounded shadow-lg bg-gray-50 drop-shadow-xl">
+        <div className="flex notification-animation max-w-[70vw] h-auto flex-col rounded shadow-lg dark:shadow-secondary bg-white dark:bg-black">
 
             <div className="flex flex-row justify-center">
 
-                <div className={`${isError ? "bg-red-600" : "bg-green-600"} w-[3px] `}></div>
+                <div className={`${isError ? "dark:bg-red-400 bg-red-600" : "dark:bg-green-400 bg-green-600"} w-[3px] `}></div>
 
                 <div className="font-extrabold flex justify-center items-center ml-1">
-                    {isError ? <FaTimes className="text-white bg-red-600 rounded-full p-0.5" /> : <FaCheck className="text-white bg-green-600 rounded-full p-0.5 " />}
+                    {isError ? <FaTimes className="text-white dark:bg-red-400 bg-red-600 rounded-full p-0.5" /> : <FaCheck className="text-white dark:bg-green-400 bg-green-600 rounded-full p-0.5 " />}
                 </div>
 
                 <div className="p-2 flex flex-col ml-2 flex-grow">
-                    <p className={`${isError ? "text-red-600" : "text-green-600"} text-bold`}>{notification.message}</p>
+                    <p className={`${isError ? "dark:text-red-400 text-red-600" : "dark:text-green-400 text-green-600"} text-bold`}>{notification.message}</p>
                 </div>
 
                 <div>
-                    <FaTimes onClick={deleteNotification} className="text-gray-500 rounded-sm hover:text-gray-700 hover:bg-slate-200 m-0.5 cursor-pointer" />
+                    <FaTimes onClick={deleteNotification} className="cursor-pointer rounded-sm text-gray-600 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-100 dark:hover:bg-slate-700 hover:bg-slate-300 m-0.5" />
                 </div>
 
             </div>
 
-            <div style={{ width: (width >= 0 ? `${width}%` : "0px") }} className={`${isError ? "bg-red-600" : "bg-green-600"} h-[2px] rounded-full`}></div>
+            <div style={{ width: (width >= 0 ? `${width}%` : "0px") }} className={`${isError ? "dark:bg-red-400 bg-red-600" : "dark:bg-green-400 bg-green-600"} h-[2px] rounded-full`}></div>
         </div>
     )
 }

@@ -12,15 +12,15 @@ const MyProfile = () => {
     useEffect(() => { user === null ?? navigate("/auth/login") }, [user])
 
     return !user ? null : (
-        <section className="flex flex-col lg:flex-row justify-between gap-2 w-full h-full flex-grow p-2">
+        <section className="flex flex-col lg:flex-row justify-between gap-2 w-full h-full flex-grow mt-10 p-2">
             <div className="flex flex-col w-full lg:w-fit lg:h-[60vh] h-auto justify-center items-center lg:justify-start my-2">
-                <div className="flex flex-col h-auto w-fit px-2 sm:px-4 md:px-8 lg:px-2 gap-2 rounded-2xl justify-center items-center bg-white py-2">
+                <div className="flex flex-col h-auto w-fit px-2 sm:px-4 md:px-8 lg:px-2 gap-2 rounded-2xl justify-center items-center bg-white dark:bg-black py-2 shadow-lg dark:shadow-secondary">
                     <Image />
-                    <h1 className="text-gray-800 font-medium text-2xl">{user.name}</h1>
+                    <h1 className="text-gray-800 dark:text-gray-200 font-medium text-2xl">{user.name}</h1>
                     <Bio />
                 </div>
             </div>
-            <div className="bg-white rounded-lg shadow-lg w-full h-fit p-2 lg:m-3 mb-3">
+            <div className="bg-white dark:bg-black rounded-lg shadow-lg w-full h-fit p-2 lg:m-3 mb-3 dark:shadow-secondary">
                 <Content editable url={`user/profile/${user.id}`} />
             </div>
         </section>

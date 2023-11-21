@@ -17,15 +17,15 @@ const AccountVerification = () => {
 
     return (
         <section className="flex flex-col justify-center items-center flex-grow">
-            <div className="rounded-xl bg-white flex flex-col gap-4 w-80 p-2 items-center justify-center shadow-xl">
+            <div className="rounded-xl bg-white dark:bg-black flex flex-col gap-4 w-80 p-2 items-center justify-center shadow-xl dark:shadow-secondary">
 
                 <div className="flex relative w-full items-center justify-center h-auto">
-                    <img src="/logo.svg" className="w-60 h-40 object-contain" alt="logo" />
+                    <img src="/logo.svg" className="w-20 h-20 object-contain" alt="logo" />
                 </div>
 
-                <h1 className="text-primary font-bold text-2xl text-center">Account Verification</h1>
+                <h1 className="text-primary dark:text-secondary font-bold text-2xl text-center">Account Verification</h1>
 
-                <p className="text-primary text-base text-center px-2">
+                <p className="text-primary dark:text-secondary text-base text-center px-2">
                     check your emails for the verification code, if you did not find it please check spam emails.
                 </p>
 
@@ -45,12 +45,12 @@ const AccountVerification = () => {
                     />
 
 
-<div className="flex flex-col justify-center items-center w-full my-1">
+                    <div className="flex flex-col justify-center items-center w-full my-1">
                         <Button
                             buttonProps={{ type: "submit" }}
                             isLoading={payload.isLoading}
                             isValid={isValidCode}
-                            >submit</Button>
+                        >submit</Button>
                     </div>
                 </form>
 

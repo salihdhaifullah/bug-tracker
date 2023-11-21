@@ -66,7 +66,7 @@ const Bio = () => {
                         <MdOutlineModeEditOutline className="text-2xl font-bold text-gray-600" />
                     </div>
 
-                    <p className="text-lg  text-gray-800 flex break-all text-center grid-cols-3">
+                    <p className="text-lg text-gray-800 flex break-all text-center grid-cols-3">
                         {bio}
                     </p>
                 </div>

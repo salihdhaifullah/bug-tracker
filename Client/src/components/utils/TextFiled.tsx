@@ -25,8 +25,8 @@ interface TextFiledProps {
 
 
 const TextFiled = forwardRef((props: TextFiledProps, ref: ForwardedRef<HTMLDivElement>) => {
-    const LABEL_FOCUS = `bottom-[95%] ${props?.icon ? "left-[12%]" : "left-[2.4%]"}  text-sm text-secondary`;
-    const LABEL = `text-base ${props?.icon ? "left-[20%]" : "left-[4%]"} bottom-[20%]  text-gray-600`;
+    const LABEL_FOCUS = `bottom-[95%] ${props?.icon ? "left-[12%]" : "left-[2.4%]"}  text-sm dark:text-secondary  text-primary`;
+    const LABEL = `text-base ${props?.icon ? "left-[20%]" : "left-[4%]"} bottom-[20%]  text-gray-700 dark:text-gray-200`;
 
     const Id = useId();
     const [isFocus, setIsFocus] = useState(false);
@@ -99,11 +99,11 @@ const TextFiled = forwardRef((props: TextFiledProps, ref: ForwardedRef<HTMLDivEl
                     className={labelClassName}>
                     {props.label}
                 </label>
-                {!props?.icon ? null : <props.icon className="text-gray-600 text-2xl font-bold" />}
+                {!props?.icon ? null : <props.icon className="text-gray-700 dark:text-gray-50 text-2xl font-bold" />}
                 {!props?.InElement ? null : props.InElement}
                 <input
                     {...props.inputProps}
-                    className={`${props.small ? "p-1" : "p-2"} border h-fit rounded-sm w-full ${isError ? "border-red-500 hover:border-red-700 focus:outline-red-600" : "border-gray-400 hover:border-gray-900 focus:outline-secondary"} `}
+                    className={`${props.small ? "p-1" : "p-2"} dark:text-white dark:bg-black border h-fit rounded-sm w-full focus:border-none focus:outline-solid focus:outline-2 ${isError ? "border-red-600 hover:border-red-800 dark:border-red-400 dark:hover:border-red-500 focus:outline-red-600 dark:focus:outline-red-400" : "dark:border-gray-300 dark:hover:border-white border-gray-700 hover:border-gray-900 focus:outline-primary dark:focus:outline-secondary"}`}
                     id={Id}
                     value={props.value}
                     onFocus={onFocus}
@@ -114,8 +114,8 @@ const TextFiled = forwardRef((props: TextFiledProps, ref: ForwardedRef<HTMLDivEl
             </div>
             {!isError
                 ? (props.maxLength !== undefined
-                    && <p className="text-gray-600 text-center text-xs font-light">You have {props.maxLength - props.value.length} characters remaining out of a maximum of {props.maxLength}.</p>)
-                : <p className="text-red-600 text-center text-base font-bold">{errorMassage}</p>}
+                    && <p className="text-gray-700 dark:text-gray-200 text-center text-xs font-light">You have {props.maxLength - props.value.length} characters remaining out of a maximum of {props.maxLength}.</p>)
+                : <p className="text-red-600 dark:text-red-400 text-center text-sm">{errorMassage}</p>}
         </div>
     )
 })

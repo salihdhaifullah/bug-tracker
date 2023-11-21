@@ -78,17 +78,17 @@ const SelectUser = (props: ISelectToInventProps) => {
             />
 
             <datalist
-                className={`${isOpen && payload.result && payload.result.length ? "block" : "none"} absolute w-full shadow-lg z-40 max-h-40 top-[100%] bg-white no-scrollbar border rounded-md border-t-0 p-2 overflow-y-scroll`}>
+                className={`${isOpen && payload.result && payload.result.length ? "block" : "none"} absolute w-full shadow-lg z-40 max-h-40 top-[100%] bg-white dark:bg-black no-scrollbar border rounded-md border-t-0 p-2 overflow-y-scroll`}>
                 {payload.isLoading || !payload.result ? <CircleProgress size="md" /> : payload.result.map((option, index) => (
                     <div
                         key={index}
                         id={`option-${index}`}
                         onClick={() => choseOption(index)}
-                        className={`${index === activeOption ? "bg-slate-200 font-extrabold" : "bg-white"}  flex flex-col w-full justify-center items-center  bg-slate-200 rounded-md text-gray-600 p-1 mb-1 text-base cursor-pointer`}
+                        className={`${index === activeOption ? "bg-slate-200 dark:bg-slate-800 font-extrabold" : "bg-white dark:bg-black"} flex flex-col w-full justify-center items-center rounded-md text-gray-600 dark:text-gray-300 p-1 mb-1 text-base cursor-pointer`}
                     >
 
                         <div className="flex flex-row w-full gap-4">
-                            <img className="rounded-full flex shadow-md w-10 h-10 object-contain" src={option.imageUrl} alt={option.name} />
+                            <img className="rounded-full flex shadow-md dark:shadow-secondary w-10 h-10 object-contain" src={option.imageUrl} alt={option.name} />
                             <p className="font-bold">{option.name}</p>
                         </div>
                         <p className="text-sm font-light -mt-2 -ml-8">{option.email}</p>
