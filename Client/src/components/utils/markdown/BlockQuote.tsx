@@ -21,7 +21,7 @@ const BlockQuote = () => {
     return (
         <div title="Block quote" className="flex justify-center items-center"
             onClick={() => insertBlockQuote()}>
-            <BsQuote className="text-gray-700 text-xl rounded-sm hover:bg-gray-200 hover:text-secondary cursor-pointer" />
+            <BsQuote className="text-gray-700 dark:text-gray-300 dark:hover:bg-slate-800 hover:bg-slate-200 hover:text-primary dark:hover:text-secondary text-xl rounded-sm cursor-pointer" />
         </div>
     )
 }

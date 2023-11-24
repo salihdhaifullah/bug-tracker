@@ -99,14 +99,8 @@ public class ProjectController : Controller
     {
         try
         {
+            _auth.TryGetId(Request, out string? userId);
 
-            var isAllowedToEditContent = false;
-
-            if (_auth.TryGetId(Request, out string? userId) || !string.IsNullOrEmpty(userId))
-            {
-                isAllowedToEditContent = await _ctx.Projects.AnyAsync(p => p.Id == projectId && p.Members.Any(m => m.UserId == userId && (m.Role == Role.owner || m.Role == Role.project_manger)));
-            }
- 
             var project = await _ctx.Projects
                             .Where((p) => p.Id == projectId && (!p.IsPrivate || p.Members.Any(m => userId != null && m.UserId == userId && m.IsJoined)))
                             .Select((p) => new
@@ -119,7 +113,6 @@ public class ProjectController : Controller
                                 tickets = p.Tickets.Count,
                                 createdAt = p.CreatedAt,
                                 markdown = p.Content.Markdown,
-                                isAllowedToEditContent = isAllowedToEditContent,
                                 owner = p.Members.Where(m => m.Role == Role.owner).Select(m => new
                                 {
                                     name = $"{m.User.FirstName} {m.User.LastName}",

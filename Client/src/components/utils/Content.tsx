@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import useFetchApi from "../../utils/hooks/useFetchApi";
 import { AiOutlineClose } from "react-icons/ai";
 import Editor from "./markdown";
@@ -30,9 +30,9 @@ const Content = (props: IContentProps) => {
         setIsEditing(false);
     }
 
-    useLayoutEffect(() => { callGet() }, [])
+    useEffect(() => { callGet() }, [])
 
-    useLayoutEffect(() => {
+    useEffect(() => {
         if (!payload.isLoading && payload.result) setMd(payload.result.markdown);
     }, [payload.isLoading])
 
@@ -43,14 +43,14 @@ const Content = (props: IContentProps) => {
 
     return (
         <div className="flex flex-col h-auto w-full">
-            <div className="flex flex-col w-full h-fit min-h-[200px] rounded-2xl justify-start items-start bg-white">
+            <div className="flex flex-col w-full h-fit min-h-[200px] rounded-2xl justify-start items-start bg-white dark:bg-black">
                 {payload.isLoading ? <CircleProgress size="lg" /> : (
                     <>
                         {!props.editable || props.form ? null : (
                             <div className="flex w-full h-8 justify-end items-center gap-2">
                                 {(props.handelDelete && props.editable) && <MdDeleteForever className="text-2xl text-red-600 mr-2 transition-all ease-in-out cursor-pointer font-bold"  onClick={() => props.handelDelete!()} /> }
-                                {isEditing ? <AiOutlineClose onClick={() => setIsEditing(false)} className="text-2xl mr-2 transition-all ease-in-out cursor-pointer font-bold text-gray-600" />
-                                    : <MdOutlineModeEditOutline onClick={() => setIsEditing(true)} className="text-2xl mr-2 transition-all ease-in-out cursor-pointer font-bold text-gray-600" />}
+                                {isEditing ? <AiOutlineClose onClick={() => setIsEditing(false)} className="text-2xl mr-2 transition-all ease-in-out cursor-pointer font-bold text-gray-600 dark:text-gray-300" />
+                                    : <MdOutlineModeEditOutline onClick={() => setIsEditing(true)} className="text-2xl mr-2 transition-all ease-in-out cursor-pointer font-bold text-gray-600 dark:text-gray-300" />}
                             </div>
                         )}
 

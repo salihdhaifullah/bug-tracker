@@ -1,7 +1,7 @@
 import { Link, useParams } from "react-router-dom"
 import formatDate from "../../utils/formatDate"
 import Button from "../utils/Button";
-import { useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import useFetchApi from "../../utils/hooks/useFetchApi";
 import CircleProgress from "../utils/CircleProgress";
 import TextFiled from "../utils/TextFiled";
@@ -141,17 +141,19 @@ const Members = () => {
     const [page, setPage] = useState(1);
 
     const [isOwnerPayload, callIsOwner] = useFetchApi<boolean>("GET", `project/is-owner/${projectId}`);
-    const [payload, call] = useFetchApi<{ members: IMember[], count: number }>("GET", `member/members-table/${projectId}?take=${take}&page=${page}&role=${role}&search=${search}`, [take, page, role, search]);
+    const [membersPayload, callMembers] = useFetchApi<IMember[]>("GET", `member/members-table/${projectId}?take=${take}&page=${page}&role=${role}&search=${search}`, [take, page, role, search]);
+    const [countPayload, callCount] = useFetchApi<number>("GET", `member/members-count/${projectId}?role=${role}&search=${search}`, [role, search]);
 
-    useLayoutEffect(() => { callIsOwner() }, [])
-    useLayoutEffect(() => { call() }, [take, page, role, search])
+    useEffect(() => { callIsOwner() }, [])
+    useEffect(() => { callMembers() }, [take, page, role, search])
+    useEffect(() => { callCount() }, [role, search])
 
     const handelPrevPage = () => {
         if (page > 1) setPage((prev) => prev - 1)
     }
 
     const handelNextPage = () => {
-        if (payload.result && !(page * take >= payload.result.count)) setPage((prev) => prev + 1)
+        if (countPayload.result && !(page * take >= countPayload.result)) setPage((prev) => prev + 1)
     }
 
     return (
@@ -175,7 +177,7 @@ const Members = () => {
                 </div>
 
                 <div className="flex flex-col justify-center items-center w-full gap-4">
-                    {payload.isLoading || payload.result === null ? <CircleProgress size="lg" className="mb-4" /> : (
+                    {membersPayload.isLoading || membersPayload.result === null || countPayload.isLoading || countPayload.result == null ? <CircleProgress size="lg" className="mb-4" /> : (
                         <>
                             <div className="overflow-x-scroll overflow-y-hidden w-full">
                                 <table className="text-sm text-left text-gray-500 w-full">
@@ -191,7 +193,7 @@ const Members = () => {
                                     </thead>
 
                                     <tbody>
-                                        {payload.result.members.map((member, index) => (
+                                        {membersPayload.result.map((member, index) => (
                                             <tr className="bg-white border-b hover:bg-gray-50" key={index}>
 
                                                 <td className="flex items-center px-6 py-4 min-w-[150px] justify-center text-gray-900 whitespace-nowrap">
@@ -208,7 +210,7 @@ const Members = () => {
 
                                                 <td className="px-6 py-4 min-w-[150px]"> {formatDate(member.joinedAt)} </td>
 
-                                                {isOwnerPayload.result ? <td className="px-6 py-4 min-w-[150px]"> {member.role === "owner" ? null : <Action call={call} member={member} />} </td> : null}
+                                                {isOwnerPayload.result ? <td className="px-6 py-4 min-w-[150px]"> {member.role === "owner" ? null : <Action call={callMembers} member={member} />} </td> : null}
                                             </tr>
                                         ))}
                                     </tbody>
@@ -217,7 +219,7 @@ const Members = () => {
 
                             <div className="flex w-full justify-end items-center flex-row gap-2">
 
-                                <p>{((page * take) - take) + 1} to {payload.result.members.length === take ? (payload.result.members.length + ((page * take) - take)) : payload.result.members.length} out of {payload.result.count}</p>
+                                <p>{((page * take) - take) + 1} to {membersPayload.result.length === take ? (membersPayload.result.length + ((page * take) - take)) : membersPayload.result.length} out of {countPayload.result}</p>
 
                                 <SelectButton options={[5, 10, 15, 20, 100]} label="take" setValue={setTake} value={take} />
 
@@ -227,7 +229,7 @@ const Members = () => {
 
                                 <AiOutlineArrowRight
                                     onClick={handelNextPage}
-                                    className={`${page * take >= payload.result.count ? "" : "hover:bg-slate-200 cursor-pointer"} p-2 rounded-xl shadow-md text-4xl`} />
+                                    className={`${page * take >= countPayload.result ? "" : "hover:bg-slate-200 cursor-pointer"} p-2 rounded-xl shadow-md text-4xl`} />
                             </div>
                         </>
                     )}

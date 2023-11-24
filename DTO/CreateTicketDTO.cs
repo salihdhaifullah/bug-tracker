@@ -9,7 +9,7 @@ public class CreateTicketDTO {
     [JsonPropertyName("name")]
     [Required(ErrorMessage ="name is required"),
     MaxLength(100, ErrorMessage ="maximum length of ticket name is 100 characters"),
-    MinLength(3, ErrorMessage = "minium length of ticket name is 3 characters")]
+    MinLength(3, ErrorMessage = "minimum length of ticket name is 3 characters")]
     public string Name { get; set; } = null!;
 
     [JsonPropertyName("type"), Required(ErrorMessage = "ticket type is required")]
@@ -24,6 +24,6 @@ public class CreateTicketDTO {
     [RegularExpression(@"^(review|active|in_progress|resolved|closed)$", ErrorMessage = "un-valid ticket status")]
     public string Status { get; set; } = null!;
 
-    [JsonPropertyName("memberId"), IdValidation(ErrorMessage = "un-valid user id")]
+    [JsonPropertyName("memberId"), IdValidation(ErrorMessage = "un-valid member id")]
     public string? MemberId {get; set;}
 }

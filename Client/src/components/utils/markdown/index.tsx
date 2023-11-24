@@ -31,8 +31,8 @@ const Editor = ({ md, setMd, files, onSubmit, onCancel }: IEditorProps) => {
     const textareaCallback = useCallback((element: HTMLTextAreaElement | null) => { setTextarea(element) }, [])
 
     return (
-        <div className="flex flex-col w-full h-auto border-gray-700 justify-center items-center ">
-            <div className="flex flex-col w-full border-gray-700 bg-white p-2 rounded-md">
+        <div className="flex flex-col w-full h-auto border-gray-700 dark:border-gray-300 justify-center items-center ">
+            <div className="flex flex-col w-full border-gray-700 dark:border-gray-300 bg-white dark:bg-black p-2 rounded-md">
                 <div className="inline-flex w-full justify-between">
 
                     <div className="flex gap-2 mb-2 mr-8">
@@ -69,7 +69,7 @@ const Editor = ({ md, setMd, files, onSubmit, onCancel }: IEditorProps) => {
                             value={md}
                             onChange={(e) => setMd(e.target.value)}
                             ref={textareaCallback}
-                            className="border h-auto flex flex-1 flex-grow outline-secondary border-secondary p-2 rounded-md w-full min-h-[20vh]"></textarea>
+                            className="border h-auto dark:bg-black dark:text-white flex flex-1 flex-grow outline-primary border-primary dark:outline-secondary dark:border-secondary p-2 rounded-md w-full min-h-[20vh]"></textarea>
                     </div>
                 )}
 

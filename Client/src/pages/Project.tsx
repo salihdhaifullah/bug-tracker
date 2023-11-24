@@ -1,5 +1,5 @@
 import { Link, useParams } from "react-router-dom"
-import { useLayoutEffect } from "react";
+import { useEffect } from "react";
 import useFetchApi from "../utils/hooks/useFetchApi";
 import formatDate from "../utils/formatDate";
 import CircleProgress from "../components/utils/CircleProgress";
@@ -18,7 +18,6 @@ interface IProject {
     members: number;
     tickets: number;
     markdown: string;
-    isAllowedToEditContent: boolean;
     owner: {
         imageUrl: string;
         name: string;
@@ -28,9 +27,14 @@ interface IProject {
 
 const Project = () => {
     const { projectId } = useParams();
-    const [payload, call] = useFetchApi<IProject>("GET", `project/${projectId}`, []);
+    const [payload, call] = useFetchApi<IProject>("GET", `project/${projectId}`);
 
-    useLayoutEffect(() => { call() }, [])
+    const [isOwnerPayload, callIsOwner] = useFetchApi<boolean>("GET", `project/is-owner/${projectId}`);
+
+    useEffect(() => {
+        call()
+        callIsOwner()
+    }, [])
 
     return payload.isLoading || !payload.result
         ? <CircleProgress size="lg" />
@@ -38,17 +42,17 @@ const Project = () => {
             <div className="bg-white mb-4 rounded-md shadow-md p-4 gap-2 flex flex-col">
 
                 <h1 className="text-2xl font-bold">{payload.result.name}</h1>
-                
+
                 {payload.result.isReadOnly ? (
-                <div className="flex  flex-col justify-center w-full">
+                    <div className="flex  flex-col justify-center w-full">
                         <div className="flex rounded-md bg-yellow-300 bg-opacity-80 border-black border p-2 w-fit">
-                            <p className="text-center text-gray-900 text-lg font-bold">this project is archived</p> 
+                            <p className="text-center text-gray-900 text-lg font-bold">this project is archived</p>
                         </div>
-                </div>
+                    </div>
                 ) : null}
 
 
-                <Content editable={payload.result.isAllowedToEditContent} url={`project/content/${projectId}`} />
+                <Content editable={Boolean(isOwnerPayload?.result)} url={`project/content/${projectId}`} />
 
                 <div title="owner" className="flex flex-row justify-start items-center">
                     <Link to={`/profile/${payload.result.owner.id}`}>
@@ -69,7 +73,8 @@ const Project = () => {
             <Members />
             <Tickets />
             <Activities />
-            <DangerZone {...payload.result} />
+
+            {Boolean(isOwnerPayload.result) ? <DangerZone {...payload.result} /> : null}
 
         </section >
         );

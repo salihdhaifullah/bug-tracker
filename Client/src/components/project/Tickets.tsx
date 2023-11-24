@@ -2,7 +2,7 @@ import { Link, useParams } from "react-router-dom"
 import formatDate from "../../utils/formatDate"
 import Button from "../utils/Button";
 import useFetchApi from "../../utils/hooks/useFetchApi";
-import { useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import CircleProgress from "../utils/CircleProgress";
 import TextFiled from "../utils/TextFiled";
 import { AiOutlineArrowLeft, AiOutlineArrowRight, AiOutlineSearch } from "react-icons/ai";
@@ -19,7 +19,7 @@ interface ITicket {
     name: string;
     createdAt: string;
     creator: { name: string, id: string };
-    assignedTo: { name: string, id: string } | null;
+    assignedTo: { name: string, id: string, memberId: string } | null;
     priority: string;
     status: string;
     type: string;
@@ -35,28 +35,37 @@ interface IActionProps {
 const Action = (props: IActionProps) => {
     const [isOpen, setIsOpen] = useState(false);
     const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
+    const [isOpenUpdateModal, setIsOpenUpdateModal] = useState(false);
     const [name, setName] = useState(props.ticket.name);
     const [type, setType] = useState(props.ticket.type);
     const [priority, setPriority] = useState(props.ticket.priority);
     const [status, setStatus] = useState(props.ticket.status);
-    const [memberId, setMemberId] = useState(props.ticket.assignedTo?.id || "");
+    const [memberId, setMemberId] = useState(props.ticket.assignedTo?.memberId || "");
     const [isValidName, setIsValidName] = useState(true);
     const [isValidType, setIsValidType] = useState(true);
     const [isValidPriority, setIsValidPriority] = useState(true);
     const [isValidStatus, setIsValidStatus] = useState(true);
     const { projectId } = useParams();
 
+    const targetRef = useRef<HTMLDivElement>(null);
+    const [isChange, setIsChange] = useState(false);
+
     const [deleteTicketPayload, callDeleteTicket] = useFetchApi("DELETE", `ticket/${props.ticket.id}`, [], () => {
-        props.call()
+        setIsOpenDeleteModal(false);
+        setIsChange(true)
     })
 
-    const [isOpenUpdateModal, setIsOpenUpdateModal] = useState(false);
-    const targetRef = useRef<HTMLDivElement>(null);
-    useOnClickOutside(targetRef, () => setIsOpen(false));
-
     const [updateTicketPayload, callUpdateTicket] = useFetchApi<unknown, { name: string, type: string, priority: string, status: string, memberId?: string }>("PATCH", `ticket/${props.ticket.id}`, [], () => {
-        props.call()
+        setIsOpenUpdateModal(false);
+        setIsChange(true)
     });
+
+    useEffect(() => {
+        if (isChange) props.call();
+    }, [isChange])
+
+
+    useOnClickOutside(targetRef, () => setIsOpen(false));
 
     return (
         <div ref={targetRef} className="flex w-fit relative">
@@ -183,19 +192,21 @@ const Tickets = () => {
     const [ticketType, setTicketType] = useState("all");
     const [ticketStatus, setTicketStatus] = useState("all");
     const [ticketPriority, setTicketPriority] = useState("all");
-    const [payload, call] = useFetchApi<{ tickets: ITicket[], count: number }>("GET", `ticket/tickets-table/${projectId}?page=${page}&take=${take}&search=${search}&type=${ticketType}&status=${ticketStatus}&priority=${ticketPriority}`, [page, take, search, ticketType, ticketStatus, ticketPriority]);
+    const [isOwnerOrMangerPayload, callIsOwnerOrManger] = useFetchApi<boolean>("GET", `project/is-owner-or-manger/${projectId}`);
 
-    const [isOwnerPayload, callIsOwner] = useFetchApi<boolean>("GET", `project/is-owner-or-manger/${projectId}`);
+    const [countPayload, callCount] = useFetchApi<number>("GET", `ticket/tickets-count/${projectId}?search=${search}&type=${ticketType}&status=${ticketStatus}&priority=${ticketPriority}`, [search, ticketType, ticketStatus, ticketPriority]);
+    const [ticketsPayload, callTickets] = useFetchApi<ITicket[]>("GET", `ticket/tickets/${projectId}?page=${page}&take=${take}&search=${search}&type=${ticketType}&status=${ticketStatus}&priority=${ticketPriority}`, [page, take, search, ticketType, ticketStatus, ticketPriority]);
 
-    useLayoutEffect(() => { callIsOwner() }, [])
-    useLayoutEffect(() => { call() }, [page, take, search, ticketType, ticketStatus, ticketPriority])
+    useEffect(() => { callIsOwnerOrManger() }, [])
+    useEffect(() => { callTickets() }, [page, take, search, ticketType, ticketStatus, ticketPriority])
+    useEffect(() => { callCount() }, [search, ticketType, ticketStatus, ticketPriority])
 
     const handelPrevPage = () => {
         if (page > 1) setPage((prev) => prev - 1)
     }
 
     const handelNextPage = () => {
-        if (payload.result && !(page * take >= payload.result.count)) setPage((prev) => prev + 1)
+        if (countPayload.result && !(page * take >= countPayload.result)) setPage((prev) => prev + 1)
     }
 
     return (
@@ -222,7 +233,7 @@ const Tickets = () => {
                 </div>
 
                 <div className="flex flex-col justify-center items-center w-full gap-4">
-                    {payload.isLoading || payload.result === null ? <CircleProgress size="lg" className="mb-4" /> : (
+                    {ticketsPayload.isLoading || ticketsPayload.result === null || countPayload.isLoading || countPayload.result == null ? <CircleProgress size="lg" className="mb-4" /> : (
                         <>
                             <div className="overflow-x-scroll overflow-y-hidden w-full">
                                 <table className="text-sm text-left text-gray-500 w-full">
@@ -235,12 +246,12 @@ const Tickets = () => {
                                             <th scope="col" className="px-6 py-3 min-w-[150px]"> priority </th>
                                             <th scope="col" className="px-6 py-3 min-w-[150px]"> status </th>
                                             <th scope="col" className="px-6 py-3 min-w-[150px]"> type </th>
-                                            {isOwnerPayload.result ? <th scope="col" className="px-6 py-3  min-w-[150px]"> action </th> : null}
+                                            {isOwnerOrMangerPayload.result ? <th scope="col" className="px-6 py-3  min-w-[150px]"> action </th> : null}
                                         </tr>
                                     </thead>
 
                                     <tbody>
-                                        {payload.result.tickets.map((ticket, index) => (
+                                        {ticketsPayload.result.map((ticket, index) => (
                                             <tr className="bg-white border-b hover:bg-gray-50" key={index}>
 
                                                 <td className="px-6 py-4 min-w-[150px]">
@@ -274,9 +285,9 @@ const Tickets = () => {
                                                     <p className={`rounded-md font-bold border-black w-fit p-1 text-white ${(labelsColors.TYPE as any)[ticket.type]}`}>{ticket.type}</p>
                                                 </td>
 
-                                                {isOwnerPayload.result ?
+                                                {isOwnerOrMangerPayload.result ?
                                                     <td className="px-6 py-4 min-w-[150px]">
-                                                        <Action call={call} ticket={ticket} />
+                                                        <Action call={callTickets} ticket={ticket} />
                                                     </td>
                                                     : null}
                                             </tr>
@@ -287,7 +298,7 @@ const Tickets = () => {
 
                             <div className="flex w-full justify-end items-center flex-row gap-2">
 
-                                <p>{((page * take) - take) + 1} to {payload.result.tickets.length === take ? (payload.result.tickets.length + ((page * take) - take)) : payload.result.tickets.length} out of {payload.result.count}</p>
+                                <p>{((page * take) - take) + 1} to {ticketsPayload.result.length === take ? (ticketsPayload.result.length + ((page * take) - take)) : ticketsPayload.result.length} out of {countPayload.result}</p>
 
                                 <SelectButton options={[5, 10, 15, 20, 100]} label="take" setValue={setTake} value={take} />
 
@@ -297,7 +308,7 @@ const Tickets = () => {
 
                                 <AiOutlineArrowRight
                                     onClick={handelNextPage}
-                                    className={`${page * take >= payload.result.count ? "" : "hover:bg-slate-200 cursor-pointer"} p-2 rounded-xl shadow-md text-4xl`} />
+                                    className={`${page * take >= countPayload.result ? "" : "hover:bg-slate-200 cursor-pointer"} p-2 rounded-xl shadow-md text-4xl`} />
                             </div>
                         </>
                     )}

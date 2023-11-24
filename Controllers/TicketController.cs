@@ -38,6 +38,7 @@ public class TicketController : Controller
                     .Select(m => new AssignedTo(m.User.Email, $"{m.User.FirstName} {m.User.LastName}"))
                     .FirstOrDefaultAsync();
 
+
         return assignedTo;
     }
 
@@ -130,8 +131,8 @@ public class TicketController : Controller
         }
     }
 
-    [HttpGet("tickets-table/{projectId}"), Authorized]
-    public async Task<IActionResult> TicketsTable([FromRoute] string projectId, [FromQuery(Name = "status")] string? statusQuery, [FromQuery(Name = "type")] string? typeQuery, [FromQuery(Name = "priority")] string? priorityQuery, [FromQuery] string? search, [FromQuery] int take = 10, [FromQuery] int page = 1)
+    [HttpGet("tickets-count/{projectId}"), Authorized]
+    public async Task<IActionResult> TicketsCount([FromRoute] string projectId, [FromQuery(Name = "status")] string? statusQuery, [FromQuery(Name = "type")] string? typeQuery, [FromQuery(Name = "priority")] string? priorityQuery, [FromQuery] string? search)
     {
         try
         {
@@ -143,15 +144,40 @@ public class TicketController : Controller
             if (!string.IsNullOrEmpty(priorityQuery) && Enum.TryParse<Priority>(priorityQuery, out Priority parsedPriority)) priority = parsedPriority;
 
 
-            var query = _ctx.Tickets.Where(t => t.ProjectId == projectId
+            var count = await _ctx.Tickets.Where(t => t.ProjectId == projectId
                                             && (status == null || t.Status == status)
                                             && (type == null || t.Type == type)
                                             && (priority == null || t.Priority == priority)
-                                            && EF.Functions.ILike(t.Name, $"{search}%"));
+                                            && EF.Functions.ILike(t.Name, $"{search}%")).CountAsync();
 
-            var count = await query.CountAsync();
 
-            var tickets = await query
+            return HttpResult.Ok(body: count);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.Message);
+            return HttpResult.InternalServerError();
+        }
+    }
+
+
+    [HttpGet("tickets/{projectId}"), Authorized]
+    public async Task<IActionResult> Tickets([FromRoute] string projectId, [FromQuery(Name = "status")] string? statusQuery, [FromQuery(Name = "type")] string? typeQuery, [FromQuery(Name = "priority")] string? priorityQuery, [FromQuery] string? search, [FromQuery] int take = 10, [FromQuery] int page = 1)
+    {
+        try
+        {
+            Status? status = null;
+            if (!string.IsNullOrEmpty(statusQuery) && Enum.TryParse<Status>(statusQuery, out Status parsedStatus)) status = parsedStatus;
+            TicketType? type = null;
+            if (!string.IsNullOrEmpty(typeQuery) && Enum.TryParse<TicketType>(typeQuery, out TicketType parsedType)) type = parsedType;
+            Priority? priority = null;
+            if (!string.IsNullOrEmpty(priorityQuery) && Enum.TryParse<Priority>(priorityQuery, out Priority parsedPriority)) priority = parsedPriority;
+
+            var tickets = await _ctx.Tickets.Where(t => t.ProjectId == projectId
+                          && (status == null || t.Status == status)
+                          && (type == null || t.Type == type)
+                          && (priority == null || t.Priority == priority)
+                          && EF.Functions.ILike(t.Name, $"{search}%"))
                         .OrderBy(t => t.Status)
                         .ThenByDescending(t => t.Priority)
                         .ThenBy(t => t.Type)
@@ -162,12 +188,13 @@ public class TicketController : Controller
                             createdAt = t.CreatedAt,
                             creator = new
                             {
-                                id = t.Creator.User.Id,
+                                id = t.Creator.UserId,
                                 name = $"{t.Creator.User.FirstName} {t.Creator.User.LastName}",
                             },
                             assignedTo = t.AssignedTo == null ? null : new
                             {
-                                id = t.AssignedTo.User.Id,
+                                id = t.AssignedTo.UserId,
+                                memberId = t.AssignedToId,
                                 name = $"{t.AssignedTo.User.FirstName} {t.AssignedTo.User.LastName}",
                             },
                             id = t.Id,
@@ -179,7 +206,7 @@ public class TicketController : Controller
                         .Take(take)
                         .ToListAsync();
 
-            return HttpResult.Ok(body: new { tickets, count });
+            return HttpResult.Ok(body: tickets);
         }
         catch (Exception e)
         {
@@ -285,13 +312,13 @@ public class TicketController : Controller
 
 
     [HttpPatch("{ticketId}"), BodyValidation, Authorized]
-    public async Task<IActionResult> UpdateTicket([FromBody] CreateTicketDTO dto, [FromRoute] string ticketId)
+    public async Task<IActionResult> UpdateTicket([FromBody] UpdateTicketDTO dto, [FromRoute] string ticketId)
     {
         try
         {
             var userId = _auth.GetId(Request);
 
-            var ticket = await _ctx.Tickets.Where((t) => t.Id == ticketId && t.Creator.UserId == userId).FirstOrDefaultAsync();
+            var ticket = await _ctx.Tickets.Where((t) => t.Id == ticketId && (t.Project.Members.Any(m => (m.Role == Role.owner || m.Role == Role.project_manger) && m.UserId == userId))).FirstOrDefaultAsync();
 
             if (ticket is null) return HttpResult.NotFound("sorry, ticket not found");
 

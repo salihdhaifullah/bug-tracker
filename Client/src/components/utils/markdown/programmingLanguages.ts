@@ -24,7 +24,7 @@ const programmingLanguages: { name: string, icon: IconType, color: string }[] = 
     { name: "php", icon: SiPhp, color: "#777BB4" },
     { name: "python", icon: SiPython, color: "#3776AB" },
     { name: "ruby", icon: SiRuby, color: "#CC342D" },
-    { name: "rust", icon: FaRust, color: "#000000" },
+    { name: "rust", icon: FaRust, color: "#FA7343" },
     { name: "sql", icon: TbSql, color: "#00758F" },
     { name: "swift", icon: SiSwift, color: "#FA7343" },
     { name: "typescript", icon: SiTypescript, color: "#3178C6" }

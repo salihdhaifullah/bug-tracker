@@ -1,7 +1,7 @@
 import { Link, useParams } from "react-router-dom";
 import useFetchApi from "../utils/hooks/useFetchApi";
 import CircleProgress from "../components/utils/CircleProgress";
-import { useLayoutEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Content from "../components/utils/Content";
 import formatDate from "../utils/formatDate";
 import { useUser } from "../utils/context/user";
@@ -79,8 +79,8 @@ const Ticket = () => {
     const [payload, call] = useFetchApi<ITicket>("GET", `ticket/${ticketId}`, []);
     const [commentPayload, callComment] = useFetchApi<{ count: number, comments: IComment[] }>("GET", `comment/${ticketId}`, [commentPage, commentTake]);
 
-    useLayoutEffect(() => { call() }, [])
-    useLayoutEffect(() => { callComment() }, [commentPage, commentTake])
+    useEffect(() => { call() }, [])
+    useEffect(() => { callComment() }, [commentPage, commentTake])
 
     return (!payload.result) || payload.isLoading ? <CircleProgress size="lg" /> : (
         <section className="flex flex-col w-full h-full my-10 p-2 flex-grow gap-2">

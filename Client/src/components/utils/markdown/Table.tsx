@@ -3,6 +3,7 @@ import { AiOutlineTable } from "react-icons/ai"
 import NumberFiled from "../NumberFiled";
 import { setRange, useTextarea } from "./util";
 import useOnClickOutside from "../../../utils/hooks/useOnClickOutside";
+import Button from "../Button";
 
 const makeTable = (rows: number, cols: number) => {
     let result = "";
@@ -49,24 +50,24 @@ const Table = () => {
 
     return (
         <div title="Table" ref={tableRef} className="flex flex-row gap-2 items-center">
-            <AiOutlineTable onClick={() => setIsOpen(true)} className="text-gray-700 text-xl rounded-sm hover:bg-gray-200 hover:text-secondary cursor-pointer" />
+            <AiOutlineTable onClick={() => setIsOpen(true)} className="text-gray-700 dark:text-gray-300 dark:hover:bg-slate-800 hover:bg-slate-200 hover:text-primary dark:hover:text-secondary text-xl rounded-sm cursor-pointer" />
 
             <div
                 className={`${isOpen ? "h-auto p-2 w-[160px]" : "hidden"}
                     gap-1 flex flex-col items-center justify-center left-[30%] top-4 absolute transition-all
-                    ease-in-out bg-white rounded-md shadow-md`}>
+                    ease-in-out bg-white dark:bg-black rounded-md shadow-md dark:shadow-secondary`}>
 
                 <div className="flex -gap-2 flex-col">
                     <NumberFiled value={rows} onChange={(e) => setRows(Number(e.target.value))} label="table rows" />
                     <NumberFiled value={cols} onChange={(e) => setCols(Number(e.target.value))} label="table columns" />
                 </div>
 
-                <button
+                <Button 
                     onClick={() => {
                         insertTable();
                         setIsOpen(false);
                     }}
-                    className="flex w-fit px-1 rounded-md hover:shadow-md bg-secondary text-primary text-base">add table</button>
+                >add table</Button>
             </div>
         </div>
     )

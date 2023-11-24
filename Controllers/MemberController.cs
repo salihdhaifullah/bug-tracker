@@ -189,8 +189,9 @@ public class MemberController : Controller
         }
     }
 
-    [HttpGet("members-table/{projectId}"), Authorized]
-    public async Task<IActionResult> MembersTable([FromRoute] string projectId, [FromQuery(Name = "role")] string? roleQuery, [FromQuery] string? search, [FromQuery] int take = 10, [FromQuery] int page = 1)
+
+    [HttpGet("members-count/{projectId}"), Authorized]
+    public async Task<IActionResult> MembersCount([FromRoute] string projectId, [FromQuery(Name = "role")] string? roleQuery, [FromQuery] string? search)
     {
         try
         {
@@ -198,6 +199,23 @@ public class MemberController : Controller
             if (!string.IsNullOrEmpty(roleQuery) && Enum.TryParse<Role>(roleQuery, out Role parsedRole)) role = parsedRole;
 
             var count = await _ctx.Members.Where(m => m.ProjectId == projectId && m.IsJoined && (role == null || m.Role == role) && (EF.Functions.ILike(m.User.Email, $"{search}%") || EF.Functions.ILike(m.User.FirstName, $"{search}%") || EF.Functions.ILike(m.User.LastName, $"{search}%"))).CountAsync();
+
+            return HttpResult.Ok(body: count);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.Message);
+            return HttpResult.InternalServerError();
+        }
+    }
+
+    [HttpGet("members-table/{projectId}"), Authorized]
+    public async Task<IActionResult> MembersTable([FromRoute] string projectId, [FromQuery(Name = "role")] string? roleQuery, [FromQuery] string? search, [FromQuery] int take = 10, [FromQuery] int page = 1)
+    {
+        try
+        {
+            Role? role = null;
+            if (!string.IsNullOrEmpty(roleQuery) && Enum.TryParse<Role>(roleQuery, out Role parsedRole)) role = parsedRole;
 
             var members = await _ctx.Members
                         .Where(m => m.ProjectId == projectId && m.IsJoined && (role == null || m.Role == role) &&
@@ -216,7 +234,7 @@ public class MemberController : Controller
                         .Take(take)
                         .ToListAsync();
 
-            return HttpResult.Ok(body: new { members, count });
+            return HttpResult.Ok(body: members);
         }
         catch (Exception e)
         {
