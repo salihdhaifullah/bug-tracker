@@ -67,9 +67,9 @@ const Action = (props: IActionProps) => {
                 <FiMoreVertical />
             </Button>
 
-            <div className={`${isOpen ? "flex" : "hidden"} flex flex-col px-2 py-4 justify-center items-center gap-4 w-40 absolute right-[50%] bottom-[50%] z-50 bg-white rounded shadow-md`}>
-                <Button onClick={() => setIsOpenDeleteModal(true)} className="w-full shadow-sm">delete member</Button>
-                <Button onClick={() => setIsOpenRoleModal(true)} className="w-full shadow-sm">change role</Button>
+            <div className={`${isOpen ? "flex" : "hidden"} flex flex-col py-2 px-4 justify-center gap-2 items-center absolute right-[50%] bottom-[50%] bg-white rounded shadow-md`}>
+                <Button onClick={() => setIsOpenDeleteModal(true)} size="xs" className="w-full shadow-sm">delete member</Button>
+                <Button onClick={() => setIsOpenRoleModal(true)} size="xs" className="w-full shadow-sm">change role</Button>
             </div>
 
             <Modal isOpen={isOpenDeleteModal} setIsOpen={setIsOpenDeleteModal}>
@@ -192,7 +192,7 @@ const Members = () => {
                                         </tr>
                                     </thead>
 
-                                    <tbody>
+                                    <tbody className="before:block before:h-4">
                                         {membersPayload.result.map((member, index) => (
                                             <tr className="bg-white border-b hover:bg-gray-50" key={index}>
 

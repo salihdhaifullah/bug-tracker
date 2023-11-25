@@ -48,4 +48,7 @@ public class Ticket
 
     [Column("comments")]
     public List<Comment> Comments { get; set; } = new List<Comment>();
+
+    [Column("Attachments")]
+    public List<Attachment> Attachments { get; set; } = new List<Attachment>();
 }

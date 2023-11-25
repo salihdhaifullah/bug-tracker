@@ -5,13 +5,12 @@ import Editor from "./markdown";
 import { MdOutlineModeEditOutline } from "react-icons/md";
 import Parser from "./markdown/Parser";
 import CircleProgress from "./CircleProgress";
-import { MdDeleteForever } from "react-icons/md";
 
 interface IContentProps {
     url: string;
     form?: boolean;
     editable?: boolean;
-    handelDelete?: () => void
+    call?: () => void;
 }
 
 const Content = (props: IContentProps) => {
@@ -19,7 +18,9 @@ const Content = (props: IContentProps) => {
     const [isEditing, setIsEditing] = useState(false);
     const files = useRef<{ base64: string, previewUrl: string }[]>([]);
 
-    const [_, call] = useFetchApi<any, { markdown: string, files: { base64: string, previewUrl: string }[] }>("POST", props.url, [])
+    const [createPayload, call] = useFetchApi<any, { markdown: string, files: { base64: string, previewUrl: string }[] }>("POST", props.url, [], () => {
+        if (props?.call) props.call();
+    })
     const [payload, callGet] = useFetchApi<{ markdown: string }>("GET", props.url, [])
 
     const handelSubmit = () => {
@@ -30,7 +31,9 @@ const Content = (props: IContentProps) => {
         setIsEditing(false);
     }
 
-    useEffect(() => { callGet() }, [])
+    useEffect(() => {
+        if (!props.form) callGet()
+    }, [props.form])
 
     useEffect(() => {
         if (!payload.isLoading && payload.result) setMd(payload.result.markdown);
@@ -44,17 +47,16 @@ const Content = (props: IContentProps) => {
     return (
         <div className="flex flex-col h-auto w-full">
             <div className="flex flex-col w-full h-fit min-h-[200px] rounded-2xl justify-start items-start bg-white dark:bg-black">
-                {payload.isLoading ? <CircleProgress size="lg" /> : (
+                {!props.form && payload.isLoading ? <CircleProgress size="lg" /> : (
                     <>
                         {!props.editable || props.form ? null : (
                             <div className="flex w-full h-8 justify-end items-center gap-2">
-                                {(props.handelDelete && props.editable) && <MdDeleteForever className="text-2xl text-red-600 mr-2 transition-all ease-in-out cursor-pointer font-bold"  onClick={() => props.handelDelete!()} /> }
                                 {isEditing ? <AiOutlineClose onClick={() => setIsEditing(false)} className="text-2xl mr-2 transition-all ease-in-out cursor-pointer font-bold text-gray-600 dark:text-gray-300" />
                                     : <MdOutlineModeEditOutline onClick={() => setIsEditing(true)} className="text-2xl mr-2 transition-all ease-in-out cursor-pointer font-bold text-gray-600 dark:text-gray-300" />}
                             </div>
                         )}
 
-                        {isEditing || props.form ? <Editor md={md} onSubmit={handelSubmit} onCancel={props.form ? undefined : handelCancel} setMd={setMd} files={files} />
+                        {isEditing || props.form ? <Editor isLoading={createPayload.isLoading} md={md} onSubmit={handelSubmit} onCancel={props.form ? undefined : handelCancel} setMd={setMd} files={files} />
                             : <div id="parser" className="markdown flex flex-col p-1 w-full overflow-hidden h-full" dangerouslySetInnerHTML={{ __html: Parser(md) }}></div>}
                     </>
                 )}

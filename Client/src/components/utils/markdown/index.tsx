@@ -18,13 +18,14 @@ import Button from "../Button";
 
 interface IEditorProps {
     md: string;
+    isLoading: boolean;
     files: MutableRefObject<{ base64: string, previewUrl: string }[]>;
     setMd: (md: string) => void;
     onSubmit?: () => void;
     onCancel?: () => void;
 }
 
-const Editor = ({ md, setMd, files, onSubmit, onCancel }: IEditorProps) => {
+const Editor = ({ md, setMd, files, onSubmit, onCancel, isLoading }: IEditorProps) => {
     const [isPreview, setIsPreview] = useState(false);
     const [textarea, setTextarea] = useState<HTMLTextAreaElement | null>(null);
 
@@ -74,7 +75,7 @@ const Editor = ({ md, setMd, files, onSubmit, onCancel }: IEditorProps) => {
                 )}
 
                 <div className="justify-end mt-2 gap-2 inline-flex w-full">
-                    {!onSubmit || isPreview ? null : <Button onClick={onSubmit}>submit</Button>}
+                    {!onSubmit || isPreview ? null : <Button isLoading={isLoading} onClick={onSubmit}>submit</Button>}
                     {!onCancel ? null : <Button onClick={onCancel}>cancel</Button>}
                 </div>
 

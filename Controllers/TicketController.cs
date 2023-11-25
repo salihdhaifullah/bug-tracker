@@ -232,11 +232,16 @@ public class TicketController : Controller
                                     imageUrl = Helper.StorageUrl(t.Creator.User.ImageName),
                                     id = t.Creator.Id,
                                 },
+                                project = new {
+                                    name = t.Project.Name,
+                                    id = t.ProjectId,
+                                },
                                 assignedTo = t.AssignedTo != null ? new
                                 {
                                     name = $"{t.AssignedTo.User.FirstName} {t.AssignedTo.User.LastName}",
                                     imageUrl = Helper.StorageUrl(t.AssignedTo.User.ImageName),
-                                    id = t.AssignedTo.User.Id,
+                                    id = t.AssignedTo.UserId,
+                                    memberId = t.AssignedToId,
                                 } : null,
                                 name = t.Name,
                                 priority = t.Priority.ToString(),
