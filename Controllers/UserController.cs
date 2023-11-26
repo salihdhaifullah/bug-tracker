@@ -44,7 +44,7 @@ public class UserController : Controller
 
             if (user is null) return HttpResult.UnAuthorized();
 
-            var newImageName = await _firebase.Update(user.ImageName, ContentType.webp, Convert.FromBase64String(dto.Data));
+            var newImageName = await _firebase.Update(user.ImageName, ContentType.webp.ToString(), Convert.FromBase64String(dto.Data));
 
             user.ImageName = newImageName;
 

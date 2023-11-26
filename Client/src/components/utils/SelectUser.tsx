@@ -79,7 +79,7 @@ const SelectUser = (props: ISelectToInventProps) => {
 
             <datalist
                 className={`${isOpen && payload.result && payload.result.length ? "block" : "none"} absolute w-full shadow-lg z-40 max-h-40 top-[100%] bg-white dark:bg-black no-scrollbar border rounded-md border-t-0 p-2 overflow-y-scroll`}>
-                {payload.isLoading || !payload.result ? <CircleProgress size="md" /> : payload.result.map((option, index) => (
+                {payload.isLoading ? <CircleProgress size="md" /> : payload.result !== null && payload.result.map((option, index) => (
                     <div
                         key={index}
                         id={`option-${index}`}

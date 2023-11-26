@@ -75,12 +75,12 @@ public class Seed
             if (item.Image is not null)
             {
                 var imageBytes = await _client.GetByteArrayAsync(item.Image);
-                imageName = await _firebase.Upload(imageBytes, ContentType.jpeg);
+                imageName = await _firebase.Upload(imageBytes, ContentType.jpeg.ToString());
             }
             else
             {
                 var imageBytes = await _client.GetByteArrayAsync($"https://api.dicebear.com/6.x/identicon/svg?seed={userId.ToString()}");
-                imageName = await _firebase.Upload(imageBytes, ContentType.svg);
+                imageName = await _firebase.Upload(imageBytes, ContentType.svg.ToString());
             }
 
             var content = await _ctx.Contents.AddAsync(new Content() { Id = contentId });

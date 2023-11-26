@@ -106,7 +106,7 @@ public class AuthController : Controller
 
             return HttpResult.Ok("we have send to a 6 digits verification code", null, "/auth/account-verification");
         }
-         catch (Exception e)
+        catch (Exception e)
         {
             _logger.LogError(e.Message);
             return HttpResult.InternalServerError();
@@ -136,7 +136,7 @@ public class AuthController : Controller
             using (var client = new HttpClient())
             {
                 var imageBytes = await client.GetByteArrayAsync($"https://api.dicebear.com/6.x/identicon/svg?seed={userId}");
-                imageName = await _firebase.Upload(imageBytes, ContentType.svg);
+                imageName = await _firebase.Upload(imageBytes, ContentType.svg.ToString());
             }
 
             var content = await _ctx.Contents.AddAsync(new Content() { Id = contentId });
@@ -159,7 +159,7 @@ public class AuthController : Controller
 
             return HttpResult.Created("successfully verified your account", null, "/auth/login");
         }
-         catch (Exception e)
+        catch (Exception e)
         {
             _logger.LogError(e.Message);
             return HttpResult.InternalServerError();
@@ -194,7 +194,7 @@ public class AuthController : Controller
 
             return HttpResult.Ok("we have send to you a 6 digits verification code", null, "/auth/reset-password");
         }
-         catch (Exception e)
+        catch (Exception e)
         {
             _logger.LogError(e.Message);
             return HttpResult.InternalServerError();
@@ -228,7 +228,7 @@ public class AuthController : Controller
 
             return HttpResult.Ok("successfully changed your password", null, "/auth/login");
         }
-         catch (Exception e)
+        catch (Exception e)
         {
             _logger.LogError(e.Message);
             return HttpResult.InternalServerError();
@@ -243,7 +243,7 @@ public class AuthController : Controller
             Response.Cookies.Delete("token");
             return HttpResult.Ok("logged out successfully", null, "/");
         }
-         catch (Exception e)
+        catch (Exception e)
         {
             _logger.LogError(e.Message);
             return HttpResult.InternalServerError();

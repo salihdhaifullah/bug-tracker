@@ -6,9 +6,8 @@ import Select from "./utils/Select";
 import SelectUser from "./utils/SelectUser";
 import TextFiled from "./utils/TextFiled";
 import useOnClickOutside from "../utils/hooks/useOnClickOutside";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import useFetchApi from "../utils/hooks/useFetchApi";
-import { useParams } from "react-router-dom";
 
 interface ITicket {
     name: string;
@@ -19,6 +18,7 @@ interface ITicket {
     status: string;
     type: string;
     id: string;
+    projectId: string;
 }
 
 
@@ -41,7 +41,6 @@ const TicketAction = (props: IActionProps) => {
     const [isValidType, setIsValidType] = useState(true);
     const [isValidPriority, setIsValidPriority] = useState(true);
     const [isValidStatus, setIsValidStatus] = useState(true);
-    const { projectId } = useParams();
 
     const targetRef = useRef<HTMLDivElement>(null);
 
@@ -159,7 +158,7 @@ const TicketAction = (props: IActionProps) => {
                             label="ticket status"
                         />
 
-                        <SelectUser search={props.ticket.assignedTo?.name} label="chose user to assign this ticket to" route={`members/${projectId}`} setId={setMemberId} id={memberId} />
+                        <SelectUser search={props.ticket.assignedTo?.name} label="chose user to assign this ticket to" route={`members/${props.ticket.projectId}`} setId={setMemberId} id={memberId} />
 
                         <div className="flex flex-row items-center mt-4  justify-between w-full px-4">
                             <Button onClick={() => setIsOpenUpdateModal(false)}>cancel</Button>

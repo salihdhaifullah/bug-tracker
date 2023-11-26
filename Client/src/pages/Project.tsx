@@ -36,9 +36,9 @@ const Project = () => {
         callIsOwner()
     }, [])
 
-    return payload.isLoading || !payload.result
+    return payload.isLoading
         ? <CircleProgress size="lg" />
-        : (<section className="flex flex-col w-full h-full my-10 p-2 flex-grow">
+        : payload.result !== null && (<section className="flex flex-col w-full h-full my-10 p-2 flex-grow">
             <div className="bg-white mb-4 rounded-md shadow-md p-4 gap-2 flex flex-col">
 
                 <h1 className="text-2xl font-bold">{payload.result.name}</h1>

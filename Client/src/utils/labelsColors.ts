@@ -18,4 +18,4 @@ const labelsColors = {
     },
 };
 
-export default labelsColors; 
+export default labelsColors;

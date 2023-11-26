@@ -2,7 +2,6 @@ using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 using Firebase.Storage;
 using FirebaseAdmin.Auth;
-using Buegee.Utils.Enums;
 
 namespace Buegee.Services.FirebaseService;
 public class FirebaseService : IFirebaseService
@@ -28,7 +27,7 @@ public class FirebaseService : IFirebaseService
         _logger = logger;
     }
 
-    public async Task<string> Upload(byte[] data, ContentType ContentType)
+    public async Task<string> Upload(byte[] data, string ContentType)
     {
         var name = $"{Guid.NewGuid()}.{ContentType.ToString()}";
         await _storage.Child(name).PutAsync(new MemoryStream(data));
@@ -40,7 +39,7 @@ public class FirebaseService : IFirebaseService
         await _storage.Child(name).DeleteAsync();
     }
 
-    public async Task<string> Update(string oldName, ContentType ContentType, byte[] data)
+    public async Task<string> Update(string oldName, string ContentType, byte[] data)
     {
         try
         {

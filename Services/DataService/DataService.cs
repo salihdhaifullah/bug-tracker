@@ -38,7 +38,7 @@ public class DataService : IDataService
 
             if (dto.Markdown.Contains(file.PreviewUrl))
             {
-                var imageName = await _firebase.Upload(Convert.FromBase64String(file.Base64), ContentType.webp);
+                var imageName = await _firebase.Upload(Convert.FromBase64String(file.Base64), ContentType.webp.ToString());
                 await ctx.Documents.AddAsync(new Document() { Name = imageName, Id = Ulid.NewUlid().ToString(), ContentId = content.Id });
                 dto.Markdown = dto.Markdown.Replace(file.PreviewUrl, Helper.StorageUrl(imageName));
             }
@@ -58,7 +58,7 @@ public class DataService : IDataService
 
             if (dto.Markdown.Contains(file.PreviewUrl))
             {
-                var imageName = await _firebase.Upload(Convert.FromBase64String(file.Base64), ContentType.webp);
+                var imageName = await _firebase.Upload(Convert.FromBase64String(file.Base64), ContentType.webp.ToString());
                 await ctx.Documents.AddAsync(new Document() { Name = imageName, Id = Ulid.NewUlid().ToString(), ContentId = content.Entity.Id });
                 dto.Markdown = dto.Markdown.Replace(file.PreviewUrl, Helper.StorageUrl(imageName));
             }
@@ -146,7 +146,8 @@ public class DataService : IDataService
         return addActivity(projectId, $"project {projectName} visibility changed from {getStatus(currentState)} to {getStatus(!currentState)}", ctx);
     }
 
-    public Task ArchiveProjectActivity(string projectId, string projectName, bool currentState, DataContext ctx) {
+    public Task ArchiveProjectActivity(string projectId, string projectName, bool currentState, DataContext ctx)
+    {
 
         GetStatus getStatus = val => val ? "archived" : "unarchived";
 

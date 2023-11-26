@@ -66,10 +66,10 @@ public class MemberController : Controller
                     .FirstOrDefaultAsync();
 
 
-            if (project is null) return HttpResult.Forbidden(massage: "you are not authorized to invent users", redirectTo: "/403");
+            if (project is null) return HttpResult.Forbidden(massage: "you are not authorized to invent users");
 
             if (project.IsReadOnly) return HttpResult.BadRequest("this project is archived");
-            
+
             var role = Enum.Parse<Role>(dto.Role);
 
             var memberId = Ulid.NewUlid().ToString();
@@ -168,7 +168,7 @@ public class MemberController : Controller
             var userId = _auth.GetId(Request);
 
             var nameParts = string.IsNullOrEmpty(email) ? null : email.Split(" ");
-            var members = await _ctx.Members.Where(m =>  ((!(nameParts  == null || nameParts.Length < 2) && (m.User.FirstName == nameParts[0] && m.User.LastName == nameParts[1])) || EF.Functions.ILike(m.User.Email, $"{email}%") || EF.Functions.ILike(m.User.FirstName, $"{email}%") || EF.Functions.ILike(m.User.LastName, $"{email}%")) && m.ProjectId == projectId && m.IsJoined && (!notMe || m.UserId != userId))
+            var members = await _ctx.Members.Where(m => ((!(nameParts == null || nameParts.Length < 2) && (m.User.FirstName == nameParts[0] && m.User.LastName == nameParts[1])) || EF.Functions.ILike(m.User.Email, $"{email}%") || EF.Functions.ILike(m.User.FirstName, $"{email}%") || EF.Functions.ILike(m.User.LastName, $"{email}%")) && m.ProjectId == projectId && m.IsJoined && (!notMe || m.UserId != userId))
                     .OrderBy((u) => u.JoinedAt)
                     .Select(u => new
                     {
@@ -297,7 +297,7 @@ public class MemberController : Controller
             var isReadOnly = await _ctx.Projects.AnyAsync(p => p.Id == projectId && p.IsReadOnly);
 
             if (isReadOnly) return HttpResult.BadRequest("this project is archived");
-            
+
             var member = await _ctx.Members
                     .Where(m => m.ProjectId == projectId && m.IsJoined && m.UserId == dto.MemberId)
                     .Include(m => m.User)

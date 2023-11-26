@@ -16,7 +16,7 @@ const Profile = () => {
 
   useEffect(() => { call() }, [])
 
-  return payload.isLoading || !payload.result ? <CircleProgress size="lg"/> : (
+  return payload.isLoading ? <CircleProgress size="lg" /> : payload.result !== null && (
     <section className="flex flex-col lg:flex-row justify-between gap-2 w-full h-full flex-grow p-2">
       <div className="flex flex-col w-full lg:w-fit lg:h-[60vh] justify-center items-center lg:justify-start my-2">
         <div className="flex flex-col h-full w-fit px-2 sm:px-4 md:px-8 lg:px-2 gap-2 rounded-2xl justify-center items-center bg-white py-2">

@@ -107,7 +107,7 @@ public class ProjectController : Controller
                             {
                                 name = p.Name,
                                 id = p.Id,
-                                isPrivate = p.IsPrivate, 
+                                isPrivate = p.IsPrivate,
                                 isReadOnly = p.IsReadOnly,
                                 members = p.Members.Count,
                                 tickets = p.Tickets.Count,
@@ -189,14 +189,14 @@ public class ProjectController : Controller
         try
         {
             var userId = _auth.GetId(Request);
-            
+
             var isAllowed = await _ctx.Projects
                     .AnyAsync(p => p.Id == projectId && p.Members.Any(m => m.UserId == userId
                     && (m.Role == Role.owner || m.Role == Role.project_manger)));
 
-            if (!isAllowed) return HttpResult.Forbidden("you are not allowed to do this action", redirectTo: "/403");
+            if (!isAllowed) return HttpResult.Forbidden("you are not allowed to do this action");
 
-            var isArchived = await  _ctx.Projects.AnyAsync(p => p.Id == projectId && p.IsReadOnly);
+            var isArchived = await _ctx.Projects.AnyAsync(p => p.Id == projectId && p.IsReadOnly);
 
             if (isArchived) return HttpResult.BadRequest("this project is archived");
 
@@ -234,10 +234,10 @@ public class ProjectController : Controller
             var project = await _ctx.Projects.Where(p => p.Id == projectId).FirstOrDefaultAsync();
 
             if (project == null) return HttpResult.NotFound("project not found");
-            
+
             if (project.IsReadOnly) return HttpResult.BadRequest("this project is archived");
-            
-           await _data.ChangeVisibilityActivity(projectId, project.Name, project.IsPrivate, _ctx);
+
+            await _data.ChangeVisibilityActivity(projectId, project.Name, project.IsPrivate, _ctx);
 
             project.IsPrivate = !project.IsPrivate;
 
@@ -266,14 +266,14 @@ public class ProjectController : Controller
             var project = await _ctx.Projects.Where(p => p.Id == projectId).FirstOrDefaultAsync();
 
             if (project == null) return HttpResult.NotFound("project not found");
-            
-           await _data.ArchiveProjectActivity(projectId, project.Name, project.IsReadOnly, _ctx);
+
+            await _data.ArchiveProjectActivity(projectId, project.Name, project.IsReadOnly, _ctx);
 
             project.IsReadOnly = !project.IsReadOnly;
 
             await _ctx.SaveChangesAsync();
 
-            return HttpResult.Ok($"successfully {(project.IsReadOnly ? "archived" : "unarchived")} project");
+            return HttpResult.Ok($"successfully {(project.IsReadOnly ? "archived" : "unarchive")} project");
         }
         catch (Exception e)
         {
@@ -307,7 +307,7 @@ public class ProjectController : Controller
             var project = await _ctx.Projects.Where(p => p.Id == dto.ProjectId).Select(p => new { p.Name, p.IsReadOnly }).FirstOrDefaultAsync();
 
             if (project == null) return HttpResult.NotFound("project not found");
-            
+
             if (project.IsReadOnly) return HttpResult.BadRequest("this project is archived");
 
             currentOwner.Role = Role.project_manger;
@@ -315,10 +315,10 @@ public class ProjectController : Controller
             newOwner.Role = Role.owner;
 
             await _data.TransferOwnershipActivity(dto.ProjectId, project.Name, $"{currentOwner.User.FirstName} {currentOwner.User.LastName}", $"{newOwner.User.FirstName} {newOwner.User.LastName}", _ctx);
-            
+
             await _ctx.SaveChangesAsync();
 
-            return HttpResult.Ok($"successfully trasfered project");
+            return HttpResult.Ok($"successfully transferred project");
         }
         catch (Exception e)
         {

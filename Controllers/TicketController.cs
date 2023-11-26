@@ -93,7 +93,7 @@ public class TicketController : Controller
 
             if (assignedTo is not null) _email.TicketAssignation(assignedTo.email, assignedTo.name, dto.Name, ticketType, ticketStatus, ticketPriority);
 
-            return HttpResult.Ok($"Ticket {dto.Name} successfully created", redirectTo: $"/project/{projectId}");
+            return HttpResult.Ok($"Ticket {dto.Name} successfully created", redirectTo: $"/tickets/{ticketId}");
         }
         catch (Exception e)
         {
@@ -103,13 +103,23 @@ public class TicketController : Controller
     }
 
     [HttpGet("my-tickets"), Authorized]
-    public async Task<IActionResult> TicketsTable()
+    public async Task<IActionResult> TicketsTable([FromQuery(Name = "type")] string? typeQuery, [FromQuery(Name = "priority")] string? priorityQuery, [FromQuery] string? search)
     {
         try
         {
+            TicketType? type = null;
+            if (!string.IsNullOrEmpty(typeQuery) && Enum.TryParse<TicketType>(typeQuery, out TicketType parsedType)) type = parsedType;
+            Priority? priority = null;
+            if (!string.IsNullOrEmpty(priorityQuery) && Enum.TryParse<Priority>(priorityQuery, out Priority parsedPriority)) priority = parsedPriority;
+
             var userId = _auth.GetId(Request);
             var tickets = await _ctx.Tickets
-                        .Where(t => t.AssignedTo != null && t.AssignedTo.UserId == userId)
+                        .Where(t =>
+                        t.AssignedTo != null
+                        && t.AssignedTo.UserId == userId
+                        && (type == null || t.Type == type)
+                        && (priority == null || t.Priority == priority)
+                        && EF.Functions.ILike(t.Name, $"{search}%"))
                         .OrderBy(t => t.Priority)
                         .ThenBy(t => t.CreatedAt)
                         .Select(t => new
@@ -232,7 +242,8 @@ public class TicketController : Controller
                                     imageUrl = Helper.StorageUrl(t.Creator.User.ImageName),
                                     id = t.Creator.Id,
                                 },
-                                project = new {
+                                project = new
+                                {
                                     name = t.Project.Name,
                                     id = t.ProjectId,
                                 },
@@ -351,7 +362,7 @@ public class TicketController : Controller
 
             if (assignedTo is not null) _email.TicketAssignation(assignedTo.email, assignedTo.name, dto.Name, ticketType, ticketStatus, ticketPriority);
 
-            return HttpResult.Ok($"Ticket {dto.Name} successfully updated", redirectTo: $"/project/{ticket.ProjectId}");
+            return HttpResult.Ok($"Ticket {dto.Name} successfully updated");
         }
         catch (Exception e)
         {
@@ -366,7 +377,7 @@ public class TicketController : Controller
         try
         {
             var isAllowed = await _ctx.Tickets.AnyAsync(t => t.Creator.UserId == _auth.GetId(Request));
-            if (!isAllowed) return HttpResult.Forbidden("you are not allowed to do this action", redirectTo: "/403");
+            if (!isAllowed) return HttpResult.Forbidden("you are not allowed to do this action");
 
             var content = await _ctx.Tickets
                           .Where(t => t.Id == ticketId)

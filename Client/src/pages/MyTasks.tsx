@@ -2,8 +2,12 @@ import { useEffect, useRef, useState, ReactElement, DragEvent, useMemo } from "r
 import useFetchApi from "../utils/hooks/useFetchApi";
 import { Priority, Status, Type } from "../types";
 import CircleProgress from "../components/utils/CircleProgress";
-import labelsColors from "../utils/lablesColors";
+import labelsColors from "../utils/labelsColors";
 import { Link } from "react-router-dom";
+import TextFiled from "../components/utils/TextFiled";
+import SelectButton from "../components/utils/SelectButton";
+import { AiOutlineSearch } from "react-icons/ai";
+import { priorityOptions, typeOptions } from "./CreateTicket";
 
 interface IDraggableProps {
     children: ReactElement[] | ReactElement | string;
@@ -87,11 +91,14 @@ const Draggable = (props: IDraggableProps) => {
 
 const MyTasks = () => {
     const [data, setData] = useState<IItem[]>([])
+    const [search, setSearch] = useState("");
+    const [ticketType, setTicketType] = useState("all");
+    const [ticketPriority, setTicketPriority] = useState("all");
 
     const [_, callUpdate] = useFetchApi<unknown, { id: string, status: Status }>("PATCH", "ticket/status", [])
-    const [tasksPayload, callTasks] = useFetchApi<IItem[], unknown>("GET", "ticket/my-tickets", [], (result) => { setData(result) })
+    const [tasksPayload, callTasks] = useFetchApi<IItem[], unknown>("GET", `ticket/my-tickets?search=${search}&type=${ticketType}&priority=${ticketPriority}`, [search, ticketType, ticketPriority], (result) => { setData(result) })
 
-    useEffect(() => { callTasks() }, [])
+    useEffect(() => { callTasks() }, [search, ticketType, ticketPriority])
 
     const realScreenHeightOffset = useMemo(() => window.screen.height * 0.3, [window.screen.height]);
     const realScreenHeightScroll = useMemo(() => window.screen.height * 0.01, [window.screen.height]);
@@ -123,18 +130,36 @@ const MyTasks = () => {
     }
 
     return (
-        <div className="py-10 my-10 flex flex-wrap min-w-[100vw] flex-row justify-center items-start p-2 gap-2">
-            {!tasksPayload.isLoading && data.length ? (
-                <>
-                    <Droppable handelDrop={handelDrop} items={data} col={Status.review} />
-                    <Droppable handelDrop={handelDrop} items={data} col={Status.active} />
-                    <Droppable handelDrop={handelDrop} items={data} col={Status.in_progress} />
-                    <Droppable handelDrop={handelDrop} items={data} col={Status.resolved} />
-                    <Droppable handelDrop={handelDrop} items={data} col={Status.closed} />
-                </>
-            ) : (
-                <CircleProgress size="md" />
-            )}
+
+        <div className="flex flex-col min-w-[100vw] p-2 py-10 my-10">
+
+            <div className="flex flex-row gap-4 w-full flex-wrap items-center justify-between">
+                <div className="flex items-center justify-center w-full sm:w-auto">
+                    <div className="max-w-[400px]">
+                        <TextFiled small icon={AiOutlineSearch} label="Search for tickets" value={search} onChange={(e) => setSearch(e.target.value)} />
+                    </div>
+
+                    <div className="flex gap-1 flex-row flex-wrap">
+                        <SelectButton value={ticketPriority} setValue={setTicketPriority} label="priority" options={["all", ...priorityOptions]} />
+                        <SelectButton value={ticketType} setValue={setTicketType} label="type" options={["all", ...typeOptions]} />
+                    </div>
+                </div>
+            </div>
+
+            <div className="flex flex-wrap  flex-row justify-center items-start gap-2">
+
+                {!tasksPayload.isLoading ? (
+                    <>
+                        <Droppable handelDrop={handelDrop} items={data} col={Status.review} />
+                        <Droppable handelDrop={handelDrop} items={data} col={Status.active} />
+                        <Droppable handelDrop={handelDrop} items={data} col={Status.in_progress} />
+                        <Droppable handelDrop={handelDrop} items={data} col={Status.resolved} />
+                        <Droppable handelDrop={handelDrop} items={data} col={Status.closed} />
+                    </>
+                ) : (
+                    <CircleProgress size="md" />
+                )}
+            </div>
         </div>
     )
 }

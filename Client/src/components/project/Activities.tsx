@@ -53,7 +53,7 @@ const Activities = () => {
                 </div>
 
                 <div className="flex flex-col justify-center items-center w-full gap-4">
-                    {activitiesPayload.isLoading || countPayload.isLoading || !countPayload.result || !activitiesPayload.result ? <CircleProgress size="lg" className="mb-4" /> : (
+                    {activitiesPayload.isLoading || countPayload.isLoading ? <CircleProgress size="lg" className="mb-4" /> : (
                         <>
                             <div className="overflow-x-scroll overflow-y-hidden w-full">
                                 <table className="text-sm text-left text-gray-500 w-full">
@@ -65,7 +65,7 @@ const Activities = () => {
                                     </thead>
 
                                     <tbody>
-                                        {activitiesPayload.result.map((activity, index) => (
+                                        {activitiesPayload.result !== null && activitiesPayload.result.map((activity, index) => (
                                             <tr className="bg-white border-b hover:bg-gray-50" key={index}>
                                                 <td className="px-6 py-4 min-w-[150px]">{activity.content}</td>
                                                 <td className="px-6 py-4 min-w-[150px]">{formatDate(activity.createdAt, true)}</td>
@@ -80,13 +80,18 @@ const Activities = () => {
 
                                 <SelectButton options={[5, 10, 15, 20, 100]} label="take" setValue={setTake} value={take} />
 
-                                <AiOutlineArrowLeft
-                                    onClick={handelPrevPage}
-                                    className={`${page === 1 ? "" : "hover:bg-slate-200 cursor-pointer"} p-2 rounded-xl shadow-md text-4xl`} />
+                                {countPayload.result !== null && (
+                                    <>
+                                        <AiOutlineArrowLeft
+                                            onClick={handelPrevPage}
+                                            className={`${page === 1 ? "" : "hover:bg-slate-200 cursor-pointer"} p-2 rounded-xl shadow-md text-4xl`} />
 
-                                <AiOutlineArrowRight
-                                    onClick={handelNextPage}
-                                    className={`${page * take >= countPayload.result ? "" : "hover:bg-slate-200 cursor-pointer"} p-2 rounded-xl shadow-md text-4xl`} />
+                                        <AiOutlineArrowRight
+                                            onClick={handelNextPage}
+                                            className={`${page * take >= countPayload.result ? "" : "hover:bg-slate-200 cursor-pointer"} p-2 rounded-xl shadow-md text-4xl`} />
+                                    </>
+                                )}
+
                             </div>
                         </>
                     )}

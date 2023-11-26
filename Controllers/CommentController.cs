@@ -51,7 +51,9 @@ public class CommentController : Controller
     {
         try
         {
-            var comments = await _ctx.Comments.Where(c => c.TicketId == ticketId)
+            var comments = await _ctx.Comments
+            .Where(c => c.TicketId == ticketId)
+            .OrderBy(c => c.CreatedAt)
             .Select(c => new
             {
                 commenter = new
@@ -108,7 +110,7 @@ public class CommentController : Controller
         try
         {
             var isAllowed = await _ctx.Comments.AnyAsync(c => c.CommenterId == _auth.GetId(Request));
-            if (!isAllowed) return HttpResult.Forbidden("you are not allowed to do this action", redirectTo: "/403");
+            if (!isAllowed) return HttpResult.Forbidden("you are not allowed to do this action");
 
             var content = await _ctx.Comments
                           .Where(c => c.Id == commentId)
