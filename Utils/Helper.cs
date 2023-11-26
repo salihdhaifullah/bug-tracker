@@ -36,11 +36,6 @@ public static class Helper
         };
     }
 
-    public static string StorageUrl(string name)
-    {
-        return $"https://firebasestorage.googleapis.com/v0/b/bug-tracker-buegee.appspot.com/o/{name}?alt=media";
-    }
-
     public static string BaseUrl(HttpRequest request)
     {
         return $"{request.Scheme}://{request.Host.Value}";

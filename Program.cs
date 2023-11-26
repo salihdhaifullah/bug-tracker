@@ -23,7 +23,7 @@ builder.Services.AddSingleton<IDataService, DataService>();
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment() && args.Contains("seed"))
-using (var scope = app.Services.CreateScope()) await new Seed(scope).SeedAsync();
+    using (var scope = app.Services.CreateScope()) await new Seed(scope).SeedAsync();
 
 app.UseRouting();
 #pragma warning disable ASP0014
@@ -37,7 +37,7 @@ if (app.Environment.IsDevelopment())
 else
 {
     app.UseSpaStaticFiles();
-    app.UseSpa(_ => {});
+    app.UseSpa(_ => { });
 }
 
 app.Run();

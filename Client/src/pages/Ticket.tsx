@@ -16,7 +16,7 @@ interface ITicket {
     createdAt: string;
     creator: {
         name: string;
-        imageUrl: string;
+        avatarUrl: string;
         id: string;
     };
     project: {
@@ -25,7 +25,7 @@ interface ITicket {
     };
     assignedTo: null | {
         name: string;
-        imageUrl: string;
+        avatarUrl: string;
         id: string;
         memberId: string;
     };
@@ -71,7 +71,7 @@ const Ticket = () => {
                     <img
                         title="creator"
                         className="rounded-full bg-white dark:bg-black shadow-md w-10 h-10 object-contain"
-                        src={payload.result.creator.imageUrl}
+                        src={payload.result.creator.avatarUrl}
                         alt={`${payload.result.creator.name}`}
                     />
                 </Link>
@@ -112,7 +112,7 @@ const Ticket = () => {
                                 <Link title="assigned to" className="flex gap-2 w-fit h-fit items-center flex-row" to={`/profile/${payload.result.assignedTo.id}`}>
                                     <img
                                         className="rounded-full shadow-md w-10 h-10 object-contain"
-                                        src={payload.result.assignedTo.imageUrl}
+                                        src={payload.result.assignedTo.avatarUrl}
                                         alt={`${payload.result.assignedTo.name}`}
                                     />
                                     <span className="font-bold text-primary hover:underline">{payload.result.assignedTo.name}</span>

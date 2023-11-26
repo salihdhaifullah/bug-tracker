@@ -59,7 +59,7 @@ public class CommentController : Controller
                 commenter = new
                 {
                     name = $"{c.Commenter.FirstName} {c.Commenter.LastName}",
-                    imageUrl = Helper.StorageUrl(c.Commenter.ImageName),
+                    avatarUrl = c.Commenter.AvatarUrl,
                     id = c.Commenter.Id
                 },
                 createdAt = c.CreatedAt,

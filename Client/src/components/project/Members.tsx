@@ -14,7 +14,7 @@ import Modal from "../utils/Model";
 import Select from "../utils/Select";
 
 interface IMember {
-    imageUrl: string;
+    avatarUrl: string;
     email: string;
     name: string;
     role: string;
@@ -78,7 +78,7 @@ const Action = (props: IActionProps) => {
 
                     <div className="w-full justify-center gap-4 pl-2 my-3 items-start flex flex-col">
                         <Link to={`/profile/${props.member.id}`}>
-                            <img className="rounded-full shadow-md w-10 h-10 object-contain" src={props.member.imageUrl} alt={props.member.name} />
+                            <img className="rounded-full shadow-md w-10 h-10 object-contain" src={props.member.avatarUrl} alt={props.member.name} />
                         </Link>
 
                         <p className="flex flex-row gap-2">
@@ -198,7 +198,7 @@ const Members = () => {
 
                                                 <td className="flex items-center px-6 py-4 min-w-[150px] justify-center text-gray-900 whitespace-nowrap">
                                                     <Link to={`/profile/${member.id}`}>
-                                                        <img className="rounded-full shadow-md w-10 h-10 object-contain" src={member.imageUrl} alt={member.name} />
+                                                        <img className="rounded-full shadow-md w-10 h-10 object-contain" src={member.avatarUrl} alt={member.name} />
                                                     </Link>
                                                 </td>
 

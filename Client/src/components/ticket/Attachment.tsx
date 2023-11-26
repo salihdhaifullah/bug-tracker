@@ -1,7 +1,7 @@
 import { Link, useParams } from "react-router-dom"
 import formatDate from "../../utils/formatDate"
 import Button from "../utils/Button";
-import { useEffect, useRef, useState } from "react";
+import { ChangeEvent, Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import useFetchApi from "../../utils/hooks/useFetchApi";
 import CircleProgress from "../utils/CircleProgress";
 import TextFiled from "../utils/TextFiled";
@@ -11,6 +11,8 @@ import { FiMoreVertical } from "react-icons/fi";
 import useOnClickOutside from "../../utils/hooks/useOnClickOutside";
 import Modal from "../utils/Model";
 import { useUser } from "../../utils/context/user";
+import toWEBPImage from "../../utils/toWEBPImage";
+import toBase64 from "../../utils/toBase64";
 
 interface IAttachment {
     creator: {
@@ -26,6 +28,90 @@ interface IActionProps {
     attachment: IAttachment
     call: () => void;
 }
+
+interface ICreateAttachmentModalProps {
+    isOpen: boolean;
+    call: () => void;
+    setIsOpen: Dispatch<SetStateAction<boolean>>
+}
+
+const CreateAttachmentModal = (props: ICreateAttachmentModalProps) => {
+    const [title, setTitle] = useState("")
+    const [isValidTitle, setIsValidTitle] = useState(false)
+    const [data, setData] = useState("")
+    const [contentType, setContentType] = useState("")
+    const { ticketId } = useParams();
+
+    const [fileName, setFileName] = useState("")
+
+    const [payload, call] = useFetchApi<unknown, { title: string, data: string, ticketId: string, contentType: string }>("POST", "attachment", [], () => {
+        props.call();
+        props.setIsOpen(false);
+    })
+
+    const resetState = () => {
+        setTitle("")
+        setIsValidTitle(false)
+        setData("")
+        setFileName("")
+        setContentType("")
+    }
+
+    const handelChangeFile = async (e: ChangeEvent<HTMLInputElement>) => {
+        const file = e?.target?.files?.item(0);
+        if (file) {
+            setFileName(file.name)
+            setContentType(file.type)
+            setData(await toBase64(file));
+        }
+    }
+
+    return (
+        <Modal isOpen={props.isOpen} setIsOpen={props.setIsOpen}>
+            <div className="flex flex-col justify-center  items-center pt-4 pb-2 px-4 w-[400px] text-center h-full">
+                <h1 className="text-xl font-bold text-primary">add attachment</h1>
+                <div className="flex-col flex w-full justify-center items-center">
+
+                    <TextFiled
+                        validation={[
+                            { validate: (str: string) => str.length <= 50, massage: "max length of title is 50 characters" },
+                            { validate: (str: string) => str.length >= 3, massage: "min length of title is 3 characters" }
+                        ]}
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                        label="title"
+                        setIsValid={setIsValidTitle}
+                    />
+
+                    <div className="w-full my-4 px-6 justify-start flex-col items-center">
+                        <input onChange={handelChangeFile} type="file" className="hidden" accept="*" id="file-upload" />
+
+                        <label htmlFor="file-upload">
+                            <div className="rounded-md cursor-pointer w-fit shadow-md bg-secondary text-primary p-1 font-bold text-start hover:text-white dark:hover:text-black">{fileName || "upload"}</div>
+                        </label>
+                    </div>
+
+                    <div className="flex flex-row items-center mt-4  justify-between w-full px-4">
+                        <Button onClick={() => {
+                            resetState()
+                            props.setIsOpen(false)
+                        }}
+                        >cancel</Button>
+
+                        <Button
+                            isLoading={payload.isLoading}
+                            isValid={data.length > 0 && isValidTitle && contentType.length > 0}
+                            onClick={() => call({ title, data, ticketId: ticketId!, contentType })}
+                        >add</Button>
+                    </div>
+
+                </div>
+            </div>
+
+        </Modal>
+    )
+}
+
 
 const Action = (props: IActionProps) => {
     const [isOpen, setIsOpen] = useState(false);
@@ -80,6 +166,7 @@ const Attachment = () => {
     const [search, setSearch] = useState("");
     const [take, setTake] = useState(10);
     const [page, setPage] = useState(1);
+    const [isOpenCreateAttachmentModal, setIsOpenCreateAttachmentModal] = useState(false);
 
     const [attachmentsPayload, callAttachments] = useFetchApi<IAttachment[]>("GET", `attachment/attachments/${ticketId}?take=${take}&page=${page}&search=${search}`, [take, page, search]);
     const [countPayload, callCount] = useFetchApi<number>("GET", `attachment/attachments-count/${ticketId}?search=${search}`, [search]);
@@ -104,6 +191,9 @@ const Attachment = () => {
 
                 <div className="flex flex-row gap-4 w-full flex-wrap items-center pb-4 p-2 bg-white justify-between">
 
+                    <Button onClick={() => setIsOpenCreateAttachmentModal(prev => !prev)}>add attachment</Button>
+                    <CreateAttachmentModal setIsOpen={setIsOpenCreateAttachmentModal} isOpen={isOpenCreateAttachmentModal} call={callAttachments} />
+
                     <div className="flex items-center justify-center w-full sm:w-auto">
 
                         <div className="max-w-[400px]">
@@ -120,7 +210,6 @@ const Attachment = () => {
                                 <table className="text-sm text-left text-gray-500 w-full">
                                     <thead className="text-xs text-gray-700 uppercase bg-white">
                                         <tr>
-                                            <th scope="col" className="px-6 py-3 min-w-[150px]">  </th>
                                             <th scope="col" className="px-6 py-3 min-w-[150px]"> title </th>
                                             <th scope="col" className="px-6 py-3 min-w-[150px]"> uploaded by </th>
                                             <th scope="col" className="px-6 py-3 min-w-[150px]"> uploaded at </th>
@@ -132,8 +221,8 @@ const Attachment = () => {
                                         {attachmentsPayload.result !== null && countPayload.result !== null && attachmentsPayload.result.map((attachment, index) => (
                                             <tr className="bg-white border-b hover:bg-gray-50" key={index}>
 
-                                                <td className="flex items-center px-6 py-4 min-w-[150px] justify-center text-gray-900 whitespace-nowrap">
-                                                    <a className="link" href={attachment.url}>
+                                                <td className="px-6 py-4 min-w-[150px]">
+                                                    <a target="_blank" className="link" href={attachment.url}>
                                                         {attachment.title}
                                                     </a>
                                                 </td>

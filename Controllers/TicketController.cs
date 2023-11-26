@@ -239,7 +239,7 @@ public class TicketController : Controller
                                 creator = new
                                 {
                                     name = $"{t.Creator.User.FirstName} {t.Creator.User.LastName}",
-                                    imageUrl = Helper.StorageUrl(t.Creator.User.ImageName),
+                                    avatarUrl = t.Creator.User.AvatarUrl,
                                     id = t.Creator.Id,
                                 },
                                 project = new
@@ -250,7 +250,7 @@ public class TicketController : Controller
                                 assignedTo = t.AssignedTo != null ? new
                                 {
                                     name = $"{t.AssignedTo.User.FirstName} {t.AssignedTo.User.LastName}",
-                                    imageUrl = Helper.StorageUrl(t.AssignedTo.User.ImageName),
+                                    avatarUrl = t.AssignedTo.User.AvatarUrl,
                                     id = t.AssignedTo.UserId,
                                     memberId = t.AssignedToId,
                                 } : null,

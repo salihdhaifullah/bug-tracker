@@ -116,7 +116,7 @@ public class ProjectController : Controller
                                 owner = p.Members.Where(m => m.Role == Role.owner).Select(m => new
                                 {
                                     name = $"{m.User.FirstName} {m.User.LastName}",
-                                    imageUrl = Helper.StorageUrl(m.User.ImageName),
+                                    avatarUrl = m.User.AvatarUrl,
                                     id = m.UserId,
                                 })
                                 .FirstOrDefault(),

@@ -34,8 +34,8 @@ public class User
     public required string ContentId { get; set; } = null!;
     public Content Content { get; set; } = null!;
 
-    [Required, Column("image_name")]
-    public required string ImageName { get; set; } = null!;
+    [Required, Column("avatar_url")]
+    public required string AvatarUrl { get; set; } = null!;
 
     [Column("bio"), StringLength(100)]
     public string Bio { get; set; } = string.Empty;

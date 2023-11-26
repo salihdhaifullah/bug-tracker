@@ -143,7 +143,7 @@ public class MemberController : Controller
                             .OrderBy((u) => u.CreatedAt)
                             .Select(u => new
                             {
-                                imageUrl = Helper.StorageUrl(u.ImageName),
+                                avatarUrl = u.AvatarUrl,
                                 email = u.Email,
                                 name = $"{u.FirstName} {u.LastName}",
                                 id = u.Id,
@@ -172,7 +172,7 @@ public class MemberController : Controller
                     .OrderBy((u) => u.JoinedAt)
                     .Select(u => new
                     {
-                        imageUrl = Helper.StorageUrl(u.User.ImageName),
+                        avatarUrl = u.User.AvatarUrl,
                         email = u.User.Email,
                         name = $"{u.User.FirstName} {u.User.LastName}",
                         id = u.Id,
@@ -223,7 +223,7 @@ public class MemberController : Controller
                         .OrderBy((m) => m.JoinedAt)
                         .Select(m => new
                         {
-                            imageUrl = Helper.StorageUrl(m.User.ImageName),
+                            avatarUrl = m.User.AvatarUrl,
                             email = m.User.Email,
                             name = $"{m.User.FirstName} {m.User.LastName}",
                             role = m.Role.ToString(),

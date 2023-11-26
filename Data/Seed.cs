@@ -93,7 +93,7 @@ public class Seed
                 PasswordSalt = salt,
                 Id = userId,
                 ContentId = contentId,
-                ImageName = imageName
+                AvatarUrl = imageName
             });
         }
 

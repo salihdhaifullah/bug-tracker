@@ -1,7 +1,6 @@
 using Buegee.Data;
 using Buegee.DTO;
 using Buegee.Services.FirebaseService;
-using Buegee.Utils;
 using Buegee.Utils.Enums;
 using Buegee.Models;
 using System.Text;
@@ -25,9 +24,9 @@ public class DataService : IDataService
         {
             var document = content.Documents[i];
 
-            if (!dto.Markdown.Contains(document.Name))
+            if (!dto.Markdown.Contains(document.Url))
             {
-                await _firebase.Delete(document.Name);
+                await _firebase.Delete(document.Url);
                 ctx.Documents.Remove(document);
             }
         }
@@ -39,8 +38,8 @@ public class DataService : IDataService
             if (dto.Markdown.Contains(file.PreviewUrl))
             {
                 var imageName = await _firebase.Upload(Convert.FromBase64String(file.Base64), ContentType.webp.ToString());
-                await ctx.Documents.AddAsync(new Document() { Name = imageName, Id = Ulid.NewUlid().ToString(), ContentId = content.Id });
-                dto.Markdown = dto.Markdown.Replace(file.PreviewUrl, Helper.StorageUrl(imageName));
+                await ctx.Documents.AddAsync(new Document() { Url = imageName, Id = Ulid.NewUlid().ToString(), ContentId = content.Id });
+                dto.Markdown = dto.Markdown.Replace(file.PreviewUrl, imageName);
             }
         }
 
@@ -59,8 +58,8 @@ public class DataService : IDataService
             if (dto.Markdown.Contains(file.PreviewUrl))
             {
                 var imageName = await _firebase.Upload(Convert.FromBase64String(file.Base64), ContentType.webp.ToString());
-                await ctx.Documents.AddAsync(new Document() { Name = imageName, Id = Ulid.NewUlid().ToString(), ContentId = content.Entity.Id });
-                dto.Markdown = dto.Markdown.Replace(file.PreviewUrl, Helper.StorageUrl(imageName));
+                await ctx.Documents.AddAsync(new Document() { Url = imageName, Id = Ulid.NewUlid().ToString(), ContentId = content.Entity.Id });
+                dto.Markdown = dto.Markdown.Replace(file.PreviewUrl, imageName);
             }
         }
 

@@ -6,7 +6,7 @@ import CircleProgress from "../components/utils/CircleProgress";
 
 interface IProfilePageResult {
   bio: string;
-  imageUrl: string;
+  avatarUrl: string;
   name: string;
 }
 
@@ -23,7 +23,7 @@ const Profile = () => {
           <img
             title="change image"
             className="rounded-full cursor-pointer shadow-md w-60 h-60 object-contain"
-            src={payload.result.imageUrl}
+            src={payload.result.avatarUrl}
             alt={payload.result.name} />
 
           <h1 className="text-gray-800 font-medium text-2xl">{payload.result.name}</h1>

@@ -34,7 +34,7 @@ const Header = () => {
                     <div className="flex justify-center items-center">
                         <img
                             className="rounded-full dark:shadow-secondary shadow-md w-8 h-8 object-contain"
-                            src={user.imageUrl}
+                            src={user.avatarUrl}
                             alt={user.name} />
 
                     </div>

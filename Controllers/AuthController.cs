@@ -56,7 +56,7 @@ public class AuthController : Controller
                     passwordHash = u.PasswordHash,
                     passwordSalt = u.PasswordSalt,
                     id = u.Id,
-                    imageUrl = Helper.StorageUrl(u.ImageName),
+                    avatarUrl = u.AvatarUrl,
                     email = u.Email,
                     name = $"{u.FirstName} {u.LastName}",
                 })
@@ -73,7 +73,7 @@ public class AuthController : Controller
             return HttpResult.Ok("logged in successfully", new
             {
                 id = isFound.id,
-                imageUrl = isFound.imageUrl,
+                avatarUrl = isFound.avatarUrl,
                 email = isFound.email,
                 name = isFound.name,
             });
@@ -149,7 +149,7 @@ public class AuthController : Controller
                 PasswordHash = hash,
                 PasswordSalt = salt,
                 Id = userId,
-                ImageName = imageName,
+                AvatarUrl = imageName,
                 ContentId = contentId
             });
 

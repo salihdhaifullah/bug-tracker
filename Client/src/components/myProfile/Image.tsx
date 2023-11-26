@@ -8,15 +8,15 @@ const Image = () => {
     const user = useUser() as IUser;
     const dispatchUser = useUserDispatch();
 
-    const [_, call] = useFetchApi<{ imageUrl: string }, { data: string, contentType: string }>("POST", "user/avatar", [], (payload) => {
-            dispatchUser({
-                type: "add",
-                payload: {
-                    ...user,
-                    imageUrl: payload.imageUrl
-                }
-            });
+    const [_, call] = useFetchApi<{ avatarUrl: string }, { data: string, contentType: string }>("POST", "user/avatar", [], (payload) => {
+        dispatchUser({
+            type: "add",
+            payload: {
+                ...user,
+                avatarUrl: payload.avatarUrl
+            }
         });
+    });
 
     useEffect(() => {
         if (base64.length) call({ data: base64, contentType: "webp" });
@@ -36,7 +36,7 @@ const Image = () => {
                 <img
                     title="change image"
                     className="rounded-full cursor-pointer shadow-md w-60 h-60 object-contain"
-                    src={user.imageUrl}
+                    src={user.avatarUrl}
                     alt={user.name} />
             </label>
         </>

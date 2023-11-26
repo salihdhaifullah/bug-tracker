@@ -65,6 +65,7 @@ public class AttachmentController : Controller
     {
         try
         {
+
             _auth.TryGetId(Request, out string? userId);
 
             var query = _ctx.Attachments.Where(a => a.TicketId == ticketId);
@@ -80,7 +81,7 @@ public class AttachmentController : Controller
                     id = a.CreatorId
                 },
                 title = a.Title,
-                url = Helper.StorageUrl(a.Url),
+                url = a.Url,
                 createdAt = a.CreatedAt,
             })
             .Skip((page - 1) * take)

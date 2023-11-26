@@ -11,7 +11,7 @@ import formatDate from "../../utils/formatDate";
 export interface IComment {
     commenter: {
         name: string;
-        imageUrl: string;
+        avatarUrl: string;
         id: string;
     };
     createdAt: string;
@@ -65,7 +65,7 @@ const Comment = (props: ICommentProps) => {
                 <img
                     title="commenter"
                     className="rounded-full bg-white dark:bg-black shadow-md w-10 h-10 object-contain"
-                    src={props.comment.commenter.imageUrl}
+                    src={props.comment.commenter.avatarUrl}
                     alt={`${props.comment.commenter.name}`}
                 />
             </Link>

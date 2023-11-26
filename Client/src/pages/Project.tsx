@@ -19,7 +19,7 @@ interface IProject {
     tickets: number;
     markdown: string;
     owner: {
-        imageUrl: string;
+        avatarUrl: string;
         name: string;
         id: string;
     };
@@ -59,7 +59,7 @@ const Project = () => {
                         <div className="flex items-center">
                             <img
                                 className="rounded-full shadow-md w-10 h-10 object-contain"
-                                src={payload.result.owner.imageUrl}
+                                src={payload.result.owner.avatarUrl}
                                 alt={`${payload.result.owner.name}`}
                             />
                             <span className="ml-2 font-medium">{payload.result.owner.name}</span>

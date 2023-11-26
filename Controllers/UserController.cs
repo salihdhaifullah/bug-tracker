@@ -44,13 +44,13 @@ public class UserController : Controller
 
             if (user is null) return HttpResult.UnAuthorized();
 
-            var newImageName = await _firebase.Update(user.ImageName, ContentType.webp.ToString(), Convert.FromBase64String(dto.Data));
+            var newAvatarUrl = await _firebase.Update(user.AvatarUrl, ContentType.webp.ToString(), Convert.FromBase64String(dto.Data));
 
-            user.ImageName = newImageName;
+            user.AvatarUrl = newAvatarUrl;
 
             await _ctx.SaveChangesAsync();
 
-            return HttpResult.Ok("successfully changed profile image", new { imageUrl = Helper.StorageUrl(newImageName) });
+            return HttpResult.Ok("successfully changed profile image", new { avatarUrl = newAvatarUrl });
         }
         catch (Exception e)
         {
@@ -165,7 +165,7 @@ public class UserController : Controller
                         {
                             bio = u.Bio,
                             name = $"{u.FirstName} {u.LastName}",
-                            imageUrl = Helper.StorageUrl(u.ImageName),
+                            avatarUrl = u.AvatarUrl,
                         })
                         .FirstOrDefaultAsync();
 

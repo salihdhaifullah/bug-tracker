@@ -29,9 +29,9 @@ public class FirebaseService : IFirebaseService
 
     public async Task<string> Upload(byte[] data, string ContentType)
     {
-        var name = $"{Guid.NewGuid()}.{ContentType.ToString()}";
+        var name = $"{Guid.NewGuid()}.{ContentType}";
         await _storage.Child(name).PutAsync(new MemoryStream(data));
-        return name;
+        return await _storage.Child(name).GetDownloadUrlAsync();
     }
 
     public async Task Delete(string name)
@@ -50,8 +50,8 @@ public class FirebaseService : IFirebaseService
             _logger.LogError($"Filed to delete file {oldName}, \n error massage {e.Message}");
         }
 
-        var name = $"{Guid.NewGuid()}.{ContentType.ToString()}";
+        var name = $"{Guid.NewGuid()}.{ContentType}";
         await _storage.Child(name).PutAsync(new MemoryStream(data));
-        return name;
+        return await _storage.Child(name).GetDownloadUrlAsync();
     }
 }
