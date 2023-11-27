@@ -11,7 +11,6 @@ import { FiMoreVertical } from "react-icons/fi";
 import useOnClickOutside from "../../utils/hooks/useOnClickOutside";
 import Modal from "../utils/Model";
 import { useUser } from "../../utils/context/user";
-import toWEBPImage from "../../utils/toWEBPImage";
 import toBase64 from "../../utils/toBase64";
 
 interface IAttachment {
@@ -113,7 +112,7 @@ const CreateAttachmentModal = (props: ICreateAttachmentModalProps) => {
 }
 
 
-const Action = (props: IActionProps) => {
+const Action = (_: IActionProps) => {
     const [isOpen, setIsOpen] = useState(false);
     const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
     const [isOpenRoleModal, setIsOpenRoleModal] = useState(false);

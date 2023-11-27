@@ -11,9 +11,9 @@ EXPOSE 5018
 
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /src
-COPY ["Buegee.csproj", "."]
-RUN dotnet restore "./Buegee.csproj"
-COPY . .
+COPY ["Server/Buegee.csproj", "Server/"]
+RUN dotnet restore "./Server/Buegee.csproj"
+COPY ./Server .
 WORKDIR "/src/."
 RUN dotnet build "Buegee.csproj" -c Release -o /app/build
 

@@ -3,8 +3,6 @@ import Button from "../utils/Button"
 import Modal from "../utils/Model";
 import Tag from "../utils/Tag";
 import formatDate from "../../utils/formatDate";
-import { FiUsers } from "react-icons/fi";
-import { BiTask } from "react-icons/bi";
 import useFetchApi from "../../utils/hooks/useFetchApi";
 import SelectUser from "../utils/SelectUser";
 
@@ -47,13 +45,13 @@ const TransferModal = (props: (IDangerZoneProps & { isOpenTransferModal: boolean
 
                         <div className="w-full justify-center gap-4 pl-2 my-3 items-start flex flex-col">
 
-                            <Tag name={`Members ${!Number(props.members) ? "none" : Number(props.members)}`} icon={FiUsers} />
+                            <Tag name={`Members ${!Number(props.members) ? "none" : Number(props.members)}`} />
 
-                            <Tag name={`Tickets ${!Number(props.tickets) ? "none" : Number(props.tickets)}`} icon={BiTask} />
+                            <Tag name={`Tickets ${!Number(props.tickets) ? "none" : Number(props.tickets)}`} />
 
                             <Tag name={props.isPrivate ? "private" : "public"} />
 
-                            <Tag name={props.isReadOnly ? "archived" : "unarchived"} />
+                            <Tag name={props.isReadOnly ? "archived" : "unarchive"} />
 
                             <Tag name={`Created At ${formatDate(props.createdAt)}`} />
 
@@ -95,13 +93,13 @@ const useVisibilityModal = (props: IDangerZoneProps): [() => JSX.Element, Dispat
 
                 <div className="w-full justify-center gap-4 pl-2 my-3 items-start flex flex-col">
 
-                    <Tag name={`Members ${!Number(props.members) ? "none" : Number(props.members)}`} icon={FiUsers} />
+                    <Tag name={`Members ${!Number(props.members) ? "none" : Number(props.members)}`} />
 
-                    <Tag name={`Tickets ${!Number(props.tickets) ? "none" : Number(props.tickets)}`} icon={BiTask} />
+                    <Tag name={`Tickets ${!Number(props.tickets) ? "none" : Number(props.tickets)}`} />
 
                     <Tag name={props.isPrivate ? "private" : "public"} />
 
-                    <Tag name={props.isReadOnly ? "archived" : "unarchived"} />
+                    <Tag name={props.isReadOnly ? "archived" : "unarchive"} />
 
                     <Tag name={`Created At ${formatDate(props.createdAt)}`} />
 
@@ -134,12 +132,12 @@ const useArchiveModal = (props: IDangerZoneProps): [() => JSX.Element, Dispatch<
 
                 <div className="w-full justify-center gap-4 pl-2 my-3 items-start flex flex-col">
 
-                    <Tag name={`Members ${!Number(props.members) ? "none" : Number(props.members)}`} icon={FiUsers} />
+                    <Tag name={`Members ${!Number(props.members) ? "none" : Number(props.members)}`} />
 
-                    <Tag name={`Tickets ${!Number(props.tickets) ? "none" : Number(props.tickets)}`} icon={BiTask} />
+                    <Tag name={`Tickets ${!Number(props.tickets) ? "none" : Number(props.tickets)}`} />
 
                     <Tag name={props.isPrivate ? "private" : "public"} />
-                    <Tag name={props.isReadOnly ? "archived" : "unarchived"} />
+                    <Tag name={props.isReadOnly ? "archived" : "unarchive"} />
 
                     <Tag name={`Created At ${formatDate(props.createdAt)}`} />
 
@@ -172,13 +170,13 @@ const useDeleteModal = (props: IDangerZoneProps): [() => JSX.Element, Dispatch<S
 
                 <div className="w-full justify-center gap-4 pl-2 my-3 items-start flex flex-col">
 
-                    <Tag name={`Members ${!Number(props.members) ? "none" : Number(props.members)}`} icon={FiUsers} />
+                    <Tag name={`Members ${!Number(props.members) ? "none" : Number(props.members)}`} />
 
-                    <Tag name={`Tickets ${!Number(props.tickets) ? "none" : Number(props.tickets)}`} icon={BiTask} />
+                    <Tag name={`Tickets ${!Number(props.tickets) ? "none" : Number(props.tickets)}`} />
 
                     <Tag name={props.isPrivate ? "private" : "public"} />
 
-                    <Tag name={props.isReadOnly ? "archived" : "unarchived"} />
+                    <Tag name={props.isReadOnly ? "archived" : "unarchive"} />
                     <Tag name={`Created At ${formatDate(props.createdAt)}`} />
 
                 </div>
@@ -228,7 +226,7 @@ const DangerZone = (props: IDangerZoneProps) => {
             <div className='flex flex-row w-full items-center justify-between p-2 border-b border-gray-500'>
                 <div className="flex flex-col">
                     <h3 className="text-primary font-bold">{props.isReadOnly ? "unarchive project" : "archive project"}</h3>
-                    <p className="text-primary">Mark this project as {props.isReadOnly ? "unarchived and read-write" : "archived and read-only"}</p>
+                    <p className="text-primary">Mark this project as {props.isReadOnly ? "unarchive and read-write" : "archived and read-only"}</p>
                 </div>
                 <Button size="md" onClick={() => setIsOpenArchiveModal(true)} className="text-red-700 hover:bg-red-600">{props.isReadOnly ? "unarchive" : "archive"}</Button>
             </div>

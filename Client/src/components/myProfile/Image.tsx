@@ -1,18 +1,26 @@
 import { ChangeEvent, useEffect, useState } from "react";
-import { IUser, useUser, useUserDispatch } from "../../utils/context/user";
+import { useUser, useUserDispatch } from "../../utils/context/user";
 import useFetchApi from "../../utils/hooks/useFetchApi";
 import toWEBPImage from "../../utils/toWEBPImage";
+import { IProfilePageResult } from "../../pages/Profile";
+import { useParams } from "react-router-dom";
 
-const Image = () => {
+interface IImageProps {
+    user: IProfilePageResult;
+}
+
+const Image = (props: IImageProps) => {
+    const { userId } = useParams();
+
     const [base64, setBase64] = useState("")
-    const user = useUser() as IUser;
     const dispatchUser = useUserDispatch();
+    const user = useUser();
 
     const [_, call] = useFetchApi<{ avatarUrl: string }, { data: string, contentType: string }>("POST", "user/avatar", [], (payload) => {
         dispatchUser({
             type: "add",
             payload: {
-                ...user,
+                ...user!,
                 avatarUrl: payload.avatarUrl
             }
         });
@@ -28,18 +36,28 @@ const Image = () => {
     }
 
     return (
-        <>
-            <input
-                onChange={handelChangeImage} type="file" className="hidden" accept="image/*" id="file-upload" />
+        user !== null && user.id === userId ? (
+            <>
+                <input
+                    onChange={handelChangeImage} type="file" className="hidden" accept="image/*" id="file-upload" />
 
-            <label htmlFor="file-upload">
+                <label htmlFor="file-upload">
+                    <img
+                        title="change image"
+                        className="rounded-full cursor-pointer shadow-md w-60 h-60 object-contain"
+                        src={props.user.avatarUrl}
+                        alt={props.user.name} />
+                </label>
+            </>
+        ) : (
+            <>
                 <img
                     title="change image"
                     className="rounded-full cursor-pointer shadow-md w-60 h-60 object-contain"
-                    src={user.avatarUrl}
-                    alt={user.name} />
-            </label>
-        </>
+                    src={props.user.avatarUrl}
+                    alt={props.user.name} />
+            </>
+        )
     )
 }
 

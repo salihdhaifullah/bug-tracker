@@ -63,7 +63,7 @@ const Ticket = () => {
 
     const user = useUser();
 
-    return payload.isLoading ? <CircleProgress size="lg" /> : payload.result !== null && (
+    return payload.isLoading ? <CircleProgress size="lg" /> : payload.result === null ? null : (
         <section className="flex flex-col w-full h-full my-10 p-2 flex-grow">
             <div className="flex flex-row w-full h-full gap-3">
 

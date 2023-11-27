@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { HiBars3 } from 'react-icons/hi2';
-import { MdClose, MdDashboardCustomize, MdOutlineCreateNewFolder } from 'react-icons/md';
+import { MdClose, MdOutlineCreateNewFolder } from 'react-icons/md';
 import { BiLogOut, BiLogIn } from 'react-icons/bi';
 import { CgProfile } from 'react-icons/cg';
 import { Link } from 'react-router-dom';
@@ -38,7 +38,7 @@ const Sidebar = () => {
 
                 <div className='flex flex-col mt-4 gap-2 w-full h-full flex-grow'>
                     <Link
-                        to="/my-profile"
+                        to={`/profile/${user.id}`}
                         onClick={() => setIsOpen(false)}
                         className="text-primary dark:text-secondary hover:bg-slate-300 dark:hover:bg-slate-700 transition-all ease-in-out rounded-md text-xl p-2 flex-row flex gap-2 items-center ">
                         <CgProfile /> <p>your profile</p>
@@ -52,13 +52,6 @@ const Sidebar = () => {
                     </Link>
 
                     <Link
-                        to="/projects"
-                        onClick={() => setIsOpen(false)}
-                        className="text-primary dark:text-secondary hover:bg-slate-300 dark:hover:bg-slate-700 transition-all ease-in-out rounded-md text-xl p-2 flex-row flex gap-2 items-center ">
-                        <MdDashboardCustomize /> <p>your projects</p>
-                    </Link>
-
-                    <Link
                         to="/my-tasks"
                         onClick={() => setIsOpen(false)}
                         className="text-primary dark:text-secondary hover:bg-slate-300 dark:hover:bg-slate-700 transition-all ease-in-out rounded-md text-xl p-2 flex-row flex gap-2 items-center ">
@@ -66,7 +59,7 @@ const Sidebar = () => {
                     </Link>
 
                     <Button
-                        onClick={callLogout}
+                        onClick={() => callLogout()}
                         isLoading={logoutPayload.isLoading}
                         className="!text-primary w-full !bg-inherit hover:!bg-slate-300 dark:!text-secondary dark:hover:!bg-slate-700 !shadow-none font-normal text-xl p-2 flex-row flex gap-2 items-center">
                         <BiLogOut />

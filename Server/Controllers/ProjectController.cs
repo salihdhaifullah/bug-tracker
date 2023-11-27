@@ -76,7 +76,8 @@ public class ProjectController : Controller
                                 id = p.Id,
                                 isPrivate = p.IsPrivate,
                                 name = p.Name,
-                                members = p.Members.Count,
+                                role = p.Members.Where(m => m.UserId == userId).Select(m => m.Role.ToString()), 
+                                members = p.Members.Where(m => m.IsJoined).Count(),
                                 tickets = p.Tickets.Count
                             })
                             .Skip((page - 1) * take)

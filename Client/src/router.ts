@@ -13,9 +13,7 @@ import Profile from "./pages/Profile";
 
 import { createBrowserRouter } from "react-router-dom";
 import CreateProject from "./pages/CreateProject";
-import Projects from "./pages/Projects";
 import Project from "./pages/Project";
-import MyProfile from "./pages/MyProfile";
 import CreateTicket from "./pages/CreateTicket";
 import Ticket from "./pages/Ticket";
 import JoinProject from "./pages/JoinProject";
@@ -33,9 +31,7 @@ const router = createBrowserRouter([{
         { path: "auth/forget-password", Component: ForgetPassword },
         { path: "auth/account-verification", Component: AccountVerification },
         { path: "create-project", Component: CreateProject },
-        { path: "my-profile", Component: MyProfile },
         { path: "profile/:userId", Component: Profile },
-        { path: "projects", Component: Projects },
         { path: "project/:projectId", Component: Project },
         { path: "join-project/:sessionId", Component: JoinProject },
         { path: "project/:projectId/create-ticket", Component: CreateTicket },
