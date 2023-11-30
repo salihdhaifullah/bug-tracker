@@ -60,23 +60,25 @@ public class ProjectController : Controller
         }
     }
 
-    [HttpGet("projects/{page?}"), Authorized]
-    public async Task<IActionResult> GetMyProjects([FromRoute] int page = 1, [FromQuery] int take = 10)
+    [HttpGet("projects/{page?}")]
+    public async Task<IActionResult> GetMyProjects([FromQuery] string userId, [FromRoute] int page = 1, [FromQuery] int take = 10)
     {
         try
         {
-            var userId = _auth.GetId(Request);
+            _auth.TryGetId(Request, out string? currentUserId);
 
             var projects = await _ctx.Projects
-                            .Where((p) => p.Members.Any(m => m.UserId == userId))
-                            .OrderBy((p) => p.CreatedAt)
+                            .Where((p) =>
+                            (!p.IsPrivate || (currentUserId != null && p.Members.Any(m => m.UserId == currentUserId)))
+                            && p.Members.Any(m => m.UserId == userId)
+                            ).OrderBy((p) => p.CreatedAt)
                             .Select((p) => new
                             {
                                 createdAt = p.CreatedAt,
                                 id = p.Id,
                                 isPrivate = p.IsPrivate,
                                 name = p.Name,
-                                role = p.Members.Where(m => m.UserId == userId).Select(m => m.Role.ToString()), 
+                                role = p.Members.Where(m => m.UserId == userId).Select(m => m.Role.ToString()),
                                 members = p.Members.Where(m => m.IsJoined).Count(),
                                 tickets = p.Tickets.Count
                             })
@@ -164,14 +166,17 @@ public class ProjectController : Controller
         }
     }
 
-    [HttpGet("count"), Authorized]
-    public async Task<IActionResult> GetMyProjectsCount([FromQuery] int take = 10)
+    [HttpGet("count")]
+    public async Task<IActionResult> GetMyProjectsCount([FromQuery] string userId, [FromQuery] int take = 10)
     {
         try
         {
-            var userId = _auth.GetId(Request);
+            _auth.TryGetId(Request, out string? currentUserId);
 
-            var projectsCount = await _ctx.Projects.Where((p) => p.Members.Any(m => m.UserId == userId)).CountAsync();
+            var projectsCount = await _ctx.Projects.Where((p) =>
+            (!p.IsPrivate || (currentUserId != null && p.Members.Any(m => m.UserId == currentUserId)))
+            && p.Members.Any(m => m.UserId == userId)
+            ).CountAsync();
 
             int pages = (int)Math.Ceiling((double)projectsCount / take);
 
