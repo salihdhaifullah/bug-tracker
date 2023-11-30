@@ -9,6 +9,6 @@ export default {
                 secondary: "#f9bd4b",
             }
         },
-    },
+    }
 }
 

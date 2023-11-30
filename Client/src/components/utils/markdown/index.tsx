@@ -9,11 +9,10 @@ import CodeLanguage from "./CodeLanguage";
 import Image from "./Image";
 import UnOrderedList from "./UnOrderedList";
 import OrderedList from "./OrderedList";
-import Parser from "./Parser";
+import useParser from "./useParser";
 import Table from "./Table";
 import LineBreak from "./LineBreak";
 import { TextareaProvider } from "./util";
-import "highlight.js/styles/atom-one-dark.css";
 import Button from "../Button";
 
 interface IEditorProps {
@@ -30,6 +29,8 @@ const Editor = ({ md, setMd, files, onSubmit, onCancel, isLoading }: IEditorProp
     const [textarea, setTextarea] = useState<HTMLTextAreaElement | null>(null);
 
     const textareaCallback = useCallback((element: HTMLTextAreaElement | null) => { setTextarea(element) }, [])
+
+    const html = useParser(md);
 
     return (
         <div className="flex flex-col w-full h-auto border-gray-700 dark:border-gray-300 justify-center items-center ">
@@ -63,14 +64,14 @@ const Editor = ({ md, setMd, files, onSubmit, onCancel, isLoading }: IEditorProp
                 </div>
 
                 {isPreview ? (
-                    <div className="markdown flex flex-col flex-1 flex-grow w-full h-full" dangerouslySetInnerHTML={{ __html: Parser(md) }}></div>
+                    <div className="markdown flex flex-col flex-1 flex-grow w-full h-full" dangerouslySetInnerHTML={{ __html: html }}></div>
                 ) : (
                     <div className="inline-flex w-full">
                         <textarea
                             value={md}
                             onChange={(e) => setMd(e.target.value)}
                             ref={textareaCallback}
-                            className="border h-auto dark:bg-black dark:text-white flex flex-1 flex-grow outline-primary border-primary dark:outline-secondary dark:border-secondary p-2 rounded-md w-full min-h-[20vh]"></textarea>
+                            className="border h-auto thin-scrollbar dark:bg-black dark:text-white flex flex-1 flex-grow outline-primary border-primary dark:outline-secondary dark:border-secondary p-2 rounded-md w-full min-h-[20vh]"></textarea>
                     </div>
                 )}
 

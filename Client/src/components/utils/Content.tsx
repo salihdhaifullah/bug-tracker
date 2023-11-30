@@ -3,7 +3,7 @@ import useFetchApi from "../../utils/hooks/useFetchApi";
 import { AiOutlineClose } from "react-icons/ai";
 import Editor from "./markdown";
 import { MdOutlineModeEditOutline } from "react-icons/md";
-import Parser from "./markdown/Parser";
+import useParser from "./markdown/useParser";
 import CircleProgress from "./CircleProgress";
 
 interface IContentProps {
@@ -44,6 +44,8 @@ const Content = (props: IContentProps) => {
         setIsEditing(false)
     }
 
+    const html = useParser(md);
+
     return (
         <div className="flex flex-col h-auto w-full">
             <div className="flex flex-col w-full h-fit min-h-[200px] rounded-2xl justify-start items-start bg-white dark:bg-black">
@@ -57,7 +59,7 @@ const Content = (props: IContentProps) => {
                         )}
 
                         {isEditing || props.form ? <Editor isLoading={createPayload.isLoading} md={md} onSubmit={handelSubmit} onCancel={props.form ? undefined : handelCancel} setMd={setMd} files={files} />
-                            : <div id="parser" className="markdown flex flex-col p-1 w-full overflow-hidden h-full" dangerouslySetInnerHTML={{ __html: Parser(md) }}></div>}
+                            : <div id="parser" className="markdown flex flex-col p-1 w-full overflow-hidden h-full" dangerouslySetInnerHTML={{ __html: html }}></div>}
                     </>
                 )}
             </div>

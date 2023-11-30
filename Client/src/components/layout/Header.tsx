@@ -3,12 +3,13 @@ import Sidebar from "./Sidebar";
 import { useUser } from "../../utils/context/user";
 import { MdOutlineNotifications } from "react-icons/md"
 import { FaMoon, FaSun } from "react-icons/fa";
-import useTheme from "../../utils/hooks/useTheme";
+import { useTheme, useThemeDispatch } from "../../utils/context/theme";
 
 
 const Header = () => {
     const user = useUser();
-    const [isDark, setIsDark] = useTheme();
+    const theme = useTheme();
+    const themeDispatch = useThemeDispatch();
 
     return (
         <header className="flex flex-row fixed top-0 w-full min-h-[8vh] z-[11] justify-between items-center text-primary dark:bg-black bg-white p-2 shadow-lg dark:shadow-secondary">
@@ -27,8 +28,8 @@ const Header = () => {
                         <MdOutlineNotifications />
                     </div>
 
-                    <div onClick={() => setIsDark((prev) => !prev)} className="flex dark:text-secondary p-1 dark:hover:bg-slate-700 justify-center cursor-pointer items-center rounded-md hover:bg-slate-300 text-primary font-bold text-2xl">
-                        {isDark ? <FaMoon /> : <FaSun />}
+                    <div onClick={() => themeDispatch({ type: theme === "dark" ? "light" : "dark" })} className="flex dark:text-secondary p-1 dark:hover:bg-slate-700 justify-center cursor-pointer items-center rounded-md hover:bg-slate-300 text-primary font-bold text-2xl">
+                        {theme === "dark" ? <FaMoon /> : <FaSun />}
                     </div>
 
                     <div className="flex justify-center items-center">

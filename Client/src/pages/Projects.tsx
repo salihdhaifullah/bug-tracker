@@ -1,7 +1,7 @@
 import { Fragment, useEffect, useState } from "react"
 import useFetchApi from "../utils/hooks/useFetchApi"
 import CircleProgress from "../components/utils/CircleProgress"
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import Tag from "../components/utils/Tag";
 import formatDate from "../utils/formatDate";
 import Pagination from "../components/utils/Pagination";
@@ -22,9 +22,10 @@ interface IProject {
 const take = 10;
 
 const Projects = () => {
+  const {userId} = useParams();
   const [page, setPage] = useState(1)
-  const [projectsPayload, callProjects] = useFetchApi<IProject[]>("GET", `project/projects/${page}/?take=${take}`, [page, take]);
-  const [PagesCountPayload, callPagesCount] = useFetchApi<number>("GET", `project/count/?take=${take}`, [take]);
+  const [projectsPayload, callProjects] = useFetchApi<IProject[]>("GET", `project/projects/${page}/?take=${take}&userId=${userId}`, [page, take, userId]);
+  const [PagesCountPayload, callPagesCount] = useFetchApi<number>("GET", `project/count/?take=${take}&userId=${userId}`, [take, userId]);
 
   useEffect(() => { callProjects() }, [page, take])
   useEffect(() => { callPagesCount() }, [take])
@@ -96,4 +97,3 @@ const Projects = () => {
 }
 
 export default Projects;
-

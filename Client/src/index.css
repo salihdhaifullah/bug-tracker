@@ -50,20 +50,20 @@
     box-sizing: border-box;
 }
 
-
-@layer components {
-  .outline-solid {
-    outline-style: solid;
-  }
-}
-
 html,
 body {
     @apply min-h-[100vh] h-auto m-0 p-0 overflow-x-hidden
 }
 
 body {
-    @apply flex flex-col bg-sky-200 dark:bg-gray-950 
+    @apply flex flex-col bg-sky-200 dark:bg-gray-950
+}
+
+
+@layer components {
+    .outline-solid {
+        outline-style: solid;
+    }
 }
 
 .link {
@@ -102,93 +102,92 @@ body {
 }
 
 .markdown h6 {
-  @apply my-2 font-bold text-xs
+    @apply my-2 font-bold text-xs
 }
 
 .markdown h5 {
     @apply my-2 font-bold text-sm
-  }
+}
+
 .markdown h4 {
-  @apply my-2 font-bold text-base
+    @apply my-2 font-bold text-base
 }
 
 .markdown h3 {
     @apply my-2 font-bold text-lg
-  }
+}
+
 .markdown h2 {
-  @apply my-2 font-bold text-xl
+    @apply my-2 font-bold text-xl
 }
 
 .markdown h1 {
     @apply my-2 font-bold text-2xl
-  }
+}
 
 .markdown ul, .markdown ol {
     @apply pl-5
 }
 
 .markdown img {
-  @apply my-6
+    @apply my-6
 }
 
-.markdown :not(pre) > code {
-  @apply bg-slate-100 border-[0.2px] border-gray-500 p-[0.5px] mx-1 rounded-md
+.markdown :not(pre)>code {
+    @apply bg-slate-100 dark:bg-slate-900 border-[0.2px] border-gray-500 p-[0.5px] mx-1 rounded-md
 }
 
 .markdown blockquote {
-    background: #f9f9f9;
-    border-left: 10px solid #ccc;
-    margin: 1.5em 10px;
-    padding: 0.5em 10px;
-    quotes: "\201C""\201D""\2018""\2019";
+    quotes: "\201C" "\201D" "\2018" "\2019";
+    @apply bg-slate-100 dark:bg-slate-900 rounded-sm dark:border-l-gray-600 border-l-gray-400 border-l-[10px] mx-2.5 my-6 px-2.5 py-2
 }
 
 .markdown blockquote:before {
-    color: #ccc;
-    content: open-quote;
-    font-size: 4em;
-    line-height: 0.1em;
-    margin-right: 0.25em;
-    vertical-align: -0.4em;
+    @apply dark:text-gray-600 content-[open-quote] text-gray-400 text-4xl ml-px align-[-0.5rem]
+}
+
+.markdown blockquote:after {
+    @apply dark:text-gray-600 content-[close-quote] text-gray-400 text-4xl mr-px align-[-0.5rem]
 }
 
 .markdown blockquote p {
-   display: inline;
+    @apply inline
 }
 
 .markdown ol {
- @apply list-decimal
+    @apply list-decimal
 }
 
 .markdown ol li {
-  display: list-item !important;
-  text-align: -webkit-match-parent !important;
+    display: list-item !important;
+    text-align: -webkit-match-parent !important;
 }
 
 .markdown ul {
-  @apply list-disc
+    @apply list-disc
 }
 
 .markdown pre {
     @apply p-2 rounded-md shadow-md my-4 w-fit
 }
+
 .markdown .hljs {
     @apply overflow-x-auto w-full flex
 }
 
 .markdown a {
-    @apply  text-blue-600 hover:text-blue-500 hover:underline
+    @apply text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-500 hover:underline
 }
 
 .markdown p {
-    @apply text-base text-gray-800 font-bold my-1
+    @apply text-base text-gray-800 dark:text-gray-200 font-bold my-1
 }
 
 .markdown table {
-    @apply flex bg-white rounded-md p-1 shadow-md w-fit border flex-col
+    @apply flex dark:bg-black bg-white rounded-md p-1 shadow-md w-fit border flex-col
 }
 
-.markdown table tbody  {
+.markdown table tbody {
     @apply gap-1 border-t flex flex-col w-fit
 }
 
@@ -197,7 +196,7 @@ body {
 }
 
 .markdown table tbody tr td {
-    @apply gap-1 min-w-[4rem] text-center w-auto bg-slate-100 border flex p-1 flex-col
+    @apply gap-1 min-w-[4rem] text-center w-auto bg-slate-100 dark:bg-slate-900 border flex p-1 flex-col
 }
 
 .markdown table thead {
@@ -209,35 +208,64 @@ body {
 }
 
 .markdown table thead tr th {
-    @apply gap-1 min-w-[4rem] text-center w-auto bg-slate-100 border flex p-1 flex-col
+    @apply gap-1 min-w-[4rem] text-center w-auto bg-slate-100 dark:bg-slate-900 border flex p-1 flex-col
 }
 
 .markdown img {
-    @apply max-w-[400px] max-h-[400px] mx-auto object-contain border overflow-x-auto
+    @apply max-w-[400px] max-h-[400px] mx-auto object-contain border border-slate-100 dark:border-slate-900 overflow-x-auto
 }
-
 
 .thin-scrollbar, .markdown {
     scrollbar-width: thin;
     scrollbar-color: #c5c5c5 #f6f6f6;
 }
 
-.thin-scrollbar::-webkit-scrollbar-corner, .markdown::-webkit-scrollbar-corner { background: rgba(0,0,0,0.5); }
+.dark .thin-scrollbar,
+.dark .markdown {
+    scrollbar-width: thin;
+    scrollbar-color: #4a4a4a #282828;
+}
 
-.thin-scrollbar::-webkit-scrollbar, .markdown::-webkit-scrollbar {
+.thin-scrollbar::-webkit-scrollbar-corner,
+.markdown::-webkit-scrollbar-corner {
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.dark .thin-scrollbar::-webkit-scrollbar-corner,
+.dark .markdown::-webkit-scrollbar-corner {
+    background: rgba(0, 0, 0, 0.7);
+}
+
+.thin-scrollbar::-webkit-scrollbar,
+.markdown::-webkit-scrollbar {
     width: 12px;
     height: 12px;
 }
 
-.thin-scrollbar::-webkit-scrollbar-track, .markdown::-webkit-scrollbar-track {
+.thin-scrollbar::-webkit-scrollbar-track,
+.markdown::-webkit-scrollbar-track {
     background: #f6f6f6;
     border-radius: 20px;
- }
+}
 
-.thin-scrollbar::-webkit-scrollbar-thumb, .markdown::-webkit-scrollbar-thumb {
+.dark .thin-scrollbar::-webkit-scrollbar-track,
+.dark .markdown::-webkit-scrollbar-track {
+    background: #282828;
+    border-radius: 20px;
+}
+
+.thin-scrollbar::-webkit-scrollbar-thumb,
+.markdown::-webkit-scrollbar-thumb {
     background-color: #c5c5c5;
     border-radius: 20px;
     border: 3px solid #f6f6f6;
+}
+
+.dark .thin-scrollbar::-webkit-scrollbar-thumb,
+.dark .markdown::-webkit-scrollbar-thumb {
+    background-color: #4a4a4a;
+    border-radius: 20px;
+    border: 3px solid #282828;
 }
 
 .prevent-select {
