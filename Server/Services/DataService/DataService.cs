@@ -133,24 +133,25 @@ public class DataService : IDataService
 
     public Task TransferOwnershipActivity(string projectId, string projectName, string currentOwner, string newOwner, DataContext ctx)
     {
-        return addActivity(projectId, $"trasfered project {projectName} from {currentOwner} to {newOwner}", ctx);
+        return addActivity(projectId, $"transferred project {projectName} from {currentOwner} to {newOwner}", ctx);
     }
-
 
     delegate string GetStatus(bool val);
     public Task ChangeVisibilityActivity(string projectId, string projectName, bool currentState, DataContext ctx)
     {
         GetStatus getStatus = val => val ? "private" : "public";
-
         return addActivity(projectId, $"project {projectName} visibility changed from {getStatus(currentState)} to {getStatus(!currentState)}", ctx);
     }
 
     public Task ArchiveProjectActivity(string projectId, string projectName, bool currentState, DataContext ctx)
     {
 
-        GetStatus getStatus = val => val ? "archived" : "unarchived";
-
+        GetStatus getStatus = val => val ? "archived" : "unarchive";
         return addActivity(projectId, $"project {projectName} {getStatus}", ctx);
     }
 
+    public Task ChangeProjectNameActivity(string projectId, string oldProjectName, string newProjectName, DataContext ctx)
+    {
+        return addActivity(projectId, $"project changed name from {oldProjectName} to {newProjectName}", ctx);
+    }
 }

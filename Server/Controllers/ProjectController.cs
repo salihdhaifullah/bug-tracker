@@ -333,6 +333,38 @@ public class ProjectController : Controller
         }
     }
 
+    [HttpPatch("name"), Authorized, BodyValidation]
+    public async Task<IActionResult> ChangeProjectName([FromBody] ChangeProjectNameDTO dto)
+    {
+        try
+        {
+            var userId = _auth.GetId(Request);
+
+            var isOwner = await _ctx.Projects.AnyAsync(p => p.Id == dto.ProjectId && p.Members.Any(m => m.Role == Role.owner && m.UserId == userId));
+
+            if (!isOwner) return HttpResult.Forbidden("you are not allowed to do this action");
+
+            var project = await _ctx.Projects.Where(p => p.Id == dto.ProjectId).FirstOrDefaultAsync();
+
+            if (project == null) return HttpResult.NotFound("project not found");
+
+            if (project.IsReadOnly) return HttpResult.BadRequest("this project is archived");
+
+            await _data.ChangeProjectNameActivity(dto.ProjectId, project.Name, dto.Name, _ctx);
+
+            project.Name = dto.Name;
+
+            await _ctx.SaveChangesAsync();
+
+            return HttpResult.Ok($"successfully changed project name");
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.Message);
+            return HttpResult.InternalServerError();
+        }
+    }
+
     [HttpGet("content/{projectId}")]
     public async Task<IActionResult> GetProjectContent([FromRoute] string projectId)
     {

@@ -64,7 +64,7 @@ const Ticket = () => {
     const user = useUser();
 
     return payload.isLoading ? <CircleProgress size="lg" /> : payload.result === null ? null : (
-        <section className="flex flex-col w-full h-full my-10 p-2 flex-grow overflow-y-hidden">
+        <section className="flex flex-col w-full h-full px-2 py-16 flex-grow overflow-y-hidden">
             <div className="flex flex-row w-full h-full gap-3">
 
                 <Link to={`/profile/${payload.result.creator.id}`} className="w-fit h-fit min-w-[2.5rem] min-h-[2.5rem] flex">

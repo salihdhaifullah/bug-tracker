@@ -128,7 +128,7 @@ const CreateAttachmentModal = (props: ICreateAttachmentModalProps) => {
 const Action = (_: IActionProps) => {
     const [isOpen, setIsOpen] = useState(false);
     const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
-    const [isOpenRoleModal, setIsOpenUpdateModal] = useState(false);
+    const [isOpenUpdateModal, setIsOpenUpdateModal] = useState(false);
 
     const targetRef = useRef<HTMLDivElement>(null);
 
@@ -157,7 +157,7 @@ const Action = (_: IActionProps) => {
                 </div>
             </Modal>
 
-            <Modal isOpen={isOpenRoleModal} setIsOpen={setIsOpenUpdateModal}>
+            <Modal isOpen={isOpenUpdateModal} setIsOpen={setIsOpenUpdateModal}>
                 <div className="flex flex-col justify-center items-center pt-4 pb-2 px-4 w-[400px] text-center h-full">
                     <h1 className="text-xl font-bold text-primary">update modal</h1>
 
