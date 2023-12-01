@@ -58,44 +58,44 @@ const TicketAction = (props: IActionProps) => {
 
     return (
         <div ref={targetRef} className="flex w-fit relative">
-            <div onClick={() => setIsOpen(!isOpen)} className="p-1 font-normal text-lg rounded-md hover:bg-slate-300 cursor-pointer">
+            <div onClick={() => setIsOpen(!isOpen)} className="p-1 font-normal text-lg dark:text-gray-400 hover:dark:text-gray-200 text-gray-600 hover:text-gray-800 rounded-md hover:bg-slate-200 dark:hover:bg-slate-800 cursor-pointer">
                 <FiMoreVertical />
             </div>
 
-            <div className={`${isOpen ? "scale-100" : "scale-0"} flex transition-all flex-col py-2 px-4 bg-white justify-center items-center gap-1 absolute right-[80%] -bottom-[50%] rounded shadow-md`}>
-                <Button onClick={() => setIsOpenDeleteModal(true)} size="sm" className="w-full shadow-sm">delete</Button>
-                <Button onClick={() => setIsOpenUpdateModal(true)} size="sm" className="w-full shadow-sm">update</Button>
+            <div className={`${isOpen ? "scale-100" : "scale-0"} transition-all flex flex-col gap-2 py-2 px-4 bg-white dark:bg-black justify-center items-center absolute right-[80%] -bottom-[50%] rounded shadow-md dark:shadow-secondary/40`}>
+                <Button onClick={() => setIsOpenDeleteModal(true)} size="xs" className="w-full">delete</Button>
+                <Button onClick={() => setIsOpenUpdateModal(true)} size="xs" className="w-full">update</Button>
             </div>
 
             <Modal isOpen={isOpenDeleteModal} setIsOpen={setIsOpenDeleteModal}>
-                <div className="flex flex-col justify-center items-center pt-4 pb-2 px-4 w-[400px] text-center h-full">
-                    <h1 className="text-xl font-bold text-primary">are you sure you want to delete this ticket</h1>
+                <div className="flex flex-col bg-white dark:bg-black justify-center items-center pt-4 pb-2 px-4 w-[400px] text-center h-full">
+                    <h1 className="text-xl font-bold text-primary dark:text-secondary">are you sure you want to delete this ticket</h1>
 
                     <div className="w-full justify-center gap-4 pl-2 my-3 items-start flex flex-col">
                         <p className="flex flex-row gap-2">
-                            <span>name: </span>
-                            <span className="font-bold text-primary">
+                            <span className="dark:text-white">name: </span>
+                            <span className="font-bold text-primary dark:text-secondary">
                                 {props.ticket.name}
                             </span>
                         </p>
 
                         <p className="flex flex-row gap-2">
-                            <span>priority: </span>
-                            <span className="font-bold text-primary">
+                            <span className="dark:text-white">priority: </span>
+                            <span className="font-bold text-primary dark:text-secondary">
                                 {props.ticket.priority}
                             </span>
                         </p>
 
                         <p className="flex flex-row gap-2">
-                            <span>status: </span>
-                            <span className="font-bold text-primary">
+                            <span className="dark:text-white">status: </span>
+                            <span className="font-bold text-primary dark:text-secondary">
                                 {props.ticket.status}
                             </span>
                         </p>
 
                         <p className="flex flex-row gap-2">
-                            <span>type: </span>
-                            <span className="font-bold text-primary">
+                            <span className="dark:text-white">type: </span>
+                            <span className="font-bold text-primary dark:text-secondary">
                                 {props.ticket.type}
                             </span>
                         </p>
@@ -109,8 +109,8 @@ const TicketAction = (props: IActionProps) => {
             </Modal>
 
             <Modal isOpen={isOpenUpdateModal} setIsOpen={setIsOpenUpdateModal}>
-                <div className="rounded-xl bg-white flex flex-col gap-4 w-80 p-2 pt-6 items-center justify-center">
-                    <h1 className="text-primary font-bold text-2xl text-center">update ticket</h1>
+                <div className="rounded-xl bg-white dark:bg-black flex flex-col gap-4 w-80 p-2 pt-6 items-center justify-center">
+                    <h1 className="text-primary dark:text-secondary font-bold text-2xl text-center">update ticket</h1>
 
                     <div className="flex-col flex w-full justify-center items-center">
 

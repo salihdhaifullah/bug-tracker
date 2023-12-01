@@ -66,7 +66,7 @@ const Bio = () => {
                     <div title="edit your bio" className="min-h-[2rem] h-full grid grid-flow-col gap-1 w-full text-center justify-center items-center">
 
                         <div ref={iconRef} onClick={() => setIsEditing(true)} className="flex grid-cols-1 cursor-pointer">
-                            <MdOutlineModeEditOutline className="text-2xl font-bold text-gray-600 dark:text-gray-300" />
+                            <MdOutlineModeEditOutline className="text-2xl font-bold text-gray-600 hover:text-gray-800 dark:text-gray-300 dark:hover:text-gray-100" />
                         </div>
 
                         <p className="text-lg text-gray-800 dark:text-gray-200 flex break-all text-center grid-cols-3">

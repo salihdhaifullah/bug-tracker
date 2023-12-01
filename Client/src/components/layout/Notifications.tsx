@@ -42,7 +42,7 @@ const Notification = ({ notification }: { notification: INotification }) => {
     useEffect(() => startTimer(), [])
 
     return (
-        <div className="flex notification-animation max-w-[70vw] h-auto flex-col rounded shadow-lg dark:shadow-secondary bg-white dark:bg-black">
+        <div className="flex notification-animation max-w-[70vw] h-auto flex-col rounded shadow-lg dark:shadow-secondary/40 bg-white dark:bg-black">
 
             <div className="flex flex-row justify-center">
 

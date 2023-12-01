@@ -39,14 +39,14 @@ const Project = () => {
     return payload.isLoading
         ? <CircleProgress size="lg" />
         : payload.result === null ? null : (<section className="flex flex-col w-full h-full my-10 p-2 flex-grow">
-            <div className="bg-white mb-4 rounded-md shadow-md p-4 gap-2 flex flex-col">
+            <div className="bg-white dark:bg-black mb-4 rounded-md shadow-md dark:shadow-secondary/40 p-4 gap-2 flex flex-col">
 
-                <h1 className="text-2xl font-bold">{payload.result.name}</h1>
+                <h1 className="text-2xl text-primary dark:text-secondary font-bold">{payload.result.name}</h1>
 
                 {payload.result.isReadOnly ? (
                     <div className="flex  flex-col justify-center w-full">
-                        <div className="flex rounded-md bg-yellow-300 bg-opacity-80 border-black border p-2 w-fit">
-                            <p className="text-center text-gray-900 text-lg font-bold">this project is archived</p>
+                        <div className="flex rounded-md bg-yellow-300 dark:bg-yellow-700 bg-opacity-80 border-black dark:border-white border p-2 w-fit">
+                            <p className="text-center text-gray-900 dark:text-gray-100 text-lg font-bold">this project is archived</p>
                         </div>
                     </div>
                 ) : null}
@@ -58,16 +58,16 @@ const Project = () => {
                     <Link to={`/profile/${payload.result.owner.id}`}>
                         <div className="flex items-center">
                             <img
-                                className="rounded-full shadow-md w-10 h-10 object-contain"
+                                className="rounded-full bg-white dark:bg-black shadow-md dark:shadow-secondary/40 w-10 h-10 object-contain"
                                 src={payload.result.owner.avatarUrl}
                                 alt={`${payload.result.owner.name}`}
                             />
-                            <span className="ml-2 font-medium">{payload.result.owner.name}</span>
+                            <span className="ml-2 font-medium text-primary dark:text-secondary">{payload.result.owner.name}</span>
                         </div>
                     </Link>
                 </div>
 
-                <p className="text-sm mt-4 text-gray-600">Created at: {formatDate(payload.result.createdAt)}</p>
+                <p className="text-sm mt-4 text-gray-600 dark:text-gray-400">Created at: {formatDate(payload.result.createdAt)}</p>
             </div>
 
             <Members />

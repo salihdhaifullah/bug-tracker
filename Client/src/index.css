@@ -56,7 +56,7 @@ body {
 }
 
 body {
-    @apply flex flex-col bg-sky-200 dark:bg-gray-950
+    @apply flex flex-col bg-sky-200 dark:bg-sky-950
 }
 
 
@@ -96,37 +96,35 @@ body {
 }
 
 .markdown {
-    overflow-x: auto;
-
     @apply overflow-x-auto
 }
 
 .markdown h6 {
-    @apply my-2 font-bold text-xs
+    @apply my-2 font-bold text-xs dark:text-white
 }
 
 .markdown h5 {
-    @apply my-2 font-bold text-sm
+    @apply my-2 font-bold text-sm dark:text-white
 }
 
 .markdown h4 {
-    @apply my-2 font-bold text-base
+    @apply my-2 font-bold text-base dark:text-white
 }
 
 .markdown h3 {
-    @apply my-2 font-bold text-lg
+    @apply my-2 font-bold text-lg dark:text-white
 }
 
 .markdown h2 {
-    @apply my-2 font-bold text-xl
+    @apply my-2 font-bold text-xl dark:text-white
 }
 
 .markdown h1 {
-    @apply my-2 font-bold text-2xl
+    @apply my-2 font-bold text-2xl dark:text-white
 }
 
 .markdown ul, .markdown ol {
-    @apply pl-5
+    @apply pl-5 dark:text-white
 }
 
 .markdown img {
@@ -155,16 +153,17 @@ body {
 }
 
 .markdown ol {
-    @apply list-decimal
+    @apply list-decimal dark:text-white
 }
 
 .markdown ol li {
     display: list-item !important;
     text-align: -webkit-match-parent !important;
+    @apply dark:text-white
 }
 
 .markdown ul {
-    @apply list-disc
+    @apply list-disc dark:text-white
 }
 
 .markdown pre {
@@ -184,11 +183,11 @@ body {
 }
 
 .markdown table {
-    @apply flex dark:bg-black bg-white rounded-md p-1 shadow-md w-fit border flex-col
+    @apply flex dark:bg-black bg-white dark:border-gray-800 my-2 rounded-md p-1 shadow-md w-fit border flex-col
 }
 
 .markdown table tbody {
-    @apply gap-1 border-t flex flex-col w-fit
+    @apply gap-1 border-t dark:border-gray-600 flex flex-col w-fit
 }
 
 .markdown table tbody tr {
@@ -196,11 +195,11 @@ body {
 }
 
 .markdown table tbody tr td {
-    @apply gap-1 min-w-[4rem] text-center w-auto bg-slate-100 dark:bg-slate-900 border flex p-1 flex-col
+    @apply gap-1 min-w-[4rem] dark:text-gray-100 dark:border-gray-800 text-center w-auto bg-slate-100 dark:bg-slate-900 border flex p-1 flex-col
 }
 
 .markdown table thead {
-    @apply gap-1 flex py-1 flex-col w-fit
+    @apply gap-1 flex py-1 flex-col w-fit dark:text-white
 }
 
 .markdown table thead tr {
@@ -208,7 +207,7 @@ body {
 }
 
 .markdown table thead tr th {
-    @apply gap-1 min-w-[4rem] text-center w-auto bg-slate-100 dark:bg-slate-900 border flex p-1 flex-col
+    @apply gap-1 min-w-[4rem] text-center w-auto dark:text-white dark:border-gray-800 bg-slate-100 dark:bg-slate-900 border flex p-1 flex-col
 }
 
 .markdown img {
@@ -217,23 +216,6 @@ body {
 
 .thin-scrollbar, .markdown {
     scrollbar-width: thin;
-    scrollbar-color: #c5c5c5 #f6f6f6;
-}
-
-.dark .thin-scrollbar,
-.dark .markdown {
-    scrollbar-width: thin;
-    scrollbar-color: #4a4a4a #282828;
-}
-
-.thin-scrollbar::-webkit-scrollbar-corner,
-.markdown::-webkit-scrollbar-corner {
-    background: rgba(0, 0, 0, 0.5);
-}
-
-.dark .thin-scrollbar::-webkit-scrollbar-corner,
-.dark .markdown::-webkit-scrollbar-corner {
-    background: rgba(0, 0, 0, 0.7);
 }
 
 .thin-scrollbar::-webkit-scrollbar,
@@ -242,30 +224,16 @@ body {
     height: 12px;
 }
 
-.thin-scrollbar::-webkit-scrollbar-track,
-.markdown::-webkit-scrollbar-track {
-    background: #f6f6f6;
-    border-radius: 20px;
+*::-webkit-scrollbar-track {
+    @apply dark:bg-gray-900 bg-gray-100
 }
 
-.dark .thin-scrollbar::-webkit-scrollbar-track,
-.dark .markdown::-webkit-scrollbar-track {
-    background: #282828;
-    border-radius: 20px;
+*::-webkit-scrollbar-thumb {
+    @apply dark:bg-gray-700 bg-gray-300 border-[3px] border-solid dark:border-gray-900 border-gray-100
 }
 
-.thin-scrollbar::-webkit-scrollbar-thumb,
-.markdown::-webkit-scrollbar-thumb {
-    background-color: #c5c5c5;
-    border-radius: 20px;
-    border: 3px solid #f6f6f6;
-}
-
-.dark .thin-scrollbar::-webkit-scrollbar-thumb,
-.dark .markdown::-webkit-scrollbar-thumb {
-    background-color: #4a4a4a;
-    border-radius: 20px;
-    border: 3px solid #282828;
+*::-webkit-scrollbar {
+    @apply w-4 h-4
 }
 
 .prevent-select {

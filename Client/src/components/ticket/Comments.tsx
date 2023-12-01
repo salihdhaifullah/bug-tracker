@@ -22,7 +22,7 @@ const Comments = () => {
         <>
             <div className="flex w-full justify-center my-10 items-center">
                 <div className="flex w-full flex-col max-w-[800px]">
-                    <h2 className="text-primary text-2xl font-bold text-start w-full">Comment</h2>
+                    <h2 className="text-primary dark:text-secondary text-2xl font-bold text-start w-full">Comment</h2>
                     <Content call={callComment} form url={`comment/${ticketId}`} />
                 </div>
             </div>

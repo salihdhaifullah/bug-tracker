@@ -45,10 +45,10 @@ const Activities = () => {
 
     return (
         <div className="my-10">
-            <h2 className="text-3xl font-bold w-full mb-10 text-center">Activities</h2>
-            <div className="w-full bg-white border border-gray-500 shadow-md rounded-md justify-center items-center flex flex-col p-2">
+            <h2 className="text-3xl font-bold w-full mb-10 text-center text-primary dark:text-secondary">Activities</h2>
+            <div className="w-full bg-white dark:bg-black border border-gray-500 shadow-md dark:shadow-secondary/40 rounded-md justify-center items-center flex flex-col p-2">
 
-                <div className="flex flex-row gap-4 w-full flex-wrap items-center pb-4 p-2 bg-white justify-between">
+                <div className="flex flex-row gap-4 w-full flex-wrap items-center pb-4 p-2 bg-white dark:bg-black justify-between">
                     <SelectButton label="sort by date" setValue={setSort} value={sort} options={["oldest", "latest"]} />
                 </div>
 
@@ -57,16 +57,16 @@ const Activities = () => {
                         <>
                             <div className="overflow-x-scroll overflow-y-hidden w-full">
                                 <table className="text-sm text-left text-gray-500 w-full">
-                                    <thead className="text-xs text-gray-700 uppercase bg-white">
+                                    <thead className="text-xs text-gray-700 dark:text-gray-300 uppercase bg-white dark:bg-black">
                                         <tr>
                                             <th scope="col" className="px-6 py-3 min-w-[150px]"> description </th>
                                             <th scope="col" className="px-6 py-3 min-w-[150px]"> date </th>
                                         </tr>
                                     </thead>
 
-                                    <tbody>
+                                    <tbody className="after:block after:mb-2">
                                         {activitiesPayload.result !== null && activitiesPayload.result.map((activity, index) => (
-                                            <tr className="bg-white border-b hover:bg-gray-50" key={index}>
+                                            <tr className="bg-white dark:bg-black hover:dark:bg-gray-950 border-b dark:border-gray-600 hover:bg-gray-50" key={index}>
                                                 <td className="px-6 py-4 min-w-[150px]">{activity.content}</td>
                                                 <td className="px-6 py-4 min-w-[150px]">{formatDate(activity.createdAt, true)}</td>
                                             </tr>
@@ -76,7 +76,7 @@ const Activities = () => {
                             </div>
 
                             <div className="flex w-full justify-end items-center flex-row gap-2">
-                                <p>{text}</p>
+                                <p className="dark:text-white">{text}</p>
 
                                 <SelectButton options={[5, 10, 15, 20, 100]} label="take" setValue={setTake} value={take} />
 
@@ -84,11 +84,11 @@ const Activities = () => {
                                     <>
                                         <AiOutlineArrowLeft
                                             onClick={handelPrevPage}
-                                            className={`${page === 1 ? "" : "hover:bg-slate-200 cursor-pointer"} p-2 rounded-xl shadow-md text-4xl`} />
+                                            className={`${page === 1 ? "" : "hover:bg-slate-200 dark:hover:bg-slate-800 cursor-pointer"} p-2 dark:bg-black dark:text-white dark:shadow-secondary/40 rounded-xl shadow-md text-4xl`} />
 
                                         <AiOutlineArrowRight
                                             onClick={handelNextPage}
-                                            className={`${page * take >= countPayload.result ? "" : "hover:bg-slate-200 cursor-pointer"} p-2 rounded-xl shadow-md text-4xl`} />
+                                            className={`${page * take >= countPayload.result ? "" : "hover:bg-slate-200 dark:hover:bg-slate-800 cursor-pointer"} p-2 dark:bg-black dark:text-white dark:shadow-secondary/40 rounded-xl shadow-md text-4xl`} />
                                     </>
                                 )}
 

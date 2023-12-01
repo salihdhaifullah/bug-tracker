@@ -63,45 +63,45 @@ const Action = (props: IActionProps) => {
 
     return (
         <div ref={targetRef} className="flex w-fit relative">
-            <Button onClick={() => setIsOpen(!isOpen)} className="p-1 px-1 shadow-sm font-normal">
+            <div onClick={() => setIsOpen(!isOpen)} className="p-1 font-normal text-lg rounded-md hover:bg-slate-200 dark:hover:bg-slate-800 cursor-pointer">
                 <FiMoreVertical />
-            </Button>
+            </div>
 
-            <div className={`${isOpen ? "flex" : "hidden"} flex flex-col py-2 px-4 justify-center gap-2 items-center absolute right-[50%] bottom-[50%] bg-white rounded shadow-md`}>
-                <Button onClick={() => setIsOpenDeleteModal(true)} size="xs" className="w-full shadow-sm">delete member</Button>
-                <Button onClick={() => setIsOpenRoleModal(true)} size="xs" className="w-full shadow-sm">change role</Button>
+            <div className={`${isOpen ? "scale-100" : "scale-0"} transition-all flex flex-col py-2 px-4 justify-center gap-2 items-center absolute right-[50%] bottom-[50%] bg-white dark:bg-black rounded shadow-md dark:shadow-secondary/40`}>
+                <Button onClick={() => setIsOpenDeleteModal(true)} size="xs" className="w-full">delete</Button>
+                <Button onClick={() => setIsOpenRoleModal(true)} size="xs" className="w-full">change role</Button>
             </div>
 
             <Modal isOpen={isOpenDeleteModal} setIsOpen={setIsOpenDeleteModal}>
-                <div className="flex flex-col justify-center  items-center pt-4 pb-2 px-4 w-[400px] text-center h-full">
-                    <h1 className="text-xl font-bold text-primary">are you sure you want to delete this member</h1>
+                <div className="flex flex-col justify-center dark:bg-black items-center pt-4 pb-2 px-4 w-[400px] text-center h-full">
+                    <h1 className="text-xl font-bold text-primary dark:text-secondary">are you sure you want to delete this member</h1>
 
                     <div className="w-full justify-center gap-4 pl-2 my-3 items-start flex flex-col">
                         <Link to={`/profile/${props.member.id}`}>
-                            <img className="rounded-full shadow-md w-10 h-10 object-contain" src={props.member.avatarUrl} alt={props.member.name} />
+                            <img className="rounded-full shadow-md dark:shadow-secondary/40 w-10 h-10 object-contain" src={props.member.avatarUrl} alt={props.member.name} />
                         </Link>
 
                         <p className="flex flex-row gap-2">
-                            <span>role: </span>
-                            <span className="font-bold text-primary">
+                            <span className="dark:text-white">role: </span>
+                            <span className="font-bold text-primary dark:text-secondary">
                                 {props.member.role}
                             </span>
                         </p>
                         <p className="flex flex-row gap-2">
-                            <span>name: </span>
-                            <span className="font-bold text-primary">
+                            <span className="dark:text-white">name: </span>
+                            <span className="font-bold text-primary dark:text-secondary">
                                 {props.member.name}
                             </span>
                         </p>
                         <p className="flex flex-row gap-2">
-                            <span>email: </span>
-                            <span className="font-bold text-primary">
+                            <span className="dark:text-white">email: </span>
+                            <span className="font-bold text-primary dark:text-secondary">
                                 {props.member.email}
                             </span>
                         </p>
                     </div>
 
-                    <div className="flex flex-row items-center mt-4  justify-between w-full px-4">
+                    <div className="flex flex-row items-center mt-4 justify-between w-full px-4">
                         <Button onClick={() => setIsOpenDeleteModal(false)}>cancel</Button>
                         <Button isLoading={payloadDelete.isLoading} onClick={() => callDelete()} className="!bg-red-500">delete</Button>
                     </div>
@@ -109,8 +109,8 @@ const Action = (props: IActionProps) => {
             </Modal>
 
             <Modal isOpen={isOpenRoleModal} setIsOpen={setIsOpenRoleModal}>
-                <div className="flex flex-col justify-center items-center pt-4 pb-2 px-4 w-[400px] text-center h-full">
-                    <h1 className="text-xl font-bold text-primary">change member role from {props.member.role} to {role}</h1>
+                <div className="flex flex-col dark:bg-black justify-center items-center pt-4 pb-2 px-4 w-[400px] text-center h-full">
+                    <h1 className="text-xl font-bold text-primary dark:text-secondary">change member role from {props.member.role} to {role}</h1>
 
                     <div className="w-full justify-center pl-2 mt-3 items-start flex flex-col">
                         <Select
@@ -158,10 +158,10 @@ const Members = () => {
 
     return (
         <div className="my-10">
-            <h2 className="text-3xl font-bold w-full mb-10 text-center">Members</h2>
-            <div className="w-full bg-white border border-gray-500 shadow-md rounded-md justify-center items-center flex flex-col p-2">
+            <h2 className="text-3xl font-bold w-full mb-10 text-center text-primary dark:text-secondary">Members</h2>
+            <div className="w-full bg-white dark:bg-black border border-gray-500 shadow-md dark:shadow-secondary/40 rounded-md justify-center items-center flex flex-col p-2">
 
-                <div className="flex flex-row gap-4 w-full flex-wrap items-center pb-4 p-2 bg-white justify-between">
+                <div className="flex flex-row gap-4 w-full flex-wrap items-center pb-4 p-2 justify-between">
                     <Link to={`/project/${projectId}/invent`}>
                         <Button>invite member</Button>
                     </Link>
@@ -179,9 +179,9 @@ const Members = () => {
                 <div className="flex flex-col justify-center items-center w-full gap-4">
                     {membersPayload.isLoading || countPayload.isLoading ? <CircleProgress size="lg" className="mb-4" /> : (
                         <>
-                            <div className="overflow-x-scroll overflow-y-hidden w-full">
+                            <div className="overflow-x-scroll dark-scrollbar overflow-y-hidden w-full">
                                 <table className="text-sm text-left text-gray-500 w-full">
-                                    <thead className="text-xs text-gray-700 uppercase bg-white">
+                                    <thead className="text-xs text-gray-700 dark:text-gray-300 uppercase ">
                                         <tr>
                                             <th scope="col" className="px-6 py-3 min-w-[150px]">  </th>
                                             <th scope="col" className="px-6 py-3 min-w-[150px]"> role </th>
@@ -192,13 +192,13 @@ const Members = () => {
                                         </tr>
                                     </thead>
 
-                                    <tbody className="before:block before:h-4">
+                                    <tbody className="before:block before:h-4 after:block after:mb-2">
                                         {membersPayload.result !== null && countPayload.result !== null && membersPayload.result.map((member, index) => (
-                                            <tr className="bg-white border-b hover:bg-gray-50" key={index}>
+                                            <tr className="bg-white border-b dark:border-gray-600 hover:bg-gray-50 dark:bg-black dark:hover:bg-gray-950" key={index}>
 
-                                                <td className="flex items-center px-6 py-4 min-w-[150px] justify-center text-gray-900 whitespace-nowrap">
+                                                <td className="flex items-center px-6 py-4 min-w-[150px] justify-center text-gray-900 dark:text-gray-100 whitespace-nowrap">
                                                     <Link to={`/profile/${member.id}`}>
-                                                        <img className="rounded-full shadow-md w-10 h-10 object-contain" src={member.avatarUrl} alt={member.name} />
+                                                        <img className="rounded-full shadow-md dark:shadow-secondary/40 w-10 h-10 object-contain" src={member.avatarUrl} alt={member.name} />
                                                     </Link>
                                                 </td>
 
@@ -220,18 +220,18 @@ const Members = () => {
                             <div className="flex w-full justify-end items-center flex-row gap-2">
                                 {countPayload.result !== null && membersPayload.result !== null && (
                                     <>
-                                        <p>{((page * take) - take) + 1} to {membersPayload.result.length === take ? (membersPayload.result.length + ((page * take) - take)) : membersPayload.result.length} out of {countPayload.result}</p>
+                                        <p className="dark:text-white">{((page * take) - take) + 1} to {membersPayload.result.length === take ? (membersPayload.result.length + ((page * take) - take)) : membersPayload.result.length} out of {countPayload.result}</p>
 
                                         <SelectButton options={[5, 10, 15, 20, 100]} label="take" setValue={setTake} value={take} />
 
                                         <AiOutlineArrowLeft
                                             onClick={handelPrevPage}
-                                            className={`${page === 1 ? "" : "hover:bg-slate-200 cursor-pointer"} p-2 rounded-xl shadow-md text-4xl`} />
+                                            className={`${page === 1 ? "" : "hover:bg-slate-200 dark:hover:bg-slate-800 cursor-pointer"} p-2 rounded-xl shadow-md dark:shadow-secondary/40 cursor-pointer dark:text-white text-4xl`} />
 
 
                                         <AiOutlineArrowRight
                                             onClick={handelNextPage}
-                                            className={`${page * take >= countPayload.result ? "" : "hover:bg-slate-200 cursor-pointer"} p-2 rounded-xl shadow-md text-4xl`} />
+                                            className={`${page * take >= countPayload.result ? "" : "hover:bg-slate-200 dark:hover:bg-slate-800 cursor-pointer"} p-2 rounded-xl shadow-md dark:shadow-secondary/40 cursor-pointer dark:text-white text-4xl`} />
                                     </>
                                 )}
                             </div>

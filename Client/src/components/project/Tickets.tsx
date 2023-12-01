@@ -50,10 +50,10 @@ const Tickets = () => {
 
     return (
         <div className="my-10">
-            <h2 className="text-3xl font-bold w-full mb-10 text-center">Tickets</h2>
-            <div className="w-full bg-white border border-gray-500 shadow-md rounded-md justify-center items-center flex flex-col p-2">
+            <h2 className="text-3xl font-bold w-full mb-10 text-center text-primary dark:text-secondary">Tickets</h2>
+            <div className="w-full dark:bg-black bg-white border border-gray-500 shadow-md dark:shadow-secondary/40 rounded-md justify-center items-center flex flex-col p-2">
 
-                <div className="flex flex-row gap-4 w-full flex-wrap items-center pb-4 p-2 bg-white justify-between">
+                <div className="flex flex-row gap-4 w-full flex-wrap items-center pb-4 p-2 bg-white dark:bg-black justify-between">
                     <Link to={`/project/${projectId}/create-ticket`}>
                         <Button>create ticket</Button>
                     </Link>
@@ -76,7 +76,7 @@ const Tickets = () => {
                         <>
                             <div className="overflow-x-scroll overflow-y-hidden w-full">
                                 <table className="text-sm text-left text-gray-500 w-full">
-                                    <thead className="text-xs text-gray-700 uppercase bg-white">
+                                    <thead className="text-xs text-gray-700 dark:text-gray-300 uppercase bg-white dark:bg-black">
                                         <tr>
                                             <th scope="col" className="px-6 py-3 min-w-[150px]"> name </th>
                                             <th scope="col" className="px-6 py-3 min-w-[150px]"> created by </th>
@@ -89,9 +89,9 @@ const Tickets = () => {
                                         </tr>
                                     </thead>
 
-                                    <tbody className="before:block before:h-4">
+                                    <tbody className="before:block before:h-4 after:block after:mb-2">
                                         {ticketsPayload.result !== null && countPayload.result !== null && ticketsPayload.result.map((ticket, index) => (
-                                            <tr className="bg-white border-b hover:bg-gray-50" key={index}>
+                                            <tr className="dark:bg-black dark:hover:bg-gray-950 bg-white border-b dark:border-gray-600 hover:bg-gray-50" key={index}>
 
                                                 <td className="px-6 py-4 min-w-[150px]">
                                                     <Link to={`/tickets/${ticket.id}`} className="link">
@@ -115,13 +115,13 @@ const Tickets = () => {
 
                                                 <td className="px-6 py-4 min-w-[150px]">{formatDate(ticket.createdAt)}</td>
                                                 <td className="px-6 py-4 min-w-[150px]">
-                                                    <p className={`rounded-md font-bold border-black w-fit p-1 text-white ${(labelsColors.PRIORITY as any)[ticket.priority]}`}>{ticket.priority}</p>
+                                                    <p className={`rounded-md font-bold dark:border-white border-black w-fit p-1 dark:text-black text-white ${(labelsColors.PRIORITY as any)[ticket.priority]}`}>{ticket.priority}</p>
                                                 </td>
                                                 <td className="px-6 py-4 min-w-[150px]">
-                                                    <p className={`rounded-md font-bold border-black w-fit p-1 text-white ${(labelsColors.STATUS as any)[ticket.status]}`}>{ticket.status}</p>
+                                                    <p className={`rounded-md font-bold dark:border-white border-black w-fit p-1 dark:text-black text-white ${(labelsColors.STATUS as any)[ticket.status]}`}>{ticket.status}</p>
                                                 </td>
                                                 <td className="px-6 py-4 min-w-[150px]">
-                                                    <p className={`rounded-md font-bold border-black w-fit p-1 text-white ${(labelsColors.TYPE as any)[ticket.type]}`}>{ticket.type}</p>
+                                                    <p className={`rounded-md font-bold dark:border-white border-black w-fit p-1 dark:text-black text-white ${(labelsColors.TYPE as any)[ticket.type]}`}>{ticket.type}</p>
                                                 </td>
 
                                                 {isOwnerOrMangerPayload.result ?
@@ -139,17 +139,17 @@ const Tickets = () => {
                                 {ticketsPayload.result !== null && countPayload.result !== null && (
 
                                     <>
-                                        <p>{((page * take) - take) + 1} to {ticketsPayload.result.length === take ? (ticketsPayload.result.length + ((page * take) - take)) : ticketsPayload.result.length} out of {countPayload.result}</p>
+                                        <p className="dark:text-white">{((page * take) - take) + 1} to {ticketsPayload.result.length === take ? (ticketsPayload.result.length + ((page * take) - take)) : ticketsPayload.result.length} out of {countPayload.result}</p>
 
                                         <SelectButton options={[5, 10, 15, 20, 100]} label="take" setValue={setTake} value={take} />
 
                                         <AiOutlineArrowLeft
                                             onClick={handelPrevPage}
-                                            className={`${page === 1 ? "" : "hover:bg-slate-200 cursor-pointer"} p-2 rounded-xl shadow-md text-4xl`} />
+                                            className={`${page === 1 ? "" : "hover:bg-slate-200 dark:hover:bg-slate-800 cursor-pointer"} p-2 dark:bg-black dark:shadow-secondary/40 dark:text-white rounded-xl shadow-md text-4xl`} />
 
                                         <AiOutlineArrowRight
                                             onClick={handelNextPage}
-                                            className={`${page * take >= countPayload.result ? "" : "hover:bg-slate-200 cursor-pointer"} p-2 rounded-xl shadow-md text-4xl`} />
+                                            className={`${page * take >= countPayload.result ? "" : "hover:bg-slate-200 dark:hover:bg-slate-800 cursor-pointer"} p-2 dark:bg-black dark:shadow-secondary/40 dark:text-white rounded-xl shadow-md text-4xl`} />
                                     </>
                                 )}
 

@@ -69,7 +69,7 @@ public class ProjectController : Controller
 
             var projects = await _ctx.Projects
                             .Where((p) =>
-                            (!p.IsPrivate || (currentUserId != null && p.Members.Any(m => m.UserId == currentUserId)))
+                            (!p.IsPrivate || (currentUserId != null && p.Members.Any(m => m.UserId == currentUserId && m.IsJoined)))
                             && p.Members.Any(m => m.UserId == userId)
                             ).OrderBy((p) => p.CreatedAt)
                             .Select((p) => new
@@ -112,7 +112,7 @@ public class ProjectController : Controller
                                 id = p.Id,
                                 isPrivate = p.IsPrivate,
                                 isReadOnly = p.IsReadOnly,
-                                members = p.Members.Count,
+                                members = p.Members.Where(m => m.IsJoined).Count(),
                                 tickets = p.Tickets.Count,
                                 createdAt = p.CreatedAt,
                                 markdown = p.Content.Markdown,

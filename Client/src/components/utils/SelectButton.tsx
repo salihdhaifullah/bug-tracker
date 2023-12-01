@@ -63,14 +63,14 @@ function SelectButton<T extends number | string>(props: ISelectButtonProps<T>) {
             </Button>
 
             <datalist
-                className={`${isOpen ? "block" : "none"} absolute w-auto shadow-lg z-40 h-auto right-0 top-[100%] bg-white no-scrollbar border rounded-md border-t-0 p-2 overflow-y-scroll`}
+                className={`${isOpen ? "block" : "none"} absolute w-auto shadow-lg z-40 h-auto right-0 top-[100%] bg-white dark:bg-black no-scrollbar border rounded-md border-t-0 p-2 overflow-y-scroll`}
             >
                 {props.options.map((option, index) => (
                     <option
                         id={`option-${index}`}
                         key={option}
                         onClick={() => choseOption(index)}
-                        className={`${activeOption === index ? "bg-slate-200 font-extrabold" : "bg-white"} block bg-slate-200 rounded-md text-gray-600 p-1 mb-1 text-base cursor-pointer`}
+                        className={`${activeOption === index ? "bg-slate-200 dark:bg-slate-800 font-extrabold" : "bg-white dark:bg-black"} block rounded-md text-gray-600 dark:text-gray-400 p-1 mb-1 text-base cursor-pointer`}
                         value={option}>
                         {option}
                     </option>

@@ -32,8 +32,8 @@ const CreateTicket = () => {
   }
 
   return (
-    <section className="flex flex-col  justify-center items-center flex-grow">
-      <div className="rounded-xl bg-white dark:bg-black dark:shadow-secondary flex flex-col gap-4 w-80 p-2 pt-6 items-center justify-center shadow-xl">
+    <section className="flex flex-col justify-center items-center flex-grow my-10">
+      <div className="rounded-xl bg-white dark:bg-black dark:shadow-secondary/40 flex flex-col gap-4 w-80 px-4 py-8 items-center justify-center shadow-xl">
 
         <h1 className="text-primary dark:text-secondary font-bold text-2xl text-center">create ticket</h1>
 
@@ -85,7 +85,7 @@ const CreateTicket = () => {
 
           <SelectUser label="chose user to assign this ticket to" route={`members/${projectId}`} setId={setMemberId} id={memberId} />
 
-          <div className="flex flex-col justify-center items-center w-full my-1">
+          <div className="flex flex-col justify-center items-center w-full mt-2">
             <Button
               buttonProps={{ type: "submit" }}
               isLoading={payload.isLoading}

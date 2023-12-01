@@ -42,12 +42,12 @@ const Action = (props: IActionProps) => {
 
     return (
         <div ref={targetRef} className="flex w-fit relative">
-            <div onClick={() => setIsOpen(!isOpen)} className="p-1 font-normal text-lg rounded-md hover:bg-slate-300 cursor-pointer">
+            <div onClick={() => setIsOpen(!isOpen)} className="p-1 font-normal text-lg dark:text-gray-400 hover:dark:text-gray-200 text-gray-600 hover:text-gray-800 rounded-md hover:bg-slate-200 dark:hover:bg-slate-800 cursor-pointer">
                 <FiMoreVertical />
             </div>
 
-            <div className={`${isOpen ? "flex" : "hidden"} flex flex-col py-2 px-4 justify-center gap-2 items-center absolute right-[50%] bottom-[50%] bg-white rounded shadow-md`}>
-                <Button isLoading={deletePayload.isLoading} onClick={() => callDelete()} size="xs" className="w-full shadow-sm">delete</Button>
+            <div className={`${isOpen ? "scale-100" : "scale-0"} transition-all flex flex-col gap-2 py-2 px-4 bg-white dark:bg-black justify-center items-center absolute right-[80%] -bottom-[50%] rounded shadow-md dark:shadow-secondary/40`}>
+                <Button isLoading={deletePayload.isLoading} onClick={() => callDelete()} size="xs" className="w-full">delete</Button>
             </div>
 
         </div>
@@ -70,17 +70,17 @@ const Comment = (props: ICommentProps) => {
                 />
             </Link>
 
-            <div className="flex gap-2 w-full flex-col bg-white rounded-md shadow-md relative after:w-0 after:h-0 after:border-t-[7px] after:border-t-transparent after:border-r-[14px] after:border-r-white after:border-b-[7px] after:border-b-transparent after:absolute after:top-3 after:-left-3">
+            <div className="flex gap-2 w-full flex-col dark:shadow-secondary/40 bg-white dark:bg-black rounded-md shadow-md relative after:w-0 after:h-0 after:border-t-[7px] after:border-t-transparent after:border-r-[14px] after:border-r-white dark:after:border-r-black after:border-b-[7px] after:border-b-transparent after:absolute after:top-3 after:-left-3">
 
-                <div className="flex flex-row justify-between items-center border-b-gray-400 p-2 border-b">
+                <div className="flex flex-row justify-between items-center border-b-gray-400 dark:border-b-gray-600 p-2 border-b">
                     <div className="flex flex-row gap-2 justify-start items-center">
                         <Link to={`/profile/${props.comment.commenter.id}`}>
                             <span
                                 title="commenter"
-                                className="text-primary font-bold hover:underline">{props.comment.commenter.name}</span>
+                                className="text-primary dark:text-secondary font-bold hover:underline">{props.comment.commenter.name}</span>
                         </Link>
 
-                        <p title="created at" className="text-gray-600 text-sm font-normal">{formatDate(props.comment.createdAt)}</p>
+                        <p title="created at" className="text-gray-600 dark:text-gray-400 text-sm font-normal">{formatDate(props.comment.createdAt)}</p>
                     </div>
                     <Action call={props.call} commentId={props.comment.id} />
                 </div>

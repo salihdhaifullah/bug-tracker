@@ -40,8 +40,9 @@ const TransferModal = (props: (IDangerZoneProps & { isOpenTransferModal: boolean
 
                 {isSubmit ? (
                     <>
-                        <h2 className="text-xl font-bold text-primary">are you sure you want to transfer this project</h2>
-                        <h1 className="text-3xl font-black my-4 text-blue-700">{props.name}</h1>
+                        <h1 className="text-3xl font-black my-4 text-blue-700 dark:text-blue-300">{props.name}</h1>
+
+                        <h2 className="text-xl font-bold text-primary dark:text-secondary">are you sure you want to transfer this project</h2>
 
                         <div className="w-full justify-center gap-4 pl-2 my-3 items-start flex flex-col">
 
@@ -64,12 +65,11 @@ const TransferModal = (props: (IDangerZoneProps & { isOpenTransferModal: boolean
 
                     </>
                 ) : (
-                    <>
+                    <div className="flex flex-col gap-8 p-2 w-full items-center">
                         <SelectUser notMe setIsValid={setIsValidId} required label="chose user to transfer this project to" route={`members/${props.id}`} setId={setMemberId} id={memberId} />
                         <Button isValid={isValidId} onClick={() => setIsSubmit(true)}>Transfer</Button>
-                    </>
+                    </div>
                 )}
-
             </div>
         </Modal>
     )
@@ -88,8 +88,9 @@ const useVisibilityModal = (props: IDangerZoneProps): [() => JSX.Element, Dispat
     return [() => (
         <Modal isOpen={isOpenVisibilityModal} setIsOpen={setIsOpenVisibilityModal}>
             <div className="flex flex-col justify-center  items-center pt-4 pb-2 px-4 w-[400px] text-center h-full">
-                <h2 className="text-xl font-bold text-primary">are you sure you want to make this project {props.isPrivate ? "public" : "private"}</h2>
-                <h1 className="text-3xl font-black my-4 text-blue-700">{props.name}</h1>
+            <h1 className="text-3xl font-black my-4 text-blue-700 dark:text-blue-300">{props.name}</h1>
+
+                <h2 className="text-xl font-bold text-primary dark:text-secondary">are you sure you want to make this project {props.isPrivate ? "public" : "private"}</h2>
 
                 <div className="w-full justify-center gap-4 pl-2 my-3 items-start flex flex-col">
 
@@ -127,8 +128,8 @@ const useArchiveModal = (props: IDangerZoneProps): [() => JSX.Element, Dispatch<
     return [() => (
         <Modal isOpen={isOpenArchiveModal} setIsOpen={setIsOpenArchiveModal}>
             <div className="flex flex-col justify-center  items-center pt-4 pb-2 px-4 w-[400px] text-center h-full">
-                <h2 className="text-xl font-bold text-primary">are you sure you want to {props.isReadOnly ? "unarchive" : "archive"} this project</h2>
-                <h1 className="text-3xl font-black my-4 text-blue-700">{props.name}</h1>
+                <h1 className="text-3xl font-black my-4 text-blue-700 dark:text-blue-300">{props.name}</h1>
+                <h2 className="text-xl font-bold text-primary dark:text-secondary">are you sure you want to {props.isReadOnly ? "unarchive" : "archive"} this project</h2>
 
                 <div className="w-full justify-center gap-4 pl-2 my-3 items-start flex flex-col">
 
@@ -165,8 +166,9 @@ const useDeleteModal = (props: IDangerZoneProps): [() => JSX.Element, Dispatch<S
     return [() => (
         <Modal isOpen={isOpenDeleteModal} setIsOpen={setIsOpenDeleteModal}>
             <div className="flex flex-col justify-center  items-center pt-4 pb-2 px-4 w-[400px] text-center h-full">
-                <h2 className="text-xl font-bold text-primary">are you sure you want to delete this project</h2>
-                <h1 className="text-3xl font-black my-4 text-blue-700">{props.name}</h1>
+            <h1 className="text-3xl font-black my-4 text-blue-700 dark:text-blue-300">{props.name}</h1>
+
+                <h2 className="text-xl font-bold text-primary dark:text-secondary">are you sure you want to delete this project</h2>
 
                 <div className="w-full justify-center gap-4 pl-2 my-3 items-start flex flex-col">
 
@@ -192,14 +194,13 @@ const useDeleteModal = (props: IDangerZoneProps): [() => JSX.Element, Dispatch<S
 }
 
 const DangerZone = (props: IDangerZoneProps) => {
-
     const [DeleteModal, setIsOpenDeleteModal] = useDeleteModal(props);
     const [ArchiveModal, setIsOpenArchiveModal] = useArchiveModal(props);
     const [VisibilityModal, setIsOpenVisibilityModal] = useVisibilityModal(props);
     const [isOpenTransferModal, setIsOpenTransferModal] = useState(false);
 
     return (
-        <div className='w-full bg-white border border-gray-500 shadow-md rounded-md justify-center items-center flex flex-col p-2'>
+        <div className='w-full bg-white dark:bg-black border border-gray-500 shadow-md dark:shadow-secondary/40 rounded-md justify-center items-center flex flex-col p-2'>
             <DeleteModal />
             <ArchiveModal />
             <VisibilityModal />
@@ -207,37 +208,37 @@ const DangerZone = (props: IDangerZoneProps) => {
 
             <div className='flex flex-row w-full items-center justify-between p-2 border-b border-gray-500'>
                 <div className="flex flex-col">
-                    <h3 className="text-primary font-bold">change project visibility</h3>
-                    <p className="text-primary">This project is currently {props.isPrivate ? "private" : "public"}.</p>
+                    <h3 className="text-primary dark:text-secondary font-bold">change project visibility</h3>
+                    <p className="text-primary dark:text-secondary">This project is currently {props.isPrivate ? "private" : "public"}.</p>
                 </div>
-                <Button size="md" onClick={() => setIsOpenVisibilityModal(true)} className="text-red-700  hover:bg-red-600">visibility</Button>
+                <Button size="md" onClick={() => setIsOpenVisibilityModal(true)} className="!text-red-700 hover:!bg-red-600 dark:!text-red-500 dark:hover:!bg-red-400">visibility</Button>
             </div>
 
 
             <div className='flex flex-row w-full items-center justify-between p-2 border-b border-gray-500'>
                 <div className="flex flex-col">
-                    <h3 className="text-primary font-bold">transfer ownership</h3>
-                    <p className="text-primary">transfer this project to another user</p>
+                    <h3 className="text-primary dark:text-secondary font-bold">transfer ownership</h3>
+                    <p className="text-primary dark:text-secondary">transfer this project to another user</p>
                 </div>
-                <Button size="md" onClick={() => setIsOpenTransferModal(true)} className="text-red-700 hover:bg-red-600">transfer</Button>
+                <Button size="md" onClick={() => setIsOpenTransferModal(true)} className="!text-red-700 hover:!bg-red-600 dark:!text-red-500 dark:hover:!bg-red-400">transfer</Button>
             </div>
 
 
             <div className='flex flex-row w-full items-center justify-between p-2 border-b border-gray-500'>
                 <div className="flex flex-col">
-                    <h3 className="text-primary font-bold">{props.isReadOnly ? "unarchive project" : "archive project"}</h3>
-                    <p className="text-primary">Mark this project as {props.isReadOnly ? "unarchive and read-write" : "archived and read-only"}</p>
+                    <h3 className="text-primary dark:text-secondary font-bold">{props.isReadOnly ? "unarchive project" : "archive project"}</h3>
+                    <p className="text-primary dark:text-secondary">Mark this project as {props.isReadOnly ? "unarchive and read-write" : "archived and read-only"}</p>
                 </div>
-                <Button size="md" onClick={() => setIsOpenArchiveModal(true)} className="text-red-700 hover:bg-red-600">{props.isReadOnly ? "unarchive" : "archive"}</Button>
+                <Button size="md" onClick={() => setIsOpenArchiveModal(true)} className="!text-red-700 hover:!bg-red-600 dark:!text-red-500 dark:hover:!bg-red-400">{props.isReadOnly ? "unarchive" : "archive"}</Button>
             </div>
 
 
             <div className='flex flex-row w-full items-center justify-between p-2 border-b border-gray-500'>
                 <div className="flex flex-col">
-                    <h3 className="text-primary font-bold">Delete project</h3>
-                    <p className="text-primary">Once you delete a project, there is no going back. Please be certain.</p>
+                    <h3 className="text-primary dark:text-secondary font-bold">Delete project</h3>
+                    <p className="text-primary dark:text-secondary">Once you delete a project, there is no going back. Please be certain.</p>
                 </div>
-                <Button size="md" onClick={() => setIsOpenDeleteModal(true)} className="text-red-700 hover:bg-red-600">Delete</Button>
+                <Button size="md" onClick={() => setIsOpenDeleteModal(true)} className="!text-red-700 hover:!bg-red-600 dark:!text-red-500 dark:hover:!bg-red-400">Delete</Button>
             </div>
 
         </div>

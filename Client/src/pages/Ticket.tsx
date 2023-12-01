@@ -64,7 +64,7 @@ const Ticket = () => {
     const user = useUser();
 
     return payload.isLoading ? <CircleProgress size="lg" /> : payload.result === null ? null : (
-        <section className="flex flex-col w-full h-full my-10 p-2 flex-grow">
+        <section className="flex flex-col w-full h-full my-10 p-2 flex-grow overflow-y-hidden">
             <div className="flex flex-row w-full h-full gap-3">
 
                 <Link to={`/profile/${payload.result.creator.id}`} className="w-fit h-fit min-w-[2.5rem] min-h-[2.5rem] flex">
@@ -76,17 +76,17 @@ const Ticket = () => {
                     />
                 </Link>
 
-                <div className="rounded-lg relative w-full h-full gap-4 flex flex-col shadow-md bg-white after:w-0 after:h-0 after:border-t-[7px] after:border-t-transparent after:border-r-[14px] after:border-r-white after:border-b-[7px] after:border-b-transparent after:absolute after:top-3 after:-left-3">
+                <div className="rounded-lg relative w-full h-full gap-4 flex flex-col shadow-md dark:shadow-secondary/40 bg-white dark:bg-black after:w-0 after:h-0 after:border-t-[7px] after:border-t-transparent after:border-r-[14px] after:border-r-white dark:after:border-r-black after:border-b-[7px] after:border-b-transparent after:absolute after:top-3 after:-left-3">
 
-                    <div className="flex flex-row justify-between items-center border-b-gray-400 p-2 border-b">
+                    <div className="flex flex-row justify-between items-center border-b-gray-400 dark:border-b-gray-600 p-2 border-b">
                         <div className="flex flex-row gap-2 justify-start items-center">
                             <Link className="w-fit h-fit" to={`/profile/${payload.result.creator.id}`}>
                                 <span
                                     title="creator"
-                                    className="text-primary font-bold hover:underline">{payload.result.creator.name}</span>
+                                    className="text-primary dark:text-secondary font-bold hover:underline">{payload.result.creator.name}</span>
                             </Link>
 
-                            <p title="created at" className="text-gray-600 text-sm font-normal">{formatDate(payload.result.createdAt)}</p>
+                            <p title="created at" className="text-gray-600 dark:text-gray-400 text-sm font-normal">{formatDate(payload.result.createdAt)}</p>
                         </div>
 
                         {(isOwnerOrMangerPayload.result || payload.result.creator.id === user?.id) ?
@@ -98,12 +98,12 @@ const Ticket = () => {
 
                     <div className="w-full h-full gap-4 flex flex-col p-4">
 
-                        <h2 className="text-3xl font-bold text-primary">{payload.result.name}</h2>
+                        <h2 className="text-3xl font-bold text-primary dark:text-secondary">{payload.result.name}</h2>
 
                         <div className="flex text-sm mb-2 flex-row justify-start gap-1 flex-wrap">
-                            <span title="type" className={`rounded-sm font-bold border-black w-fit p-1 text-white ${(labelsColors.TYPE as any)[payload.result.type]}`}>{payload.result.type}</span>
-                            <span title="priority" className={`rounded-sm font-bold border-black w-fit p-1 text-white ${(labelsColors.PRIORITY as any)[payload.result.priority]}`}>{payload.result.priority}</span>
-                            <span title="status" className={`rounded-sm font-bold border-black w-fit p-1 text-white ${(labelsColors.STATUS as any)[payload.result.status]}`}>{payload.result.status}</span>
+                            <span title="type" className={`rounded-sm font-bold border-black w-fit p-1 text-white dark:border-white dark:text-black ${(labelsColors.TYPE as any)[payload.result.type]}`}>{payload.result.type}</span>
+                            <span title="priority" className={`rounded-sm font-bold border-black w-fit p-1 text-white dark:border-white dark:text-black ${(labelsColors.PRIORITY as any)[payload.result.priority]}`}>{payload.result.priority}</span>
+                            <span title="status" className={`rounded-sm font-bold border-black w-fit p-1 text-white dark:border-white dark:text-black ${(labelsColors.STATUS as any)[payload.result.status]}`}>{payload.result.status}</span>
                         </div>
 
 
@@ -115,12 +115,12 @@ const Ticket = () => {
                                         src={payload.result.assignedTo.avatarUrl}
                                         alt={`${payload.result.assignedTo.name}`}
                                     />
-                                    <span className="font-bold text-primary hover:underline">{payload.result.assignedTo.name}</span>
+                                    <span className="font-bold text-primary dark:text-secondary hover:underline">{payload.result.assignedTo.name}</span>
                                 </Link>
                             </>
-                        ) : <p className="font-bold text-primary">unassigned</p>}
+                        ) : <p className="font-bold text-primary dark:text-secondary">unassigned</p>}
 
-                        <Link className="font-bold w-fit h-fit text-primary text-lg hover:underline" title="project" to={`/project/${payload.result.project.id}`}>{payload.result.project.name}</Link>
+                        <Link className="font-bold w-fit h-fit text-primary dark:text-secondary text-lg hover:underline" title="project" to={`/project/${payload.result.project.id}`}>{payload.result.project.name}</Link>
 
                         <Content editable={isOwnerOrMangerPayload.result || payload.result.creator.id === user?.id} url={`ticket/content/${ticketId}`} />
                     </div>

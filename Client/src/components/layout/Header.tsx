@@ -12,7 +12,7 @@ const Header = () => {
     const themeDispatch = useThemeDispatch();
 
     return (
-        <header className="flex flex-row fixed top-0 w-full min-h-[8vh] z-[11] justify-between items-center text-primary dark:bg-black bg-white p-2 shadow-lg dark:shadow-secondary">
+        <header className="flex flex-row fixed top-0 w-full min-h-[8vh] z-[11] justify-between items-center text-primary dark:bg-black bg-white p-2 shadow-lg dark:shadow-secondary/40">
             <div className="flex flex-row gap-2">
                 <Sidebar />
                 <Link to="/" className="flex flex-row justify-center items-center">
@@ -34,7 +34,7 @@ const Header = () => {
 
                     <div className="flex justify-center items-center">
                         <img
-                            className="rounded-full dark:shadow-secondary shadow-md w-8 h-8 object-contain"
+                            className="rounded-full dark:shadow-secondary/40 shadow-md w-8 h-8 object-contain"
                             src={user.avatarUrl}
                             alt={user.name} />
 

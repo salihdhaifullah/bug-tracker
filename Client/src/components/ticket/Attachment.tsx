@@ -65,10 +65,16 @@ const CreateAttachmentModal = (props: ICreateAttachmentModalProps) => {
         }
     }
 
+    const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+    const handleButtonClick = () => {
+        if (fileInputRef.current) fileInputRef.current.click();
+    };
+
     return (
         <Modal isOpen={props.isOpen} setIsOpen={props.setIsOpen}>
             <div className="flex flex-col justify-center  items-center pt-4 pb-2 px-4 w-[400px] text-center h-full">
-                <h1 className="text-xl font-bold text-primary">add attachment</h1>
+                <h1 className="text-xl font-bold text-primary dark:text-secondary">add attachment</h1>
                 <div className="flex-col flex w-full justify-center items-center">
 
                     <TextFiled
@@ -83,10 +89,17 @@ const CreateAttachmentModal = (props: ICreateAttachmentModalProps) => {
                     />
 
                     <div className="w-full my-4 px-6 justify-start flex-col items-center">
-                        <input onChange={handelChangeFile} type="file" className="hidden" accept="*" id="file-upload" />
+                        <input
+                            ref={fileInputRef}
+                            onChange={handelChangeFile}
+                            type="file"
+                            className="hidden"
+                            accept="*"
+                            id="file-upload"
+                        />
 
                         <label htmlFor="file-upload">
-                            <div className="rounded-md cursor-pointer w-fit shadow-md bg-secondary text-primary p-1 font-bold text-start hover:text-white dark:hover:text-black">{fileName || "upload"}</div>
+                            <Button onClick={handleButtonClick}>{fileName || "upload"}</Button>
                         </label>
                     </div>
 
@@ -115,7 +128,7 @@ const CreateAttachmentModal = (props: ICreateAttachmentModalProps) => {
 const Action = (_: IActionProps) => {
     const [isOpen, setIsOpen] = useState(false);
     const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
-    const [isOpenRoleModal, setIsOpenRoleModal] = useState(false);
+    const [isOpenRoleModal, setIsOpenUpdateModal] = useState(false);
 
     const targetRef = useRef<HTMLDivElement>(null);
 
@@ -123,13 +136,13 @@ const Action = (_: IActionProps) => {
 
     return (
         <div ref={targetRef} className="flex w-fit relative">
-            <div onClick={() => setIsOpen(!isOpen)} className="p-1 shadow-sm font-normal cursor-pointer hover:bg-slate-300 rounded-md">
+            <div onClick={() => setIsOpen(!isOpen)} className="p-1 font-normal text-lg dark:text-gray-400 hover:dark:text-gray-200 text-gray-600 hover:text-gray-800 rounded-md hover:bg-slate-200 dark:hover:bg-slate-800 cursor-pointer">
                 <FiMoreVertical />
             </div>
 
-            <div className={`${isOpen ? "flex" : "hidden"} flex flex-col py-2 px-4 justify-center gap-2 items-center absolute right-[50%] bottom-[50%] bg-white rounded shadow-md`}>
-                <Button onClick={() => setIsOpenDeleteModal(true)} size="xs" className="w-full shadow-sm">delete</Button>
-                <Button onClick={() => setIsOpenRoleModal(true)} size="xs" className="w-full shadow-sm">update</Button>
+            <div className={`${isOpen ? "scale-100" : "scale-0"} transition-all flex flex-col gap-2 py-2 px-4 bg-white dark:bg-black justify-center items-center absolute right-[80%] -bottom-[50%] rounded shadow-md dark:shadow-secondary/40`}>
+                <Button onClick={() => setIsOpenDeleteModal(true)} size="xs" className="w-full">delete</Button>
+                <Button onClick={() => setIsOpenUpdateModal(true)} size="xs" className="w-full">update</Button>
             </div>
 
             <Modal isOpen={isOpenDeleteModal} setIsOpen={setIsOpenDeleteModal}>
@@ -144,13 +157,13 @@ const Action = (_: IActionProps) => {
                 </div>
             </Modal>
 
-            <Modal isOpen={isOpenRoleModal} setIsOpen={setIsOpenRoleModal}>
+            <Modal isOpen={isOpenRoleModal} setIsOpen={setIsOpenUpdateModal}>
                 <div className="flex flex-col justify-center items-center pt-4 pb-2 px-4 w-[400px] text-center h-full">
                     <h1 className="text-xl font-bold text-primary">update modal</h1>
 
 
                     <div className="flex flex-row items-center mt-4  justify-between w-full px-4">
-                        <Button onClick={() => setIsOpenRoleModal(false)}>cancel</Button>
+                        <Button onClick={() => setIsOpenUpdateModal(false)}>cancel</Button>
                         <Button>change</Button>
                     </div>
                 </div>
@@ -185,10 +198,10 @@ const Attachment = () => {
 
     return (
         <div className="my-10">
-            <h2 className="text-3xl font-bold w-full mb-10 text-center">attachments</h2>
-            <div className="w-full bg-white border border-gray-500 shadow-md rounded-md justify-center items-center flex flex-col p-2">
+            <h2 className="text-3xl text-primary dark:text-secondary font-bold w-full mb-10 text-center">attachments</h2>
+            <div className="w-full bg-white dark:bg-black border border-gray-500 shadow-md dark:shadow-secondary rounded-md justify-center items-center flex flex-col p-2">
 
-                <div className="flex flex-row gap-4 w-full flex-wrap items-center pb-4 p-2 bg-white justify-between">
+                <div className="flex flex-row gap-4 w-full flex-wrap items-center pb-4 p-2 bg-white dark:bg-black justify-between">
 
                     <Button onClick={() => setIsOpenCreateAttachmentModal(prev => !prev)}>add attachment</Button>
                     <CreateAttachmentModal setIsOpen={setIsOpenCreateAttachmentModal} isOpen={isOpenCreateAttachmentModal} call={callAttachments} />
@@ -207,7 +220,7 @@ const Attachment = () => {
                         <>
                             <div className="overflow-x-scroll overflow-y-hidden w-full">
                                 <table className="text-sm text-left text-gray-500 w-full">
-                                    <thead className="text-xs text-gray-700 uppercase bg-white">
+                                    <thead className="text-xs text-gray-700 dark:text-gray-300 uppercase bg-white dark:bg-black">
                                         <tr>
                                             <th scope="col" className="px-6 py-3 min-w-[150px]"> title </th>
                                             <th scope="col" className="px-6 py-3 min-w-[150px]"> uploaded by </th>
@@ -216,9 +229,9 @@ const Attachment = () => {
                                         </tr>
                                     </thead>
 
-                                    <tbody className="before:block before:h-4">
+                                    <tbody className="before:block before:h-4 after:block after:mb-2">
                                         {attachmentsPayload.result !== null && countPayload.result !== null && attachmentsPayload.result.map((attachment, index) => (
-                                            <tr className="bg-white border-b hover:bg-gray-50" key={index}>
+                                            <tr className="bg-white dark:bg-black border-b dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-950" key={index}>
 
                                                 <td className="px-6 py-4 min-w-[150px]">
                                                     <a target="_blank" className="link" href={attachment.url}>
@@ -244,17 +257,17 @@ const Attachment = () => {
                             <div className="flex w-full justify-end items-center flex-row gap-2">
                                 {attachmentsPayload.result !== null && countPayload.result !== null && (
                                     <>
-                                        <p>{((page * take) - take) + 1} to {attachmentsPayload.result.length === take ? (attachmentsPayload.result.length + ((page * take) - take)) : attachmentsPayload.result.length} out of {countPayload.result}</p>
+                                        <p className="dark:text-white">{((page * take) - take) + 1} to {attachmentsPayload.result.length === take ? (attachmentsPayload.result.length + ((page * take) - take)) : attachmentsPayload.result.length} out of {countPayload.result}</p>
 
                                         <SelectButton options={[5, 10, 15, 20, 100]} label="take" setValue={setTake} value={take} />
 
                                         <AiOutlineArrowLeft
                                             onClick={handelPrevPage}
-                                            className={`${page === 1 ? "" : "hover:bg-slate-200 cursor-pointer"} p-2 rounded-xl shadow-md text-4xl`} />
+                                            className={`${page === 1 ? "" : "hover:bg-slate-200 dark:hover:bg-slate-800 cursor-pointer"} p-2 dark:bg-black dark:shadow-secondary/40 dark:text-white rounded-xl shadow-md text-4xl`} />
 
                                         <AiOutlineArrowRight
                                             onClick={handelNextPage}
-                                            className={`${page * take >= countPayload.result ? "" : "hover:bg-slate-200 cursor-pointer"} p-2 rounded-xl shadow-md text-4xl`} />
+                                            className={`${page * take >= countPayload.result ? "" : "hover:bg-slate-200 dark:hover:bg-slate-800 cursor-pointer"} p-2 dark:bg-black dark:shadow-secondary/40 dark:text-white rounded-xl shadow-md text-4xl`} />
                                     </>
                                 )}
 

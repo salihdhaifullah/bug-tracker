@@ -1,3 +1,4 @@
+import { FaAngleLeft, FaAngleRight } from 'react-icons/fa';
 import { GrPrevious, GrNext } from 'react-icons/gr';
 
 
@@ -13,23 +14,23 @@ const Pagination = (props: IPagination) => {
 
             <div
                 onClick={props.currentPage !== 1 ? () => props.handelOnChange(props.currentPage - 1) : undefined}
-                className={`${props.currentPage !== 1 ? "hover:bg-slate-200 hover:text-gray-700 cursor-pointer" : ""} px-3 py-2 w-fit h-full flex ml-0 text-primary bg-white border border-gray-300 rounded-l-lg`}>
-                <GrPrevious />
+                className={`${props.currentPage !== 1 ? "hover:bg-slate-200 dark:hover:bg-slate-800 cursor-pointer" : ""} px-3 py-2 w-fit h-full flex ml-0 dark:text-secondary text-primary bg-white dark:bg-black border border-gray-300 dark:border-gray-700 rounded-l-lg`}>
+                <FaAngleLeft />
             </div>
 
             {Array.from({ length: props.pages }).map((_, index) => (
                 <div
                     key={index}
                     onClick={props.currentPage !== (index + 1) ? () => props.handelOnChange(index + 1) : undefined}
-                    className={`${props.currentPage !== (index + 1) ? "hover:bg-slate-200 hover:text-gray-700 bg-white cursor-pointer" : "bg-slate-200"} px-3 py-2 w-fit h-full flex text-primary items-center justify-center text-center border border-gray-300 rounded-sm`}>
+                    className={`${props.currentPage !== (index + 1) ? "hover:bg-slate-200 dark:hover:bg-slate-800 cursor-pointer" : ""} px-3 py-2 w-fit h-full flex dark:text-secondary text-primary items-center justify-center text-center border bg-white dark:bg-black border-gray-300 dark:border-gray-700 rounded-sm`}>
                     {index + 1}
                 </div>
             ))}
 
             <div
                 onClick={props.currentPage !== props.pages ? () => props.handelOnChange(props.currentPage + 1) : undefined}
-                className={`${props.currentPage !== props.pages ? "hover:bg-slate-200 hover:text-gray-700 cursor-pointer" : ""} px-3 py-2 w-fit h-full flex ml-0 text-primary bg-white border border-gray-300 rounded-r-lg`}>
-                <GrNext />
+                className={`${props.currentPage !== props.pages ? "hover:bg-slate-200 dark:hover:bg-slate-800 cursor-pointer" : ""} px-3 py-2 w-fit h-full flex ml-0 dark:text-secondary text-primary bg-white dark:bg-black border border-gray-300 dark:border-gray-700 rounded-r-lg`}>
+                <FaAngleRight />
             </div>
 
         </nav>

@@ -48,8 +48,8 @@ const Button = (props: IButtonProps) => {
             disabled={props.isValid === false || props.isLoading}
             onClick={props.onClick}
             className={`${getSize(props.size)}
-                ${props.isValid === false ? "bg-gray-300 cursor-not-allowed" :  (props.isLoading ? "cursor-wait" : "cursor-pointer") + " bg-secondary"}
-                ${props.className || ""} rounded-md border-0 outline-none whitespace-nowrap font-bold text-primary dark:hover:text-black hover:text-white text-center transition-all ease-in-out shadow-md hover:shadow-lg hover:border-gray-600 w-fit h-fit
+                ${props.isValid === false ? "bg-gray-300 dark:bg-gray-700 cursor-not-allowed" :  (props.isLoading ? "cursor-wait" : "cursor-pointer") + " dark:bg-secondary bg-primary"}
+                ${props.className || ""} rounded-md border-0 outline-none whitespace-nowrap font-bold dark:text-primary text-secondary dark:hover:text-black hover:text-white text-center transition-all ease-in-out shadow-md hover:shadow-lg dark:shadow-secondary/40 dark:hover:border-gray-400 hover:border-gray-600 w-fit h-fit
             `}>
 
             {props.isLoading ? <CircleProgress size="xm" /> : props.children}

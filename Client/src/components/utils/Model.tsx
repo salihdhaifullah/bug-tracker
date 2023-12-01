@@ -33,7 +33,7 @@ const Modal = (props: IModalProps) => {
     useOnClickOutside(modalRef, () => { if (props.isOpen && modalRef.current) closeCallback(); })
 
     return !props.isOpen ? null : ReactDOM.createPortal((
-            <div className="p-2 fixed w-fit top-0 border border-gray-900 shadow-2xl left-0 right-0 bottom-0 m-auto min-h-[35vh] h-fit bg-white rounded-md flex flex-col">
+            <div className="p-2 fixed w-fit top-0 border border-gray-900 dark:border-gray-100 shadow-2xl dark:shadow-secondary/40 left-0 right-0 bottom-0 m-auto min-h-[35vh] h-fit bg-white dark:bg-black rounded-md flex flex-col">
                 {props.children}
             </div>
         ),document.getElementById('modal-root')!

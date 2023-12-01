@@ -26,7 +26,7 @@ const CodeLanguage = () => {
             <BsFileEarmarkCode onClick={() => setIsOpen(true)} className="text-gray-700 dark:text-gray-300 dark:hover:bg-slate-800 hover:bg-slate-200 hover:text-primary dark:hover:text-secondary text-xl rounded-sm cursor-pointer" />
 
             <div
-                className={`${isOpen ? "h-auto w-auto shadow-md dark:shadow-secondary overflow-y-auto p-2" : ""} w-0 h-0 max-h-40 left-[30%] top-4 absolute transition-all ease-in-out bg-white dark:bg-black rounded-md`}>
+                className={`${isOpen ? "h-auto thin-scrollbar w-auto shadow-md dark:shadow-secondary/40 overflow-y-auto p-2" : ""} w-0 h-0 max-h-40 left-[30%] top-4 absolute transition-all ease-in-out bg-white dark:bg-black rounded-md`}>
                 {programmingLanguages.map((Lang, index) => (
                     <div
                         onClick={() => {

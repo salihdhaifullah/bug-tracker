@@ -21,12 +21,12 @@ const CreateProject = () => {
     }
 
     return (
-        <section className="flex flex-col justify-center items-center flex-grow my-6 ">
-            <div className="rounded-xl bg-white dark:bg-black dark:shadow-secondary flex flex-col gap-4 w-80 p-2 items-center justify-center shadow-xl">
+        <section className="flex flex-col justify-center items-center flex-grow my-10">
+            <div className="rounded-xl bg-white dark:bg-black dark:shadow-secondary/40 px-4 py-8 flex flex-col gap-4 w-80 p-2 items-center justify-center shadow-xl">
 
                 <form className="flex-col flex w-full justify-center items-center" onSubmit={handelSubmit}>
 
-                    <h1 className="text-primary dark:text-secondary font-bold text-2xl text-center mt-4 mb-1">Create Project</h1>
+                    <h1 className="text-primary dark:text-secondary font-bold text-2xl text-center mb-4">Create Project</h1>
                     <div className="flex w-full justify-center items-center mb-4">
                         <MdOutlineCreateNewFolder className="text-3xl text-gray-800 dark:text-gray-200 font-extrabold" />
                     </div>

@@ -30,8 +30,8 @@ const makeTable = (rows: number, cols: number) => {
 };
 
 const Table = () => {
-    const [rows, setRows] = useState(3);
-    const [cols, setCols] = useState(3);
+    const [rows, setRows] = useState(0);
+    const [cols, setCols] = useState(0);
     const textarea = useTextarea();
 
     const tableRef = useRef<HTMLDivElement | null>(null);
@@ -55,14 +55,14 @@ const Table = () => {
             <div
                 className={`${isOpen ? "h-auto p-2 w-[160px]" : "hidden"}
                     gap-1 flex flex-col items-center justify-center left-[30%] top-4 absolute transition-all
-                    ease-in-out bg-white dark:bg-black rounded-md shadow-md dark:shadow-secondary`}>
+                    ease-in-out bg-white dark:bg-black rounded-md shadow-md dark:shadow-secondary/40`}>
 
-                <div className="flex -gap-2 flex-col">
+                <div className="flex gap-2 w-full h-full flex-col my-2">
                     <NumberFiled value={rows} onChange={(e) => setRows(Number(e.target.value))} label="table rows" />
                     <NumberFiled value={cols} onChange={(e) => setCols(Number(e.target.value))} label="table columns" />
                 </div>
 
-                <Button 
+                <Button
                     onClick={() => {
                         insertTable();
                         setIsOpen(false);

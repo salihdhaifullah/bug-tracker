@@ -24,7 +24,7 @@ const Sidebar = () => {
                 <HiBars3 onClick={() => setIsOpen(true)} className="text-4xl p-1 cursor-pointer rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-100 dark:hover:bg-slate-700 hover:bg-slate-300" />
             </div>
 
-            <div className={`${isOpen ? "left-0" : "-left-80"} fixed top-0 transition-all p-2 ease-in-out dark:bg-black bg-white rounded-sm shadow-md dark:shadow-secondary h-screen w-60`}>
+            <div className={`${isOpen ? "left-0" : "-left-80"} fixed top-0 transition-all p-2 ease-in-out dark:bg-black bg-white rounded-sm shadow-md dark:shadow-secondary/40 h-screen w-60`}>
                 <div className='w-full h-fit flex justify-between items-center'>
 
                     <Link to="/" className="flex flex-row justify-center items-center">

@@ -85,13 +85,13 @@ const Select = (props: ISelectProps) => {
             />
 
             <datalist
-                className={`${isOpen ? "block" : "none"} absolute w-full shadow-lg z-40 max-h-40 top-[100%] bg-white no-scrollbar border rounded-md border-t-0 p-2 overflow-y-scroll`}>
+                className={`${isOpen ? "block" : "none"} absolute w-full shadow-lg z-40 max-h-40 top-[100%] bg-white dark:bg-black no-scrollbar border rounded-md border-t-0 p-2 overflow-y-scroll`}>
                 {options.map((option, index) => (
                     <option
                         key={option}
                         id={`option-${index}`}
                         onClick={() => choseOption(index)}
-                        className={`${index === activeOption ? "bg-slate-200 font-extrabold" : "bg-white"} block bg-slate-200 rounded-md text-gray-600 p-1 mb-1 text-base cursor-pointer`}
+                        className={`${index === activeOption ? "bg-slate-200 dark:bg-slate-800 font-extrabold" : "bg-white dark:bg-black"} block rounded-md text-gray-600 dark:text-gray-400 p-1 mb-1 text-base cursor-pointer`}
                         value={option}>
                         {option}
                     </option>

@@ -25,7 +25,7 @@ interface TextFiledProps {
 
 
 const TextFiled = forwardRef((props: TextFiledProps, ref: ForwardedRef<HTMLDivElement>) => {
-    const LABEL_FOCUS = `bottom-[95%] ${props?.icon ? "left-[12%]" : "left-[2.4%]"}  text-sm dark:text-secondary  text-primary`;
+    const LABEL_FOCUS = `bottom-[95%] ${props?.icon ? "left-[12%]" : "left-[2.4%]"}  text-sm dark:text-secondary text-primary`;
     const LABEL = `text-base ${props?.icon ? "left-[20%]" : "left-[4%]"} bottom-[20%]  text-gray-700 dark:text-gray-200`;
 
     const Id = useId();

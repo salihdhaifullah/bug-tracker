@@ -39,25 +39,25 @@ const Projects = () => {
           <h1> Sorry No Project Found </h1>
         ) : (
           <>
-            <h1 className="text-lg text-primary font-bold"> Your Projects </h1>
+            <h1 className="text-lg text-primary dark:text-secondary font-bold"> Your Projects </h1>
 
             {projectsPayload.result.map((item) => (
               <Fragment key={item.id}>
-                <div className="flex w-full max-w-xl rounded-md shadow-md p-4 bg-white flex-row gap-2 items-center justify-between">
+                <div className="flex w-full max-w-xl rounded-md shadow-md dark:shadow-secondary/40 p-4 bg-white dark:bg-black flex-row gap-2 items-center justify-between">
 
                   <div className="flex flex-col gap-2 justify-start">
                     <Link className="link text-2xl" to={`/project/${item.id}`}>{item.name}</Link>
 
                     <div className="flex justify-start gap-2 items-center">
 
-                      <div className={`font-bold px-1 py-px rounded-xl shadow-md  ${(rolesColors as any)[item.role]}`}>
+                      <div className={`font-bold px-1 py-px rounded-xl shadow-md dark:shadow-secondary/40 ${(rolesColors as any)[item.role]}`}>
                         <span title="your role in this project"> {item.role} </span>
                       </div>
 
                       <Tag name={item.isPrivate ? "private" : "public"} />
 
                       <div className="flex text-sm flex-row justify-end gap-2">
-                        <p className="text-primary font-bold">{formatDate(item.createdAt)}</p>
+                        <p className="text-primary dark:text-secondary font-bold">{formatDate(item.createdAt)}</p>
                       </div>
 
                     </div>
@@ -67,12 +67,12 @@ const Projects = () => {
                   <div className="flex flex-col justify-center h-full items-center">
                     <div className="flex flex-col gap-1">
 
-                      <span className="text-gray-500 text-center justify-center items-center flex flex-row gap-1 hover:text-primary text-lg" title="tickets">
+                      <span className="text-gray-500 text-center justify-center items-center flex flex-row gap-1 dark:hover:text-secondary hover:text-primary text-lg" title="tickets">
                         <BiTask />
                         <span>{item.tickets}</span>
                       </span>
 
-                      <span className="text-gray-500 text-center justify-center items-center flex flex-row gap-1 hover:text-primary text-lg" title="members">
+                      <span className="text-gray-500 text-center justify-center items-center flex flex-row gap-1 dark:hover:text-secondary hover:text-primary text-lg" title="members">
                         <FiUsers />
                         <span>{item.members}</span>
                       </span>
