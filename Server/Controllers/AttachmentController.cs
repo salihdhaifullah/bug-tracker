@@ -60,6 +60,64 @@ public class AttachmentController : Controller
         }
     }
 
+    [HttpPatch("{attachmentId}"), Authorized, BodyValidation]
+    public async Task<IActionResult> UpdateAttachment([FromRoute] string attachmentId, [FromBody] UpdateAttachmentDTO dto)
+    {
+        try
+        {
+            var userId = _auth.GetId(Request);
+
+            var attachment = await _ctx.Attachments.Where(a => a.Id == attachmentId && a.CreatorId == userId).FirstOrDefaultAsync();
+
+            if (attachment == null) return HttpResult.NotFound("attachment not found");
+
+            if (dto.Title != null) attachment.Title = dto.Title;
+            if (dto.ContentType != null && dto.Data != null)
+            {
+                var newFileUrl = await _firebase.Update(attachment.Url, dto.ContentType, Convert.FromBase64String(dto.Data));
+                attachment.Url = newFileUrl;
+            }
+
+            await _ctx.SaveChangesAsync();
+
+            if (dto.Title != null || (dto.ContentType != null && dto.Data != null)) return HttpResult.Ok("successfully updated attachment");
+
+            return HttpResult.Ok();
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.Message);
+            return HttpResult.InternalServerError();
+        }
+    }
+
+
+    [HttpDelete("{attachmentId}"), Authorized]
+    public async Task<IActionResult> DeleteAttachment([FromRoute] string attachmentId)
+    {
+        try
+        {
+            var userId = _auth.GetId(Request);
+
+            var attachment = await _ctx.Attachments.Where(a => a.Id == attachmentId && a.CreatorId == userId).FirstOrDefaultAsync();
+
+            if (attachment == null) return HttpResult.NotFound("attachment not found");
+
+            await _firebase.Delete(attachment.Url);
+
+            _ctx.Remove(attachment);
+
+            await _ctx.SaveChangesAsync();
+
+            return HttpResult.Ok("successfully deleted attachment");
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.Message);
+            return HttpResult.InternalServerError();
+        }
+    }
+
     [HttpGet("attachments/{ticketId}")]
     public async Task<IActionResult> Attachments([FromRoute] string ticketId, [FromQuery] int take = 10, [FromQuery] int page = 1, [FromQuery] string sort = "oldest")
     {
@@ -80,6 +138,7 @@ public class AttachmentController : Controller
                     name = $"{a.Creator.FirstName} {a.Creator.LastName}",
                     id = a.CreatorId
                 },
+                id = a.Id,
                 title = a.Title,
                 url = a.Url,
                 createdAt = a.CreatedAt,

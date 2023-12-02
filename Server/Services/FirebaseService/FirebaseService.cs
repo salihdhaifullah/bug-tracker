@@ -31,25 +31,20 @@ public class FirebaseService : IFirebaseService
     {
         var name = $"{Guid.NewGuid()}.{ContentType}";
         await _storage.Child(name).PutAsync(new MemoryStream(data));
-        return await _storage.Child(name).GetDownloadUrlAsync();
+        var url = await _storage.Child(name).GetDownloadUrlAsync();
+        return url;
     }
 
-    public async Task Delete(string name)
+    public async Task Delete(string url)
     {
-        await _storage.Child(name).DeleteAsync();
+        var uri = new Uri(url);
+        _logger.LogWarning($"\n\n\n the url is \n Url: \"{url}\" \n Name: \"{Path.GetFileName(uri.AbsolutePath)}\"  \n\n\n");
+        await _storage.Child(Path.GetFileName(uri.AbsolutePath)).DeleteAsync();
     }
 
-    public async Task<string> Update(string oldName, string ContentType, byte[] data)
+    public async Task<string> Update(string url, string ContentType, byte[] data)
     {
-        try
-        {
-            await Delete(oldName);
-        }
-        catch (Exception e)
-        {
-            _logger.LogError($"Filed to delete file {oldName}, \n error massage {e.Message}");
-        }
-
+        await Delete(url);
         var name = $"{Guid.NewGuid()}.{ContentType}";
         await _storage.Child(name).PutAsync(new MemoryStream(data));
         return await _storage.Child(name).GetDownloadUrlAsync();

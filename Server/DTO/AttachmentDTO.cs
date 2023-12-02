@@ -18,6 +18,7 @@ public class AttachmentDTO
 
     [JsonPropertyName("title")]
     [Required(ErrorMessage = "title is required"),
-    MaxLength(100, ErrorMessage = "maximum length of title is 100 character")]
+    MaxLength(100, ErrorMessage = "maximum length of attachment title is 100 characters"),
+    MinLength(3, ErrorMessage = "minimum length of attachment title is 3 characters")]
     public required string Title { get; set; } = null!;
 }

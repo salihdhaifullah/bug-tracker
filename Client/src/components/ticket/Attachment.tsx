@@ -12,19 +12,22 @@ import useOnClickOutside from "../../utils/hooks/useOnClickOutside";
 import Modal from "../utils/Model";
 import { useUser } from "../../utils/context/user";
 import toBase64 from "../../utils/toBase64";
+import getContentType from "../../utils/getContentType";
 
 interface IAttachment {
     creator: {
         name: string;
         id: string;
     };
+    id: string;
     title: string;
     url: string;
     createdAt: string;
 }
 
 interface IActionProps {
-    attachment: IAttachment
+    id: string;
+    title: string;
     call: () => void;
 }
 
@@ -60,7 +63,7 @@ const CreateAttachmentModal = (props: ICreateAttachmentModalProps) => {
         const file = e?.target?.files?.item(0);
         if (file) {
             setFileName(file.name)
-            setContentType(file.type)
+            setContentType(getContentType(file.name))
             setData(await toBase64(file));
         }
     }
@@ -113,10 +116,12 @@ const CreateAttachmentModal = (props: ICreateAttachmentModalProps) => {
                         <Button
                             isLoading={payload.isLoading}
                             isValid={data.length > 0 && isValidTitle && contentType.length > 0}
-                            onClick={() => call({ title, data, ticketId: ticketId!, contentType })}
-                        >add</Button>
-                    </div>
+                            onClick={() => {
+                                resetState();
+                                call({ title, data, ticketId: ticketId!, contentType });
+                            }}>add</Button>
 
+                    </div>
                 </div>
             </div>
 
@@ -125,14 +130,58 @@ const CreateAttachmentModal = (props: ICreateAttachmentModalProps) => {
 }
 
 
-const Action = (_: IActionProps) => {
+const Action = (props: IActionProps) => {
     const [isOpen, setIsOpen] = useState(false);
     const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
     const [isOpenUpdateModal, setIsOpenUpdateModal] = useState(false);
+    const [isFileChange, setIsFileChange] = useState(false)
+    const [title, setTitle] = useState(props.title)
+    const [isValidTitle, setIsValidTitle] = useState(false)
+    const [data, setData] = useState("")
+    const [contentType, setContentType] = useState("")
+    const [fileName, setFileName] = useState("")
 
+    const fileInputRef = useRef<HTMLInputElement>(null);
     const targetRef = useRef<HTMLDivElement>(null);
 
     useOnClickOutside(targetRef, () => setIsOpen(false));
+
+    const [deletePayload, callDelete] = useFetchApi("DELETE", `attachment/${props.id}`, [], () => {
+        setIsOpenDeleteModal(false);
+        setIsOpen(false);
+        props.call();
+    })
+
+    const [updatePayload, callUpdate] = useFetchApi<unknown, { title?: string, data?: string, contentType?: string }>("PATCH", `attachment/${props.id}`, [], () => {
+        setIsOpen(false);
+        setIsOpenUpdateModal(false);
+        props.call();
+    })
+
+    const handelChangeFile = async (e: ChangeEvent<HTMLInputElement>) => {
+        const file = e?.target?.files?.item(0);
+        if (file) {
+            setIsFileChange(true)
+            setFileName(file.name)
+            setContentType(getContentType(file.name))
+            setData(await toBase64(file));
+        }
+    }
+
+
+    const handleButtonClick = () => {
+        if (fileInputRef.current) fileInputRef.current.click();
+    };
+
+    const handelUpdate = () =>  {
+       const obj = {
+            title: title  === props.title ? undefined : title,
+            data: isFileChange ? data : undefined,
+            contentType: isFileChange ? contentType : undefined,
+       }
+
+        callUpdate(obj);
+    }
 
     return (
         <div ref={targetRef} className="flex w-fit relative">
@@ -146,28 +195,61 @@ const Action = (_: IActionProps) => {
             </div>
 
             <Modal isOpen={isOpenDeleteModal} setIsOpen={setIsOpenDeleteModal}>
-                <div className="flex flex-col justify-center  items-center pt-4 pb-2 px-4 w-[400px] text-center h-full">
-                    <h1 className="text-xl font-bold text-primary">delete modal</h1>
-
+                <div className="flex flex-col h-[150px] justify-between items-center pt-4 pb-2 px-4 w-[400px] text-center">
+                    <h1 className="text-2xl font-bold text-primary dark:text-secondary">delete attachment</h1>
 
                     <div className="flex flex-row items-center mt-4  justify-between w-full px-4">
                         <Button onClick={() => setIsOpenDeleteModal(false)}>cancel</Button>
-                        <Button className="!bg-red-500">delete</Button>
+                        <Button isLoading={deletePayload.isLoading} onClick={() => callDelete()} className="!bg-red-500">delete</Button>
                     </div>
                 </div>
             </Modal>
 
             <Modal isOpen={isOpenUpdateModal} setIsOpen={setIsOpenUpdateModal}>
-                <div className="flex flex-col justify-center items-center pt-4 pb-2 px-4 w-[400px] text-center h-full">
-                    <h1 className="text-xl font-bold text-primary">update modal</h1>
+            <div className="flex flex-col justify-center  items-center pt-4 pb-2 px-4 w-[400px] text-center h-full">
+                <h1 className="text-2xl font-bold text-primary dark:text-secondary">update attachment</h1>
+                <div className="flex-col flex w-full justify-center items-center">
 
+                    <TextFiled
+                        validation={[
+                            { validate: (str: string) => str.length <= 50, massage: "max length of title is 50 characters" },
+                            { validate: (str: string) => str.length >= 3, massage: "min length of title is 3 characters" }
+                        ]}
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                        label="title"
+                        setIsValid={setIsValidTitle}
+                    />
+
+                    <div className="w-full my-4 px-6 justify-start flex-col items-center">
+                        <input
+                            ref={fileInputRef}
+                            onChange={handelChangeFile}
+                            type="file"
+                            className="hidden"
+                            accept="*"
+                            id="file-upload"
+                        />
+
+                        <label htmlFor="file-upload">
+                            <Button onClick={handleButtonClick}>{fileName || "upload"}</Button>
+                        </label>
+                    </div>
 
                     <div className="flex flex-row items-center mt-4  justify-between w-full px-4">
                         <Button onClick={() => setIsOpenUpdateModal(false)}>cancel</Button>
-                        <Button>change</Button>
+
+                        <Button
+                            isLoading={updatePayload.isLoading}
+                            isValid={(data.length > 0 && contentType.length > 0) || (isValidTitle && title !== props.title)}
+                            onClick={handelUpdate}
+                        >update</Button>
                     </div>
+
                 </div>
-            </Modal>
+            </div>
+
+        </Modal>
         </div>
     )
 }
@@ -247,7 +329,7 @@ const Attachment = () => {
 
                                                 <td className="px-6 py-4 min-w-[150px]"> {formatDate(attachment.createdAt)} </td>
 
-                                                {attachment.creator.id === user?.id ? <td className="px-6 py-4 min-w-[150px]"> <Action call={callAttachments} attachment={attachment} /> </td> : null}
+                                                {attachment.creator.id === user?.id ? <td className="px-6 py-4 min-w-[150px]"> <Action call={callAttachments} id={attachment.id} title={attachment.title} /> </td> : null}
                                             </tr>
                                         ))}
                                     </tbody>

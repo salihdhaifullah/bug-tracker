@@ -2,6 +2,7 @@ firebase-sdk.json
 data.json
 DROP.sql
 COPY.sql
+TEST.sql
 .env
 appsettings.json
 .vscode
