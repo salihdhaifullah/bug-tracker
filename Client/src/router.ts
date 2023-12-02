@@ -19,6 +19,7 @@ import Ticket from "./pages/Ticket";
 import JoinProject from "./pages/JoinProject";
 import Invent from "./pages/Invent";
 import MyTasks from "./pages/MyTasks";
+import Projects from "./pages/Projects";
 
 const router = createBrowserRouter([{
     path: "/",
@@ -32,12 +33,13 @@ const router = createBrowserRouter([{
         { path: "auth/account-verification", Component: AccountVerification },
         { path: "create-project", Component: CreateProject },
         { path: "profile/:userId", Component: Profile },
+        { path: "projects/:userId", Component: Projects },
         { path: "project/:projectId", Component: Project },
         { path: "join-project/:sessionId", Component: JoinProject },
         { path: "project/:projectId/create-ticket", Component: CreateTicket },
         { path: "project/:projectId/invent", Component: Invent },
         { path: "tickets/:ticketId", Component: Ticket },
-        { path: "my-tasks", Component: MyTasks },
+        { path: "my-tasks/:projectId", Component: MyTasks },
         { path: "500", Component: InternalServerError },
         { path: "403", Component: Forbidden },
         { path: "401", Component: Unauthorized },

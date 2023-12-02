@@ -2,16 +2,14 @@ import { ChangeEvent, useEffect, useState } from "react";
 import { useUser, useUserDispatch } from "../../utils/context/user";
 import useFetchApi from "../../utils/hooks/useFetchApi";
 import toWEBPImage from "../../utils/toWEBPImage";
-import { IProfilePageResult } from "../../pages/Profile";
-import { useParams } from "react-router-dom";
+import { IProfileResult } from "../../pages/Profile";
 
 interface IImageProps {
-    user: IProfilePageResult;
+    editable: boolean;
+    data: IProfileResult;
 }
 
 const Image = (props: IImageProps) => {
-    const { userId } = useParams();
-
     const [base64, setBase64] = useState("")
     const dispatchUser = useUserDispatch();
     const user = useUser();
@@ -36,7 +34,7 @@ const Image = (props: IImageProps) => {
     }
 
     return (
-        user !== null && user.id === userId ? (
+        props.editable ? (
             <>
                 <input
                     onChange={handelChangeImage} type="file" className="hidden" accept="image/*" id="file-upload" />
@@ -45,8 +43,8 @@ const Image = (props: IImageProps) => {
                     <img
                         title="change image"
                         className="rounded-full cursor-pointer shadow-md w-60 h-60 object-contain"
-                        src={props.user.avatarUrl}
-                        alt={props.user.name} />
+                        src={props.data.avatarUrl}
+                        alt={props.data.name} />
                 </label>
             </>
         ) : (
@@ -54,8 +52,8 @@ const Image = (props: IImageProps) => {
                 <img
                     title="change image"
                     className="rounded-full cursor-pointer shadow-md w-60 h-60 object-contain"
-                    src={props.user.avatarUrl}
-                    alt={props.user.name} />
+                    src={props.data.avatarUrl}
+                    alt={props.data.name} />
             </>
         )
     )

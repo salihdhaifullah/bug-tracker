@@ -211,7 +211,7 @@ const DangerZone = (props: IDangerZoneProps) => {
                     <h3 className="text-primary dark:text-secondary font-bold">change project visibility</h3>
                     <p className="text-primary dark:text-secondary">This project is currently {props.isPrivate ? "private" : "public"}.</p>
                 </div>
-                <Button size="md" onClick={() => setIsOpenVisibilityModal(true)} className="!text-red-700 hover:!bg-red-600 dark:!text-red-500 dark:hover:!bg-red-400">visibility</Button>
+                <Button onClick={() => setIsOpenVisibilityModal(true)} className="!text-red-700 hover:!bg-red-600 dark:!text-red-500 dark:hover:!bg-red-400">visibility</Button>
             </div>
 
 
@@ -220,7 +220,7 @@ const DangerZone = (props: IDangerZoneProps) => {
                     <h3 className="text-primary dark:text-secondary font-bold">transfer ownership</h3>
                     <p className="text-primary dark:text-secondary">transfer this project to another user</p>
                 </div>
-                <Button size="md" onClick={() => setIsOpenTransferModal(true)} className="!text-red-700 hover:!bg-red-600 dark:!text-red-500 dark:hover:!bg-red-400">transfer</Button>
+                <Button onClick={() => setIsOpenTransferModal(true)} className="!text-red-700 hover:!bg-red-600 dark:!text-red-500 dark:hover:!bg-red-400">transfer</Button>
             </div>
 
 
@@ -229,7 +229,7 @@ const DangerZone = (props: IDangerZoneProps) => {
                     <h3 className="text-primary dark:text-secondary font-bold">{props.isReadOnly ? "unarchive project" : "archive project"}</h3>
                     <p className="text-primary dark:text-secondary">Mark this project as {props.isReadOnly ? "unarchive and read-write" : "archived and read-only"}</p>
                 </div>
-                <Button size="md" onClick={() => setIsOpenArchiveModal(true)} className="!text-red-700 hover:!bg-red-600 dark:!text-red-500 dark:hover:!bg-red-400">{props.isReadOnly ? "unarchive" : "archive"}</Button>
+                <Button onClick={() => setIsOpenArchiveModal(true)} className="!text-red-700 hover:!bg-red-600 dark:!text-red-500 dark:hover:!bg-red-400">{props.isReadOnly ? "unarchive" : "archive"}</Button>
             </div>
 
 
@@ -238,7 +238,7 @@ const DangerZone = (props: IDangerZoneProps) => {
                     <h3 className="text-primary dark:text-secondary font-bold">Delete project</h3>
                     <p className="text-primary dark:text-secondary">Once you delete a project, there is no going back. Please be certain.</p>
                 </div>
-                <Button size="md" onClick={() => setIsOpenDeleteModal(true)} className="!text-red-700 hover:!bg-red-600 dark:!text-red-500 dark:hover:!bg-red-400">Delete</Button>
+                <Button onClick={() => setIsOpenDeleteModal(true)} className="!text-red-700 hover:!bg-red-600 dark:!text-red-500 dark:hover:!bg-red-400">Delete</Button>
             </div>
 
         </div>

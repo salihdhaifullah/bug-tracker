@@ -3,11 +3,12 @@ import useFetchApi from "../utils/hooks/useFetchApi";
 import { Priority, Status, Type } from "../types";
 import CircleProgress from "../components/utils/CircleProgress";
 import labelsColors from "../utils/labelsColors";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import TextFiled from "../components/utils/TextFiled";
 import SelectButton from "../components/utils/SelectButton";
 import { AiOutlineSearch } from "react-icons/ai";
 import { priorityOptions, typeOptions } from "./CreateTicket";
+import Button from "../components/utils/Button";
 
 interface IDraggableProps {
     children: ReactElement[] | ReactElement | string;
@@ -90,13 +91,14 @@ const Draggable = (props: IDraggableProps) => {
 }
 
 const MyTasks = () => {
+    const {projectId} = useParams();
     const [data, setData] = useState<IItem[]>([])
     const [search, setSearch] = useState("");
     const [ticketType, setTicketType] = useState("all");
     const [ticketPriority, setTicketPriority] = useState("all");
 
     const [_, callUpdate] = useFetchApi<unknown, { id: string, status: Status }>("PATCH", "ticket/status", [])
-    const [tasksPayload, callTasks] = useFetchApi<IItem[], unknown>("GET", `ticket/my-tickets?search=${search}&type=${ticketType}&priority=${ticketPriority}`, [search, ticketType, ticketPriority], (result) => { setData(result) })
+    const [tasksPayload, callTasks] = useFetchApi<IItem[], unknown>("GET", `ticket/my-tickets/${projectId}?search=${search}&type=${ticketType}&priority=${ticketPriority}`, [search, ticketType, ticketPriority], (result) => { setData(result) })
 
     useEffect(() => { callTasks() }, [search, ticketType, ticketPriority])
 
@@ -130,11 +132,10 @@ const MyTasks = () => {
     }
 
     return (
-
-        <div className="flex flex-col min-w-[100vw] p-2 py-10 my-10">
+        <div className="flex flex-col w-full p-2 py-10 my-10">
 
             <div className="flex flex-row gap-4 w-full flex-wrap items-center justify-between">
-                <div className="flex items-center justify-center w-full sm:w-auto">
+                <div className="flex items-center justify-center">
                     <div className="max-w-[400px]">
                         <TextFiled small icon={AiOutlineSearch} label="Search for tickets" value={search} onChange={(e) => setSearch(e.target.value)} />
                     </div>
@@ -144,6 +145,17 @@ const MyTasks = () => {
                         <SelectButton value={ticketType} setValue={setTicketType} label="type" options={["all", ...typeOptions]} />
                     </div>
                 </div>
+
+                <div className="flex items-center justify-center gap-2">
+                    <Link to={`/project/${projectId}/create-ticket`}>
+                        <Button>create ticket</Button>
+                    </Link>
+
+                    <Link to={`/project/${projectId}`}>
+                        <Button>project</Button>
+                    </Link>
+                </div>
+
             </div>
 
             <div className="flex flex-wrap  flex-row justify-center items-start gap-2">

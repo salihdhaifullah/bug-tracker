@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import useFetchApi from "../utils/hooks/useFetchApi"
 import CircleProgress from "../components/utils/CircleProgress"
 import { Link, useParams } from "react-router-dom";
@@ -8,6 +8,8 @@ import Pagination from "../components/utils/Pagination";
 import { BiTask } from "react-icons/bi";
 import { FiUsers } from "react-icons/fi";
 import rolesColors from "../utils/rolesColors";
+import Button from "../components/utils/Button";
+import { MdOutlineCreateNewFolder } from "react-icons/md";
 
 interface IProject {
   id: number;
@@ -22,7 +24,7 @@ interface IProject {
 const take = 10;
 
 const Projects = () => {
-  const {userId} = useParams();
+  const { userId } = useParams();
   const [page, setPage] = useState(1)
   const [projectsPayload, callProjects] = useFetchApi<IProject[]>("GET", `project/projects/${page}/?take=${take}&userId=${userId}`, [page, take, userId]);
   const [PagesCountPayload, callPagesCount] = useFetchApi<number>("GET", `project/count/?take=${take}&userId=${userId}`, [take, userId]);
@@ -31,59 +33,66 @@ const Projects = () => {
   useEffect(() => { callPagesCount() }, [take])
 
   return (
-    <div className="flex flex-col justify-center items-center w-full gap-2">
+    <section className="flex flex-col justify-center items-center w-full gap-8 my-10">
+      <div className="flex flex-row justify-end w-full items-center px-4">
+        <Link to="/create-project">
+          <Button size="lg" className="flex-row flex justify-center items-center gap-1">
+            <MdOutlineCreateNewFolder />
+            <p>create projects</p>
+          </Button>
+        </Link>
+      </div>
+
       {projectsPayload.isLoading ? (
         <CircleProgress size="lg" />
       ) : (
         (!projectsPayload.result || projectsPayload.result.length === 0) ? (
           <h1> Sorry No Project Found </h1>
         ) : (
-          <>
-            <h1 className="text-lg text-primary dark:text-secondary font-bold"> Your Projects </h1>
+          <div className="gap-2 flex flex-col justify-center items-center w-full p-4">
+
 
             {projectsPayload.result.map((item) => (
-              <Fragment key={item.id}>
-                <div className="flex w-full max-w-xl rounded-md shadow-md dark:shadow-secondary/40 p-4 bg-white dark:bg-black flex-row gap-2 items-center justify-between">
+              <div key={item.id} className="flex w-full max-w-xl rounded-md shadow-md dark:shadow-secondary/40 p-4 bg-white dark:bg-black flex-row gap-2 items-center justify-between">
 
-                  <div className="flex flex-col gap-2 justify-start">
-                    <Link className="link text-2xl" to={`/project/${item.id}`}>{item.name}</Link>
+                <div className="flex flex-col gap-2 justify-start">
+                  <Link className="link text-2xl" to={`/project/${item.id}`}>{item.name}</Link>
 
-                    <div className="flex justify-start gap-2 items-center">
+                  <div className="flex justify-start gap-2 items-center">
 
-                      <div className={`font-bold px-1 py-px rounded-xl shadow-md dark:shadow-secondary/40 ${(rolesColors as any)[item.role]}`}>
-                        <span title="your role in this project"> {item.role} </span>
-                      </div>
-
-                      <Tag name={item.isPrivate ? "private" : "public"} />
-
-                      <div className="flex text-sm flex-row justify-end gap-2">
-                        <p className="text-primary dark:text-secondary font-bold">{formatDate(item.createdAt)}</p>
-                      </div>
-
+                    <div className={`font-bold px-1 py-px rounded-xl shadow-md dark:shadow-secondary/40 ${(rolesColors as any)[item.role]}`}>
+                      <span title="your role in this project"> {item.role} </span>
                     </div>
 
-                  </div>
+                    <Tag name={item.isPrivate ? "private" : "public"} />
 
-                  <div className="flex flex-col justify-center h-full items-center">
-                    <div className="flex flex-col gap-1">
-
-                      <span className="text-gray-500 text-center justify-center items-center flex flex-row gap-1 dark:hover:text-secondary hover:text-primary text-lg" title="tickets">
-                        <BiTask />
-                        <span>{item.tickets}</span>
-                      </span>
-
-                      <span className="text-gray-500 text-center justify-center items-center flex flex-row gap-1 dark:hover:text-secondary hover:text-primary text-lg" title="members">
-                        <FiUsers />
-                        <span>{item.members}</span>
-                      </span>
-
+                    <div className="flex text-sm flex-row justify-end gap-2">
+                      <p className="text-primary dark:text-secondary font-bold">{formatDate(item.createdAt)}</p>
                     </div>
+
                   </div>
 
                 </div>
-              </ Fragment>
+
+                <div className="flex flex-col justify-center h-full items-center">
+                  <div className="flex flex-col gap-1">
+
+                    <span className="text-gray-500 text-center justify-center items-center flex flex-row gap-1 dark:hover:text-secondary hover:text-primary text-lg" title="tickets">
+                      <BiTask />
+                      <span>{item.tickets}</span>
+                    </span>
+
+                    <span className="text-gray-500 text-center justify-center items-center flex flex-row gap-1 dark:hover:text-secondary hover:text-primary text-lg" title="members">
+                      <FiUsers />
+                      <span>{item.members}</span>
+                    </span>
+
+                  </div>
+                </div>
+
+              </div>
             ))}
-          </>
+          </div>
         )
       )}
 
@@ -92,7 +101,7 @@ const Projects = () => {
         pages={PagesCountPayload.result || 0}
         handelOnChange={(newPage) => setPage(newPage)}
       />
-    </div>
+    </section>
   )
 }
 

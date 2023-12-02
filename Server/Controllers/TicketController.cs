@@ -102,8 +102,8 @@ public class TicketController : Controller
         }
     }
 
-    [HttpGet("my-tickets"), Authorized]
-    public async Task<IActionResult> TicketsTable([FromQuery(Name = "type")] string? typeQuery, [FromQuery(Name = "priority")] string? priorityQuery, [FromQuery] string? search)
+    [HttpGet("my-tickets/{projectId}"), Authorized]
+    public async Task<IActionResult> TicketsTable([FromRoute] string projectId, [FromQuery(Name = "type")] string? typeQuery, [FromQuery(Name = "priority")] string? priorityQuery, [FromQuery] string? search)
     {
         try
         {
@@ -115,7 +115,8 @@ public class TicketController : Controller
             var userId = _auth.GetId(Request);
             var tickets = await _ctx.Tickets
                         .Where(t =>
-                        t.AssignedTo != null
+                        t.ProjectId == projectId
+                        && t.AssignedTo != null
                         && t.AssignedTo.UserId == userId
                         && (type == null || t.Type == type)
                         && (priority == null || t.Priority == priority)

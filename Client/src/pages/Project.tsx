@@ -15,6 +15,7 @@ import Modal from "../components/utils/Model";
 import TextFiled from "../components/utils/TextFiled";
 import { MdOutlineDriveFileRenameOutline } from "react-icons/md";
 import { useUser } from "../utils/context/user";
+import { FaTasks } from "react-icons/fa";
 
 interface IProject {
     id: string;
@@ -128,6 +129,14 @@ const Project = () => {
                                 </Link>
 
                                 <p title="created at" className="text-gray-600 dark:text-gray-400 text-sm font-normal">{formatDate(payload.result.createdAt)}</p>
+
+                                <Link to={`/my-tasks/${projectId}`}>
+                                    <div className="flex flex-row justify-center rounded-md font-bold hover:bg-slate-200 dark:hover:bg-slate-800 text-primary dark:text-secondary p-1 items-center gap-2">
+                                        <p>your tasks</p>
+                                        <FaTasks/>
+                                    </div>
+                                </Link>
+
                             </div>
 
                             {payload.result.owner.id === user?.id ? <Action call={call} projectId={payload.result.id} name={payload.result.name} /> : null}

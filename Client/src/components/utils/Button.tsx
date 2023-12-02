@@ -14,13 +14,7 @@ function getSize(size?: Size) {
             sizeClass = "text-base px-2 py-1";
             break;
         case "lg":
-            sizeClass = "text-lg px-4 py-2";
-            break;
-        case "xl":
-            sizeClass = "text-xl px-6 py-3";
-            break;
-        case "2xl":
-            sizeClass = "text-2xl px-8 py-4";
+            sizeClass = "text-lg px-3 py-1.5";
             break;
         default:
             sizeClass = "text-base px-2 p-1"
