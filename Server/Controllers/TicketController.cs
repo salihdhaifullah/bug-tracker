@@ -93,7 +93,7 @@ public class TicketController : Controller
 
             if (assignedTo is not null) _email.TicketAssignation(assignedTo.email, assignedTo.name, dto.Name, ticketType, ticketStatus, ticketPriority);
 
-            return HttpResult.Ok($"Ticket {dto.Name} successfully created", redirectTo: $"/tickets/{ticketId}");
+            return HttpResult.Ok($"Ticket **{dto.Name.Trim()}** successfully created", redirectTo: $"/tickets/{ticketId}");
         }
         catch (Exception e)
         {
@@ -289,7 +289,7 @@ public class TicketController : Controller
 
             await _ctx.SaveChangesAsync();
 
-            return HttpResult.Ok($"ticket \"{ticket.Name}\" successfully deleted");
+            return HttpResult.Ok($"ticket **{ticket.Name.Trim()}** successfully deleted");
         }
         catch (Exception e)
         {
@@ -313,11 +313,13 @@ public class TicketController : Controller
 
             await _data.UpdateTicketStatusActivity(ticket.ProjectId, ticket.Name, ticket.Status, ticketStatus, _ctx);
 
+            var oldStatus = ticket.Status.ToString();
+
             ticket.Status = ticketStatus;
 
             await _ctx.SaveChangesAsync();
 
-            return HttpResult.Ok($"Ticket {ticket.Name} successfully updated");
+            return HttpResult.Ok($"Ticket **{ticket.Name.Trim()}** status changed from **{oldStatus.Trim()}** to **{dto.Status.Trim()}** successfully");
         }
         catch (Exception e)
         {
@@ -362,7 +364,7 @@ public class TicketController : Controller
 
             if (assignedTo is not null) _email.TicketAssignation(assignedTo.email, assignedTo.name, dto.Name, ticketType, ticketStatus, ticketPriority);
 
-            return HttpResult.Ok($"Ticket {dto.Name} successfully updated");
+            return HttpResult.Ok($"Ticket **{dto.Name.Trim()}** successfully updated");
         }
         catch (Exception e)
         {
@@ -390,7 +392,7 @@ public class TicketController : Controller
 
             await _data.EditContent(dto, content, _ctx);
 
-            return HttpResult.Ok("successfully changed content");
+            return HttpResult.Ok("successfully updated content");
         }
         catch (Exception e)
         {

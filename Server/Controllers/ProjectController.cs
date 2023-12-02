@@ -51,7 +51,7 @@ public class ProjectController : Controller
 
             await _ctx.SaveChangesAsync();
 
-            return HttpResult.Ok($"project {dto.Name} successfully created");
+            return HttpResult.Ok($"project **{dto.Name.Trim()}** successfully created");
         }
         catch (Exception e)
         {
@@ -86,9 +86,7 @@ public class ProjectController : Controller
                             .Take(take)
                             .ToListAsync();
 
-            if (projects is null || projects.Count == 0) return HttpResult.NotFound("sorry, no project found");
-
-            return HttpResult.Ok(null, projects);
+            return HttpResult.Ok(body: projects);
         }
         catch (Exception e)
         {
@@ -128,7 +126,7 @@ public class ProjectController : Controller
 
             if (project is null) return HttpResult.NotFound("sorry, project not found");
 
-            return HttpResult.Ok(null, project);
+            return HttpResult.Ok(body: project);
 
         }
         catch (Exception e)
@@ -157,7 +155,7 @@ public class ProjectController : Controller
 
             await _ctx.SaveChangesAsync();
 
-            return HttpResult.Ok($"project \"{project.Name}\" successfully deleted");
+            return HttpResult.Ok($"project **{project.Name.Trim()}** successfully deleted");
         }
         catch (Exception e)
         {
@@ -180,7 +178,7 @@ public class ProjectController : Controller
 
             int pages = (int)Math.Ceiling((double)projectsCount / take);
 
-            return HttpResult.Ok(null, pages);
+            return HttpResult.Ok(body: pages);
         }
         catch (Exception e)
         {
@@ -217,7 +215,7 @@ public class ProjectController : Controller
 
             await _data.EditContent(dto, content, _ctx);
 
-            return HttpResult.Ok("successfully changed content");
+            return HttpResult.Ok("successfully updated content");
         }
         catch (Exception e)
         {
@@ -249,7 +247,7 @@ public class ProjectController : Controller
 
             await _ctx.SaveChangesAsync();
 
-            return HttpResult.Ok($"successfully changed project visibility to {(project.IsPrivate ? "private" : "public")}");
+            return HttpResult.Ok($"successfully updated project visibility to **{(project.IsPrivate ? "private" : "public")}**");
         }
         catch (Exception e)
         {
@@ -279,7 +277,7 @@ public class ProjectController : Controller
 
             await _ctx.SaveChangesAsync();
 
-            return HttpResult.Ok($"successfully {(project.IsReadOnly ? "archived" : "unarchive")} project");
+            return HttpResult.Ok($"successfully **{(project.IsReadOnly ? "archived" : "unarchive")}** project");
         }
         catch (Exception e)
         {
@@ -356,7 +354,7 @@ public class ProjectController : Controller
 
             await _ctx.SaveChangesAsync();
 
-            return HttpResult.Ok($"successfully changed project name");
+            return HttpResult.Ok($"successfully updated project name");
         }
         catch (Exception e)
         {
@@ -377,7 +375,7 @@ public class ProjectController : Controller
                         .Select(p => new { markdown = p.Content.Markdown })
                         .FirstOrDefaultAsync();
 
-            if (content is null) return HttpResult.NotFound("content not found");
+            if (content is null) return HttpResult.NotFound();
 
             return HttpResult.Ok(body: content);
         }

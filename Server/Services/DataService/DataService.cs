@@ -113,7 +113,7 @@ public class DataService : IDataService
 
     private void AppendChange(StringBuilder sb, string property, string oldValue, string? newValue)
     {
-        if (newValue != null && newValue != oldValue) sb.Append($", ticket {property} changed from {oldValue} to {newValue}");
+        if (newValue != null && newValue != oldValue) sb.Append($", ticket {property} updated from {oldValue} to {newValue}");
     }
 
     public Task DeleteTicketActivity(string projectId, string name, string by, DataContext ctx)
@@ -128,7 +128,7 @@ public class DataService : IDataService
 
     public Task ChangeMemberRoleActivity(string projectId, string memberName, Role oldRole, Role newRole, DataContext ctx)
     {
-        return addActivity(projectId, $"the member {memberName} role had been changed from {oldRole.ToString()} to {newRole.ToString()}", ctx);
+        return addActivity(projectId, $"the member {memberName} role had been updated from {oldRole.ToString()} to {newRole.ToString()}", ctx);
     }
 
     public Task TransferOwnershipActivity(string projectId, string projectName, string currentOwner, string newOwner, DataContext ctx)
@@ -140,7 +140,7 @@ public class DataService : IDataService
     public Task ChangeVisibilityActivity(string projectId, string projectName, bool currentState, DataContext ctx)
     {
         GetStatus getStatus = val => val ? "private" : "public";
-        return addActivity(projectId, $"project {projectName} visibility changed from {getStatus(currentState)} to {getStatus(!currentState)}", ctx);
+        return addActivity(projectId, $"project {projectName} visibility updated from {getStatus(currentState)} to {getStatus(!currentState)}", ctx);
     }
 
     public Task ArchiveProjectActivity(string projectId, string projectName, bool currentState, DataContext ctx)
@@ -152,6 +152,6 @@ public class DataService : IDataService
 
     public Task ChangeProjectNameActivity(string projectId, string oldProjectName, string newProjectName, DataContext ctx)
     {
-        return addActivity(projectId, $"project changed name from {oldProjectName} to {newProjectName}", ctx);
+        return addActivity(projectId, $"project updated name from {oldProjectName} to {newProjectName}", ctx);
     }
 }

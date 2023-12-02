@@ -50,7 +50,7 @@ public class UserController : Controller
 
             await _ctx.SaveChangesAsync();
 
-            return HttpResult.Ok("successfully changed profile image", new { avatarUrl = newAvatarUrl });
+            return HttpResult.Ok("successfully updated profile image", new { avatarUrl = newAvatarUrl });
         }
         catch (Exception e)
         {
@@ -97,7 +97,7 @@ public class UserController : Controller
 
             await _ctx.SaveChangesAsync();
 
-            return HttpResult.Ok("successfully changed bio");
+            return HttpResult.Ok("successfully updated bio");
         }
         catch (Exception e)
         {
@@ -124,7 +124,7 @@ public class UserController : Controller
 
             await _data.EditContent(dto, profile, _ctx);
 
-            return HttpResult.Ok("successfully changed profile");
+            return HttpResult.Ok("successfully updated profile");
         }
         catch (Exception e)
         {

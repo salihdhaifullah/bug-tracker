@@ -62,7 +62,7 @@ public class AuthController : Controller
                 })
                 .FirstOrDefaultAsync();
 
-            if (isFound is null) return HttpResult.NotFound($"this {dto.Email} email dose not exist try sing-up", null, "/auth/sing-up");
+            if (isFound is null) return HttpResult.NotFound($"this **{dto.Email.Trim()}** email dose not exist try sing-up", null, "/auth/sing-up");
 
             _crypto.Compar(dto.Password, isFound.passwordHash, isFound.passwordSalt, out bool isMatch);
 
@@ -92,7 +92,7 @@ public class AuthController : Controller
         {
             var isFound = await _ctx.Users.AnyAsync(u => u.Email == dto.Email);
 
-            if (isFound) return HttpResult.NotFound($"this account {dto.Email} is already exist try login", null, "/auth/login");
+            if (isFound) return HttpResult.NotFound($"this account **{dto.Email.Trim()}** is already exist try login", null, "/auth/login");
 
             var sessionTimeSpan = new TimeSpan(0, 30, 0);
 
@@ -122,7 +122,7 @@ public class AuthController : Controller
 
             if (session is null) return HttpResult.NotFound("session expired please try sign-up again", null, "/auth/sing-up");
 
-            if (session.Code != dto.Code) return HttpResult.BadRequest("incorrect verification code. please try again");
+            if (session.Code != dto.Code) return BadRequest("incorrect verification code. please try again");
 
             await _auth.DeleteSessionAsync("sing-up-session", HttpContext);
 
@@ -182,7 +182,7 @@ public class AuthController : Controller
                 .FirstOrDefaultAsync();
 
 
-            if (user is null) return HttpResult.NotFound($"this {dto.Email} email dose not exist try sing-up", null, "/auth/sing-up");
+            if (user is null) return HttpResult.NotFound($"this **{dto.Email.Trim()}** email dose not exist try sing-up", null, "/auth/sing-up");
 
             string code = Helper.RandomCode();
 
@@ -226,7 +226,7 @@ public class AuthController : Controller
 
             await _ctx.SaveChangesAsync();
 
-            return HttpResult.Ok("successfully changed your password", null, "/auth/login");
+            return HttpResult.Ok("successfully updated your password", null, "/auth/login");
         }
         catch (Exception e)
         {

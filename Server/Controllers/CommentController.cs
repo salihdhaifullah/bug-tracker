@@ -95,7 +95,7 @@ public class CommentController : Controller
 
             await _ctx.SaveChangesAsync();
 
-            return HttpResult.Ok("Successfully created comment");
+            return HttpResult.Ok("Successfully commented");
         }
         catch (Exception e)
         {
@@ -110,7 +110,7 @@ public class CommentController : Controller
         try
         {
             var isAllowed = await _ctx.Comments.AnyAsync(c => c.CommenterId == _auth.GetId(Request));
-            if (!isAllowed) return HttpResult.Forbidden("you are not allowed to do this action");
+            if (!isAllowed) return HttpResult.Forbidden("you are not unauthorized to edit this comment");
 
             var content = await _ctx.Comments
                           .Where(c => c.Id == commentId)
@@ -119,11 +119,11 @@ public class CommentController : Controller
                           .Select(c => c.Content)
                           .FirstOrDefaultAsync();
 
-            if (content is null) return HttpResult.UnAuthorized();
+            if (content is null) return HttpResult.BadRequest("comment not found");
 
             await _data.EditContent(dto, content, _ctx);
 
-            return HttpResult.Ok("successfully changed content");
+            return HttpResult.Ok("successfully updated comment");
         }
         catch (Exception e)
         {
@@ -142,7 +142,7 @@ public class CommentController : Controller
                         .Select(c => new { markdown = c.Content.Markdown })
                         .FirstOrDefaultAsync();
 
-            if (content is null) return HttpResult.NotFound("content not found");
+            if (content is null) return HttpResult.NotFound("comment not found");
 
             return HttpResult.Ok(body: content);
         }

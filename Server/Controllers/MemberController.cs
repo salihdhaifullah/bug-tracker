@@ -88,7 +88,7 @@ public class MemberController : Controller
 
             _email.Invitation(user.email, user.name, project.name, role, invited.name, $"{Helper.BaseUrl(Request)}/join-project/{sessionId}");
 
-            return HttpResult.Ok($"successfully invented user {user.name}");
+            return HttpResult.Ok($"successfully invented user **{user.name.Trim()}**");
         }
         catch (Exception e)
         {
@@ -273,7 +273,7 @@ public class MemberController : Controller
 
             await _ctx.SaveChangesAsync();
 
-            return HttpResult.Ok($"member {name} successfully deleted form project");
+            return HttpResult.Ok($"member **{name.Trim()}** successfully deleted form project");
         }
         catch (Exception e)
         {
@@ -309,7 +309,7 @@ public class MemberController : Controller
 
             var name = $"{member.User.FirstName} {member.User.LastName}";
 
-            var massage = $"member {name} role successfully changed from {member.Role.ToString()} to {newRole.ToString()}";
+            var massage = $"member **{name.Trim()}** role successfully changed from **{member.Role.ToString().Trim()}** to **{newRole.ToString().Trim()}**";
 
             await _data.ChangeMemberRoleActivity(projectId, name, member.Role, newRole, _ctx);
 
