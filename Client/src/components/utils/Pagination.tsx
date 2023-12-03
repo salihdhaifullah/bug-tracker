@@ -1,6 +1,4 @@
 import { FaAngleLeft, FaAngleRight } from 'react-icons/fa';
-import { GrPrevious, GrNext } from 'react-icons/gr';
-
 
 interface IPagination {
     currentPage: number;

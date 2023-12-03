@@ -30,7 +30,7 @@ const Image = (props: IImageProps) => {
             <input type="file" id="image-input" className="hidden" accept="image/*" onChange={(e) => insertImage(e?.target?.files ? e?.target?.files[0] : null)} />
             <label htmlFor="image-input" title="Image">
                 <div className="flex justify-center items-center">
-                    <BsFileEarmarkImage className="text-gray-700 dark:text-gray-300 dark:hover:bg-slate-800 hover:bg-slate-200 hover:text-primary dark:hover:text-secondary text-xl rounded-sm cursor-pointer" />
+                    <BsFileEarmarkImage className="text-gray-700 dark:text-gray-300 dark:hover:bg-slate-800 hover:bg-slate-200 hover:text-primary dark:hover:text-secondary text-xl p-0.5 rounded-sm cursor-pointer" />
                 </div>
             </label>
         </>

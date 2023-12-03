@@ -14,6 +14,8 @@ import Table from "./Table";
 import LineBreak from "./LineBreak";
 import { TextareaProvider } from "./util";
 import Button from "../Button";
+import StrikeThrough from "./StrikeThrough";
+import List from "./List";
 
 interface IEditorProps {
     md: string;
@@ -30,7 +32,7 @@ const Editor = ({ md, setMd, files, onSubmit, onCancel, isLoading }: IEditorProp
 
     const textareaCallback = useCallback((element: HTMLTextAreaElement | null) => { setTextarea(element) }, [])
 
-    const html = useParser(md);
+    const jsx = useParser(md);
 
     return (
         <div className="flex flex-col w-full h-auto border-gray-700 dark:border-gray-300 justify-center items-center ">
@@ -48,6 +50,8 @@ const Editor = ({ md, setMd, files, onSubmit, onCancel, isLoading }: IEditorProp
                                     <Heading />
                                     <Bold />
                                     <Italic />
+                                    <List />
+                                    <StrikeThrough />
                                     <CodeBlock />
                                     <BlockQuote />
                                     <Link />
@@ -64,7 +68,7 @@ const Editor = ({ md, setMd, files, onSubmit, onCancel, isLoading }: IEditorProp
                 </div>
 
                 {isPreview ? (
-                    <div className="markdown flex flex-col flex-1 flex-grow w-full h-full" dangerouslySetInnerHTML={{ __html: html }}></div>
+                    <div className="flex flex-col flex-1 flex-grow w-full h-full">{jsx}</div>
                 ) : (
                     <div className="inline-flex w-full">
                         <textarea

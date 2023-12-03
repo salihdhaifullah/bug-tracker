@@ -27,7 +27,7 @@ const Comments = () => {
                 </div>
             </div>
 
-            <div className="flex gap-2 flex-col">
+            <div className="flex gap-6 flex-col">
                 {countPayload.isLoading || commentPayload.isLoading ? <CircleProgress size="md" /> :
                     !(commentPayload.result && countPayload.result && commentPayload.result.length > 0) ? null
                         : (

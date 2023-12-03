@@ -12,15 +12,15 @@
   "dependencies": {
     "autoprefixer": "^10.4.14",
     "highlight.js": "^11.8.0",
-    "markdown-it": "^13.0.1",
     "postcss": "^8.4.23",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^4.8.0",
-    "react-router-dom": "^6.11.1"
+    "react-markdown": "^9.0.1",
+    "react-router-dom": "^6.11.1",
+    "remark-gfm": "^4.0.0"
   },
   "devDependencies": {
-    "@types/markdown-it": "^12.2.3",
     "@types/react": "^18.0.28",
     "@types/react-dom": "^18.0.11",
     "@typescript-eslint/eslint-plugin": "^5.57.1",

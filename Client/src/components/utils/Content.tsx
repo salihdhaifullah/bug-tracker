@@ -44,7 +44,7 @@ const Content = (props: IContentProps) => {
         setIsEditing(false)
     }
 
-    const html = useParser(md);
+    const jsx = useParser(md);
 
     return (
         <div className="flex flex-col h-auto w-full">
@@ -59,7 +59,7 @@ const Content = (props: IContentProps) => {
                         )}
 
                         {isEditing || props.form ? <Editor isLoading={createPayload.isLoading} md={md} onSubmit={handelSubmit} onCancel={props.form ? undefined : handelCancel} setMd={setMd} files={files} />
-                            : <div id="parser" className="markdown flex flex-col p-1 w-full overflow-hidden h-full" dangerouslySetInnerHTML={{ __html: html }}></div>}
+                            : <div id="parser" className="flex flex-col p-1 w-full overflow-hidden h-full">{jsx}</div>}
                     </>
                 )}
             </div>

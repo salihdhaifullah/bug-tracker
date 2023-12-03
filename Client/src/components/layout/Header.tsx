@@ -41,13 +41,13 @@ const Header = () => {
                 )}
             </div>
 
-            {user && (
-                <div className="flex flex-row justify-center gap-4 items-center">
+            <div className="flex flex-row justify-center gap-4 items-center">
 
-                    <div onClick={() => themeDispatch({ type: theme === "dark" ? "light" : "dark" })} className="flex dark:text-secondary p-1 dark:hover:bg-slate-700 justify-center cursor-pointer items-center rounded-md hover:bg-slate-300 text-primary font-bold text-2xl">
-                        {theme === "dark" ? <FaMoon /> : <FaSun />}
-                    </div>
+                <div onClick={() => themeDispatch({ type: theme === "dark" ? "light" : "dark" })} className="flex dark:text-secondary p-1 dark:hover:bg-slate-700 justify-center cursor-pointer items-center rounded-md hover:bg-slate-300 text-primary font-bold text-2xl">
+                    {theme === "dark" ? <FaMoon /> : <FaSun />}
+                </div>
 
+                {user && (
                     <div className="flex justify-center items-center">
                         <Link to={`/profile/${user.id}`} title="your profile">
                             <img
@@ -56,8 +56,8 @@ const Header = () => {
                                 alt={user.name} />
                         </Link>
                     </div>
-                </div>
-            )}
+                )}
+            </div>
         </header>
     )
 }

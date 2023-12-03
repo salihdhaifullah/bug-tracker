@@ -65,6 +65,9 @@ public class ProjectController : Controller
     {
         try
         {
+            var serverUrl = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host}";
+            _logger.LogWarning($"\n\n serverUrl: {serverUrl} \n\n");
+
             _auth.TryGetId(Request, out string? currentUserId);
 
             var projects = await _ctx.Projects

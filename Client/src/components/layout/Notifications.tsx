@@ -42,7 +42,7 @@ const Notification = ({ notification }: { notification: INotification }) => {
 
     useEffect(() => startTimer(), [])
 
-    const html = useParser(notification.message);
+    const jsx = useParser(notification.message);
 
     return (
         <div className="flex notification-animation max-w-[70vw] h-auto flex-col rounded shadow-lg dark:shadow-secondary/40 bg-white dark:bg-black">
@@ -56,7 +56,9 @@ const Notification = ({ notification }: { notification: INotification }) => {
                 </div>
 
                 <div className="p-2 flex flex-col ml-2 flex-grow">
-                    <div dangerouslySetInnerHTML={{__html: html}} className={`markdown-lite ${isError ? "dark:!text-red-400 !text-red-600" : "dark:!text-green-400 !text-green-600"}`}></div>
+                    <div className={`markdown-lite ${isError ? "dark:!text-red-400 !text-red-600" : "dark:!text-green-400 !text-green-600"}`}>
+                        {jsx}
+                    </div>
                 </div>
 
                 <div>

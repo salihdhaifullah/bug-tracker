@@ -77,14 +77,15 @@ public class DataService : IDataService
 
     public Task JoinProjectActivity(string projectId, string userName, DataContext ctx)
     {
-        return addActivity(projectId, $"user {userName} joined the project", ctx);
+        return addActivity(projectId, $"user **{userName}** joined the project", ctx);
     }
 
     public Task CreateProjectActivity(string projectId, string projectName, DataContext ctx)
     {
-        return addActivity(projectId, $"created project {projectName}", ctx);
+        return addActivity(projectId, $"created project **{projectName}**", ctx);
     }
 
+    // TODO
     public Task CreateTicketActivity(string projectId, string name, TicketType type, Status status, string? assignedTo, Priority priority, DataContext ctx)
     {
         var assignedToText = assignedTo != null ? $" assigned to {assignedTo}" : "";
@@ -92,6 +93,7 @@ public class DataService : IDataService
         return addActivity(projectId, $"created ticket {name} of type {type.ToString()}{assignedToText}, status is {status.ToString()} and priority is {priority.ToString()}", ctx);
     }
 
+    // TODO
     public Task UpdateTicketActivity(string projectId, string name, TicketType type, Status status, string? assignedTo, Priority priority, string? newName, TicketType? newType, Status? newStatus, string? newAssignedTo, Priority? newPriority, DataContext ctx)
     {
         var sb = new StringBuilder($"updated ticket {name}");
@@ -105,6 +107,7 @@ public class DataService : IDataService
         return addActivity(projectId, sb.ToString(), ctx);
     }
 
+    // TODO
     public Task UpdateTicketStatusActivity(string projectId, string name, Status status, Status? newStatus, DataContext ctx)
     {
         if (status != newStatus) return addActivity(projectId, $"updated ticket \"{name}\" status from {status} to {newStatus}", ctx);
