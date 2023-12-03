@@ -9,7 +9,7 @@ import CodeLanguage from "./CodeLanguage";
 import Image from "./Image";
 import UnOrderedList from "./UnOrderedList";
 import OrderedList from "./OrderedList";
-import useParser from "./useParser";
+import useMarkdown from "./useMarkdown";
 import Table from "./Table";
 import LineBreak from "./LineBreak";
 import { TextareaProvider } from "./util";
@@ -32,7 +32,7 @@ const Editor = ({ md, setMd, files, onSubmit, onCancel, isLoading }: IEditorProp
 
     const textareaCallback = useCallback((element: HTMLTextAreaElement | null) => { setTextarea(element) }, [])
 
-    const jsx = useParser(md);
+    const jsx = useMarkdown(md);
 
     return (
         <div className="flex flex-col w-full h-auto border-gray-700 dark:border-gray-300 justify-center items-center ">

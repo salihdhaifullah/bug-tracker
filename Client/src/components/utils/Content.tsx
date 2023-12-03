@@ -3,7 +3,7 @@ import useFetchApi from "../../utils/hooks/useFetchApi";
 import { AiOutlineClose } from "react-icons/ai";
 import Editor from "./markdown";
 import { MdOutlineModeEditOutline } from "react-icons/md";
-import useParser from "./markdown/useParser";
+import useMarkdown from "./markdown/useMarkdown";
 import CircleProgress from "./CircleProgress";
 
 interface IContentProps {
@@ -44,7 +44,7 @@ const Content = (props: IContentProps) => {
         setIsEditing(false)
     }
 
-    const jsx = useParser(md);
+    const jsx = useMarkdown(md);
 
     return (
         <div className="flex flex-col h-auto w-full">

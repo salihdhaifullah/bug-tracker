@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { INotification, useNotification, useNotificationDispatch } from "../../utils/context/notification";
 import { FaTimes, FaCheck } from 'react-icons/fa';
-import useParser from "../utils/markdown/useParser";
+import useMarkdown from "../utils/markdown/useMarkdown";
 
 const Notifications = () => {
     const notifications = useNotification();
@@ -42,7 +42,7 @@ const Notification = ({ notification }: { notification: INotification }) => {
 
     useEffect(() => startTimer(), [])
 
-    const jsx = useParser(notification.message);
+    const jsx = useMarkdown(notification.message);
 
     return (
         <div className="flex notification-animation max-w-[70vw] h-auto flex-col rounded shadow-lg dark:shadow-secondary/40 bg-white dark:bg-black">

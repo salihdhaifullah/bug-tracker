@@ -7,7 +7,7 @@ import dark from "highlight.js/styles/atom-one-dark.css?inline";
 import light from 'highlight.js/styles/atom-one-light.css?inline';
 import remarkGfm from 'remark-gfm';
 
-export default function useParser(md: string): JSX.Element {
+export default function useMarkdown(md: string): JSX.Element {
   const theme = useTheme();
 
   useEffect(() => {
