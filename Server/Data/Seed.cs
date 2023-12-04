@@ -107,7 +107,7 @@ public class Seed
             var contentId = Ulid.NewUlid().ToString();
             var projectId = Ulid.NewUlid().ToString();
 
-            await _data.CreateProjectActivity(projectId, item.Name, _ctx);
+
             await _ctx.Contents.AddAsync(new Content() { Id = contentId, Markdown = item.Content });
             await _ctx.Projects.AddAsync(new Project()
             {
@@ -117,7 +117,7 @@ public class Seed
                 ContentId = contentId
             });
 
-            await _data.CreateProjectActivity(projectId, item.Name, _ctx);
+            await _data.AddActivity(projectId, $"created project **{item.Name}**", _ctx);
 
             foreach (var member in item.Members)
             {
@@ -125,7 +125,10 @@ public class Seed
                 if (user is null) continue;
                 var memberId = Ulid.NewUlid().ToString();
                 var role = Enum.Parse<Role>(member.Role);
-                await _data.JoinProjectActivity(projectId, user.fullName, _ctx);
+
+                await _data.AddActivity(projectId,
+                $"user [{user.fullName}](/profile/{user.Id}) joined the project", _ctx);
+
                 await _ctx.Members.AddAsync(new Member() { UserId = user.Id, Id = memberId, ProjectId = projectId, Role = role, IsJoined = true });
             }
         }

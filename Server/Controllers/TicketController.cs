@@ -1,3 +1,4 @@
+using System.Text;
 using Buegee.Data;
 using Buegee.DTO;
 using Buegee.Models;
@@ -29,13 +30,13 @@ public class TicketController : Controller
         _auth = auth;
     }
 
-    record AssignedTo(string email, string name);
+    record AssignedTo(string email, string name, string userId);
 
     private async Task<AssignedTo?> getAssignedTo(string id, string projectId)
     {
         var assignedTo = await _ctx.Members
                     .Where(m => m.Id == id && m.ProjectId == projectId)
-                    .Select(m => new AssignedTo(m.User.Email, $"{m.User.FirstName} {m.User.LastName}"))
+                    .Select(m => new AssignedTo(m.User.Email, $"{m.User.FirstName} {m.User.LastName}", m.UserId))
                     .FirstOrDefaultAsync();
 
 
@@ -50,11 +51,13 @@ public class TicketController : Controller
             var userId = _auth.GetId(Request);
 
             AssignedTo? assignedTo = null;
+            string assignedToText = "";
 
             if (dto.MemberId is not null)
             {
                 assignedTo = await getAssignedTo(dto.MemberId, projectId);
                 if (assignedTo is null) return HttpResult.NotFound("user is not found to assignee ticket to");
+                assignedToText = $"assigned to [{assignedTo.name}](/profile/{assignedTo.userId}), ";
             }
 
             if (!await _ctx.Members.AnyAsync(m => m.ProjectId == projectId && m.UserId == userId
@@ -69,15 +72,18 @@ public class TicketController : Controller
             var ticketStatus = Enum.Parse<Status>(dto.Status);
             var ticketPriority = Enum.Parse<Priority>(dto.Priority);
 
-            var creatorId = await _ctx.Members.Where(m => m.ProjectId == projectId && m.UserId == userId).Select(m => m.Id).FirstOrDefaultAsync();
+            var creator = await _ctx.Members
+            .Where(m => m.ProjectId == projectId && m.UserId == userId)
+            .Select(m => new { name = $"{m.User.FirstName} {m.User.LastName}", id = m.Id })
+            .FirstOrDefaultAsync();
 
-            if (string.IsNullOrEmpty(creatorId)) return HttpResult.Forbidden("you are not authorized to create a ticket in this project");
+            if (creator is null) return HttpResult.Forbidden("you are not authorized to create a ticket in this project");
 
             var content = await _ctx.Contents.AddAsync(new Content() { Id = contentId });
             var ticket = await _ctx.Tickets.AddAsync(new Ticket()
             {
                 Name = dto.Name,
-                CreatorId = creatorId,
+                CreatorId = creator.id,
                 ProjectId = projectId,
                 ContentId = contentId,
                 Type = ticketType,
@@ -87,13 +93,21 @@ public class TicketController : Controller
                 AssignedToId = dto.MemberId
             });
 
-            await _data.CreateTicketActivity(projectId, dto.Name, ticketType, ticketStatus, assignedTo?.name, ticketPriority, _ctx);
+            await _data.AddActivity(
+                projectId,
+                $"created ticket [{ticket.Entity.Name}](/tickets/{ticket.Entity.Id}) " +
+                $"of type **{ticket.Entity.Type.ToString()}**, " +
+                $"created by [{creator.name}](/profile/{userId}), " +
+                $"{assignedToText}" +
+                $"status is **{ticket.Entity.Status.ToString()}** and " +
+                $"priority is **{ticket.Entity.Priority.ToString()}**"
+            ,_ctx);
 
             await _ctx.SaveChangesAsync();
 
             if (assignedTo is not null) _email.TicketAssignation(assignedTo.email, assignedTo.name, dto.Name, ticketType, ticketStatus, ticketPriority);
 
-            return HttpResult.Ok($"Ticket **{dto.Name.Trim()}** successfully created", redirectTo: $"/tickets/{ticketId}");
+            return HttpResult.Ok("successfully created ticket", redirectTo: $"/tickets/{ticketId}");
         }
         catch (Exception e)
         {
@@ -286,11 +300,13 @@ public class TicketController : Controller
 
             _ctx.Tickets.Remove(ticket);
 
-            await _data.DeleteTicketActivity(ticket.ProjectId, ticket.Name, $"{ticket.Creator.User.FirstName} {ticket.Creator.User.LastName}", _ctx);
+            await _data.AddActivity(ticket.ProjectId,
+            $"ticket **{ticket.Name}** deleted by [{ticket.Creator.User.FirstName} {ticket.Creator.User.LastName}](/profile/{ticket.Creator.UserId})",
+             _ctx);
 
             await _ctx.SaveChangesAsync();
 
-            return HttpResult.Ok($"ticket **{ticket.Name.Trim()}** successfully deleted");
+            return HttpResult.Ok("successfully deleted ticket");
         }
         catch (Exception e)
         {
@@ -312,15 +328,17 @@ public class TicketController : Controller
 
             var ticketStatus = Enum.Parse<Status>(dto.Status);
 
-            await _data.UpdateTicketStatusActivity(ticket.ProjectId, ticket.Name, ticket.Status, ticketStatus, _ctx);
+            if (ticketStatus != ticket.Status)
+            {
+                await _data.AddActivity(ticket.ProjectId,
+                $"changed ticket [{ticket.Name}](/tickets/{ticket.Id}) " +
+                $"status from **{ticket.Status}** to **{ticketStatus}**", _ctx);
+                ticket.Status = ticketStatus;
 
-            var oldStatus = ticket.Status.ToString();
+                await _ctx.SaveChangesAsync();
+            }
 
-            ticket.Status = ticketStatus;
-
-            await _ctx.SaveChangesAsync();
-
-            return HttpResult.Ok($"Ticket **{ticket.Name.Trim()}** status changed from **{oldStatus.Trim()}** to **{dto.Status.Trim()}** successfully");
+            return HttpResult.Ok("successfully changed ticket status");
         }
         catch (Exception e)
         {
@@ -330,6 +348,8 @@ public class TicketController : Controller
     }
 
 
+    record Change(string Property, string OldValue, string NewValue);
+
     [HttpPatch("{ticketId}"), BodyValidation, Authorized]
     public async Task<IActionResult> UpdateTicket([FromBody] UpdateTicketDTO dto, [FromRoute] string ticketId)
     {
@@ -337,7 +357,12 @@ public class TicketController : Controller
         {
             var userId = _auth.GetId(Request);
 
-            var ticket = await _ctx.Tickets.Where((t) => t.Id == ticketId && (t.Project.Members.Any(m => (m.Role == Role.owner || m.Role == Role.project_manger) && m.UserId == userId))).FirstOrDefaultAsync();
+            var ticket = await _ctx.Tickets
+            .Where((t) => t.Id == ticketId
+            && (t.Project.Members.Any(m => (m.Role == Role.owner || m.Role == Role.project_manger) && m.UserId == userId))
+            )
+            .Include(t => t.AssignedTo != null ? t.AssignedTo.User : null)
+            .FirstOrDefaultAsync();
 
             if (ticket is null) return HttpResult.NotFound("sorry, ticket not found");
 
@@ -353,19 +378,57 @@ public class TicketController : Controller
             var ticketStatus = Enum.Parse<Status>(dto.Status);
             var ticketPriority = Enum.Parse<Priority>(dto.Priority);
 
-            await _data.UpdateTicketActivity(ticket.ProjectId, ticket.Name, ticket.Type, ticket.Status, ticket.AssignedTo != null ? $"{ticket.AssignedTo.User.FirstName} {ticket.AssignedTo.User.LastName}" : null, ticket.Priority, dto.Name, ticketType, ticketStatus, assignedTo != null ? assignedTo.name : null, ticketPriority, _ctx);
+            var sb = new StringBuilder("");
 
-            ticket.AssignedToId = dto.MemberId;
-            ticket.Name = dto.Name;
-            ticket.Type = ticketType;
-            ticket.Status = ticketStatus;
-            ticket.Priority = ticketPriority;
+            var changes = new List<Change>();
 
-            await _ctx.SaveChangesAsync();
+            if (ticket.Name != dto.Name)
+            {
+                changes.Add(new Change("name", $"**{ticket.Name.Trim()}**", $"**{dto.Name.Trim()}**"));
+                ticket.Name = dto.Name;
+            }
+            if (ticket.Type != ticketType)
+            {
+                changes.Add(new Change("type", $"**{ticket.Type.ToString()}**", $"**{ticketType.ToString()}**"));
+                ticket.Type = ticketType;
+            }
+            if (ticket.Status != ticketStatus)
+            {
+                changes.Add(new Change("status", $"**{ticket.Status.ToString()}**", $"**{ticketStatus.ToString()}**"));
+                ticket.Status = ticketStatus;
+            }
+            if (ticket.Priority != ticketPriority)
+            {
+                changes.Add(new Change("priority", $"**{ticket.Priority.ToString()}**", $"**{ticketPriority.ToString()}**"));
+                ticket.Priority = ticketPriority;
+            }
+            if (ticket.AssignedToId != dto.MemberId)
+            {
+                changes.Add(new Change("assignation",
+                ticket.AssignedTo != null ? $"[{ticket.AssignedTo.User.FirstName} {ticket.AssignedTo.User.LastName}](/profile/{ticket.AssignedTo.UserId})" : "**none**",
+                assignedTo != null ? $"[{assignedTo.name}](/profile/{assignedTo.userId})" : "**none**"));
+
+                ticket.AssignedToId = dto.MemberId;
+            }
+
+            if (changes.Count > 0)
+            {
+                sb.Append($"ticket [{ticket.Name}](/tickets/{ticket.Id}) ");
+
+                for (var i = 0; i < changes.Count; i++)
+                {
+                    if (i != 0) sb.Append(", ");
+                    sb.Append($"{changes[i].Property} changed from {changes[i].OldValue} to {changes[i].NewValue}");
+                }
+
+                await _data.AddActivity(ticket.ProjectId, sb.ToString(), _ctx);
+                await _ctx.SaveChangesAsync();
+            }
+
 
             if (assignedTo is not null) _email.TicketAssignation(assignedTo.email, assignedTo.name, dto.Name, ticketType, ticketStatus, ticketPriority);
 
-            return HttpResult.Ok($"Ticket **{dto.Name.Trim()}** successfully updated");
+            return HttpResult.Ok("successfully updated ticket");
         }
         catch (Exception e)
         {
@@ -393,6 +456,7 @@ public class TicketController : Controller
 
             await _data.EditContent(dto, content, _ctx);
 
+            await _ctx.SaveChangesAsync();
             return HttpResult.Ok("successfully updated content");
         }
         catch (Exception e)

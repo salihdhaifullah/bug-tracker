@@ -88,7 +88,7 @@ public class MemberController : Controller
 
             _email.Invitation(user.email, user.name, project.name, role, invited.name, $"{Helper.BaseUrl(Request)}/join-project/{sessionId}");
 
-            return HttpResult.Ok($"successfully invented user **{user.name.Trim()}**");
+            return HttpResult.Ok("successfully invented user");
         }
         catch (Exception e)
         {
@@ -119,7 +119,9 @@ public class MemberController : Controller
             member.IsJoined = true;
             member.JoinedAt = DateTime.UtcNow;
 
-            await _data.JoinProjectActivity(data.projectId, data.userFullName, _ctx);
+            await _data.AddActivity(data.projectId,
+            $"user [{data.userFullName}](/profile/{data.userId}) joined the project",
+             _ctx);
 
             await _ctx.SaveChangesAsync();
 
@@ -265,15 +267,16 @@ public class MemberController : Controller
 
             if (member is null) return HttpResult.NotFound("the member to delete is not found");
 
-            var name = $"{member.User.FirstName} {member.User.LastName}";
-
-            await _data.DeleteMemberActivity(projectId, name, _ctx);
+            await _data.AddActivity(projectId,
+                $"member [{member.User.FirstName} {member.User.LastName}](/profile/{member.UserId})" +
+                $"deleted from the project",
+                _ctx);
 
             _ctx.Members.Remove(member);
 
             await _ctx.SaveChangesAsync();
 
-            return HttpResult.Ok($"member **{name.Trim()}** successfully deleted form project");
+            return HttpResult.Ok("successfully deleted member");
         }
         catch (Exception e)
         {
@@ -307,17 +310,16 @@ public class MemberController : Controller
 
             var newRole = Enum.Parse<Role>(dto.Role);
 
-            var name = $"{member.User.FirstName} {member.User.LastName}";
-
-            var massage = $"member **{name.Trim()}** role successfully changed from **{member.Role.ToString().Trim()}** to **{newRole.ToString().Trim()}**";
-
-            await _data.ChangeMemberRoleActivity(projectId, name, member.Role, newRole, _ctx);
+            await _data.AddActivity(projectId,
+            $"member [{member.User.FirstName} {member.User.LastName}](/profile/{member.UserId}) " +
+            $"role changed from **{member.Role.ToString()}** to **{newRole.ToString()}**",
+            _ctx);
 
             member.Role = newRole;
 
             await _ctx.SaveChangesAsync();
 
-            return HttpResult.Ok(massage);
+            return HttpResult.Ok("successfully changed role");
         }
         catch (Exception e)
         {

@@ -124,6 +124,7 @@ public class UserController : Controller
 
             await _data.EditContent(dto, profile, _ctx);
 
+            await _ctx.SaveChangesAsync();
             return HttpResult.Ok("successfully updated profile");
         }
         catch (Exception e)

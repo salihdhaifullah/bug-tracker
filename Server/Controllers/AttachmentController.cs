@@ -51,7 +51,7 @@ public class AttachmentController : Controller
 
             await _ctx.SaveChangesAsync();
 
-            return HttpResult.Ok($"successfully created attachment **{dto.Title.Trim()}**");
+            return HttpResult.Ok("successfully added attachment");
         }
         catch (Exception e)
         {
@@ -80,7 +80,10 @@ public class AttachmentController : Controller
 
             await _ctx.SaveChangesAsync();
 
-            if (dto.Title != null || (dto.ContentType != null && dto.Data != null)) return HttpResult.Ok($"successfully updated attachment **{attachment.Title.Trim()}**");
+            if (dto.Title != null || (dto.ContentType != null && dto.Data != null))
+            {
+                return HttpResult.Ok("successfully updated attachment");
+            }
 
             return HttpResult.Ok();
         }
@@ -109,7 +112,7 @@ public class AttachmentController : Controller
 
             await _ctx.SaveChangesAsync();
 
-            return HttpResult.Ok($"successfully deleted attachment **{attachment.Title.Trim()}**");
+            return HttpResult.Ok("successfully deleted attachment");
         }
         catch (Exception e)
         {

@@ -5,10 +5,27 @@ import { useEffect, useMemo, useState } from "react";
 import CircleProgress from "../utils/CircleProgress";
 import SelectButton from "../utils/SelectButton";
 import { AiOutlineArrowLeft, AiOutlineArrowRight } from "react-icons/ai";
+import useMarkdown from "../utils/markdown/useMarkdown";
 
 interface IActivity {
     content: string;
     createdAt: string;
+}
+
+
+interface IActivitiesRow {
+    activity: IActivity;
+}
+
+const ActivitiesRow = (props: IActivitiesRow) => {
+    const jsx = useMarkdown(props.activity.content);
+
+    return (
+        <tr className="bg-white dark:bg-black hover:dark:bg-gray-950 border-b dark:border-gray-600 hover:bg-gray-50">
+            <td className="px-6 py-4 min-w-[150px]">{jsx}</td>
+            <td className="px-6 py-4 min-w-[150px]">{formatDate(props.activity.createdAt, true)}</td>
+        </tr>
+    )
 }
 
 const Activities = () => {
@@ -66,10 +83,7 @@ const Activities = () => {
 
                                     <tbody className="after:block after:mb-2">
                                         {activitiesPayload.result !== null && activitiesPayload.result.map((activity, index) => (
-                                            <tr className="bg-white dark:bg-black hover:dark:bg-gray-950 border-b dark:border-gray-600 hover:bg-gray-50" key={index}>
-                                                <td className="px-6 py-4 min-w-[150px]">{activity.content}</td>
-                                                <td className="px-6 py-4 min-w-[150px]">{formatDate(activity.createdAt, true)}</td>
-                                            </tr>
+                                            <ActivitiesRow key={index} activity={activity} />
                                         ))}
                                     </tbody>
                                 </table>
@@ -103,3 +117,5 @@ const Activities = () => {
 
 
 export default Activities;
+
+

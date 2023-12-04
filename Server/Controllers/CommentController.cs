@@ -123,6 +123,7 @@ public class CommentController : Controller
 
             await _data.EditContent(dto, content, _ctx);
 
+            await _ctx.SaveChangesAsync();
             return HttpResult.Ok("successfully updated comment");
         }
         catch (Exception e)
@@ -165,7 +166,7 @@ public class CommentController : Controller
 
             await _ctx.SaveChangesAsync();
 
-            return HttpResult.Ok("comment successfully deleted");
+            return HttpResult.Ok("successfully deleted comment");
         }
         catch (Exception e)
         {

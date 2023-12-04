@@ -47,11 +47,11 @@ public class ProjectController : Controller
                 ContentId = contentId
             });
 
-            await _data.CreateProjectActivity(projectId, dto.Name, _ctx);
+            await _data.AddActivity(projectId, $"created project **{dto.Name}**", _ctx);
 
             await _ctx.SaveChangesAsync();
 
-            return HttpResult.Ok($"project **{dto.Name.Trim()}** successfully created");
+            return HttpResult.Ok("successfully created project");
         }
         catch (Exception e)
         {
@@ -65,9 +65,6 @@ public class ProjectController : Controller
     {
         try
         {
-            var serverUrl = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host}";
-            _logger.LogWarning($"\n\n serverUrl: {serverUrl} \n\n");
-
             _auth.TryGetId(Request, out string? currentUserId);
 
             var projects = await _ctx.Projects
@@ -158,7 +155,7 @@ public class ProjectController : Controller
 
             await _ctx.SaveChangesAsync();
 
-            return HttpResult.Ok($"project **{project.Name.Trim()}** successfully deleted");
+            return HttpResult.Ok("successfully deleted project");
         }
         catch (Exception e)
         {
@@ -218,6 +215,7 @@ public class ProjectController : Controller
 
             await _data.EditContent(dto, content, _ctx);
 
+            await _ctx.SaveChangesAsync();
             return HttpResult.Ok("successfully updated content");
         }
         catch (Exception e)
@@ -244,13 +242,17 @@ public class ProjectController : Controller
 
             if (project.IsReadOnly) return HttpResult.BadRequest("this project is archived");
 
-            await _data.ChangeVisibilityActivity(projectId, project.Name, project.IsPrivate, _ctx);
+            await _data.AddActivity(projectId,
+                $"project visibility changed from " +
+                $"**{(project.IsPrivate ? "private" : "public")}** to " +
+                $"**{(!project.IsPrivate ? "private" : "public")}**",
+                _ctx);
 
             project.IsPrivate = !project.IsPrivate;
 
             await _ctx.SaveChangesAsync();
 
-            return HttpResult.Ok($"successfully updated project visibility to **{(project.IsPrivate ? "private" : "public")}**");
+            return HttpResult.Ok("successfully updated project visibility");
         }
         catch (Exception e)
         {
@@ -274,13 +276,14 @@ public class ProjectController : Controller
 
             if (project == null) return HttpResult.NotFound("project not found");
 
-            await _data.ArchiveProjectActivity(projectId, project.Name, project.IsReadOnly, _ctx);
+            await _data.AddActivity(projectId,
+             $"project **{(project.IsReadOnly ? "archived" : "restored")}**", _ctx);
 
             project.IsReadOnly = !project.IsReadOnly;
 
             await _ctx.SaveChangesAsync();
 
-            return HttpResult.Ok($"successfully **{(project.IsReadOnly ? "archived" : "unarchive")}** project");
+            return HttpResult.Ok($"successfully **{(project.IsReadOnly ? "archived" : "restored")}** project");
         }
         catch (Exception e)
         {
@@ -321,11 +324,14 @@ public class ProjectController : Controller
 
             newOwner.Role = Role.owner;
 
-            await _data.TransferOwnershipActivity(dto.ProjectId, project.Name, $"{currentOwner.User.FirstName} {currentOwner.User.LastName}", $"{newOwner.User.FirstName} {newOwner.User.LastName}", _ctx);
+            await _data.AddActivity(dto.ProjectId,
+                $"transferred project " +
+                $"from [{currentOwner.User.FirstName} {currentOwner.User.LastName}](/profile/{currentOwner.User.Id}) " +
+                $"to [{newOwner.User.FirstName} {newOwner.User.LastName}](/profile/{newOwner.User.Id})", _ctx);
 
             await _ctx.SaveChangesAsync();
 
-            return HttpResult.Ok($"successfully transferred project");
+            return HttpResult.Ok("successfully transferred project");
         }
         catch (Exception e)
         {
@@ -351,13 +357,14 @@ public class ProjectController : Controller
 
             if (project.IsReadOnly) return HttpResult.BadRequest("this project is archived");
 
-            await _data.ChangeProjectNameActivity(dto.ProjectId, project.Name, dto.Name, _ctx);
+            await _data.AddActivity(dto.ProjectId,
+             $"updated the name of project from **{project.Name}** to **{dto.Name}**", _ctx);
 
             project.Name = dto.Name;
 
             await _ctx.SaveChangesAsync();
 
-            return HttpResult.Ok($"successfully updated project name");
+            return HttpResult.Ok("successfully updated project name");
         }
         catch (Exception e)
         {
