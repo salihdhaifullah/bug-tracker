@@ -61,22 +61,39 @@ public class ProjectController : Controller
     }
 
     [HttpGet("projects/{page?}")]
-    public async Task<IActionResult> GetMyProjects([FromQuery] string userId, [FromRoute] int page = 1, [FromQuery] int take = 10)
+    public async Task<IActionResult> GetMyProjects([FromQuery] string userId, [FromQuery(Name = "type")] string? type,
+            [FromQuery(Name = "role")] string? roleQuery, [FromQuery] string? search, [FromQuery(Name = "status")] string? status,
+            [FromRoute] int page = 1, [FromQuery] int take = 10)
     {
         try
         {
             _auth.TryGetId(Request, out string? currentUserId);
 
+            Role? role = null;
+            if (!string.IsNullOrEmpty(roleQuery) && Enum.TryParse<Role>(roleQuery, out Role parsedRole)) role = parsedRole;
+
+            bool? isPrivate = null;
+            if (!string.IsNullOrEmpty(type) && type == "private") isPrivate = true;
+            else if (!string.IsNullOrEmpty(type) && type == "public") isPrivate = false;
+
+            bool? isReadOnly = null;
+            if (!string.IsNullOrEmpty(status) && status == "archived") isReadOnly = true;
+            else if (!string.IsNullOrEmpty(status) && status == "unarchive") isReadOnly = false;
+
             var projects = await _ctx.Projects
                             .Where((p) =>
                             (!p.IsPrivate || (currentUserId != null && p.Members.Any(m => m.UserId == currentUserId && m.IsJoined)))
-                            && p.Members.Any(m => m.UserId == userId)
-                            ).OrderBy((p) => p.CreatedAt)
+                            && p.Members.Any(m => m.UserId == userId && (role == null || m.Role == role))
+                            && (isPrivate == null || p.IsPrivate == isPrivate)
+                            && (isReadOnly == null || p.IsReadOnly == isReadOnly)
+                            && EF.Functions.ILike(p.Name, $"{search}%")
+                            ).OrderByDescending((p) => p.Activities.Max(a => a.CreatedAt))
                             .Select((p) => new
                             {
                                 createdAt = p.CreatedAt,
                                 id = p.Id,
                                 isPrivate = p.IsPrivate,
+                                isReadOnly = p.IsReadOnly, 
                                 name = p.Name,
                                 role = p.Members.Where(m => m.UserId == userId).Select(m => m.Role.ToString()),
                                 members = p.Members.Where(m => m.IsJoined).Count(),

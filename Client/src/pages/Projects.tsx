@@ -10,12 +10,17 @@ import { FiUsers } from "react-icons/fi";
 import rolesColors from "../utils/rolesColors";
 import Button from "../components/utils/Button";
 import { MdOutlineCreateNewFolder } from "react-icons/md";
+import { AiOutlineSearch } from "react-icons/ai";
+import TextFiled from "../components/utils/TextFiled";
+import SelectButton from "../components/utils/SelectButton";
+import { roles } from "./Invent";
 
 interface IProject {
   id: number;
   createdAt: string
   name: string
-  isPrivate: boolean
+  isPrivate: boolean;
+  isReadOnly: boolean;
   members: number
   role: string;
   tickets: number;
@@ -26,22 +31,48 @@ const take = 10;
 const Projects = () => {
   const { userId } = useParams();
   const [page, setPage] = useState(1)
-  const [projectsPayload, callProjects] = useFetchApi<IProject[]>("GET", `project/projects/${page}/?take=${take}&userId=${userId}`, [page, take, userId]);
-  const [PagesCountPayload, callPagesCount] = useFetchApi<number>("GET", `project/count/?take=${take}&userId=${userId}`, [take, userId]);
+  const [search, setSearch] = useState("");
+  const [role, setRole] = useState("all");
+  const [status, setStatus] = useState("all");
+  const [type, setType] = useState("all");
 
-  useEffect(() => { callProjects() }, [page, take])
-  useEffect(() => { callPagesCount() }, [take])
+  const [projectsPayload, callProjects] = useFetchApi<IProject[]>("GET", `project/projects/${page}/?take=${take}&userId=${userId}&search=${search}&role=${role}&status=${status}&type=${type}`, [page, take, userId, search, role, type, status]);
+  const [PagesCountPayload, callPagesCount] = useFetchApi<number>("GET", `project/count/?take=${take}&userId=${userId}&search=${search}&role=${role}&status=${status}&type=${type}`, [take, userId, search, role, type, status]);
+
+  useEffect(() => { callProjects() }, [page, take, search, role, type, status])
+  useEffect(() => { callPagesCount() }, [take, search, role, type, status])
 
   return (
     <section className="flex flex-col justify-center items-center w-full gap-8 my-10">
-      <div className="flex flex-row justify-end w-full items-center px-4">
-        <Link to="/create-project">
-          <Button size="lg" className="flex-row flex justify-center items-center gap-1">
-            <MdOutlineCreateNewFolder />
-            <p>create projects</p>
-          </Button>
-        </Link>
+
+      <div className="flex flex-row gap-4 w-full flex-wrap items-center justify-between px-4">
+
+        <div className="flex items-center justify-center">
+
+          <div className="max-w-[400px]">
+            <TextFiled small icon={AiOutlineSearch} label="Search for projects" value={search} onChange={(e) => setSearch(e.target.value)} />
+          </div>
+
+          <div className="flex gap-1 flex-row flex-wrap">
+            <SelectButton value={role} setValue={setRole} label="role" options={["all", ...roles, "owner"]} />
+            <SelectButton value={status} setValue={setStatus} label="status" options={["all", "archived", "unarchive"]} />
+            <SelectButton value={type} setValue={setType} label="type" options={["all", "private", "public"]} />
+          </div>
+
+        </div>
+
+        <div className="flex items-center justify-center">
+          <Link to="/create-project">
+            <Button size="lg" className="flex-row flex justify-center items-center gap-1">
+              <MdOutlineCreateNewFolder />
+              <p>create projects</p>
+            </Button>
+          </Link>
+        </div>
+
       </div>
+
+
 
       {projectsPayload.isLoading ? (
         <CircleProgress size="lg" />
