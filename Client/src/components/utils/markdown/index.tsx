@@ -1,4 +1,4 @@
-import { useState, useCallback, MutableRefObject } from "react";
+import { useState, useCallback, MutableRefObject, useEffect } from "react";
 import Heading from "./Heading";
 import Bold from "./Bold";
 import Italic from "./Italic";
@@ -33,6 +33,27 @@ const Editor = ({ md, setMd, files, onSubmit, onCancel, isLoading }: IEditorProp
     const textareaCallback = useCallback((element: HTMLTextAreaElement | null) => { setTextarea(element) }, [])
 
     const jsx = useMarkdown(md);
+
+    function autoAdjustHeight() {
+        if (!textarea) return;
+        textarea.style.height = "5px";
+        textarea.style.height = textarea.scrollHeight + 'px';
+    }
+
+    function centerTextareaView() {
+        if (!textarea) return;
+        const totalLines = textarea.value.split('\n').length;
+        const lineHeight = textarea.scrollHeight / totalLines;
+        const cursorLine = textarea.value.substring(0, textarea.selectionStart).split('\n').length;
+        const centerPosition = Math.max(cursorLine - Math.floor(textarea.clientHeight / (2 * lineHeight)), 0);
+
+        textarea.scrollTop = centerPosition * lineHeight;
+    }
+
+    useEffect(() => {
+        autoAdjustHeight();
+        centerTextareaView();
+    }, [md, textarea])
 
     return (
         <div className="flex flex-col w-full h-auto border-gray-700 dark:border-gray-300 justify-center items-center ">
@@ -75,7 +96,7 @@ const Editor = ({ md, setMd, files, onSubmit, onCancel, isLoading }: IEditorProp
                             value={md}
                             onChange={(e) => setMd(e.target.value)}
                             ref={textareaCallback}
-                            className="border h-auto thin-scrollbar dark:bg-black dark:text-white flex flex-1 flex-grow outline-primary border-primary dark:outline-secondary dark:border-secondary p-2 rounded-md w-full min-h-[20vh]"></textarea>
+                            className="border max-h-[65vh] h-auto thin-scrollbar dark:bg-black dark:text-white flex flex-1 flex-grow outline-primary border-primary dark:outline-secondary dark:border-secondary p-2 rounded-md w-full min-h-[20vh]"></textarea>
                     </div>
                 )}
 

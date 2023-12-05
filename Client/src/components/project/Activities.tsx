@@ -12,7 +12,6 @@ interface IActivity {
     createdAt: string;
 }
 
-
 interface IActivitiesRow {
     activity: IActivity;
 }
@@ -115,7 +114,4 @@ const Activities = () => {
     )
 }
 
-
 export default Activities;
-
-
