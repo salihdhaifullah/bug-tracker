@@ -1,13 +1,14 @@
 import { FiMoreVertical } from "react-icons/fi";
 import { priorityOptions, statusOptions, typeOptions } from "../pages/CreateTicket";
 import Button from "./utils/Button";
-import Modal from "./utils/Model";
+import Modal from "./utils/Modal";
 import Select from "./utils/Select";
 import SelectUser from "./utils/SelectUser";
 import TextFiled from "./utils/TextFiled";
 import useOnClickOutside from "../utils/hooks/useOnClickOutside";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import useFetchApi from "../utils/hooks/useFetchApi";
+import { Link } from "react-router-dom";
 
 interface ITicket {
     name: string;
@@ -44,14 +45,25 @@ const TicketAction = (props: IActionProps) => {
 
     const targetRef = useRef<HTMLDivElement>(null);
 
+    const [isDelete, setIsDelete] = useState(false);
+    const [isUpdate, setIsUpdate] = useState(false);
+
+    useEffect(() => {
+        if (isDelete) props.onDelete();
+    }, [isDelete])
+
     const [deleteTicketPayload, callDeleteTicket] = useFetchApi("DELETE", `ticket/${props.ticket.id}`, [], () => {
         setIsOpenDeleteModal(false);
-        props.onDelete();
+        setIsDelete(true);
     })
+
+    useEffect(() => {
+        if (isUpdate) props.onUpdate();
+    }, [isUpdate])
 
     const [updateTicketPayload, callUpdateTicket] = useFetchApi<unknown, { name: string, type: string, priority: string, status: string, memberId?: string }>("PATCH", `ticket/${props.ticket.id}`, [], () => {
         setIsOpenUpdateModal(false);
-        props.onUpdate();
+        setIsUpdate(true);
     });
 
     useOnClickOutside(targetRef, () => setIsOpen(false));
@@ -69,36 +81,11 @@ const TicketAction = (props: IActionProps) => {
 
             <Modal isOpen={isOpenDeleteModal} setIsOpen={setIsOpenDeleteModal}>
                 <div className="flex flex-col bg-white dark:bg-black justify-center items-center pt-4 pb-2 px-4 w-[400px] text-center h-full">
-                    <h1 className="text-xl font-bold text-primary dark:text-secondary">are you sure you want to delete this ticket</h1>
-
-                    <div className="w-full justify-center gap-4 pl-2 my-3 items-start flex flex-col">
-                        <p className="flex flex-row gap-2">
-                            <span className="dark:text-white">name: </span>
-                            <span className="font-bold text-primary dark:text-secondary">
-                                {props.ticket.name}
-                            </span>
-                        </p>
-
-                        <p className="flex flex-row gap-2">
-                            <span className="dark:text-white">priority: </span>
-                            <span className="font-bold text-primary dark:text-secondary">
-                                {props.ticket.priority}
-                            </span>
-                        </p>
-
-                        <p className="flex flex-row gap-2">
-                            <span className="dark:text-white">status: </span>
-                            <span className="font-bold text-primary dark:text-secondary">
-                                {props.ticket.status}
-                            </span>
-                        </p>
-
-                        <p className="flex flex-row gap-2">
-                            <span className="dark:text-white">type: </span>
-                            <span className="font-bold text-primary dark:text-secondary">
-                                {props.ticket.type}
-                            </span>
-                        </p>
+                    <div className="pt-4 pb-14 gap-4 flex flex-col w-full justify-center items-center">
+                        <h1 className="text-3xl font-black text-blue-700 dark:text-blue-300">
+                            <Link to={`/tickets/${props.ticket.id}`}>{props.ticket.name}</Link>
+                        </h1>
+                        <h2 className="text-xl font-bold text-primary dark:text-secondary">are you sure you want to delete this ticket</h2>
                     </div>
 
                     <div className="flex flex-row items-center mt-4  justify-between w-full px-4">
@@ -110,7 +97,10 @@ const TicketAction = (props: IActionProps) => {
 
             <Modal isOpen={isOpenUpdateModal} setIsOpen={setIsOpenUpdateModal}>
                 <div className="rounded-xl bg-white dark:bg-black flex flex-col gap-4 w-80 p-2 pt-6 items-center justify-center">
-                    <h1 className="text-primary dark:text-secondary font-bold text-2xl text-center">update ticket</h1>
+                    <div className="pb-4 gap-4 flex flex-col w-full text-center justify-center items-center">
+                        <h1 className="text-3xl font-black text-blue-700 dark:text-blue-300">{props.ticket.name}</h1>
+                        <h2 className="text-xl font-bold text-primary dark:text-secondary">are you sure you want to update this ticket</h2>
+                    </div>
 
                     <div className="flex-col flex w-full justify-center items-center">
 

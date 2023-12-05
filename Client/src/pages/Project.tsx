@@ -11,9 +11,8 @@ import DangerZone from "../components/project/DangerZone";
 import useOnClickOutside from "../utils/hooks/useOnClickOutside";
 import { FiMoreVertical } from "react-icons/fi";
 import Button from "../components/utils/Button";
-import Modal from "../components/utils/Model";
+import Modal from "../components/utils/Modal";
 import TextFiled from "../components/utils/TextFiled";
-import { MdOutlineDriveFileRenameOutline } from "react-icons/md";
 import { useUser } from "../utils/context/user";
 import { FaTasks } from "react-icons/fa";
 
@@ -44,14 +43,20 @@ const Action = (props: IActionProps) => {
     const [isOpen, setIsOpen] = useState(false);
     const [isOpenUpdateModal, setIsOpenUpdateModal] = useState(false);
     const [isValidName, setIsValidName] = useState(false);
+    const [isChange, setIsChange] = useState(false);
 
     const targetRef = useRef<HTMLDivElement>(null);
 
     useOnClickOutside(targetRef, () => setIsOpen(false));
 
     const [payload, call] = useFetchApi<unknown, { projectId: string, name: string }>("PATCH", "project/name", [], () => {
-        props.call()
+        setIsOpenUpdateModal(false)
+        setIsChange(true)
     });
+
+    useEffect(() => {
+       if (isChange) props.call();
+    }, [isChange])
 
     return (
         <div ref={targetRef} className="flex w-fit relative">
@@ -65,21 +70,20 @@ const Action = (props: IActionProps) => {
 
             <Modal isOpen={isOpenUpdateModal} setIsOpen={setIsOpenUpdateModal}>
                 <div className="flex flex-col justify-center items-center pt-4 pb-2 px-4 w-[400px] text-center h-full gap-4">
-                    <h1 className="text-2xl font-bold text-primary dark:text-secondary">update name</h1>
+                    <h1 className="text-3xl py-8 font-bold text-primary dark:text-secondary">change name</h1>
 
                     <TextFiled
                         validation={[
                             { validate: (str: string) => str.length > 0, massage: "name is required" },
                             { validate: (str: string) => str.length <= 100, massage: "max length of name is 100 character" }
                         ]}
-                        icon={MdOutlineDriveFileRenameOutline}
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         label="project name"
                         setIsValid={setIsValidName}
                     />
 
-                    <div className="flex flex-row items-center mt-4  justify-between w-full px-4">
+                    <div className="flex flex-row items-center mt-4 justify-between w-full px-4">
                         <Button onClick={() => setIsOpenUpdateModal(false)}>cancel</Button>
                         <Button isLoading={payload.isLoading} onClick={() => call({ projectId: props.projectId, name })} isValid={isValidName}>change</Button>
                     </div>

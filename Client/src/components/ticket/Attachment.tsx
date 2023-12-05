@@ -9,7 +9,7 @@ import { AiOutlineArrowLeft, AiOutlineArrowRight, AiOutlineSearch } from "react-
 import SelectButton from "../utils/SelectButton";
 import { FiMoreVertical } from "react-icons/fi";
 import useOnClickOutside from "../../utils/hooks/useOnClickOutside";
-import Modal from "../utils/Model";
+import Modal from "../utils/Modal";
 import { useUser } from "../../utils/context/user";
 import toBase64 from "../../utils/toBase64";
 import getContentType from "../../utils/getContentType";
@@ -45,10 +45,17 @@ const CreateAttachmentModal = (props: ICreateAttachmentModalProps) => {
     const { ticketId } = useParams();
 
     const [fileName, setFileName] = useState("")
+    const [isChange, setIsChange] = useState(false)
+
+    useEffect(() => {
+        if (!isChange) return;
+        resetState();
+        props.call();
+    }, [isChange])
 
     const [payload, call] = useFetchApi<unknown, { title: string, data: string, ticketId: string, contentType: string }>("POST", "attachment", [], () => {
-        props.call();
         props.setIsOpen(false);
+        setIsChange(true);
     })
 
     const resetState = () => {
@@ -77,8 +84,11 @@ const CreateAttachmentModal = (props: ICreateAttachmentModalProps) => {
     return (
         <Modal isOpen={props.isOpen} setIsOpen={props.setIsOpen}>
             <div className="flex flex-col justify-center  items-center pt-4 pb-2 px-4 w-[400px] text-center h-full">
-                <h1 className="text-xl font-bold text-primary dark:text-secondary">add attachment</h1>
-                <div className="flex-col flex w-full justify-center items-center">
+                <div className="pt-4 pb-8 gap-4 flex flex-col w-full justify-center items-center">
+                    <h1 className="text-3xl font-black text-blue-700 dark:text-blue-300">add attachment</h1>
+                </div>
+
+                <div className="flex-col flex w-full gap-2 mb-4 justify-center items-start">
 
                     <TextFiled
                         validation={[
@@ -91,7 +101,7 @@ const CreateAttachmentModal = (props: ICreateAttachmentModalProps) => {
                         setIsValid={setIsValidTitle}
                     />
 
-                    <div className="w-full my-4 px-6 justify-start flex-col items-center">
+                    <div className="px-6">
                         <input
                             ref={fileInputRef}
                             onChange={handelChangeFile}
@@ -102,26 +112,22 @@ const CreateAttachmentModal = (props: ICreateAttachmentModalProps) => {
                         />
 
                         <label htmlFor="file-upload">
-                            <Button onClick={handleButtonClick}>{fileName || "upload"}</Button>
+                            <Button className="!whitespace-normal" onClick={handleButtonClick}>{fileName || "upload file"}</Button>
                         </label>
                     </div>
+                </div>
 
-                    <div className="flex flex-row items-center mt-4  justify-between w-full px-4">
-                        <Button onClick={() => {
-                            resetState()
-                            props.setIsOpen(false)
-                        }}
-                        >cancel</Button>
+                <div className="flex flex-row items-center mt-4  justify-between w-full px-4">
+                    <Button onClick={() => {
+                        resetState()
+                        props.setIsOpen(false)
+                    }}
+                    >cancel</Button>
 
-                        <Button
-                            isLoading={payload.isLoading}
-                            isValid={data.length > 0 && isValidTitle && contentType.length > 0}
-                            onClick={() => {
-                                resetState();
-                                call({ title, data, ticketId: ticketId!, contentType });
-                            }}>add</Button>
-
-                    </div>
+                    <Button
+                        isLoading={payload.isLoading}
+                        isValid={data.length > 0 && isValidTitle && contentType.length > 0}
+                        onClick={() => call({ title, data, ticketId: ticketId!, contentType })}>add</Button>
                 </div>
             </div>
 
@@ -144,18 +150,24 @@ const Action = (props: IActionProps) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const targetRef = useRef<HTMLDivElement>(null);
 
+    const [isChange, setIsChange] = useState(false);
+
     useOnClickOutside(targetRef, () => setIsOpen(false));
+
+    useEffect(() => {
+        if (isChange) props.call();
+    }, [isChange])
 
     const [deletePayload, callDelete] = useFetchApi("DELETE", `attachment/${props.id}`, [], () => {
         setIsOpenDeleteModal(false);
         setIsOpen(false);
-        props.call();
+        setIsChange(true);
     })
 
     const [updatePayload, callUpdate] = useFetchApi<unknown, { title?: string, data?: string, contentType?: string }>("PATCH", `attachment/${props.id}`, [], () => {
-        setIsOpen(false);
         setIsOpenUpdateModal(false);
-        props.call();
+        setIsOpen(false);
+        setIsChange(true);
     })
 
     const handelChangeFile = async (e: ChangeEvent<HTMLInputElement>) => {
@@ -168,18 +180,26 @@ const Action = (props: IActionProps) => {
         }
     }
 
-
     const handleButtonClick = () => {
         if (fileInputRef.current) fileInputRef.current.click();
     };
 
-    const handelUpdate = () =>  {
-       const obj = {
-            title: title  === props.title ? undefined : title,
+    const resetState = () => {
+        setTitle(props.title)
+        setIsValidTitle(false)
+        setData("")
+        setFileName("")
+        setContentType("")
+    }
+
+    const handelUpdate = () => {
+        const obj = {
+            title: title === props.title ? undefined : title,
             data: isFileChange ? data : undefined,
             contentType: isFileChange ? contentType : undefined,
-       }
+        }
 
+        resetState();
         callUpdate(obj);
     }
 
@@ -195,10 +215,13 @@ const Action = (props: IActionProps) => {
             </div>
 
             <Modal isOpen={isOpenDeleteModal} setIsOpen={setIsOpenDeleteModal}>
-                <div className="flex flex-col h-[150px] justify-between items-center pt-4 pb-2 px-4 w-[400px] text-center">
-                    <h1 className="text-2xl font-bold text-primary dark:text-secondary">delete attachment</h1>
+                <div className="flex flex-col justify-center items-center pt-4 pb-2 px-4 w-[400px] text-center h-full">
+                    <div className="pt-4 pb-14 gap-4 flex flex-col w-full justify-center items-center">
+                        <h1 className="text-3xl font-black text-blue-700 dark:text-blue-300">{props.title}</h1>
+                        <h2 className="text-xl font-bold text-primary dark:text-secondary">are you sure you want to delete this attachment</h2>
+                    </div>
 
-                    <div className="flex flex-row items-center mt-4  justify-between w-full px-4">
+                    <div className="flex flex-row items-center justify-between w-full px-4">
                         <Button onClick={() => setIsOpenDeleteModal(false)}>cancel</Button>
                         <Button isLoading={deletePayload.isLoading} onClick={() => callDelete()} className="!bg-red-500">delete</Button>
                     </div>
@@ -206,50 +229,53 @@ const Action = (props: IActionProps) => {
             </Modal>
 
             <Modal isOpen={isOpenUpdateModal} setIsOpen={setIsOpenUpdateModal}>
-            <div className="flex flex-col justify-center  items-center pt-4 pb-2 px-4 w-[400px] text-center h-full">
-                <h1 className="text-2xl font-bold text-primary dark:text-secondary">update attachment</h1>
-                <div className="flex-col flex w-full justify-center items-center">
+                <div className="flex flex-col justify-center items-center pt-4 pb-2 px-4 w-[400px] text-center h-full">
+                    <div className="pt-4 pb-8 gap-4 flex flex-col w-full justify-center items-center">
+                        <h1 className="text-3xl font-black text-blue-700 dark:text-blue-300">update attachment</h1>
+                    </div>
 
-                    <TextFiled
-                        validation={[
-                            { validate: (str: string) => str.length <= 50, massage: "max length of title is 50 characters" },
-                            { validate: (str: string) => str.length >= 3, massage: "min length of title is 3 characters" }
-                        ]}
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                        label="title"
-                        setIsValid={setIsValidTitle}
-                    />
-
-                    <div className="w-full my-4 px-6 justify-start flex-col items-center">
-                        <input
-                            ref={fileInputRef}
-                            onChange={handelChangeFile}
-                            type="file"
-                            className="hidden"
-                            accept="*"
-                            id="file-upload"
+                    <div className="flex-col flex w-full gap-2 mb-4 justify-center items-start">
+                        <TextFiled
+                            validation={[
+                                { validate: (str: string) => str.length <= 50, massage: "max length of title is 50 characters" },
+                                { validate: (str: string) => str.length >= 3, massage: "min length of title is 3 characters" }
+                            ]}
+                            value={title}
+                            onChange={(e) => setTitle(e.target.value)}
+                            label="title"
+                            setIsValid={setIsValidTitle}
                         />
 
-                        <label htmlFor="file-upload">
-                            <Button onClick={handleButtonClick}>{fileName || "upload"}</Button>
-                        </label>
+                        <div className="pl-6">
+                            <input
+                                ref={fileInputRef}
+                                onChange={handelChangeFile}
+                                type="file"
+                                className="hidden"
+                                accept="*"
+                                id="file-upload"
+                            />
+
+                            <label htmlFor="file-upload">
+                                <Button onClick={handleButtonClick}>{fileName || "upload"}</Button>
+                            </label>
+                        </div>
+
                     </div>
 
                     <div className="flex flex-row items-center mt-4  justify-between w-full px-4">
-                        <Button onClick={() => setIsOpenUpdateModal(false)}>cancel</Button>
+                        <Button onClick={() => {
+                            resetState()
+                            setIsOpenUpdateModal(false)
+                        }}>cancel</Button>
 
                         <Button
                             isLoading={updatePayload.isLoading}
                             isValid={(data.length > 0 && contentType.length > 0) || (isValidTitle && title !== props.title)}
-                            onClick={handelUpdate}
-                        >update</Button>
+                            onClick={handelUpdate}>update</Button>
                     </div>
-
                 </div>
-            </div>
-
-        </Modal>
+            </Modal>
         </div>
     )
 }

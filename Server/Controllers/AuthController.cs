@@ -62,7 +62,7 @@ public class AuthController : Controller
                 })
                 .FirstOrDefaultAsync();
 
-            if (isFound is null) return HttpResult.NotFound($"this **{dto.Email.Trim()}** email dose not exist try sing-up", null, "/auth/sing-up");
+            if (isFound is null) return HttpResult.NotFound($"this {dto.Email} email dose not exist try sing-up", null, "/auth/sing-up");
 
             _crypto.Compar(dto.Password, isFound.passwordHash, isFound.passwordSalt, out bool isMatch);
 
@@ -92,7 +92,7 @@ public class AuthController : Controller
         {
             var isFound = await _ctx.Users.AnyAsync(u => u.Email == dto.Email);
 
-            if (isFound) return HttpResult.NotFound($"this account **{dto.Email.Trim()}** is already exist try login", null, "/auth/login");
+            if (isFound) return HttpResult.NotFound($"this account {dto.Email} is already exist try login", null, "/auth/login");
 
             var sessionTimeSpan = new TimeSpan(0, 30, 0);
 
@@ -182,7 +182,7 @@ public class AuthController : Controller
                 .FirstOrDefaultAsync();
 
 
-            if (user is null) return HttpResult.NotFound($"this **{dto.Email.Trim()}** email dose not exist try sing-up", null, "/auth/sing-up");
+            if (user is null) return HttpResult.NotFound($"this {dto.Email} email dose not exist try sing-up", null, "/auth/sing-up");
 
             string code = Helper.RandomCode();
 

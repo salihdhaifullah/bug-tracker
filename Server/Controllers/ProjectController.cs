@@ -283,7 +283,7 @@ public class ProjectController : Controller
 
             await _ctx.SaveChangesAsync();
 
-            return HttpResult.Ok($"successfully **{(project.IsReadOnly ? "archived" : "restored")}** project");
+            return HttpResult.Ok($"successfully {(project.IsReadOnly ? "archived" : "restored")} project");
         }
         catch (Exception e)
         {
