@@ -121,7 +121,6 @@ const Project = () => {
                         />
                     </Link>
 
-
                     <div className="rounded-lg relative w-full h-full gap-4 flex flex-col shadow-md dark:shadow-secondary/40 bg-white dark:bg-black after:w-0 after:h-0 after:border-t-[7px] after:border-t-transparent after:border-r-[14px] after:border-r-white dark:after:border-r-black after:border-b-[7px] after:border-b-transparent after:absolute after:top-3 after:-left-3">
 
                         <div className="flex flex-row justify-between items-center border-b-gray-400 dark:border-b-gray-600 p-2 border-b">
@@ -169,8 +168,7 @@ const Project = () => {
                 <Members />
                 <Tickets />
                 <Activities />
-
-                {Boolean(isOwnerPayload.result) ? <DangerZone {...payload.result} /> : null}
+                <DangerZone {...payload.result} isOwner={Boolean(isOwnerPayload.result)}/>
 
 
             </section >

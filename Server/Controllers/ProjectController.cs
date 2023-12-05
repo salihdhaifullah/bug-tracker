@@ -86,14 +86,14 @@ public class ProjectController : Controller
                             && p.Members.Any(m => m.UserId == userId && (role == null || m.Role == role))
                             && (isPrivate == null || p.IsPrivate == isPrivate)
                             && (isReadOnly == null || p.IsReadOnly == isReadOnly)
-                            && EF.Functions.ILike(p.Name, $"{search}%")
+                            && EF.Functions.ILike(p.Name, $"%{search}%")
                             ).OrderByDescending((p) => p.Activities.Max(a => a.CreatedAt))
                             .Select((p) => new
                             {
                                 createdAt = p.CreatedAt,
                                 id = p.Id,
                                 isPrivate = p.IsPrivate,
-                                isReadOnly = p.IsReadOnly, 
+                                isReadOnly = p.IsReadOnly,
                                 name = p.Name,
                                 role = p.Members.Where(m => m.UserId == userId).Select(m => m.Role.ToString()),
                                 members = p.Members.Where(m => m.IsJoined).Count(),

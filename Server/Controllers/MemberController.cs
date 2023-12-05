@@ -136,12 +136,60 @@ public class MemberController : Controller
         }
     }
 
+    [HttpPatch("leave/{projectId}"), Authorized]
+    public async Task<IActionResult> LeaveProject([FromRoute] string projectId)
+    {
+        try
+        {
+            var userId = _auth.GetId(Request);
+
+            var member = await _ctx.Members
+            .Where(m => m.UserId == userId && m.ProjectId == projectId)
+            .Include(m => m.User)
+            .Include(m => m.AssignedTo)
+            .FirstOrDefaultAsync();
+
+            if (member is null) return HttpResult.NotFound(redirectTo: "/404");
+
+            await _data.AddActivity(projectId,
+            $"user [{member.User.FirstName} {member.User.LastName}](/profile/{userId}) left the project",
+             _ctx);
+
+            if (member.Role == Role.owner)
+            {
+                var project = await _ctx.Projects.Where(p => p.Id == projectId).FirstOrDefaultAsync();
+                if (project is null) return HttpResult.NotFound(redirectTo: "/404");
+                _ctx.Remove(project);
+                await _ctx.SaveChangesAsync();
+                return HttpResult.Ok(massage: "successfully deleted project", redirectTo: $"/profile/{userId}");
+            }
+            else
+            {
+                foreach (Ticket ticket in member.AssignedTo)
+                {
+                    ticket.AssignedToId = null;
+                }
+
+                _ctx.Remove(member);
+                await _ctx.SaveChangesAsync();
+                return HttpResult.Ok(massage: "successfully left project", redirectTo: $"/profile/{userId}");
+            }
+
+
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.Message);
+            return HttpResult.InternalServerError();
+        }
+    }
+
     [HttpGet("not-members/{projectId}"), Authorized]
     public async Task<IActionResult> SearchNotMembers([FromQuery] string email, [FromRoute] string projectId)
     {
         try
         {
-            var users = await _ctx.Users.Where(u => (EF.Functions.ILike(u.Email, $"{email}%")) && !u.MemberShips.Any(m => m.ProjectId == projectId && m.IsJoined))
+            var users = await _ctx.Users.Where(u => (EF.Functions.ILike(u.Email, $"%{email}%")) && !u.MemberShips.Any(m => m.ProjectId == projectId && m.IsJoined))
                             .OrderBy((u) => u.CreatedAt)
                             .Select(u => new
                             {
@@ -170,7 +218,7 @@ public class MemberController : Controller
             var userId = _auth.GetId(Request);
 
             var nameParts = string.IsNullOrEmpty(email) ? null : email.Split(" ");
-            var members = await _ctx.Members.Where(m => ((!(nameParts == null || nameParts.Length < 2) && (m.User.FirstName == nameParts[0] && m.User.LastName == nameParts[1])) || EF.Functions.ILike(m.User.Email, $"{email}%") || EF.Functions.ILike(m.User.FirstName, $"{email}%") || EF.Functions.ILike(m.User.LastName, $"{email}%")) && m.ProjectId == projectId && m.IsJoined && (!notMe || m.UserId != userId))
+            var members = await _ctx.Members.Where(m => ((!(nameParts == null || nameParts.Length < 2) && (m.User.FirstName == nameParts[0] && m.User.LastName == nameParts[1])) || EF.Functions.ILike(m.User.Email, $"%{email}%") || EF.Functions.ILike(m.User.FirstName, $"%{email}%") || EF.Functions.ILike(m.User.LastName, $"%{email}%")) && m.ProjectId == projectId && m.IsJoined && (!notMe || m.UserId != userId))
                     .OrderBy((u) => u.JoinedAt)
                     .Select(u => new
                     {
@@ -200,7 +248,7 @@ public class MemberController : Controller
             Role? role = null;
             if (!string.IsNullOrEmpty(roleQuery) && Enum.TryParse<Role>(roleQuery, out Role parsedRole)) role = parsedRole;
 
-            var count = await _ctx.Members.Where(m => m.ProjectId == projectId && m.IsJoined && (role == null || m.Role == role) && (EF.Functions.ILike(m.User.Email, $"{search}%") || EF.Functions.ILike(m.User.FirstName, $"{search}%") || EF.Functions.ILike(m.User.LastName, $"{search}%"))).CountAsync();
+            var count = await _ctx.Members.Where(m => m.ProjectId == projectId && m.IsJoined && (role == null || m.Role == role) && (EF.Functions.ILike(m.User.Email, $"%{search}%") || EF.Functions.ILike(m.User.FirstName, $"%{search}%") || EF.Functions.ILike(m.User.LastName, $"%{search}%"))).CountAsync();
 
             return HttpResult.Ok(body: count);
         }
@@ -221,7 +269,7 @@ public class MemberController : Controller
 
             var members = await _ctx.Members
                         .Where(m => m.ProjectId == projectId && m.IsJoined && (role == null || m.Role == role) &&
-                        (EF.Functions.ILike(m.User.Email, $"{search}%") || EF.Functions.ILike(m.User.FirstName, $"{search}%") || EF.Functions.ILike(m.User.LastName, $"{search}%")))
+                        (EF.Functions.ILike(m.User.Email, $"%{search}%") || EF.Functions.ILike(m.User.FirstName, $"%{search}%") || EF.Functions.ILike(m.User.LastName, $"%{search}%")))
                         .OrderBy((m) => m.JoinedAt)
                         .Select(m => new
                         {

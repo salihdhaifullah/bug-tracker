@@ -134,7 +134,7 @@ public class TicketController : Controller
                         && t.AssignedTo.UserId == userId
                         && (type == null || t.Type == type)
                         && (priority == null || t.Priority == priority)
-                        && EF.Functions.ILike(t.Name, $"{search}%"))
+                        && EF.Functions.ILike(t.Name, $"%{search}%"))
                         .OrderBy(t => t.Priority)
                         .ThenBy(t => t.CreatedAt)
                         .Select(t => new
@@ -173,7 +173,7 @@ public class TicketController : Controller
                                             && (status == null || t.Status == status)
                                             && (type == null || t.Type == type)
                                             && (priority == null || t.Priority == priority)
-                                            && EF.Functions.ILike(t.Name, $"{search}%")).CountAsync();
+                                            && EF.Functions.ILike(t.Name, $"%{search}%")).CountAsync();
 
 
             return HttpResult.Ok(body: count);
@@ -202,7 +202,7 @@ public class TicketController : Controller
                           && (status == null || t.Status == status)
                           && (type == null || t.Type == type)
                           && (priority == null || t.Priority == priority)
-                          && EF.Functions.ILike(t.Name, $"{search}%"))
+                          && EF.Functions.ILike(t.Name, $"%{search}%"))
                         .OrderBy(t => t.Status)
                         .ThenByDescending(t => t.Priority)
                         .ThenBy(t => t.Type)

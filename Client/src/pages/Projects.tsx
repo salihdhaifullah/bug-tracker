@@ -96,6 +96,7 @@ const Projects = () => {
                     </div>
 
                     <Tag name={item.isPrivate ? "private" : "public"} />
+                    {item.isReadOnly ? <Tag name="archived" /> : null}
 
                     <div className="flex text-sm flex-row justify-end gap-2">
                       <p className="text-primary dark:text-secondary font-bold">{formatDate(item.createdAt)}</p>
