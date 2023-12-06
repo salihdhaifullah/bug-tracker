@@ -47,7 +47,7 @@ public class ProjectController : Controller
                 ContentId = contentId
             });
 
-            await _data.AddActivity(projectId, $"created project **{dto.Name}**", _ctx);
+            await _data.AddActivity(projectId, $"created project **{dto.Name.Trim()}**", _ctx);
 
             await _ctx.SaveChangesAsync();
 
@@ -375,7 +375,7 @@ public class ProjectController : Controller
             if (project.IsReadOnly) return HttpResult.BadRequest("this project is archived");
 
             await _data.AddActivity(dto.ProjectId,
-             $"updated the name of project from **{project.Name}** to **{dto.Name}**", _ctx);
+             $"updated the name of project from **{project.Name.Trim()}** to **{dto.Name.Trim()}**", _ctx);
 
             project.Name = dto.Name;
 

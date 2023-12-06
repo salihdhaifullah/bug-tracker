@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, KeyboardEvent } from "react";
+import { useEffect, useRef, useState, KeyboardEvent, useId } from "react";
 import useOnClickOutside from "../../utils/hooks/useOnClickOutside";
 import useFetchApi from "../../utils/hooks/useFetchApi";
 import TextFiled from "./TextFiled";
@@ -22,12 +22,23 @@ interface Option {
     id: string;
 }
 
+const scrollToEle = (container: HTMLElement, ele: HTMLElement) => {
+    const containerRect = container.getBoundingClientRect();
+    const elementRect = ele.getBoundingClientRect();
+
+    const yAxisPosition = elementRect.top - containerRect.top + container.scrollTop;
+
+    container.scrollTop = yAxisPosition;
+}
+
 const SelectUser = (props: ISelectToInventProps) => {
+    const id = useId();
     const [isOpen, setIsOpen] = useState(false);
-    const [activeOption, setActiveOption] = useState(1);
+    const [activeOption, setActiveOption] = useState(0);
     const [search, setSearch] = useState(props.search || "");
 
     const targetRef = useRef<HTMLDivElement>(null);
+    const dropdownRef = useRef<HTMLDataListElement>(null);
 
     useOnClickOutside(targetRef, () => setIsOpen(false));
 
@@ -42,10 +53,12 @@ const SelectUser = (props: ISelectToInventProps) => {
     }
 
     useEffect(() => {
-        document.getElementById(`option-${activeOption - 1}`)?.scrollIntoView({ behavior: "smooth" });
-    }, [activeOption])
+        const ele = document.getElementById(`${id}-option-${activeOption}`)
+        if (dropdownRef.current && ele) scrollToEle(dropdownRef.current, ele);
+    }, [activeOption, isOpen])
 
     const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+        e.preventDefault()
         if (e.key === "ArrowDown" && activeOption !== (payload.result!.length - 1)) {
             setActiveOption((prev) => prev + 1);
         }
@@ -53,6 +66,7 @@ const SelectUser = (props: ISelectToInventProps) => {
     }
 
     const handleKeyUp = (e: KeyboardEvent<HTMLInputElement>) => {
+        e.preventDefault()
         if (e.key === "ArrowUp" && activeOption !== 0) {
             setActiveOption((prev) => prev - 1);
         }
@@ -78,11 +92,12 @@ const SelectUser = (props: ISelectToInventProps) => {
             />
 
             <datalist
-                className={`${isOpen && payload.result && payload.result.length ? "block" : "none"} absolute w-full shadow-lg z-40 max-h-40 top-[100%] bg-white dark:bg-black no-scrollbar border rounded-md border-t-0 p-2 overflow-y-scroll`}>
+                ref={dropdownRef}
+                className={`${isOpen && payload.result && payload.result.length ? "block" : "none"} absolute w-full shadow-lg z-40 max-h-20 top-[100%] bg-white dark:bg-black border rounded-md border-t-0 p-2 overflow-y-scroll thin-scrollbar`}>
                 {payload.isLoading ? <CircleProgress size="md" /> : payload.result !== null && payload.result.map((option, index) => (
                     <div
                         key={index}
-                        id={`option-${index}`}
+                        id={`${id}-option-${index}`}
                         onClick={() => choseOption(index)}
                         className={`${index === activeOption ? "bg-slate-200 dark:bg-slate-800 font-extrabold" : "bg-white dark:bg-black"} flex flex-col w-full justify-center items-center rounded-md text-gray-600 dark:text-gray-300 p-1 mb-1 text-base cursor-pointer`}
                     >

@@ -7,9 +7,9 @@ export interface IValidate {
 }
 
 interface TextFiledProps {
-    onChange: ChangeEventHandler<HTMLInputElement>;
     label: string
     value: string
+    onChange?: ChangeEventHandler<HTMLInputElement>;
     setIsValid?: (bool: boolean) => void;
     validation?: IValidate[]
     icon?: IconType
@@ -65,7 +65,7 @@ const TextFiled = forwardRef((props: TextFiledProps, ref: ForwardedRef<HTMLDivEl
     }
 
     const handelChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        props.onChange(e)
+        props?.onChange && props.onChange(e)
 
         setIsFocus(true)
         setIsError(false)

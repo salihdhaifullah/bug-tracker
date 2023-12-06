@@ -45,6 +45,19 @@ const TicketAction = (props: IActionProps) => {
 
     const targetRef = useRef<HTMLDivElement>(null);
 
+    const handelCancel = () => {
+        setName(props.ticket.name);
+        setType(props.ticket.type);
+        setPriority(props.ticket.priority);
+        setStatus(props.ticket.status);
+        setMemberId(props.ticket.assignedTo?.memberId || "");
+        setIsOpenUpdateModal(false)
+    }
+
+    useEffect(() => {
+        if (!isOpenUpdateModal) handelCancel()
+    }, [isOpenUpdateModal])
+
     const [isDelete, setIsDelete] = useState(false);
     const [isUpdate, setIsUpdate] = useState(false);
 
@@ -151,7 +164,7 @@ const TicketAction = (props: IActionProps) => {
                         <SelectUser search={props.ticket.assignedTo?.name} label="chose user to assign this ticket to" route={`members/${props.ticket.projectId}`} setId={setMemberId} id={memberId} />
 
                         <div className="flex flex-row items-center mt-4  justify-between w-full px-4">
-                            <Button onClick={() => setIsOpenUpdateModal(false)}>cancel</Button>
+                            <Button onClick={handelCancel}>cancel</Button>
                             <Button isValid={isValidName && isValidType && isValidStatus && isValidPriority} isLoading={updateTicketPayload.isLoading} onClick={() => callUpdateTicket({ name, type, priority, status, memberId: !memberId.length ? undefined : memberId })}>update</Button>
                         </div>
 

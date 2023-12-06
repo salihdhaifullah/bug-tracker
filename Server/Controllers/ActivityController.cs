@@ -31,8 +31,8 @@ public class ActivityController : Controller
             
             var query = _ctx.Activities.Where(a => a.ProjectId == projectId && (!a.Project.IsPrivate || a.Project.Members.Any(m => userId != null && m.UserId == userId && m.IsJoined)));
 
-            if (sort == "latest") query = query.OrderByDescending(a => a.CreatedAt);
-            else query = query.OrderBy(a => a.CreatedAt);
+            if (sort == "oldest") query = query.OrderBy(a => a.CreatedAt);
+            else query = query.OrderByDescending(a => a.CreatedAt);
 
             var activities = await query.Select(a => new
             {

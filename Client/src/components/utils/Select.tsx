@@ -1,4 +1,4 @@
-import { KeyboardEvent, SetStateAction, useEffect, useRef, useState } from "react";
+import { KeyboardEvent, SetStateAction, useEffect, useId, useRef, useState } from "react";
 import { IconType } from "react-icons";
 import TextFiled, { IValidate } from "./TextFiled";
 import useOnClickOutside from "../../utils/hooks/useOnClickOutside";
@@ -13,46 +13,48 @@ interface ISelectProps {
     icon?: IconType
 }
 
+const activeOptionInit = (array: string[], value: string) => {
+    const option = array.indexOf(value);
+    if (option > -1) return option;
+    else return 0;
+}
+
+const scrollToEle = (container: HTMLElement, ele: HTMLElement) => {
+    const containerRect = container.getBoundingClientRect();
+    const elementRect = ele.getBoundingClientRect();
+
+    const yAxisPosition = elementRect.top - containerRect.top + container.scrollTop;
+
+    container.scrollTop = yAxisPosition;
+}
+
 const Select = (props: ISelectProps) => {
+    const id = useId();
     const [isOpen, setIsOpen] = useState(false);
-    const [activeOption, setActiveOption] = useState(1);
-    const [search, setSearch] = useState(props.value);
-    const [options, setOptions] = useState<string[]>([]);
+    const [activeOption, setActiveOption] = useState(activeOptionInit(props.options, props.value));
 
-    const optionsRef = useRef<string[]>([]);
     const targetRef = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {
-        optionsRef.current = props.options;
-        setOptions(optionsRef.current);
-    }, [props.options])
+    const dropdownRef = useRef<HTMLDataListElement>(null);
 
     useOnClickOutside(targetRef, () => setIsOpen(false));
 
     const choseOption = (optionIndex: number) => {
-        props.setValue(options[optionIndex])
-        setSearch(options[optionIndex])
+        props.setValue(props.options[optionIndex])
         setIsOpen(false);
     }
 
     useEffect(() => {
-        const text = search.toLowerCase();
-        const data = [];
-
-        for (let option of optionsRef.current) {
-            const optionValue = option.toLowerCase();
-            if (optionValue.startsWith(text)) data.push(option);
-        }
-
-        setOptions(data);
-    }, [search])
+        const ele = document.getElementById(`${id}-option-${activeOption}`);
+        if (dropdownRef.current && ele) scrollToEle(dropdownRef.current, ele);
+    }, [activeOption, isOpen])
 
     useEffect(() => {
-        document.getElementById(`option-${activeOption - 1}`)?.scrollIntoView({ behavior: "smooth" });
-    }, [activeOption])
+        setActiveOption(activeOptionInit(props.options, props.value))
+    }, [isOpen])
 
     const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === "ArrowDown" && activeOption !== (options.length - 1)) {
+        e.preventDefault();
+        if (e.key === "ArrowDown" && activeOption !== (props.options.length - 1)) {
             setActiveOption((prev) => prev + 1);
         }
 
@@ -60,6 +62,7 @@ const Select = (props: ISelectProps) => {
     }
 
     const handleKeyUp = (e: KeyboardEvent<HTMLInputElement>) => {
+        e.preventDefault();
         if (e.key === "ArrowUp" && activeOption !== 0) {
             setActiveOption((prev) => prev - 1);
         }
@@ -74,22 +77,23 @@ const Select = (props: ISelectProps) => {
                 inputProps={{
                     autoComplete: "off",
                     onKeyUp: handleKeyUp,
-                    onKeyDown: handleKeyDown
+                    onKeyDown: handleKeyDown,
+                    readOnly: true
                 }}
                 validation={props.validation}
                 icon={props.icon}
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                value={props.value}
                 label={props.label}
                 setIsValid={props.setIsValid}
             />
 
             <datalist
-                className={`${isOpen ? "block" : "none"} absolute w-full shadow-lg z-40 max-h-40 top-[100%] bg-white dark:bg-black no-scrollbar border rounded-md border-t-0 p-2 overflow-y-scroll`}>
-                {options.map((option, index) => (
+                ref={dropdownRef}
+                className={`${isOpen ? "block" : "none"}  absolute w-full shadow-lg z-40 max-h-20 top-[100%] bg-white dark:bg-black dark:shadow-secondary/40 rounded-md p-2 overflow-y-scroll thin-scrollbar`}>
+                {props.options.map((option, index) => (
                     <option
                         key={option}
-                        id={`option-${index}`}
+                        id={`${id}-option-${index}`}
                         onClick={() => choseOption(index)}
                         className={`${index === activeOption ? "bg-slate-200 dark:bg-slate-800 font-extrabold" : "bg-white dark:bg-black"} block rounded-md text-gray-600 dark:text-gray-400 p-1 mb-1 text-base cursor-pointer`}
                         value={option}>

@@ -58,6 +58,9 @@ const Action = (props: IActionProps) => {
 
     const [isValidRole, setIsValidRole] = useState(false);
 
+    useEffect(() => {
+        if(!isOpenRoleModal) setRole("")
+    }, [isOpenRoleModal])
 
     const handelRole = () => {
         callRole({ role, memberId: props.member.id });
@@ -106,7 +109,7 @@ const Action = (props: IActionProps) => {
             </Modal>
 
             <Modal isOpen={isOpenRoleModal} setIsOpen={setIsOpenRoleModal}>
-                <div className="flex flex-col dark:bg-black justify-center items-center pt-4 pb-2 px-4 w-[400px] text-center h-full">
+                <div className="flex flex-col dark:bg-black justify-center items-center py-8 px-4 w-[400px] text-center h-full">
 
                     <div className="pt-4 pb-8 gap-4 flex flex-col w-full justify-center items-center">
                         <h1 className="text-3xl font-black text-blue-700 dark:text-blue-300">change member role</h1>
@@ -138,7 +141,10 @@ const Action = (props: IActionProps) => {
                     </div>
 
                     <div className="flex flex-row items-center mt-4 justify-between w-full px-4">
-                        <Button onClick={() => setIsOpenRoleModal(false)}>cancel</Button>
+                        <Button onClick={() => {
+                            setRole("")
+                            setIsOpenRoleModal(false)
+                        }}>cancel</Button>
                         <Button isLoading={payloadRole.isLoading} isValid={isValidRole} onClick={() => handelRole()}>change</Button>
                     </div>
                 </div>

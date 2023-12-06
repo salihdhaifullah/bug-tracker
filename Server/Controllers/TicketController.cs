@@ -301,7 +301,7 @@ public class TicketController : Controller
             _ctx.Tickets.Remove(ticket);
 
             await _data.AddActivity(ticket.ProjectId,
-            $"ticket **{ticket.Name}** deleted by [{ticket.Creator.User.FirstName} {ticket.Creator.User.LastName}](/profile/{ticket.Creator.UserId})",
+            $"ticket **{ticket.Name.Trim()}** deleted by [{ticket.Creator.User.FirstName} {ticket.Creator.User.LastName}](/profile/{ticket.Creator.UserId})",
              _ctx);
 
             await _ctx.SaveChangesAsync();

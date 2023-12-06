@@ -29,7 +29,7 @@ const Notification = ({ notification }: { notification: INotification }) => {
 
     setTimeout(() => deleteNotification(), 5000);
 
-    let intervalID:  NodeJS.Timeout;
+    let intervalID: number | undefined;
 
     const startTimer = useCallback(() => {
         intervalID = setInterval(() => setWidth((prev) => (prev + 1)), 25);

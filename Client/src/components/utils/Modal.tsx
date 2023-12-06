@@ -15,7 +15,6 @@ const Modal = (props: IModalProps) => {
     const [isOpen, setIsOpen] = useState(false);
 
     const closeCallback = useCallback(() => {
-        console.log(modalRef.current);
         if (modalRef.current === null) return;
         props.setIsOpen(false);
         rootRef.current.className = "";

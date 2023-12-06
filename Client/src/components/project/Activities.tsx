@@ -32,7 +32,7 @@ const Activities = () => {
     const [text, setText] = useState("");
     const [take, setTake] = useState(10);
     const [page, setPage] = useState(1);
-    const [sort, setSort] = useState("oldest");
+    const [sort, setSort] = useState("latest");
 
     const [activitiesPayload, callActivities] = useFetchApi<IActivity[]>("GET", `activity/activities/${projectId}?page=${page}&take=${take}&sort=${sort}`, [take, page, sort]);
     const [countPayload, callCount] = useFetchApi<number>("GET", `activity/activities-count/${projectId}`);
@@ -65,7 +65,7 @@ const Activities = () => {
             <div className="w-full bg-white dark:bg-black border border-gray-500 shadow-md dark:shadow-secondary/40 rounded-md justify-center items-center flex flex-col p-2">
 
                 <div className="flex flex-row gap-4 w-full flex-wrap items-center pb-4 p-2 bg-white dark:bg-black justify-between">
-                    <SelectButton label="sort by date" setValue={setSort} value={sort} options={["oldest", "latest"]} />
+                    <SelectButton label="sort by date" setValue={setSort} value={sort} options={["latest", "oldest"]} />
                 </div>
 
                 <div className="flex flex-col justify-center items-center w-full gap-4">

@@ -117,7 +117,7 @@ public class Seed
                 ContentId = contentId
             });
 
-            await _data.AddActivity(projectId, $"created project **{item.Name}**", _ctx);
+            await _data.AddActivity(projectId, $"created project **{item.Name.Trim()}**", _ctx);
 
             foreach (var member in item.Members)
             {
