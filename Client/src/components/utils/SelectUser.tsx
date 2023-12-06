@@ -53,21 +53,28 @@ const SelectUser = (props: ISelectToInventProps) => {
     }
 
     useEffect(() => {
+        setActiveOption(0);
+    }, [payload.result])
+
+    useEffect(() => {
         const ele = document.getElementById(`${id}-option-${activeOption}`)
         if (dropdownRef.current && ele) scrollToEle(dropdownRef.current, ele);
     }, [activeOption, isOpen])
 
     const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-        e.preventDefault()
         if (e.key === "ArrowDown" && activeOption !== (payload.result!.length - 1)) {
+            e.preventDefault()
             setActiveOption((prev) => prev + 1);
         }
-        if (e.key === "Enter") choseOption(activeOption)
+        if (e.key === "Enter") {
+            e.preventDefault()
+            choseOption(activeOption)
+        }
     }
 
     const handleKeyUp = (e: KeyboardEvent<HTMLInputElement>) => {
-        e.preventDefault()
         if (e.key === "ArrowUp" && activeOption !== 0) {
+            e.preventDefault()
             setActiveOption((prev) => prev - 1);
         }
     }

@@ -27,7 +27,7 @@ const Invent = () => {
         <section className="flex flex-col justify-center items-center flex-grow my-10">
             <div className="rounded-xl bg-white dark:bg-black dark:shadow-secondary/40 flex flex-col gap-4 px-4 py-8 w-80 items-center justify-center shadow-xl">
                 <h1 className="text-primary dark:text-secondary font-bold text-2xl text-center">invent member</h1>
-                <SelectUser setIsValid={setIsValidId} required label="chose user to invent to this project" route={`not-members/${projectId}`} setId={setInventedId} id={inventedId} />
+                <SelectUser setIsValid={setIsValidId} required label="invent user to this project" route={`not-members/${projectId}`} setId={setInventedId} id={inventedId} />
                 <Select
                     label="role for user to invent"
                     validation={[{ validate: (str) => roles.includes(str), massage: "un-valid role" }]}
