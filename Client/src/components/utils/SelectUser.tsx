@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, KeyboardEvent, useId } from "react";
+import { useEffect, useRef, useState, KeyboardEvent, useId, ChangeEvent } from "react";
 import useOnClickOutside from "../../utils/hooks/useOnClickOutside";
 import useFetchApi from "../../utils/hooks/useFetchApi";
 import TextFiled from "./TextFiled";
@@ -22,6 +22,20 @@ interface Option {
     id: string;
 }
 
+
+// function useCompare(val: any) {
+    // const prevVal = usePrevious(val)
+    // return prevVal !== val
+// }
+//
+// function usePrevious(value: any) {
+    // const ref = useRef();
+    // useEffect(() => {
+        // ref.current = value;
+    // }, [value]);
+    // return ref.current;
+// }
+
 const scrollToEle = (container: HTMLElement, ele: HTMLElement) => {
     const containerRect = container.getBoundingClientRect();
     const elementRect = ele.getBoundingClientRect();
@@ -44,10 +58,22 @@ const SelectUser = (props: ISelectToInventProps) => {
 
     const [payload, call] = useFetchApi<Option[]>("GET", `member/${props.route}?email=${search}&not-me=${props.notMe || false}`, [search]);
 
-    useEffect(() => { call(); }, [search])
+    useEffect(() => {
+        call();
+    }, [])
+
+    const onChange = (e: ChangeEvent<HTMLInputElement>) => {
+        setSearch(e.target.value)
+        props.setId("")
+        call();
+    };
+
+    useEffect(() => {
+        if (!isOpen && !props.id) setSearch("");
+    }, [isOpen])
 
     const choseOption = (optionIndex: number) => {
-        setSearch(payload.result![optionIndex].email);
+        setSearch(payload.result![optionIndex].name);
         props.setId(payload.result![optionIndex].id);
         setIsOpen(false);
     }
@@ -94,7 +120,7 @@ const SelectUser = (props: ISelectToInventProps) => {
                 }}
                 value={search}
                 error={props.required ? (props.id.length ? undefined : "please select user") : undefined}
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={onChange}
                 label={props.label}
             />
 

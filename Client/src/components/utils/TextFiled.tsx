@@ -1,4 +1,4 @@
-import { ChangeEventHandler, ForwardedRef, HTMLProps, ReactNode, forwardRef, useEffect, useId, useState } from "react";
+import { ChangeEventHandler, ForwardedRef, HTMLProps, ReactNode, forwardRef, useEffect, useId, useMemo, useState } from "react";
 import { IconType } from "react-icons";
 
 export interface IValidate {
@@ -11,7 +11,8 @@ interface TextFiledProps {
     value: string
     onChange?: ChangeEventHandler<HTMLInputElement>;
     setIsValid?: (bool: boolean) => void;
-    validation?: IValidate[]
+    validation?: IValidate[];
+    isValid?: boolean;
     icon?: IconType
     InElement?: ReactNode
     inputProps?: HTMLProps<HTMLInputElement>
@@ -25,15 +26,17 @@ interface TextFiledProps {
 
 
 const TextFiled = forwardRef((props: TextFiledProps, ref: ForwardedRef<HTMLDivElement>) => {
-    const LABEL_FOCUS = `bottom-[95%] ${props?.icon ? "left-[12%]" : "left-[2.4%]"}  text-sm dark:text-secondary text-primary`;
-    const LABEL = `text-base ${props?.icon ? "left-[20%]" : "left-[4%]"} bottom-[20%]  text-gray-700 dark:text-gray-200`;
-
     const Id = useId();
     const [isFocus, setIsFocus] = useState(false);
     const [isError, setIsError] = useState(false);
-    const [changing, setChanging] = useState(false);
     const [errorMassage, setErrorMassage] = useState("");
-    const [labelClassName, setLabelClassName] = useState(`absolute z-10 font-extralight transition-all ease-in-out ${LABEL}`);
+
+    const labelClassName = useMemo(() => {
+        if (props.value) return "sr-only"
+        else return `absolute z-10 font-extralight transition-all ease-in-out
+        ${isFocus ? `bottom-[95%] ${props?.icon ? "left-[12%]" : "left-[2.4%]"} text-sm ${isError ? "dark:text-red-400 text-red-600" : "dark:text-secondary text-primary"}`
+         : `text-base ${props?.icon ? "left-[20%]" : "left-[4%]"} bottom-[20%] text-gray-700 dark:text-gray-200`}`
+    }, [props.value, props?.icon, isError, isFocus])
 
     useEffect(() => {
         if (props.error) {
@@ -46,13 +49,8 @@ const TextFiled = forwardRef((props: TextFiledProps, ref: ForwardedRef<HTMLDivEl
     }, [props.error])
 
     useEffect(() => {
-        if (props.value) setLabelClassName("sr-only");
-        else setLabelClassName(`absolute z-10 font-extralight transition-all ease-in-out  ${isFocus ? LABEL_FOCUS : LABEL}`);
-    }, [isFocus, changing])
-
-    useEffect(() => {
-        if (props.value) setLabelClassName("sr-only");
-    }, [props.value])
+        if (props.isValid === false) setIsError(true)
+    }, [isFocus])
 
     const onFocus = () => {
         setIsFocus(true)
@@ -69,21 +67,16 @@ const TextFiled = forwardRef((props: TextFiledProps, ref: ForwardedRef<HTMLDivEl
 
         setIsFocus(true)
         setIsError(false)
-        setChanging(!changing)
     }
 
     useEffect(() => {
-        if (
-            !props?.validation ||
-            props?.validation.length === 0 ||
-            !props.value
-        ) return;
+        if (!props?.validation) return;
 
-        for (let i = 0; i < props?.validation.length; i++) {
-            const item = props?.validation[i];
+        for (let i = 0; i < props.validation.length; i++) {
+            const item = props.validation[i];
             if (!item.validate(props.value)) {
                 setErrorMassage(item.massage)
-                setIsError(true)
+                setIsError(true);
                 if (props?.setIsValid !== undefined) props.setIsValid(false);
                 continue;
             }
@@ -103,7 +96,7 @@ const TextFiled = forwardRef((props: TextFiledProps, ref: ForwardedRef<HTMLDivEl
                 {!props?.InElement ? null : props.InElement}
                 <input
                     {...props.inputProps}
-                    className={`${props.small ? "p-1" : "p-2"} dark:text-white dark:bg-black border h-fit rounded-sm w-full focus:border-none focus:outline-solid focus:outline-2 ${isError ? "border-red-600 hover:border-red-800 dark:border-red-400 dark:hover:border-red-500 focus:outline-red-600 dark:focus:outline-red-400" : "dark:border-gray-300 dark:hover:border-white border-gray-700 hover:border-gray-900 focus:outline-primary dark:focus:outline-secondary"}`}
+                    className={`${props.small ? "p-1" : "p-2"} dark:text-white dark:bg-black border h-fit rounded-sm w-full focus:border-none focus:outline-solid focus:outline-2 ${(isError && isFocus) ? "border-red-600 hover:border-red-800 dark:border-red-400 dark:hover:border-red-500 focus:outline-red-600 dark:focus:outline-red-400" : "dark:border-gray-300 dark:hover:border-white border-gray-700 hover:border-gray-900 focus:outline-primary dark:focus:outline-secondary"}`}
                     id={Id}
                     value={props.value}
                     onFocus={onFocus}
@@ -112,7 +105,7 @@ const TextFiled = forwardRef((props: TextFiledProps, ref: ForwardedRef<HTMLDivEl
                     maxLength={props.maxLength}
                 />
             </div>
-            {!isError
+            {!(isError && isFocus)
                 ? (props.maxLength !== undefined
                     && <p className="text-gray-700 dark:text-gray-200 text-center text-xs font-light">You have {props.maxLength - props.value.length} characters remaining out of a maximum of {props.maxLength}.</p>)
                 : <p className="text-red-600 dark:text-red-400 text-center text-sm">{errorMassage}</p>}
