@@ -60,6 +60,72 @@ public class ProjectController : Controller
         }
     }
 
+    [HttpGet("projects/explore/{page?}")]
+    public async Task<IActionResult> GetProjects([FromQuery] string? search, [FromRoute] int page = 1, [FromQuery] int take = 10)
+    {
+        try
+        {
+            _auth.TryGetId(Request, out string? currentUserId);
+
+            var projects = await _ctx.Projects
+                            .Where((p) =>
+                            p.Members.Any(m => m.UserId != currentUserId || !m.IsJoined)
+                            && !p.IsPrivate
+                            && (EF.Functions.ILike(p.Name, $"%{search}%") ||
+                            (search != null && search.Length >= 3 && EF.Functions.ILike(p.Content.Markdown, $"%{search}%")))
+                            ).OrderByDescending((p) => p.Activities.Max(a => a.CreatedAt))
+                            .Select((p) => new
+                            {
+                                createdAt = p.CreatedAt,
+                                id = p.Id,
+                                isReadOnly = p.IsReadOnly,
+                                name = p.Name,
+                                members = p.Members.Where(m => m.IsJoined).Count(),
+                                tickets = p.Tickets.Count,
+                                content = p.Content.Markdown,
+                                owner = p.Members.Where(m => m.Role == Role.owner).Select(m => new {
+                                    id = m.UserId,
+                                    avatarUrl = m.User.AvatarUrl,
+                                    name = $"{m.User.FirstName} {m.User.LastName}"
+                                }).FirstOrDefault()
+                            })
+                            .Skip((page - 1) * take)
+                            .Take(take)
+                            .ToListAsync();
+
+            return HttpResult.Ok(body: projects);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.Message);
+            return HttpResult.InternalServerError();
+        }
+    }
+
+    [HttpGet("count/explore")]
+    public async Task<IActionResult> GetProjectsCount([FromQuery] string? search, [FromQuery] int take = 10)
+    {
+        try
+        {
+            _auth.TryGetId(Request, out string? currentUserId);
+
+            var projectsCount = await _ctx.Projects.Where((p) =>
+                            p.Members.Any(m => m.UserId != currentUserId || !m.IsJoined)
+                            && !p.IsPrivate
+                            && EF.Functions.ILike(p.Name, $"%{search}%")
+            ).CountAsync();
+
+            int pages = (int)Math.Ceiling((double)projectsCount / take);
+
+            return HttpResult.Ok(body: pages);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.Message);
+            return HttpResult.InternalServerError();
+        }
+    }
+
     [HttpGet("projects/{page?}")]
     public async Task<IActionResult> GetMyProjects([FromQuery] string userId, [FromQuery(Name = "type")] string? type,
             [FromQuery(Name = "role")] string? roleQuery, [FromQuery] string? search, [FromQuery(Name = "status")] string? status,
@@ -104,6 +170,47 @@ public class ProjectController : Controller
                             .ToListAsync();
 
             return HttpResult.Ok(body: projects);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.Message);
+            return HttpResult.InternalServerError();
+        }
+    }
+
+    [HttpGet("count")]
+    public async Task<IActionResult> GetMyProjectsCount(
+            [FromQuery] string userId, [FromQuery(Name = "type")] string? type,
+            [FromQuery(Name = "role")] string? roleQuery, [FromQuery] string? search,
+            [FromQuery(Name = "status")] string? status, [FromQuery] int take = 10)
+    {
+        try
+        {
+            _auth.TryGetId(Request, out string? currentUserId);
+
+            Role? role = null;
+            if (!string.IsNullOrEmpty(roleQuery) && Enum.TryParse<Role>(roleQuery, out Role parsedRole)) role = parsedRole;
+
+            bool? isPrivate = null;
+            if (!string.IsNullOrEmpty(type) && type == "private") isPrivate = true;
+            else if (!string.IsNullOrEmpty(type) && type == "public") isPrivate = false;
+
+            bool? isReadOnly = null;
+            if (!string.IsNullOrEmpty(status) && status == "archived") isReadOnly = true;
+            else if (!string.IsNullOrEmpty(status) && status == "unarchive") isReadOnly = false;
+
+            var projectsCount = await _ctx.Projects.Where((p) =>
+                            (!p.IsPrivate || (currentUserId != null && p.Members.Any(m => m.UserId == currentUserId && m.IsJoined)))
+                            && p.Members.Any(m => m.UserId == userId && (role == null || m.Role == role))
+                            && (isPrivate == null || p.IsPrivate == isPrivate)
+                            && (isReadOnly == null || p.IsReadOnly == isReadOnly)
+                            && EF.Functions.ILike(p.Name, $"%{search}%")
+                            )
+                            .CountAsync();
+
+            int pages = (int)Math.Ceiling((double)projectsCount / take);
+
+            return HttpResult.Ok(body: pages);
         }
         catch (Exception e)
         {
@@ -181,28 +288,7 @@ public class ProjectController : Controller
         }
     }
 
-    [HttpGet("count")]
-    public async Task<IActionResult> GetMyProjectsCount([FromQuery] string userId, [FromQuery] int take = 10)
-    {
-        try
-        {
-            _auth.TryGetId(Request, out string? currentUserId);
 
-            var projectsCount = await _ctx.Projects.Where((p) =>
-            (!p.IsPrivate || (currentUserId != null && p.Members.Any(m => m.UserId == currentUserId)))
-            && p.Members.Any(m => m.UserId == userId)
-            ).CountAsync();
-
-            int pages = (int)Math.Ceiling((double)projectsCount / take);
-
-            return HttpResult.Ok(body: pages);
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e.Message);
-            return HttpResult.InternalServerError();
-        }
-    }
 
     [HttpPost("content/{projectId}"), Authorized, BodyValidation]
     public async Task<IActionResult> Profile([FromBody] ContentDTO dto, [FromRoute] string projectId)

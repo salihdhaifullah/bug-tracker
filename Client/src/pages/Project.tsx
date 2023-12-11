@@ -65,7 +65,7 @@ const Action = (props: IActionProps) => {
             </div>
 
             <div className={`${isOpen ? "scale-100" : "scale-0"} transition-all flex flex-col gap-2 py-2 px-4 bg-white dark:bg-black justify-center items-center absolute right-[80%] -bottom-[50%] rounded shadow-md dark:shadow-secondary/40`}>
-                <Button onClick={() => setIsOpenUpdateModal(true)} size="xs" className="w-full">update</Button>
+                <Button onClick={() => setIsOpenUpdateModal(true)} size="sm" className="w-full">update</Button>
             </div>
 
             <Modal isOpen={isOpenUpdateModal} setIsOpen={setIsOpenUpdateModal}>

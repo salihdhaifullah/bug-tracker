@@ -7,11 +7,13 @@ import useFetchApi from "../../utils/hooks/useFetchApi";
 import ButtonBase from "../utils/ButtonBase";
 import { useState } from "react";
 import SearchFiled from "../utils/SearchFiled";
+import useQuery from "../../utils/hooks/useQuery";
 
 const Header = () => {
     const user = useUser();
     const theme = useTheme();
-    const [search, setSearch] = useState("");
+    const query = useQuery();
+    const [search, setSearch] = useState(query.get("search") || "");
     const themeDispatch = useThemeDispatch();
     const navigate = useNavigate();
     const userDispatch = useUserDispatch();
