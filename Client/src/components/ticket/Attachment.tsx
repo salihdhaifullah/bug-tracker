@@ -5,7 +5,7 @@ import { ChangeEvent, Dispatch, SetStateAction, useEffect, useRef, useState } fr
 import useFetchApi from "../../utils/hooks/useFetchApi";
 import CircleProgress from "../utils/CircleProgress";
 import TextFiled from "../utils/TextFiled";
-import { AiOutlineArrowLeft, AiOutlineArrowRight, AiOutlineSearch } from "react-icons/ai";
+import { AiOutlineArrowLeft, AiOutlineArrowRight } from "react-icons/ai";
 import SelectButton from "../utils/SelectButton";
 import { FiMoreVertical } from "react-icons/fi";
 import useOnClickOutside from "../../utils/hooks/useOnClickOutside";
@@ -13,6 +13,7 @@ import Modal from "../utils/Modal";
 import { useUser } from "../../utils/context/user";
 import toBase64 from "../../utils/toBase64";
 import getContentType from "../../utils/getContentType";
+import SearchFiled from "../utils/SearchFiled";
 
 interface IAttachment {
     creator: {
@@ -203,6 +204,7 @@ const Action = (props: IActionProps) => {
         callUpdate(obj);
     }
 
+
     return (
         <div ref={targetRef} className="flex w-fit relative">
             <div onClick={() => setIsOpen(!isOpen)} className="p-1 font-normal text-lg dark:text-gray-400 hover:dark:text-gray-200 text-gray-600 hover:text-gray-800 rounded-md hover:bg-slate-200 dark:hover:bg-slate-800 cursor-pointer">
@@ -210,8 +212,8 @@ const Action = (props: IActionProps) => {
             </div>
 
             <div className={`${isOpen ? "scale-100" : "scale-0"} transition-all flex flex-col gap-2 py-2 px-4 bg-white dark:bg-black justify-center items-center absolute right-[80%] -bottom-[50%] rounded shadow-md dark:shadow-secondary/40`}>
-                <Button onClick={() => setIsOpenDeleteModal(true)} size="xs" className="w-full">delete</Button>
-                <Button onClick={() => setIsOpenUpdateModal(true)} size="xs" className="w-full">update</Button>
+                <Button onClick={() => setIsOpenDeleteModal(true)} size="sm" className="w-full">delete</Button>
+                <Button onClick={() => setIsOpenUpdateModal(true)} size="sm" className="w-full">update</Button>
             </div>
 
             <Modal isOpen={isOpenDeleteModal} setIsOpen={setIsOpenDeleteModal}>
@@ -286,13 +288,19 @@ const Attachment = () => {
     const [search, setSearch] = useState("");
     const [take, setTake] = useState(10);
     const [page, setPage] = useState(1);
+    const [sort, setSort] = useState("latest");
     const [isOpenCreateAttachmentModal, setIsOpenCreateAttachmentModal] = useState(false);
 
-    const [attachmentsPayload, callAttachments] = useFetchApi<IAttachment[]>("GET", `attachment/attachments/${ticketId}?take=${take}&page=${page}&search=${search}`, [take, page, search]);
+    const [attachmentsPayload, callAttachments] = useFetchApi<IAttachment[]>("GET", `attachment/attachments/${ticketId}?take=${take}&page=${page}&search=${search}&sort=${sort}`, [take, page, search, sort]);
     const [countPayload, callCount] = useFetchApi<number>("GET", `attachment/attachments-count/${ticketId}?search=${search}`, [search]);
 
-    useEffect(() => { callAttachments() }, [take, page, search])
-    useEffect(() => { callCount() }, [search])
+    useEffect(() => { callAttachments() }, [take, page, sort])
+    useEffect(() => { callCount() }, [])
+
+    const handelUpdate = () => {
+        callCount();
+        callAttachments();
+    }
 
     const handelPrevPage = () => {
         if (page > 1) setPage((prev) => prev - 1)
@@ -317,8 +325,13 @@ const Attachment = () => {
                     <div className="flex items-center justify-center w-full sm:w-auto">
 
                         <div className="max-w-[400px]">
-                            <TextFiled small icon={AiOutlineSearch} label="Search for attachments" value={search} onChange={(e) => setSearch(e.target.value)} />
+                            <SearchFiled onClick={handelUpdate} label="Search for attachments" value={search} onChange={(e) => setSearch(e.target.value)} />
                         </div>
+
+                <div className="flex flex-row gap-4 w-full flex-wrap items-center pb-4 p-2 bg-white dark:bg-black justify-between">
+                    <SelectButton label="sort by date" setValue={setSort} value={sort} options={["latest", "oldest"]} />
+                </div>
+
 
                     </div>
                 </div>

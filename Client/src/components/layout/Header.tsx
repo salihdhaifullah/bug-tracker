@@ -1,20 +1,27 @@
 import { FaMoon, FaSun } from "react-icons/fa";
 import { useTheme, useThemeDispatch } from "../../utils/context/theme";
 import { BiLogOut, BiLogIn } from 'react-icons/bi';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useUser, useUserDispatch } from "../../utils/context/user"
 import useFetchApi from "../../utils/hooks/useFetchApi";
 import ButtonBase from "../utils/ButtonBase";
+import { useState } from "react";
+import SearchFiled from "../utils/SearchFiled";
 
 const Header = () => {
     const user = useUser();
     const theme = useTheme();
+    const [search, setSearch] = useState("");
     const themeDispatch = useThemeDispatch();
-
+    const navigate = useNavigate();
     const userDispatch = useUserDispatch();
     const [logoutPayload, callLogout] = useFetchApi("GET", "auth/logout", [], () => {
         userDispatch({ type: "logout" })
     });
+
+    const handelSearch = () => {
+        navigate(`/search?search=${search}`)
+    }
 
     return (
         <header className="flex flex-row fixed top-0 w-full min-h-[8vh] z-[11] justify-between items-center text-primary dark:bg-black bg-white p-2 shadow-lg dark:shadow-secondary/40">
@@ -42,6 +49,10 @@ const Header = () => {
             </div>
 
             <div className="flex flex-row justify-center gap-4 items-center">
+
+                <div className="max-w-[400px]">
+                    <SearchFiled onClick={handelSearch} label="Search" value={search} onChange={(e) => setSearch(e.target.value)} />
+                </div>
 
                 <div onClick={() => themeDispatch({ type: theme === "dark" ? "light" : "dark" })} className="flex dark:text-secondary p-1 dark:hover:bg-slate-700 justify-center cursor-pointer items-center rounded-md hover:bg-slate-300 text-primary font-bold text-2xl">
                     {theme === "dark" ? <FaMoon /> : <FaSun />}

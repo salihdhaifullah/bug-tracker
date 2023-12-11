@@ -10,10 +10,9 @@ import { FiUsers } from "react-icons/fi";
 import rolesColors from "../utils/rolesColors";
 import Button from "../components/utils/Button";
 import { MdOutlineCreateNewFolder } from "react-icons/md";
-import { AiOutlineSearch } from "react-icons/ai";
-import TextFiled from "../components/utils/TextFiled";
 import SelectButton from "../components/utils/SelectButton";
 import { roles } from "./Invent";
+import SearchFiled from "../components/utils/SearchFiled";
 
 interface IProject {
   id: number;
@@ -39,8 +38,13 @@ const Projects = () => {
   const [projectsPayload, callProjects] = useFetchApi<IProject[]>("GET", `project/projects/${page}/?take=${take}&userId=${userId}&search=${search}&role=${role}&status=${status}&type=${type}`, [page, take, userId, search, role, type, status]);
   const [PagesCountPayload, callPagesCount] = useFetchApi<number>("GET", `project/count/?take=${take}&userId=${userId}&search=${search}&role=${role}&status=${status}&type=${type}`, [take, userId, search, role, type, status]);
 
-  useEffect(() => { callProjects() }, [page, take, search, role, type, status])
-  useEffect(() => { callPagesCount() }, [take, search, role, type, status])
+  useEffect(() => { callProjects() }, [page, take, role, type, status])
+  useEffect(() => { callPagesCount() }, [take, role, type, status])
+
+  const handelSearch = () => {
+    callProjects()
+    callPagesCount()
+  }
 
   return (
     <section className="flex flex-col justify-center items-center w-full gap-8 my-10">
@@ -50,7 +54,7 @@ const Projects = () => {
         <div className="flex items-center justify-center">
 
           <div className="max-w-[400px]">
-            <TextFiled small icon={AiOutlineSearch} label="Search for projects" value={search} onChange={(e) => setSearch(e.target.value)} />
+            <SearchFiled onClick={handelSearch} label="Search for projects" value={search} onChange={(e) => setSearch(e.target.value)} />
           </div>
 
           <div className="flex gap-1 flex-row flex-wrap">

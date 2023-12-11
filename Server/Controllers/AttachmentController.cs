@@ -122,14 +122,14 @@ public class AttachmentController : Controller
     }
 
     [HttpGet("attachments/{ticketId}")]
-    public async Task<IActionResult> Attachments([FromRoute] string ticketId, [FromQuery] int take = 10, [FromQuery] int page = 1, [FromQuery] string sort = "oldest")
+    public async Task<IActionResult> Attachments([FromRoute] string ticketId, [FromQuery] string? search, [FromQuery] int take = 10, [FromQuery] int page = 1, [FromQuery] string sort = "oldest")
     {
         try
         {
 
             _auth.TryGetId(Request, out string? userId);
 
-            var query = _ctx.Attachments.Where(a => a.TicketId == ticketId);
+            var query = _ctx.Attachments.Where(a => a.TicketId == ticketId && EF.Functions.ILike(a.Title, $"%{search}%"));
 
             if (sort == "latest") query = query.OrderByDescending(a => a.CreatedAt);
             else query = query.OrderBy(a => a.CreatedAt);

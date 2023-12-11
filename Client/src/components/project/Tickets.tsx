@@ -4,12 +4,12 @@ import Button from "../utils/Button";
 import useFetchApi from "../../utils/hooks/useFetchApi";
 import { useEffect, useState } from "react";
 import CircleProgress from "../utils/CircleProgress";
-import TextFiled from "../utils/TextFiled";
-import { AiOutlineArrowLeft, AiOutlineArrowRight, AiOutlineSearch } from "react-icons/ai";
+import { AiOutlineArrowLeft, AiOutlineArrowRight } from "react-icons/ai";
 import SelectButton from "../utils/SelectButton";
 import { priorityOptions, statusOptions, typeOptions } from "../../pages/CreateTicket";
 import labelsColors from "../../utils/labelsColors";
 import TicketAction from "../TicketAction";
+import SearchFiled from "../utils/SearchFiled";
 
 interface ITicket {
     name: string;
@@ -37,8 +37,14 @@ const Tickets = () => {
     const [ticketsPayload, callTickets] = useFetchApi<ITicket[]>("GET", `ticket/tickets/${projectId}?page=${page}&take=${take}&search=${search}&type=${ticketType}&status=${ticketStatus}&priority=${ticketPriority}`, [page, take, search, ticketType, ticketStatus, ticketPriority]);
 
     useEffect(() => { callIsOwnerOrManger() }, [])
-    useEffect(() => { callTickets() }, [page, take, search, ticketType, ticketStatus, ticketPriority])
-    useEffect(() => { callCount() }, [search, ticketType, ticketStatus, ticketPriority])
+    useEffect(() => { callTickets() }, [page, take, ticketType, ticketStatus, ticketPriority])
+    useEffect(() => { callCount() }, [ticketType, ticketStatus, ticketPriority])
+
+
+    const handelSearch = () => {
+        callCount()
+        callTickets()
+    }
 
     const handelPrevPage = () => {
         if (page > 1) setPage((prev) => prev - 1)
@@ -60,7 +66,7 @@ const Tickets = () => {
 
                     <div className="flex items-center justify-center w-full sm:w-auto">
                         <div className="max-w-[400px]">
-                            <TextFiled small icon={AiOutlineSearch} label="Search for tickets" value={search} onChange={(e) => setSearch(e.target.value)} />
+                            <SearchFiled onClick={handelSearch} label="Search for tickets" value={search} onChange={(e) => setSearch(e.target.value)} />
                         </div>
 
                         <div className="flex gap-1 flex-row flex-wrap">

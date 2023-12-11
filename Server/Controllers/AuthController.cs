@@ -85,6 +85,88 @@ public class AuthController : Controller
         }
     }
 
+    [HttpGet("demo")]
+    public async Task<IActionResult> Demo()
+    {
+        try
+        {
+            var demo = "salehwebdev2004@gmail.com";
+
+            var isFound = await _ctx.Users
+                .Where(u => u.Email == demo)
+                .Select(u => new
+                {
+                    passwordHash = u.PasswordHash,
+                    passwordSalt = u.PasswordSalt,
+                    id = u.Id,
+                    avatarUrl = u.AvatarUrl,
+                    email = u.Email,
+                    name = $"{u.FirstName} {u.LastName}",
+                })
+                .FirstOrDefaultAsync();
+
+            if (isFound is null)
+            {
+                _crypto.Hash("salehwebdev2004@gmail.com", out byte[] hash, out byte[] salt);
+
+                string imageName;
+
+                var userId = Ulid.NewUlid().ToString();
+                var contentId = Ulid.NewUlid().ToString();
+
+                using (var client = new HttpClient())
+                {
+                    var imageBytes = await client.GetByteArrayAsync($"https://api.dicebear.com/6.x/identicon/svg?seed={userId}");
+                    imageName = await _firebase.Upload(imageBytes, ContentType.svg.ToString());
+                }
+
+                var content = await _ctx.Contents.AddAsync(new Content() { Id = contentId });
+
+                var user = await _ctx.Users.AddAsync(new User
+                {
+                    Email = demo,
+                    FirstName = "demo",
+                    LastName = "",
+                    PasswordHash = hash,
+                    PasswordSalt = salt,
+                    Id = userId,
+                    AvatarUrl = imageName,
+                    ContentId = contentId
+                });
+
+                await _ctx.SaveChangesAsync();
+
+                _auth.LogIn(userId, HttpContext);
+
+                return HttpResult.Ok("logged in successfully as demo", new
+                {
+                    id = userId,
+                    avatarUrl = imageName,
+                    email = demo,
+                    name = "demo",
+                });
+            }
+            else
+            {
+                _auth.LogIn(isFound.id, HttpContext);
+
+                return HttpResult.Ok("logged in successfully as demo", new
+                {
+                    id = isFound.id,
+                    avatarUrl = isFound.avatarUrl,
+                    email = isFound.email,
+                    name = isFound.name,
+                });
+            }
+
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.Message);
+            return HttpResult.InternalServerError();
+        }
+    }
+
     [HttpPost("sing-up"), BodyValidation]
     public async Task<IActionResult> SingUp([FromBody] SingUpDTO dto)
     {

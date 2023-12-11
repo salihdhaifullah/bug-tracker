@@ -4,11 +4,10 @@ import { Priority, Status, Type } from "../types";
 import CircleProgress from "../components/utils/CircleProgress";
 import labelsColors from "../utils/labelsColors";
 import { Link, useParams } from "react-router-dom";
-import TextFiled from "../components/utils/TextFiled";
 import SelectButton from "../components/utils/SelectButton";
-import { AiOutlineSearch } from "react-icons/ai";
 import { priorityOptions, typeOptions } from "./CreateTicket";
 import Button from "../components/utils/Button";
+import SearchFiled from "../components/utils/SearchFiled";
 
 interface IDraggableProps {
     children: ReactElement[] | ReactElement | string;
@@ -100,7 +99,11 @@ const MyTasks = () => {
     const [_, callUpdate] = useFetchApi<unknown, { id: string, status: Status }>("PATCH", "ticket/status", [])
     const [tasksPayload, callTasks] = useFetchApi<IItem[], unknown>("GET", `ticket/my-tickets/${projectId}?search=${search}&type=${ticketType}&priority=${ticketPriority}`, [search, ticketType, ticketPriority], (result) => { setData(result) })
 
-    useEffect(() => { callTasks() }, [search, ticketType, ticketPriority])
+    useEffect(() => { callTasks() }, [ticketType, ticketPriority])
+
+    const handelSearch = () => {
+        callTasks()
+    }
 
     const realScreenHeightOffset = useMemo(() => window.screen.height * 0.3, [window.screen.height]);
     const realScreenHeightScroll = useMemo(() => window.screen.height * 0.01, [window.screen.height]);
@@ -137,7 +140,7 @@ const MyTasks = () => {
             <div className="flex flex-row gap-4 w-full flex-wrap items-center justify-between">
                 <div className="flex items-center justify-center">
                     <div className="max-w-[400px]">
-                        <TextFiled small icon={AiOutlineSearch} label="Search for tickets" value={search} onChange={(e) => setSearch(e.target.value)} />
+                        <SearchFiled onClick={handelSearch} label="Search for tickets" value={search} onChange={(e) => setSearch(e.target.value)} />
                     </div>
 
                     <div className="flex gap-1 flex-row flex-wrap">

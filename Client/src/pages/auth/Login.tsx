@@ -27,7 +27,7 @@ const Login = () => {
 
 
   useEffect(() => {
-    if (payload.result) dispatchUser({ type: "add", payload: payload.result || undefined });
+    if (payload.result) dispatchUser({ type: "add", payload: payload.result });
   }, [payload.result])
 
 

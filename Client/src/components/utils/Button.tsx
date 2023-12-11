@@ -1,7 +1,7 @@
 import { HTMLProps, ReactElement } from 'react';
 import CircleProgress from './CircleProgress'
 
-type Size = "xs" | "sm" | "md" | "lg" | "xl" | "2xl";
+type Size = "sm" | "md" | "lg";
 
 function getSize(size?: Size) {
     let sizeClass = "";

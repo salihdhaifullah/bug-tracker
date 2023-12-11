@@ -4,8 +4,7 @@ import Button from "../utils/Button";
 import { useEffect, useRef, useState } from "react";
 import useFetchApi from "../../utils/hooks/useFetchApi";
 import CircleProgress from "../utils/CircleProgress";
-import TextFiled from "../utils/TextFiled";
-import { AiOutlineArrowLeft, AiOutlineArrowRight, AiOutlineSearch } from "react-icons/ai";
+import { AiOutlineArrowLeft, AiOutlineArrowRight } from "react-icons/ai";
 import SelectButton from "../utils/SelectButton";
 import { roles } from "../../pages/Invent";
 import { FiMoreVertical } from "react-icons/fi";
@@ -13,6 +12,7 @@ import useOnClickOutside from "../../utils/hooks/useOnClickOutside";
 import Modal from "../utils/Modal";
 import Select from "../utils/Select";
 import rolesColors from "../../utils/rolesColors";
+import SearchFiled from "../utils/SearchFiled";
 
 interface IMember {
     avatarUrl: string;
@@ -77,8 +77,8 @@ const Action = (props: IActionProps) => {
             </div>
 
             <div className={`${isOpen ? "scale-100" : "scale-0"} transition-all flex flex-col py-2 px-4 justify-center gap-2 items-center absolute right-[50%] bottom-[50%] bg-white dark:bg-black rounded shadow-md dark:shadow-secondary/40`}>
-                <Button onClick={() => setIsOpenDeleteModal(true)} size="xs" className="w-full">delete</Button>
-                <Button onClick={() => setIsOpenRoleModal(true)} size="xs" className="w-full">change role</Button>
+                <Button onClick={() => setIsOpenDeleteModal(true)} size="sm" className="w-full">delete</Button>
+                <Button onClick={() => setIsOpenRoleModal(true)} size="sm" className="w-full">change role</Button>
             </div>
 
             <Modal isOpen={isOpenDeleteModal} setIsOpen={setIsOpenDeleteModal}>
@@ -165,8 +165,13 @@ const Members = () => {
     const [countPayload, callCount] = useFetchApi<number>("GET", `member/members-count/${projectId}?role=${role}&search=${search}`, [role, search]);
 
     useEffect(() => { callIsOwner() }, [])
-    useEffect(() => { callMembers() }, [take, page, role, search])
-    useEffect(() => { callCount() }, [role, search])
+    useEffect(() => { callMembers() }, [take, page, role])
+    useEffect(() => { callCount() }, [role])
+
+    const handelSearch = () => {
+        callCount()
+        callMembers()
+    }
 
     const handelPrevPage = () => {
         if (page > 1) setPage((prev) => prev - 1)
@@ -189,7 +194,7 @@ const Members = () => {
                     <div className="flex items-center justify-center w-full sm:w-auto">
 
                         <div className="max-w-[400px]">
-                            <TextFiled small icon={AiOutlineSearch} label="Search for members" value={search} onChange={(e) => setSearch(e.target.value)} />
+                            <SearchFiled label="Search for members" onClick={handelSearch} value={search} onChange={(e) => setSearch(e.target.value)} />
                         </div>
 
                         <SelectButton label="role" setValue={setRole} value={role} options={[...roles, "owner", "all"]} />
