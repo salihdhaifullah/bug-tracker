@@ -1,16 +1,31 @@
 import { useParams } from "react-router-dom"
-import { FormEvent, useState } from "react";
-import TextFiled from "../components/utils/TextFiled"
+import { Dispatch, FormEvent, SetStateAction, useEffect, useState } from "react";
+import TextFiled from "./utils/TextFiled"
 import useFetchApi from "../utils/hooks/useFetchApi";
-import Button from "../components/utils/Button";
-import Select from "../components/utils/Select";
-import SelectUser from "../components/utils/SelectUser";
+import Button from "./utils/Button";
+import Select from "./utils/Select";
+import SelectUser from "./utils/SelectUser";
+import { MdOutlineCreateNewFolder } from "react-icons/md";
+import Modal from "./utils/Modal";
 
 export const typeOptions = ["bug", "feature"];
 export const priorityOptions = ["low", "medium", "high", "critical"];
 export const statusOptions = ["review", "active", "in_progress", "resolved", "closed"];
 
-const CreateTicket = () => {
+interface ICreateTicketModalProps {
+  isOpenModal: boolean;
+  setIsOpenModal: Dispatch<SetStateAction<boolean>>;
+}
+
+interface ICreateTicket {
+  name: string;
+  type: string;
+  priority: string;
+  status: string;
+  memberId?: string;
+};
+
+const CreateTicketModal = (props: ICreateTicketModalProps) => {
   const [name, setName] = useState("");
   const [type, setType] = useState(typeOptions[0]);
   const [priority, setPriority] = useState(priorityOptions[1]);
@@ -24,7 +39,24 @@ const CreateTicket = () => {
   const [isValidPriority, setIsValidPriority] = useState(true);
   const [isValidStatus, setIsValidStatus] = useState(true);
 
-  const [payload, call] = useFetchApi<unknown, { name: string, type: string, priority: string, status: string, memberId?: string }>("POST", `ticket/${projectId}`, []);
+  const [payload, call] = useFetchApi<any, ICreateTicket>("POST", `ticket/${projectId}`, [], () => {
+    props.setIsOpenModal(false);
+    setName("");
+    setType(typeOptions[0]);
+    setPriority(priorityOptions[1]);
+    setStatus(statusOptions[0]);
+    setMemberId("");
+  });
+
+  useEffect(() => {
+    if (!props.isOpenModal) {
+      setName("");
+      setType(typeOptions[0]);
+      setPriority(priorityOptions[1]);
+      setStatus(statusOptions[0]);
+      setMemberId("");
+    }
+  }, [props.isOpenModal])
 
   const handelSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -32,12 +64,15 @@ const CreateTicket = () => {
   }
 
   return (
-    <section className="flex flex-col justify-center items-center flex-grow my-10">
-      <div className="rounded-xl bg-white dark:bg-black dark:shadow-secondary/40 flex flex-col gap-4 w-80 px-4 py-8 items-center justify-center shadow-xl">
-
-        <h1 className="text-primary dark:text-secondary font-bold text-2xl text-center">create ticket</h1>
+    <Modal isOpen={props.isOpenModal} setIsOpen={props.setIsOpenModal}>
+      <div className="rounded-xl bg-white dark:bg-black flex flex-col gap-4 w-80 p-2 pt-6 items-center justify-center">
 
         <form className="flex-col flex w-full justify-center items-center" onSubmit={handelSubmit}>
+
+          <h1 className="text-primary dark:text-secondary font-bold text-3xl text-center mb-4">Create Ticket</h1>
+          <div className="flex w-full justify-center items-center mb-4">
+            <MdOutlineCreateNewFolder className="text-3xl text-gray-800 dark:text-gray-200 font-extrabold" />
+          </div>
 
           <TextFiled
             validation={[
@@ -97,9 +132,9 @@ const CreateTicket = () => {
         </form>
 
       </div>
-    </section>
 
+    </Modal>
   )
 }
 
-export default CreateTicket;
+export default CreateTicketModal;

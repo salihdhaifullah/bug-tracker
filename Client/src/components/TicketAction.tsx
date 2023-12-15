@@ -1,5 +1,5 @@
 import { FiMoreVertical } from "react-icons/fi";
-import { priorityOptions, statusOptions, typeOptions } from "../pages/CreateTicket";
+import { priorityOptions, statusOptions, typeOptions } from "./CreateTicketModal";
 import Button from "./utils/Button";
 import Modal from "./utils/Modal";
 import Select from "./utils/Select";

@@ -12,11 +12,8 @@ import Unauthorized from "./pages/errors/Unauthorized";
 import Profile from "./pages/Profile";
 
 import { createBrowserRouter } from "react-router-dom";
-import CreateProject from "./pages/CreateProject";
 import Project from "./pages/Project";
-import CreateTicket from "./pages/CreateTicket";
 import Ticket from "./pages/Ticket";
-import Invent from "./pages/Invent";
 import MyTasks from "./pages/MyTasks";
 import Projects from "./pages/Projects";
 import Search from "./pages/Search";
@@ -31,13 +28,10 @@ const router = createBrowserRouter([{
         { path: "auth/reset-password", Component: ResetPassword },
         { path: "auth/forget-password", Component: ForgetPassword },
         { path: "auth/account-verification", Component: AccountVerification },
-        { path: "create-project", Component: CreateProject },
         { path: "profile/:userId", Component: Profile },
         { path: "search", Component: Search },
         { path: "projects/:userId", Component: Projects },
         { path: "project/:projectId", Component: Project },
-        { path: "project/:projectId/create-ticket", Component: CreateTicket },
-        { path: "project/:projectId/invent", Component: Invent },
         { path: "tickets/:ticketId", Component: Ticket },
         { path: "my-tasks/:projectId", Component: MyTasks },
         { path: "500", Component: InternalServerError },

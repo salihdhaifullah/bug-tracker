@@ -11,8 +11,9 @@ import rolesColors from "../utils/rolesColors";
 import Button from "../components/utils/Button";
 import { MdOutlineCreateNewFolder } from "react-icons/md";
 import SelectButton from "../components/utils/SelectButton";
-import { roles } from "./Invent";
 import SearchFiled from "../components/utils/SearchFiled";
+import CreateProjectModal from "../components/CreateProjectModal";
+import roles from "../utils/roles";
 
 interface IProject {
   id: number;
@@ -46,6 +47,8 @@ const Projects = () => {
     callPagesCount()
   }
 
+  const [isOpenCreateModal, setIsOpenCreateModal] = useState(false);
+
   return (
     <section className="flex flex-col justify-center items-center w-full gap-8 my-10">
 
@@ -65,24 +68,22 @@ const Projects = () => {
 
         </div>
 
+        <CreateProjectModal isOpenModal={isOpenCreateModal} setIsOpenModal={setIsOpenCreateModal} />
+
         <div className="flex items-center justify-center">
-          <Link to="/create-project">
-            <Button size="lg" className="flex-row flex justify-center items-center gap-1">
+            <Button size="lg" onClick={() => setIsOpenCreateModal((prev) => !prev)} className="flex-row flex justify-center items-center gap-1">
               <MdOutlineCreateNewFolder />
               <p>create projects</p>
             </Button>
-          </Link>
         </div>
 
       </div>
-
-
 
       {projectsPayload.isLoading ? (
         <CircleProgress size="lg" />
       ) : (
         (!projectsPayload.result || projectsPayload.result.length === 0) ? (
-          <h1> Sorry No Project Found </h1>
+          <h1> No Project Found </h1>
         ) : (
           <div className="gap-2 flex flex-col justify-center items-center w-full p-4">
 
@@ -137,6 +138,7 @@ const Projects = () => {
         pages={PagesCountPayload.result || 0}
         handelOnChange={(newPage) => setPage(newPage)}
       />
+
     </section>
   )
 }

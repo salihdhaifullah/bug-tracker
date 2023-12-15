@@ -5,7 +5,7 @@ import CircleProgress from "../components/utils/CircleProgress";
 import labelsColors from "../utils/labelsColors";
 import { Link, useParams } from "react-router-dom";
 import SelectButton from "../components/utils/SelectButton";
-import { priorityOptions, typeOptions } from "./CreateTicket";
+import CreateTicketModal, { priorityOptions, typeOptions } from "../components/CreateTicketModal";
 import Button from "../components/utils/Button";
 import SearchFiled from "../components/utils/SearchFiled";
 
@@ -134,6 +134,8 @@ const MyTasks = () => {
         setData(dataCopy);
     }
 
+    const [isOpenCreateTicketModal, setIsOpenCreateTicketModal] = useState(false);
+
     return (
         <div className="flex flex-col w-full p-2 py-10 my-10">
 
@@ -150,9 +152,8 @@ const MyTasks = () => {
                 </div>
 
                 <div className="flex items-center justify-center gap-2">
-                    <Link to={`/project/${projectId}/create-ticket`}>
-                        <Button>create ticket</Button>
-                    </Link>
+                        <Button onClick={() => setIsOpenCreateTicketModal(prev => !prev)}>create ticket</Button>
+                        <CreateTicketModal isOpenModal={isOpenCreateTicketModal} setIsOpenModal={setIsOpenCreateTicketModal} />
 
                     <Link to={`/project/${projectId}`}>
                         <Button>project</Button>

@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import CircleProgress from "../utils/CircleProgress";
 import { AiOutlineArrowLeft, AiOutlineArrowRight } from "react-icons/ai";
 import SelectButton from "../utils/SelectButton";
-import { priorityOptions, statusOptions, typeOptions } from "../../pages/CreateTicket";
+import CreateTicketModal, { priorityOptions, statusOptions, typeOptions } from "../CreateTicketModal";
 import labelsColors from "../../utils/labelsColors";
 import TicketAction from "../TicketAction";
 import SearchFiled from "../utils/SearchFiled";
@@ -56,6 +56,8 @@ const Tickets = () => {
         if (countPayload.result && !(page * take >= countPayload.result)) setPage((prev) => prev + 1)
     }
 
+    const [isOpenCreateTicketModal, setIsOpenCreateTicketModal] = useState(false);
+
     return (
         <div className="my-10">
             <h2 className="text-3xl font-bold w-full mb-10 text-center text-primary dark:text-secondary">Tickets</h2>
@@ -65,9 +67,8 @@ const Tickets = () => {
             <div className="w-full dark:bg-black bg-white border border-gray-500 shadow-md dark:shadow-secondary/40 rounded-md justify-center items-center flex flex-col p-2">
 
                 <div className="flex flex-row gap-4 w-full flex-wrap items-center pb-4 p-2 bg-white dark:bg-black justify-between">
-                    <Link to={`/project/${projectId}/create-ticket`}>
-                        <Button>create ticket</Button>
-                    </Link>
+                    <Button onClick={() => setIsOpenCreateTicketModal(prev => !prev)}>create ticket</Button>
+                    <CreateTicketModal isOpenModal={isOpenCreateTicketModal} setIsOpenModal={setIsOpenCreateTicketModal} />
 
                     <div className="flex items-center justify-center w-full sm:w-auto">
                         <div className="max-w-[400px]">

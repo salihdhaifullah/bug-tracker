@@ -6,7 +6,6 @@ import useFetchApi from "../../utils/hooks/useFetchApi";
 import CircleProgress from "../utils/CircleProgress";
 import { AiOutlineArrowLeft, AiOutlineArrowRight } from "react-icons/ai";
 import SelectButton from "../utils/SelectButton";
-import { roles } from "../../pages/Invent";
 import { FiMoreVertical } from "react-icons/fi";
 import useOnClickOutside from "../../utils/hooks/useOnClickOutside";
 import Modal from "../utils/Modal";
@@ -15,6 +14,8 @@ import rolesColors from "../../utils/rolesColors";
 import SearchFiled from "../utils/SearchFiled";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { Pie } from 'react-chartjs-2';
+import roles from "../../utils/roles";
+import InventModal from "../InventModal";
 
 interface IMember {
     avatarUrl: string;
@@ -184,7 +185,7 @@ const Members = () => {
         if (countPayload.result && !(page * take >= countPayload.result)) setPage((prev) => prev + 1)
     }
 
-
+    const [isOpenInviteModal, setIsOpenInviteModal] = useState(false);
 
     return (
         <div className="my-10">
@@ -193,9 +194,8 @@ const Members = () => {
             <div className="w-full bg-white dark:bg-black border border-gray-500 shadow-md dark:shadow-secondary/40 rounded-md justify-center items-center flex flex-col p-2">
 
                 <div className="flex flex-row gap-4 w-full flex-wrap items-center pb-4 p-2 justify-between">
-                    <Link to={`/project/${projectId}/invent`}>
-                        <Button>invite member</Button>
-                    </Link>
+                    <InventModal isOpenModal={isOpenInviteModal} setIsOpenModal={setIsOpenInviteModal} />
+                    <Button onClick={() => setIsOpenInviteModal(true)}>invite member</Button>
 
                     <div className="flex items-center justify-center w-full sm:w-auto">
 

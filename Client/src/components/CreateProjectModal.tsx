@@ -1,19 +1,35 @@
-import { FormEvent, useState } from "react";
+import { Dispatch, FormEvent, useEffect, useState } from "react";
 import useFetchApi from "../utils/hooks/useFetchApi";
-import TextFiled from "../components/utils/TextFiled";
-import CheckBox from "../components/utils/CheckBox";
+import TextFiled from "./utils/TextFiled";
+import CheckBox from "./utils/CheckBox";
 import { BiBookBookmark } from "react-icons/bi";
 import { FiLock } from "react-icons/fi";
-import Button from "../components/utils/Button";
+import Button from "./utils/Button";
 import { MdOutlineCreateNewFolder, MdOutlineDriveFileRenameOutline } from "react-icons/md";
+import Modal from "./utils/Modal";
 
-const CreateProject = () => {
+interface ICreateProjectModal {
+    isOpenModal: boolean;
+    setIsOpenModal: Dispatch<React.SetStateAction<boolean>>;
+}
+
+const CreateProjectModal = (props: ICreateProjectModal) => {
     const [name, setName] = useState("");
     const [projectState, setProjectState] = useState("public");
-
     const [isValidName, setIsValidName] = useState(false);
 
-    const [payload, call] = useFetchApi<unknown, { name: string, isPrivate: boolean }>("POST", "project", []);
+    const [payload, call] = useFetchApi<unknown, { name: string, isPrivate: boolean }>("POST", "project", [], () => {
+        props.setIsOpenModal(false);
+        setName("");
+        setProjectState("public");
+    });
+
+    useEffect(() => {
+        if (!props.isOpenModal) {
+            setName("");
+            setProjectState("public");
+        }
+    }, [props.isOpenModal])
 
     const handelSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -21,12 +37,12 @@ const CreateProject = () => {
     }
 
     return (
-        <section className="flex flex-col justify-center items-center flex-grow my-10">
-            <div className="rounded-xl bg-white dark:bg-black dark:shadow-secondary/40 px-4 py-8 flex flex-col gap-4 w-80 p-2 items-center justify-center shadow-xl">
+        <Modal isOpen={props.isOpenModal} setIsOpen={props.setIsOpenModal}>
+            <div className="rounded-xl bg-white dark:bg-black flex flex-col gap-4 w-80 p-2 pt-6 items-center justify-center">
 
                 <form className="flex-col flex w-full justify-center items-center" onSubmit={handelSubmit}>
 
-                    <h1 className="text-primary dark:text-secondary font-bold text-2xl text-center mb-4">Create Project</h1>
+                    <h1 className="text-primary dark:text-secondary font-bold text-3xl text-center mb-4">Create Project</h1>
                     <div className="flex w-full justify-center items-center mb-4">
                         <MdOutlineCreateNewFolder className="text-3xl text-gray-800 dark:text-gray-200 font-extrabold" />
                     </div>
@@ -72,8 +88,8 @@ const CreateProject = () => {
 
                 </form>
             </div>
-        </section>
+        </Modal>
     )
 }
 
-export default CreateProject
+export default CreateProjectModal;
