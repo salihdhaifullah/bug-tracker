@@ -13,7 +13,7 @@ interface IBioProps {
 const Bio = (props: IBioProps) => {
     const [bio, setBio] = useState("");
     const [isEditing, setIsEditing] = useState(false)
-    const bioRef = useRef<null | HTMLDivElement>(null);
+    const bioRef = useRef<null | HTMLFormElement>(null);
     const iconRef = useRef<null | HTMLDivElement>(null);
 
     const [updateBioPayload, call] = useFetchApi<any, { bio: string }>("POST", "user/bio", []);
@@ -44,7 +44,7 @@ const Bio = (props: IBioProps) => {
     return props.editable ? (<>
         <div className={`"flex flex-col w-80 " ${Editing ? "h-full" : "h-fit"}`}>
             {Editing ? (
-                <div ref={bioRef} className="flex flex-row gap-0 justify-start items-start w-full h-full">
+                <form ref={bioRef} onSubmit={SubmitChanges} className="flex flex-row gap-0 justify-start items-start w-full h-full">
                     <TextFiled
                         icon={MdOutlineSubtitles}
                         inputProps={{ onKeyDown: onEnter }}
@@ -55,12 +55,12 @@ const Bio = (props: IBioProps) => {
                     />
                     <div className="mt-3">
                         <Button
-                            onClick={() => SubmitChanges()}
+                            buttonProps={{ type: "submit" }}
                             isLoading={updateBioPayload.isLoading}
                             isValid={true}
                         >ok</Button>
                     </div>
-                </div>
+                </form>
             ) : (
                 <div title="edit your bio" className="min-h-[2rem] h-full grid grid-flow-col gap-1 w-full text-center justify-center items-center">
 

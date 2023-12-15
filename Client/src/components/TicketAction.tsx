@@ -25,8 +25,8 @@ interface ITicket {
 
 interface IActionProps {
     ticket: ITicket
-    onDelete: () => void;
-    onUpdate: () => void;
+    onDelete?: () => void;
+    onUpdate?: () => void;
 }
 
 const TicketAction = (props: IActionProps) => {
@@ -62,7 +62,7 @@ const TicketAction = (props: IActionProps) => {
     const [isUpdate, setIsUpdate] = useState(false);
 
     useEffect(() => {
-        if (isDelete) props.onDelete();
+        if (isDelete && props?.onDelete) props.onDelete();
     }, [isDelete])
 
     const [deleteTicketPayload, callDeleteTicket] = useFetchApi("DELETE", `ticket/${props.ticket.id}`, [], () => {
@@ -71,7 +71,7 @@ const TicketAction = (props: IActionProps) => {
     })
 
     useEffect(() => {
-        if (isUpdate) props.onUpdate();
+        if (isUpdate && props?.onUpdate) props.onUpdate();
     }, [isUpdate])
 
     const [updateTicketPayload, callUpdateTicket] = useFetchApi<unknown, { name: string, type: string, priority: string, status: string, memberId?: string }>("PATCH", `ticket/${props.ticket.id}`, [], () => {
@@ -80,6 +80,10 @@ const TicketAction = (props: IActionProps) => {
     });
 
     useOnClickOutside(targetRef, () => setIsOpen(false));
+
+    const handelSubmit = () => {
+        callUpdateTicket({ name, type, priority, status, memberId: !memberId.length ? undefined : memberId })
+    }
 
     return (
         <div ref={targetRef} className="flex w-fit relative">
@@ -115,7 +119,7 @@ const TicketAction = (props: IActionProps) => {
                         <h2 className="text-xl font-bold text-primary dark:text-secondary">are you sure you want to update this ticket</h2>
                     </div>
 
-                    <div className="flex-col flex w-full justify-center items-center">
+                    <form className="flex-col flex w-full justify-center items-center" onSubmit={handelSubmit}>
 
                         <TextFiled
                             validation={[
@@ -165,10 +169,14 @@ const TicketAction = (props: IActionProps) => {
 
                         <div className="flex flex-row items-center mt-4  justify-between w-full px-4">
                             <Button onClick={handelCancel}>cancel</Button>
-                            <Button isValid={isValidName && isValidType && isValidStatus && isValidPriority} isLoading={updateTicketPayload.isLoading} onClick={() => callUpdateTicket({ name, type, priority, status, memberId: !memberId.length ? undefined : memberId })}>update</Button>
+                            <Button
+                                isValid={isValidName && isValidType && isValidStatus && isValidPriority}
+                                isLoading={updateTicketPayload.isLoading}
+                                buttonProps={{ type: "submit" }}
+                            >update</Button>
                         </div>
 
-                    </div>
+                    </form>
 
                 </div>
             </Modal>

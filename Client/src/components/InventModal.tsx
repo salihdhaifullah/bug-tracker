@@ -2,7 +2,7 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import Select from "./utils/Select";
 import Button from "./utils/Button";
 import useFetchApi from "../utils/hooks/useFetchApi";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import SelectUser from "./utils/SelectUser";
 import roles from "../utils/roles";
 import Modal from "./utils/Modal";
@@ -18,12 +18,11 @@ const InventModal = (props: IInventModalProps) => {
     const [inventedId, setInventedId] = useState("");
     const [role, setRole] = useState("developer");
     const { projectId } = useParams();
-    const navigate = useNavigate();
 
     const [isValidRole, setIsValidRole] = useState(true);
     const [isValidId, setIsValidId] = useState(true);
 
-    const [_, call] = useFetchApi<any, { inventedId: string, role: string }>("POST", `member/invent/${projectId}`, [projectId], () => {
+    const [payload, call] = useFetchApi<any, { inventedId: string, role: string }>("POST", `member/invent/${projectId}`, [projectId], () => {
         props.setIsOpenModal(false);
         setRole("developer");
         setInventedId("")
@@ -38,7 +37,6 @@ const InventModal = (props: IInventModalProps) => {
 
     const handelSubmit = () => {
         call({ inventedId, role });
-        navigate(`/project/${projectId}`);
     }
 
     return (
@@ -65,7 +63,10 @@ const InventModal = (props: IInventModalProps) => {
                     />
 
                     <div className="flex mt-2 flex-col justify-center items-center w-full">
-                        <Button isValid={isValidRole && isValidId}>Invent</Button>
+                        <Button
+                            buttonProps={{ type: "submit" }}
+                            isLoading={payload.isLoading}
+                            isValid={isValidRole && isValidId}>Invent</Button>
                     </div>
 
                 </form>

@@ -347,7 +347,7 @@ public class TicketController : Controller
 
             await _ctx.SaveChangesAsync();
 
-            return HttpResult.Ok("successfully deleted ticket");
+            return HttpResult.Ok("successfully deleted ticket", redirectTo: $"/project/{ticket.ProjectId}");
         }
         catch (Exception e)
         {

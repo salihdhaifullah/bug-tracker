@@ -1,12 +1,10 @@
 import { Link, useParams } from "react-router-dom";
 import useFetchApi from "../utils/hooks/useFetchApi";
 import CircleProgress from "../components/utils/CircleProgress";
-import { useCallback, useEffect } from "react";
+import { useEffect } from "react";
 import Content from "../components/utils/Content";
 import formatDate from "../utils/formatDate";
 import { useUser } from "../utils/context/user";
-import { useNavigate, useLocation } from 'react-router-dom';
-
 import labelsColors from "../utils/labelsColors";
 import TicketAction from "../components/TicketAction";
 import Comments from "../components/ticket/Comments";
@@ -41,19 +39,6 @@ const Ticket = () => {
     const { ticketId } = useParams();
     const [payload, call] = useFetchApi<ITicket>("GET", `ticket/${ticketId}`, []);
     const [isOwnerOrMangerPayload, callIsOwnerOrManger] = useFetchApi<boolean>("GET", `project/is-owner-or-manger/${payload.result?.project.id}`, [payload.result]);
-
-    const navigate = useNavigate();
-    const location = useLocation();
-
-    const handelDelete = useCallback(() => {
-        const previousPath = location.state?.from || '/';
-
-        if (location.key !== 'initial' && previousPath !== location.pathname) {
-            navigate(-1);
-        } else {
-            navigate(`/project/${payload.result?.project.id}`);
-        }
-    }, [payload.result])
 
     useEffect(() => { call() }, [])
 
@@ -90,7 +75,7 @@ const Ticket = () => {
                         </div>
 
                         {(isOwnerOrMangerPayload.result || payload.result.creator.id === user?.id) ?
-                            <TicketAction onUpdate={call} onDelete={handelDelete} ticket={{ ...payload.result, id: ticketId!, projectId: payload.result.project.id }} />
+                            <TicketAction onUpdate={call} ticket={{ ...payload.result, id: ticketId!, projectId: payload.result.project.id }} />
                             : null}
 
                     </div>

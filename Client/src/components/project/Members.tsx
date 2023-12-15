@@ -112,7 +112,7 @@ const Action = (props: IActionProps) => {
             </Modal>
 
             <Modal isOpen={isOpenRoleModal} setIsOpen={setIsOpenRoleModal}>
-                <div className="flex flex-col dark:bg-black justify-center items-center py-8 px-4 w-[400px] text-center h-full">
+                <form onSubmit={() => handelRole()} className="flex flex-col dark:bg-black justify-center items-center py-8 px-4 w-[400px] text-center h-full">
 
                     <div className="pt-4 pb-8 gap-4 flex flex-col w-full justify-center items-center">
                         <h1 className="text-3xl font-black text-blue-700 dark:text-blue-300">change member role</h1>
@@ -148,9 +148,14 @@ const Action = (props: IActionProps) => {
                             setRole("")
                             setIsOpenRoleModal(false)
                         }}>cancel</Button>
-                        <Button isLoading={payloadRole.isLoading} isValid={isValidRole} onClick={() => handelRole()}>change</Button>
+
+                        <Button
+                        isLoading={payloadRole.isLoading}
+                         isValid={isValidRole}
+                         buttonProps={{ type: "submit" }}
+                         >change</Button>
                     </div>
-                </div>
+                </form>
             </Modal>
         </div>
     )

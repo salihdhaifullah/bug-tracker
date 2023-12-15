@@ -76,7 +76,7 @@ public class AuthController : Controller
                 avatarUrl = isFound.avatarUrl,
                 email = isFound.email,
                 name = isFound.name,
-            });
+            }, redirectTo: $"/profile/{isFound.id}");
         }
         catch (Exception e)
         {
@@ -144,7 +144,7 @@ public class AuthController : Controller
                     avatarUrl = imageName,
                     email = demo,
                     name = "demo",
-                });
+                }, redirectTo: $"/profile/{userId}");
             }
             else
             {
@@ -156,7 +156,7 @@ public class AuthController : Controller
                     avatarUrl = isFound.avatarUrl,
                     email = isFound.email,
                     name = isFound.name,
-                });
+                }, redirectTo: $"/profile/{isFound.id}");
             }
 
         }

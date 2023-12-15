@@ -51,7 +51,7 @@ public class ProjectController : Controller
 
             await _ctx.SaveChangesAsync();
 
-            return HttpResult.Ok("successfully created project");
+            return HttpResult.Ok("successfully created project", redirectTo: $"/project/{projectId}");
         }
         catch (Exception e)
         {
@@ -282,7 +282,7 @@ public class ProjectController : Controller
 
             await _ctx.SaveChangesAsync();
 
-            return HttpResult.Ok("successfully deleted project");
+            return HttpResult.Ok("successfully deleted project", redirectTo: $"/profile/{userId}");
         }
         catch (Exception e)
         {
