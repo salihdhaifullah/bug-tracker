@@ -6,18 +6,6 @@ import CircleProgress from "../utils/CircleProgress";
 import SelectButton from "../utils/SelectButton";
 import { AiOutlineArrowLeft, AiOutlineArrowRight } from "react-icons/ai";
 import useMarkdown from "../utils/markdown/useMarkdown";
-import {
-    Chart as ChartJS,
-    CategoryScale,
-    LinearScale,
-    PointElement,
-    LineElement,
-    Title,
-    Tooltip,
-    Legend,
-} from 'chart.js';
-import { Line } from 'react-chartjs-2';
-
 
 interface IActivity {
     content: string;
@@ -71,42 +59,6 @@ const Activities = () => {
         if (countPayload.result && !(page * take >= countPayload.result)) setPage((prev) => prev + 1)
     }
 
-
-    ChartJS.register(
-        CategoryScale,
-        LinearScale,
-        PointElement,
-        LineElement,
-        Title,
-        Tooltip,
-        Legend
-    );
-
-    const options = {
-        responsive: true,
-        plugins: {
-            legend: {
-                position: 'top' as const,
-            },
-            title: {
-                display: true,
-                text: 'Chart.js Line Chart',
-            },
-        },
-    };
-
-    const data = {
-        labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-        datasets: [
-            {
-                label: 'Dataset 1',
-                data: [23, 423, 2324, 25532, 523232, 25323, 2353352],
-                borderColor: 'rgb(255, 99, 132)',
-                backgroundColor: 'rgba(255, 99, 132, 0.5)',
-            }
-        ],
-    };
-
     return (
         <div className="my-10">
             <h2 className="text-3xl font-bold w-full mb-10 text-center text-primary dark:text-secondary">Activities</h2>
@@ -157,10 +109,6 @@ const Activities = () => {
                         </>
                     )}
                 </div>
-            </div>
-
-            <div className="flex justify-center items-center my-4 w-[800px] rounded-md p-4 shadow-lg bg-white dark:bg-black">
-                <Line data={data} options={options} />
             </div>
 
         </div>

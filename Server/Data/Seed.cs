@@ -129,7 +129,7 @@ public class Seed
                 await _data.AddActivity(projectId,
                 $"user [{user.fullName}](/profile/{user.Id}) joined the project", _ctx);
 
-                await _ctx.Members.AddAsync(new Member() { UserId = user.Id, Id = memberId, ProjectId = projectId, Role = role, IsJoined = true });
+                await _ctx.Members.AddAsync(new Member() { UserId = user.Id, Id = memberId, ProjectId = projectId, Role = role });
             }
         }
 

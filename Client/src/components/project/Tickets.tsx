@@ -56,89 +56,11 @@ const Tickets = () => {
         if (countPayload.result && !(page * take >= countPayload.result)) setPage((prev) => prev + 1)
     }
 
-    ChartJS.register(ArcElement, Tooltip, Legend);
-
-    const data = {
-        labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-        datasets: [
-            {
-                label: '# of Votes',
-                data: [12, 19, 3, 5, 2, 3],
-                backgroundColor: [
-                    'rgba(255, 99, 132, 0.2)',
-                    'rgba(54, 162, 235, 0.2)',
-                    'rgba(255, 206, 86, 0.2)',
-                    'rgba(75, 192, 192, 0.2)',
-                    'rgba(153, 102, 255, 0.2)',
-                    'rgba(255, 159, 64, 0.2)',
-                ],
-                borderColor: [
-                    'rgba(255, 99, 132, 1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(255, 206, 86, 1)',
-                    'rgba(75, 192, 192, 1)',
-                    'rgba(153, 102, 255, 1)',
-                    'rgba(255, 159, 64, 1)',
-                ],
-                borderWidth: 1,
-            },
-        ],
-    };
     return (
         <div className="my-10">
             <h2 className="text-3xl font-bold w-full mb-10 text-center text-primary dark:text-secondary">Tickets</h2>
-            <div className="pb-8 px-4 flex flex-row gap-2 justify-between flex-wrap">
 
-                <div className="transition-all opacity-90 hover:opacity-100 hover:scale-100 scale-90 bg-primary dark:bg-secondary text-gray-100 dark:text-gray-900 py-6 px-12 rounded-lg flex flex-row text-center gap-2">
-                    <p className="text-lg font-bold">review</p>
-                    <p className="text-xl font-bold">2</p>
-                </div>
-
-                <div className="transition-all opacity-90 hover:opacity-100 hover:scale-100 scale-90 bg-primary dark:bg-secondary text-gray-100 dark:text-gray-900 py-6 px-12 rounded-lg flex flex-row text-center gap-2">
-                    <p className="text-lg font-bold">active</p>
-                    <p className="text-xl font-bold">6</p>
-                </div>
-
-                <div className="transition-all opacity-90 hover:opacity-100 hover:scale-100 scale-90 bg-primary dark:bg-secondary text-gray-100 dark:text-gray-900 py-6 px-12 rounded-lg flex flex-row text-center gap-2">
-                    <p className="text-lg font-bold">progress</p>
-                    <p className="text-xl font-bold">31</p>
-                </div>
-
-                <div className="transition-all opacity-90 hover:opacity-100 hover:scale-100 scale-90 bg-primary dark:bg-secondary text-gray-100 dark:text-gray-900 py-6 px-12 rounded-lg flex flex-row text-center gap-2">
-                    <p className="text-lg font-bold">resolved</p>
-                    <p className="text-xl font-bold">4</p>
-                </div>
-
-                <div className="transition-all opacity-90 hover:opacity-100 hover:scale-100 scale-90 bg-primary dark:bg-secondary text-gray-100 dark:text-gray-900 py-6 px-12 rounded-lg flex flex-row text-center gap-2">
-                    <p className="text-lg font-bold">closed</p>
-                    <p className="text-xl font-bold">17</p>
-                </div>
-
-            </div>
-
-            <div className="pb-8 px-4 ml-10 flex flex-row gap-2 justify-between flex-wrap">
-
-                <div className="transition-all opacity-90 hover:opacity-100 hover:scale-100 scale-90 bg-primary dark:bg-secondary text-gray-100 dark:text-gray-900 py-6 px-12 rounded-lg flex flex-row text-center gap-2">
-                    <p className="text-lg font-bold">low</p>
-                    <p className="text-xl font-bold">2</p>
-                </div>
-
-                <div className="transition-all opacity-90 hover:opacity-100 hover:scale-100 scale-90 bg-primary dark:bg-secondary text-gray-100 dark:text-gray-900 py-6 px-12 rounded-lg flex flex-row text-center gap-2">
-                    <p className="text-lg font-bold">medium</p>
-                    <p className="text-xl font-bold">6</p>
-                </div>
-
-                <div className="transition-all opacity-90 hover:opacity-100 hover:scale-100 scale-90 bg-primary dark:bg-secondary text-gray-100 dark:text-gray-900 py-6 px-12 rounded-lg flex flex-row text-center gap-2">
-                    <p className="text-lg font-bold">high</p>
-                    <p className="text-xl font-bold">31</p>
-                </div>
-
-                <div className="transition-all opacity-90 hover:opacity-100 hover:scale-100 scale-90 bg-primary dark:bg-secondary text-gray-100 dark:text-gray-900 py-6 px-12 rounded-lg flex flex-row text-center gap-2">
-                    <p className="text-lg font-bold">critical</p>
-                    <p className="text-xl font-bold">4</p>
-                </div>
-
-            </div>
+            <Chart />
 
             <div className="w-full dark:bg-black bg-white border border-gray-500 shadow-md dark:shadow-secondary/40 rounded-md justify-center items-center flex flex-col p-2">
 
@@ -248,14 +170,6 @@ const Tickets = () => {
                 </div>
             </div>
 
-            <div className="flex flex-row justify-between my-4">
-                <div className="flex justify-center items-center w-[400px] h-fit rounded-md p-4 shadow-lg bg-white dark:bg-black">
-                    <Pie data={data} />
-                </div>
-                <div className="flex justify-center items-center w-[400px] h-fit rounded-md p-4 shadow-lg bg-white dark:bg-black">
-                    <Pie data={data} />
-                </div>
-            </div>
 
         </div>
     )
@@ -263,3 +177,161 @@ const Tickets = () => {
 
 
 export default Tickets;
+
+
+interface ITypeChart {
+    bugs: number;
+    features: number;
+}
+
+interface IStatusChart {
+    review: number;
+    active: number;
+    progress: number;
+    resolved: number;
+    closed: number;
+}
+
+interface IPriorityChart {
+    low: number;
+    medium: number;
+    high: number;
+    critical: number;
+}
+
+interface IChartsData {
+    type: ITypeChart;
+    status: IStatusChart;
+    priority: IPriorityChart;
+}
+
+const isData = (data: any) => {
+    const keys = Object.keys(data);
+    let isData = false;
+
+    for (const key of keys) {
+        if (data[key]! > 0) {
+            isData = true;
+            break;
+        }
+    };
+
+    return isData;
+};
+
+const Chart = () => {
+    const { projectId } = useParams();
+    const [payload, call] = useFetchApi<IChartsData>("GET", `ticket/chart/${projectId}`);
+
+    useEffect(() => { call() }, [])
+
+    return (
+        !payload.isLoading && !payload.result ? null :
+            <div className="flex flex-row justify-between items-center my-4">
+                {payload.isLoading ? <CircleProgress size="lg" /> : (
+                    <>
+                        {!isData(payload.result!.type) ? null : <TypeChart {...payload.result!.type} />}
+                        {!isData(payload.result!.status) ? null : <StatusChart {...payload.result!.status} />}
+                        {!isData(payload.result!.priority) ? null : <PriorityChart {...payload.result!.priority} />}
+                    </>
+                )}
+            </div>
+    )
+}
+
+const TypeChart = (props: ITypeChart) => {
+    ChartJS.register(ArcElement, Tooltip, Legend);
+
+    const data = {
+        labels: ['Bug', 'Feature'],
+        datasets: [
+            {
+                label: 'of Tickets',
+                data: [props.bugs, props.features],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)'
+                ],
+                borderWidth: 2,
+            },
+        ],
+    };
+
+    return (
+        <div className="flex justify-center items-center w-[400px] h-fit rounded-md p-4 shadow-lg bg-white dark:bg-black">
+            <Pie data={data} />
+        </div>
+    )
+}
+
+
+const StatusChart = (props: IStatusChart) => {
+    ChartJS.register(ArcElement, Tooltip, Legend);
+
+    const data = {
+        labels: ["Review", "Active", "Progress", "Resolved", "Closed"],
+        datasets: [
+            {
+                label: 'of Tickets',
+                data: [props.review, props.active, props.progress, props.resolved, props.closed],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                ],
+                borderWidth: 2,
+            },
+        ],
+    };
+
+
+    return (
+        <div className="flex justify-center items-center w-[400px] h-fit rounded-md p-4 shadow-lg bg-white dark:bg-black">
+            <Pie data={data} />
+        </div>
+    )
+}
+
+
+const PriorityChart = (props: IPriorityChart) => {
+    ChartJS.register(ArcElement, Tooltip, Legend);
+
+    const data = {
+        labels: ["Low", "Medium", "High", "Critical"],
+        datasets: [
+            {
+                label: 'of Tickets',
+                data: [props.low, props.medium, props.high, props.critical],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)'
+                ],
+                borderWidth: 2,
+            },
+        ],
+    };
+
+
+    return (
+        <div className="flex justify-center items-center w-[400px] h-fit rounded-md p-4 shadow-lg bg-white dark:bg-black">
+            <Pie data={data} />
+        </div>
+    )
+}

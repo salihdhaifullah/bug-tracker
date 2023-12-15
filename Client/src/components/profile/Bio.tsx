@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, KeyboardEvent } from "react";
+import { useEffect, useRef, useState, KeyboardEvent, useMemo } from "react";
 import useFetchApi from "../../utils/hooks/useFetchApi";
 import useOnClickOutside from "../../utils/hooks/useOnClickOutside";
 import TextFiled from "../utils/TextFiled";
@@ -39,11 +39,11 @@ const Bio = (props: IBioProps) => {
         if (e.key === "Enter") SubmitChanges();
     }
 
-    const Editing = () => isEditing && !getBioPayload.isLoading;
+    const Editing = useMemo(() => isEditing && !getBioPayload.isLoading, [isEditing, getBioPayload]);
 
     return props.editable ? (<>
-        <div className={`"flex flex-col w-80 " ${Editing() ? "h-full" : "h-fit"}`}>
-            {Editing() ? (
+        <div className={`"flex flex-col w-80 " ${Editing ? "h-full" : "h-fit"}`}>
+            {Editing ? (
                 <div ref={bioRef} className="flex flex-row gap-0 justify-start items-start w-full h-full">
                     <TextFiled
                         icon={MdOutlineSubtitles}

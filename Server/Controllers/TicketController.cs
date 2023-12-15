@@ -43,6 +43,47 @@ public class TicketController : Controller
         return assignedTo;
     }
 
+    [HttpGet("chart/{projectId}"), Authorized]
+    public async Task<IActionResult> TicketChart([FromRoute] string projectId)
+    {
+        try
+        {
+            var data = await _ctx.Projects
+            .Where(p => p.Id == projectId)
+            .Select((p) => new
+            {
+                type = new
+                {
+                    bugs = p.Tickets.Where(t => t.Type == TicketType.bug).Count(),
+                    features = p.Tickets.Where(t => t.Type == TicketType.feature).Count(),
+                },
+                status = new
+                {
+                    review = p.Tickets.Where(t => t.Status == Status.review).Count(),
+                    active = p.Tickets.Where(t => t.Status == Status.active).Count(),
+                    progress = p.Tickets.Where(t => t.Status == Status.in_progress).Count(),
+                    resolved = p.Tickets.Where(t => t.Status == Status.resolved).Count(),
+                    closed = p.Tickets.Where(t => t.Status == Status.closed).Count(),
+                },
+                priority = new
+                {
+                    low = p.Tickets.Where(t => t.Priority == Priority.low).Count(),
+                    medium = p.Tickets.Where(t => t.Priority == Priority.medium).Count(),
+                    high = p.Tickets.Where(t => t.Priority == Priority.high).Count(),
+                    critical = p.Tickets.Where(t => t.Priority == Priority.critical).Count(),
+                }
+            })
+            .FirstOrDefaultAsync();
+
+            return HttpResult.Ok(body: data);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.Message);
+            return HttpResult.InternalServerError();
+        }
+    }
+
     [HttpPost("{projectId}"), BodyValidation, Authorized]
     public async Task<IActionResult> CreateTicket([FromBody] CreateTicketDTO dto, [FromRoute] string projectId)
     {
@@ -101,7 +142,7 @@ public class TicketController : Controller
                 $"{assignedToText}" +
                 $"status is **{ticket.Entity.Status.ToString()}** and " +
                 $"priority is **{ticket.Entity.Priority.ToString()}**"
-            ,_ctx);
+            , _ctx);
 
             await _ctx.SaveChangesAsync();
 

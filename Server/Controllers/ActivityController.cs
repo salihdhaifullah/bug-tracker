@@ -28,8 +28,8 @@ public class ActivityController : Controller
         try
         {
             _auth.TryGetId(Request, out string? userId);
-            
-            var query = _ctx.Activities.Where(a => a.ProjectId == projectId && (!a.Project.IsPrivate || a.Project.Members.Any(m => userId != null && m.UserId == userId && m.IsJoined)));
+
+            var query = _ctx.Activities.Where(a => a.ProjectId == projectId && (!a.Project.IsPrivate || a.Project.Members.Any(m => userId != null && m.UserId == userId)));
 
             if (sort == "oldest") query = query.OrderBy(a => a.CreatedAt);
             else query = query.OrderByDescending(a => a.CreatedAt);
@@ -59,7 +59,7 @@ public class ActivityController : Controller
         {
             _auth.TryGetId(Request, out string? userId);
 
-            var count = await _ctx.Activities.Where(a => a.ProjectId == projectId && (!a.Project.IsPrivate || a.Project.Members.Any(m => userId != null && m.UserId == userId && m.IsJoined))).CountAsync();
+            var count = await _ctx.Activities.Where(a => a.ProjectId == projectId && (!a.Project.IsPrivate || a.Project.Members.Any(m => userId != null && m.UserId == userId))).CountAsync();
 
             return HttpResult.Ok(body: count);
         }

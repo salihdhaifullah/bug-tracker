@@ -30,7 +30,6 @@ const Footer = () => {
         <hr className="border-gray-200 my-3 dark:border-gray-700" />
         <span className="block text-sm text-gray-500 sm:text-center dark:text-gray-400">&copy; {new Date().getFullYear()} - <Link to="/" className="hover:underline dark:text-secondary text-primary">Buegee</Link>. All Rights Reserved.</span>
     </footer>
-    // <footer className="flex flex-row fixed bottom-0 w-full min-h-[6vh] text-primary dark:text-secondary bg-white dark:bg-black p-2 shadow-xl dark:shadow-secondary/40">&copy; {new Date().getFullYear()} - Buegee</footer>
   )
 }
 

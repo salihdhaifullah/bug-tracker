@@ -1,4 +1,3 @@
-using System.Text.Json;
 using Buegee.Data;
 using Buegee.DTO;
 using Buegee.Models;
@@ -20,25 +19,17 @@ namespace Buegee.Controllers;
 public class MemberController : Controller
 {
     private readonly DataContext _ctx;
-    private readonly IEmailService _email;
-    private readonly IJWTService _jwt;
     private readonly ILogger<MemberController> _logger;
-    private readonly IRedisCacheService _cache;
     private readonly IDataService _data;
     private readonly IAuthService _auth;
 
-    public MemberController(DataContext ctx, ILogger<MemberController> logger, IEmailService email, IJWTService jwt, IDataService data, IRedisCacheService cache, IAuthService auth)
+    public MemberController(DataContext ctx, ILogger<MemberController> logger, IDataService data, IAuthService auth)
     {
         _ctx = ctx;
         _logger = logger;
-        _email = email;
-        _jwt = jwt;
-        _cache = cache;
         _data = data;
         _auth = auth;
     }
-
-    private record Invention(string projectId, string userId, string userFullName);
 
     [HttpPost("invent/{projectId}"), BodyValidation, Authorized]
     public async Task<IActionResult> Invent([FromBody] InventDTO dto, [FromRoute] string projectId)
@@ -47,24 +38,24 @@ public class MemberController : Controller
         {
             var userId = _auth.GetId(Request);
 
-            var user = await _ctx.Users
+            var isOwner = await _ctx.Members
+                .AnyAsync(m => m.ProjectId == projectId
+                && m.UserId == userId
+                && m.Role == Role.owner);
+
+            if (!isOwner) return HttpResult.UnAuthorized();
+
+            var invented = await _ctx.Users
                     .Where(u => u.Id == dto.InventedId)
-                    .Select(u => new { name = $"{u.FirstName} {u.LastName}", email = u.Email })
+                    .Select(u => new { name = $"{u.FirstName} {u.LastName}" })
                     .FirstOrDefaultAsync();
 
-            if (user is null) return HttpResult.BadRequest("user to invent is not exist");
-
-            var invited = await _ctx.Users.Where(u => u.Id == userId)
-                            .Select(u => new { name = $"{u.FirstName} {u.LastName}" })
-                            .FirstOrDefaultAsync();
-
-            if (invited is null) return HttpResult.UnAuthorized();
+            if (invented is null) return HttpResult.BadRequest("user to invent is not exist");
 
             var project = await _ctx.Projects
-                    .Where(p => p.Id == projectId && p.Members.Any(m => m.User.Id == userId && m.Role == Role.owner))
+                    .Where(p => p.Id == projectId)
                     .Select(p => new { name = p.Name, p.IsReadOnly })
                     .FirstOrDefaultAsync();
-
 
             if (project is null) return HttpResult.Forbidden(massage: "you are not authorized to invent users");
 
@@ -77,16 +68,11 @@ public class MemberController : Controller
             if (!await _ctx.Members.AnyAsync(m => m.ProjectId == projectId && m.UserId == dto.InventedId))
             {
                 await _ctx.Members.AddAsync(new Member() { ProjectId = projectId, UserId = dto.InventedId, Role = role, Id = memberId });
+                await _data.AddActivity(projectId,
+                            $"user [{invented.name}](/profile/{dto.InventedId}) joined the project",
+                            _ctx);
                 await _ctx.SaveChangesAsync();
             }
-
-            var age = new TimeSpan(7, 0, 0, 0);
-
-            var sessionId = Guid.NewGuid().ToString();
-
-            await _cache.Redis.StringSetAsync(sessionId, JsonSerializer.Serialize<Invention>(new Invention(projectId, dto.InventedId, user.name)), age);
-
-            _email.Invitation(user.email, user.name, project.name, role, invited.name, $"{Helper.BaseUrl(Request)}/join-project/{sessionId}");
 
             return HttpResult.Ok("successfully invented user");
         }
@@ -97,44 +83,6 @@ public class MemberController : Controller
         }
     }
 
-    [HttpGet("{sessionId}"), Authorized]
-    public async Task<IActionResult> JoinProject([FromRoute] string sessionId)
-    {
-        try
-        {
-            var userId = _auth.GetId(Request);
-
-            string? json = await _cache.Redis.StringGetAsync(sessionId);
-
-            if (String.IsNullOrEmpty(json)) return HttpResult.NotFound(redirectTo: "/404");
-
-            var data = JsonSerializer.Deserialize<Invention>(json);
-
-            if (data is null || data.userId != userId) return HttpResult.NotFound(redirectTo: "/404");
-
-            var member = await _ctx.Members.Where(m => m.UserId == data.userId && m.ProjectId == data.projectId).FirstOrDefaultAsync();
-
-            if (member is null) return HttpResult.NotFound(redirectTo: "/404");
-
-            member.IsJoined = true;
-            member.JoinedAt = DateTime.UtcNow;
-
-            await _data.AddActivity(data.projectId,
-            $"user [{data.userFullName}](/profile/{data.userId}) joined the project",
-             _ctx);
-
-            await _ctx.SaveChangesAsync();
-
-            await _cache.Redis.KeyDeleteAsync(sessionId);
-
-            return HttpResult.Ok(massage: "successfully joined project", redirectTo: $"/project/{data.projectId}");
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e.Message);
-            return HttpResult.InternalServerError();
-        }
-    }
 
     [HttpPatch("leave/{projectId}"), Authorized]
     public async Task<IActionResult> LeaveProject([FromRoute] string projectId)
@@ -189,17 +137,19 @@ public class MemberController : Controller
     {
         try
         {
-            var users = await _ctx.Users.Where(u => (EF.Functions.ILike(u.Email, $"%{email}%")) && !u.MemberShips.Any(m => m.ProjectId == projectId && m.IsJoined))
-                            .OrderBy((u) => u.CreatedAt)
-                            .Select(u => new
-                            {
-                                avatarUrl = u.AvatarUrl,
-                                email = u.Email,
-                                name = $"{u.FirstName} {u.LastName}",
-                                id = u.Id,
-                            })
-                            .Take(10)
-                            .ToListAsync();
+            var users = await _ctx.Users.Where(u =>
+                    EF.Functions.ILike(u.Email, $"%{email}%")
+                    && !u.MemberShips.Any(m => m.ProjectId == projectId)
+                    ).OrderBy((u) => u.CreatedAt)
+                    .Select(u => new
+                    {
+                        avatarUrl = u.AvatarUrl,
+                        email = u.Email,
+                        name = $"{u.FirstName} {u.LastName}",
+                        id = u.Id,
+                    })
+                    .Take(10)
+                    .ToListAsync();
 
             return HttpResult.Ok(body: users);
         }
@@ -211,15 +161,20 @@ public class MemberController : Controller
     }
 
     [HttpGet("members/{projectId}"), Authorized]
-    public async Task<IActionResult> SearchMember([FromRoute] string projectId, [FromQuery] string email, [FromQuery(Name = "not-me")] bool notMe = false)
+    public async Task<IActionResult> SearchMember([FromRoute] string projectId,
+    [FromQuery] string email, [FromQuery(Name = "not-me")] bool notMe = false)
     {
         try
         {
             var userId = _auth.GetId(Request);
 
-            var nameParts = string.IsNullOrEmpty(email) ? null : email.Split(" ");
-            var members = await _ctx.Members.Where(m => ((!(nameParts == null || nameParts.Length < 2) && (m.User.FirstName == nameParts[0] && m.User.LastName == nameParts[1])) || EF.Functions.ILike(m.User.Email, $"%{email}%") || EF.Functions.ILike(m.User.FirstName, $"%{email}%") || EF.Functions.ILike(m.User.LastName, $"%{email}%")) && m.ProjectId == projectId && m.IsJoined && (!notMe || m.UserId != userId))
-                    .OrderBy((u) => u.JoinedAt)
+            var members = await _ctx.Members.Where(m =>
+                    (EF.Functions.ILike(m.User.Email, $"%{email}%")
+                    || EF.Functions.ILike(m.User.FirstName, $"%{email}%")
+                    || EF.Functions.ILike(m.User.LastName, $"%{email}%"))
+                    && m.ProjectId == projectId
+                    && (!notMe || m.UserId != userId)
+                    ).OrderBy((u) => u.JoinedAt)
                     .Select(u => new
                     {
                         avatarUrl = u.User.AvatarUrl,
@@ -239,6 +194,30 @@ public class MemberController : Controller
         }
     }
 
+    [HttpGet("chart/{projectId}"), Authorized]
+    public async Task<IActionResult> MemberChart([FromRoute] string projectId)
+    {
+        try
+        {
+            var data = await _ctx.Projects
+            .Where(p => p.Id == projectId)
+            .Select((p) => new
+            {
+                developers = p.Members.Where(m => m.Role == Role.developer).Count(),
+                testers = p.Members.Where(m => m.Role == Role.tester).Count(),
+                projectMangers = p.Members.Where(m => m.Role == Role.project_manger).Count(),
+            })
+            .FirstOrDefaultAsync();
+
+            return HttpResult.Ok(body: data);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.Message);
+            return HttpResult.InternalServerError();
+        }
+    }
+
 
     [HttpGet("members-count/{projectId}"), Authorized]
     public async Task<IActionResult> MembersCount([FromRoute] string projectId, [FromQuery(Name = "role")] string? roleQuery, [FromQuery] string? search)
@@ -248,7 +227,13 @@ public class MemberController : Controller
             Role? role = null;
             if (!string.IsNullOrEmpty(roleQuery) && Enum.TryParse<Role>(roleQuery, out Role parsedRole)) role = parsedRole;
 
-            var count = await _ctx.Members.Where(m => m.ProjectId == projectId && m.IsJoined && (role == null || m.Role == role) && (EF.Functions.ILike(m.User.Email, $"%{search}%") || EF.Functions.ILike(m.User.FirstName, $"%{search}%") || EF.Functions.ILike(m.User.LastName, $"%{search}%"))).CountAsync();
+            var count = await _ctx.Members
+                    .Where(m => m.ProjectId == projectId
+                    && (role == null || m.Role == role)
+                    && (EF.Functions.ILike(m.User.Email, $"%{search}%")
+                    || EF.Functions.ILike(m.User.FirstName, $"%{search}%")
+                    || EF.Functions.ILike(m.User.LastName, $"%{search}%"))
+                    ).CountAsync();
 
             return HttpResult.Ok(body: count);
         }
@@ -268,9 +253,12 @@ public class MemberController : Controller
             if (!string.IsNullOrEmpty(roleQuery) && Enum.TryParse<Role>(roleQuery, out Role parsedRole)) role = parsedRole;
 
             var members = await _ctx.Members
-                        .Where(m => m.ProjectId == projectId && m.IsJoined && (role == null || m.Role == role) &&
-                        (EF.Functions.ILike(m.User.Email, $"%{search}%") || EF.Functions.ILike(m.User.FirstName, $"%{search}%") || EF.Functions.ILike(m.User.LastName, $"%{search}%")))
-                        .OrderBy((m) => m.JoinedAt)
+                        .Where(m => m.ProjectId == projectId
+                        && (role == null || m.Role == role)
+                        && (EF.Functions.ILike(m.User.Email, $"%{search}%")
+                        || EF.Functions.ILike(m.User.FirstName, $"%{search}%")
+                        || EF.Functions.ILike(m.User.LastName, $"%{search}%"))
+                        ).OrderBy((m) => m.JoinedAt)
                         .Select(m => new
                         {
                             avatarUrl = m.User.AvatarUrl,
@@ -300,7 +288,7 @@ public class MemberController : Controller
         {
             var userId = _auth.GetId(Request);
 
-            var isOwner = await _ctx.Members.AnyAsync(m => m.ProjectId == projectId && m.IsJoined && m.UserId == userId && m.Role == Role.owner);
+            var isOwner = await _ctx.Members.AnyAsync(m => m.ProjectId == projectId && m.UserId == userId && m.Role == Role.owner);
 
             if (!isOwner) return HttpResult.Forbidden("you are not authorized to delete a member");
 
@@ -309,7 +297,7 @@ public class MemberController : Controller
             if (isReadOnly) return HttpResult.BadRequest("this project is archived");
 
             var member = await _ctx.Members
-                    .Where(m => m.ProjectId == projectId && m.IsJoined && m.UserId == memberId)
+                    .Where(m => m.ProjectId == projectId && m.UserId == memberId)
                     .Include(m => m.User)
                     .FirstOrDefaultAsync();
 
@@ -341,7 +329,10 @@ public class MemberController : Controller
         {
             var userId = _auth.GetId(Request);
 
-            var isOwner = await _ctx.Members.AnyAsync(m => m.ProjectId == projectId && m.IsJoined && m.UserId == userId && m.Role == Role.owner);
+            var isOwner = await _ctx.Members.AnyAsync(m =>
+            m.ProjectId == projectId
+            && m.UserId == userId
+            && m.Role == Role.owner);
 
             if (!isOwner) return HttpResult.Forbidden("you are not authorized to edit members roles in this project");
 
@@ -350,7 +341,7 @@ public class MemberController : Controller
             if (isReadOnly) return HttpResult.BadRequest("this project is archived");
 
             var member = await _ctx.Members
-                    .Where(m => m.ProjectId == projectId && m.IsJoined && m.UserId == dto.MemberId)
+                    .Where(m => m.ProjectId == projectId && m.UserId == dto.MemberId)
                     .Include(m => m.User)
                     .FirstOrDefaultAsync();
 

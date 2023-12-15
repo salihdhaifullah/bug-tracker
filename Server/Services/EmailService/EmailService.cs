@@ -12,7 +12,6 @@ public class EmailService : IEmailService
 
     private readonly string _verificationEmailHtml;
     private readonly string _resetPasswordHtml;
-    private readonly string _invitationToProjectHtml;
     private readonly string _ticketAssignedToYouHtml;
 
     public EmailService(IConfiguration config)
@@ -31,7 +30,6 @@ public class EmailService : IEmailService
 
         _verificationEmailHtml = File.ReadAllText("./Emails/verification-email.html");
         _resetPasswordHtml = File.ReadAllText("./Emails/reset-password.html");
-        _invitationToProjectHtml = File.ReadAllText("./Emails/invitation-to-project.html");
         _ticketAssignedToYouHtml = File.ReadAllText("./Emails/ticket-assigned-to-you.html");
     }
 
@@ -74,18 +72,6 @@ public class EmailService : IEmailService
         items.Add(new Item("${code}", code));
 
         mail(to, "reset your password", _resetPasswordHtml, items);
-    }
-
-    public void Invitation(string to, string name, string projectName, Role role, string inventerName, string url)
-    {
-        var items = new List<Item>(5);
-        items.Add(new Item("${name}", name));
-        items.Add(new Item("${project_name}", projectName));
-        items.Add(new Item("${role}", role.ToString()));
-        items.Add(new Item("${inventer}", inventerName));
-        items.Add(new Item("${url}", url));
-
-        mail(to, "invitation to project", _invitationToProjectHtml, items);
     }
 
     public void TicketAssignation(string to, string name, string ticketName, TicketType ticketType, Status ticketStatus, Priority ticketPriority)

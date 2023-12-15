@@ -28,7 +28,4 @@ public class Member
 
     [Column("role"), EnumDataType(typeof(Role))]
     public Role Role { get; set; } = Role.developer;
-
-    [Column("is_joined")]
-    public bool IsJoined { get; set; } = false;
 }

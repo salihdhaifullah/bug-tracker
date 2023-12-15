@@ -37,7 +37,7 @@ public class ProjectController : Controller
             var projectId = Ulid.NewUlid().ToString();
             var memberId = Ulid.NewUlid().ToString();
 
-            await _ctx.Members.AddAsync(new Member() { UserId = userId, Id = memberId, ProjectId = projectId, Role = Role.owner, IsJoined = true });
+            await _ctx.Members.AddAsync(new Member() { UserId = userId, Id = memberId, ProjectId = projectId, Role = Role.owner });
             await _ctx.Contents.AddAsync(new Content() { Id = contentId });
             await _ctx.Projects.AddAsync(new Project()
             {
@@ -68,11 +68,12 @@ public class ProjectController : Controller
             _auth.TryGetId(Request, out string? currentUserId);
 
             var projects = await _ctx.Projects
-                            .Where((p) =>
-                            p.Members.Any(m => m.UserId != currentUserId || !m.IsJoined)
+                            .Where((p) => p.Members.Any(m => m.UserId != currentUserId)
                             && !p.IsPrivate
-                            && (EF.Functions.ILike(p.Name, $"%{search}%") ||
-                            (search != null && search.Length >= 3 && EF.Functions.ILike(p.Content.Markdown, $"%{search}%")))
+                            && (EF.Functions.ILike(p.Name, $"%{search}%")
+                            || (search != null
+                            && search.Length >= 3
+                            && EF.Functions.ILike(p.Content.Markdown, $"%{search}%")))
                             ).OrderByDescending((p) => p.Activities.Max(a => a.CreatedAt))
                             .Select((p) => new
                             {
@@ -80,7 +81,7 @@ public class ProjectController : Controller
                                 id = p.Id,
                                 isReadOnly = p.IsReadOnly,
                                 name = p.Name,
-                                members = p.Members.Where(m => m.IsJoined).Count(),
+                                members = p.Members.Count,
                                 tickets = p.Tickets.Count,
                                 content = p.Content.Markdown,
                                 owner = p.Members.Where(m => m.Role == Role.owner).Select(m => new {
@@ -110,10 +111,10 @@ public class ProjectController : Controller
             _auth.TryGetId(Request, out string? currentUserId);
 
             var projectsCount = await _ctx.Projects.Where((p) =>
-                            p.Members.Any(m => m.UserId != currentUserId || !m.IsJoined)
+                            p.Members.Any(m => m.UserId != currentUserId)
                             && !p.IsPrivate
                             && EF.Functions.ILike(p.Name, $"%{search}%")
-            ).CountAsync();
+                            ).CountAsync();
 
             int pages = (int)Math.Ceiling((double)projectsCount / take);
 
@@ -148,7 +149,9 @@ public class ProjectController : Controller
 
             var projects = await _ctx.Projects
                             .Where((p) =>
-                            (!p.IsPrivate || (currentUserId != null && p.Members.Any(m => m.UserId == currentUserId && m.IsJoined)))
+                            (!p.IsPrivate
+                            || (currentUserId != null
+                            && p.Members.Any(m => m.UserId == currentUserId)))
                             && p.Members.Any(m => m.UserId == userId && (role == null || m.Role == role))
                             && (isPrivate == null || p.IsPrivate == isPrivate)
                             && (isReadOnly == null || p.IsReadOnly == isReadOnly)
@@ -162,7 +165,7 @@ public class ProjectController : Controller
                                 isReadOnly = p.IsReadOnly,
                                 name = p.Name,
                                 role = p.Members.Where(m => m.UserId == userId).Select(m => m.Role.ToString()),
-                                members = p.Members.Where(m => m.IsJoined).Count(),
+                                members = p.Members.Count,
                                 tickets = p.Tickets.Count
                             })
                             .Skip((page - 1) * take)
@@ -200,7 +203,7 @@ public class ProjectController : Controller
             else if (!string.IsNullOrEmpty(status) && status == "unarchive") isReadOnly = false;
 
             var projectsCount = await _ctx.Projects.Where((p) =>
-                            (!p.IsPrivate || (currentUserId != null && p.Members.Any(m => m.UserId == currentUserId && m.IsJoined)))
+                            (!p.IsPrivate || (currentUserId != null && p.Members.Any(m => m.UserId == currentUserId)))
                             && p.Members.Any(m => m.UserId == userId && (role == null || m.Role == role))
                             && (isPrivate == null || p.IsPrivate == isPrivate)
                             && (isReadOnly == null || p.IsReadOnly == isReadOnly)
@@ -227,14 +230,14 @@ public class ProjectController : Controller
             _auth.TryGetId(Request, out string? userId);
 
             var project = await _ctx.Projects
-                            .Where((p) => p.Id == projectId && (!p.IsPrivate || p.Members.Any(m => userId != null && m.UserId == userId && m.IsJoined)))
+                            .Where((p) => p.Id == projectId && (!p.IsPrivate || p.Members.Any(m => userId != null && m.UserId == userId)))
                             .Select((p) => new
                             {
                                 name = p.Name,
                                 id = p.Id,
                                 isPrivate = p.IsPrivate,
                                 isReadOnly = p.IsReadOnly,
-                                members = p.Members.Where(m => m.IsJoined).Count(),
+                                members = p.Members.Count,
                                 tickets = p.Tickets.Count,
                                 createdAt = p.CreatedAt,
                                 markdown = p.Content.Markdown,
@@ -335,7 +338,7 @@ public class ProjectController : Controller
         {
             var userId = _auth.GetId(Request);
 
-            var isOwner = await _ctx.Members.AnyAsync(m => m.ProjectId == projectId && m.UserId == userId && m.Role == Role.owner && m.IsJoined);
+            var isOwner = await _ctx.Members.AnyAsync(m => m.ProjectId == projectId && m.UserId == userId && m.Role == Role.owner);
 
             if (!isOwner) return HttpResult.Forbidden("you are not allowed to do this action");
 
@@ -371,7 +374,7 @@ public class ProjectController : Controller
         {
             var userId = _auth.GetId(Request);
 
-            var isOwner = await _ctx.Members.AnyAsync(m => m.ProjectId == projectId && m.UserId == userId && m.Role == Role.owner && m.IsJoined);
+            var isOwner = await _ctx.Members.AnyAsync(m => m.ProjectId == projectId && m.UserId == userId && m.Role == Role.owner);
 
             if (!isOwner) return HttpResult.Forbidden("you are not allowed to do this action");
 
@@ -402,7 +405,7 @@ public class ProjectController : Controller
         try
         {
             var newOwner = await _ctx.Members
-                .Where(m => m.IsJoined && m.ProjectId == dto.ProjectId && m.Role != Role.owner && m.Id == dto.MemberId)
+                .Where(m => m.ProjectId == dto.ProjectId && m.Role != Role.owner && m.Id == dto.MemberId)
                 .Include(m => m.User)
                 .FirstOrDefaultAsync();
 
@@ -411,7 +414,7 @@ public class ProjectController : Controller
             var userId = _auth.GetId(Request);
 
             var currentOwner = await _ctx.Members
-                .Where(m => m.ProjectId == dto.ProjectId && m.UserId == userId && m.Role == Role.owner && m.IsJoined)
+                .Where(m => m.ProjectId == dto.ProjectId && m.UserId == userId && m.Role == Role.owner)
                 .Include(m => m.User)
                 .FirstOrDefaultAsync();
 
@@ -484,7 +487,7 @@ public class ProjectController : Controller
             _auth.TryGetId(Request, out string? userId);
 
             var content = await _ctx.Projects
-                        .Where(p => p.Id == projectId && (!p.IsPrivate || p.Members.Any(m => userId != null && m.UserId == userId && m.IsJoined)))
+                        .Where(p => p.Id == projectId && (!p.IsPrivate || p.Members.Any(m => userId != null && m.UserId == userId)))
                         .Select(p => new { markdown = p.Content.Markdown })
                         .FirstOrDefaultAsync();
 

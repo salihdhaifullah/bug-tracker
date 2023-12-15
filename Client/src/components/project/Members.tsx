@@ -155,6 +155,7 @@ const Action = (props: IActionProps) => {
     )
 }
 
+
 const Members = () => {
     const { projectId } = useParams();
     const [search, setSearch] = useState("");
@@ -183,57 +184,11 @@ const Members = () => {
         if (countPayload.result && !(page * take >= countPayload.result)) setPage((prev) => prev + 1)
     }
 
-    ChartJS.register(ArcElement, Tooltip, Legend);
 
-    const data = {
-        labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-        datasets: [
-            {
-                label: '# of Votes',
-                data: [12, 19, 3, 5, 2, 3],
-                backgroundColor: [
-                    'rgba(255, 99, 132, 0.2)',
-                    'rgba(54, 162, 235, 0.2)',
-                    'rgba(255, 206, 86, 0.2)',
-                    'rgba(75, 192, 192, 0.2)',
-                    'rgba(153, 102, 255, 0.2)',
-                    'rgba(255, 159, 64, 0.2)',
-                ],
-                borderColor: [
-                    'rgba(255, 99, 132, 1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(255, 206, 86, 1)',
-                    'rgba(75, 192, 192, 1)',
-                    'rgba(153, 102, 255, 1)',
-                    'rgba(255, 159, 64, 1)',
-                ],
-                borderWidth: 1,
-            },
-        ],
-    };
 
     return (
         <div className="my-10">
             <h2 className="text-3xl font-bold w-full mb-10 text-center text-primary dark:text-secondary">Members</h2>
-
-            <div className="pb-8 px-4 flex flex-row gap-2 justify-between flex-wrap">
-
-                <div className="transition-all opacity-90 hover:opacity-100 hover:scale-100 scale-90 bg-primary dark:bg-secondary text-gray-100 dark:text-gray-900 py-6 px-12 rounded-lg flex flex-row text-center gap-2">
-                    <p className="text-lg font-bold">developers</p>
-                    <p className="text-xl font-bold">31</p>
-                </div>
-
-                <div className="transition-all opacity-90 hover:opacity-100 hover:scale-100 scale-90 bg-primary dark:bg-secondary text-gray-100 dark:text-gray-900 py-6 px-12 rounded-lg flex flex-row text-center gap-2">
-                    <p className="text-lg font-bold">testers</p>
-                    <p className="text-xl font-bold">9</p>
-                </div>
-
-                <div className="transition-all opacity-90 hover:opacity-100 hover:scale-100 scale-90 bg-primary dark:bg-secondary text-gray-100 dark:text-gray-900 py-6 px-12 rounded-lg flex flex-row text-center gap-2">
-                    <p className="text-lg font-bold">project mangers</p>
-                    <p className="text-xl font-bold">6</p>
-                </div>
-
-            </div>
 
             <div className="w-full bg-white dark:bg-black border border-gray-500 shadow-md dark:shadow-secondary/40 rounded-md justify-center items-center flex flex-col p-2">
 
@@ -317,12 +272,61 @@ const Members = () => {
 
             </div>
 
-            <div className="flex justify-center items-center my-4 w-[400px] h-fit rounded-md p-4 shadow-lg bg-white dark:bg-black">
-                <Pie data={data} />
-            </div>
+            <RolesPieChart />
 
         </div>
     )
 }
 
 export default Members;
+
+const RolesPieChart = () => {
+    const { projectId } = useParams();
+
+    const [isNoMembers, setIsNoMembers] = useState(false);
+
+    const [rolesPayload, callRoles] = useFetchApi<{ developers: number, testers: number, projectMangers: number }>("GET", `member/chart/${projectId}`);
+
+    useEffect(() => { callRoles() }, [])
+
+    ChartJS.register(ArcElement, Tooltip, Legend);
+
+    const config = {
+        labels: ['developers', 'testers', 'project mangers'],
+        datasets: [
+            {
+                label: 'of members',
+                data: [0, 0, 0],
+                backgroundColor: [
+                    '#d946ef',
+                    '#eab308',
+                    '#3b82f6'
+                ],
+                borderColor: [
+                    '#701a75',
+                    '#713f12',
+                    '#1e3a8a'
+                ],
+                borderWidth: 2,
+            },
+        ],
+    }
+
+    const getData = (result: { developers: number, testers: number, projectMangers: number }) => {
+        if (result.developers + result.testers + result.projectMangers === 0) {
+            setIsNoMembers(true)
+        };
+        config.datasets[0].data = [result.developers, result.testers, result.projectMangers]
+        return config;
+    }
+
+    return (
+        isNoMembers ? null :
+            <div className="flex justify-center items-center text-center my-4 w-[400px] h-fit rounded-md p-4 shadow-lg bg-white dark:bg-black">
+                {rolesPayload.result && !rolesPayload.isLoading
+                    ? <Pie data={getData(rolesPayload.result)} />
+                    : <CircleProgress size="lg" />
+                }
+            </div>
+    )
+}

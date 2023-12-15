@@ -4,7 +4,6 @@ import Modal from "../utils/Modal";
 import useFetchApi from "../../utils/hooks/useFetchApi";
 import SelectUser from "../utils/SelectUser";
 
-
 interface IDangerZoneProps {
     id: string;
     createdAt: string;
