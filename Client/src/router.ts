@@ -17,10 +17,10 @@ import Ticket from "./pages/Ticket";
 import MyTasks from "./pages/MyTasks";
 import Projects from "./pages/Projects";
 import Search from "./pages/Search";
-import Members from "./pages/Members";
+import Members from "./pages/Project/Members";
 import Activities from "./pages/Activities";
-import Tickets from "./pages/Tickets";
-import DangerZone from "./pages/DangerZone";
+import Tickets from "./pages/Project/Tickets";
+import DangerZone from "./pages/Project/DangerZone";
 
 const router = createBrowserRouter([{
     path: "/",

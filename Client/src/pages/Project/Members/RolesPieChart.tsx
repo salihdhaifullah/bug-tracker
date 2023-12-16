@@ -2,8 +2,8 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { useEffect, useState } from 'react';
 import { Pie } from 'react-chartjs-2';
 import { useParams } from 'react-router-dom';
-import useFetchApi from '../../utils/hooks/useFetchApi';
-import CircleProgress from '../../components/utils/CircleProgress';
+import useFetchApi from '../../../utils/hooks/useFetchApi';
+import CircleProgress from '../../../components/utils/CircleProgress';
 
 interface IData {
     developers: number;

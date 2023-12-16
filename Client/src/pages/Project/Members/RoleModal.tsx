@@ -1,12 +1,12 @@
 import { Dispatch, FormEvent, SetStateAction, useEffect, useState } from 'react'
 import { IChangeRole, IMember } from '.';
-import useFetchApi from '../../utils/hooks/useFetchApi';
+import useFetchApi from '../../../utils/hooks/useFetchApi';
 import { Link, useParams } from 'react-router-dom';
-import Modal from '../../components/utils/Modal';
-import rolesColors from '../../utils/rolesColors';
-import Select from '../../components/utils/Select';
-import roles from '../../utils/roles';
-import Button from '../../components/utils/Button';
+import Modal from '../../../components/utils/Modal';
+import rolesColors from '../../../utils/rolesColors';
+import Select from '../../../components/utils/Select';
+import roles from '../../../utils/roles';
+import Button from '../../../components/utils/Button';
 
 
 interface IRoleModalProps {

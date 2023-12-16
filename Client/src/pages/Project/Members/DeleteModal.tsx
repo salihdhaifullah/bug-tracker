@@ -1,10 +1,10 @@
 import { Dispatch, SetStateAction } from 'react'
-import useFetchApi from '../../utils/hooks/useFetchApi'
+import useFetchApi from '../../../utils/hooks/useFetchApi'
 import { IMember } from '.'
 import { Link, useParams } from 'react-router-dom';
-import Modal from '../../components/utils/Modal';
-import Button from '../../components/utils/Button';
-import rolesColors from '../../utils/rolesColors';
+import Modal from '../../../components/utils/Modal';
+import Button from '../../../components/utils/Button';
+import rolesColors from '../../../utils/rolesColors';
 
 interface IDeleteModalProps {
     member: IMember;

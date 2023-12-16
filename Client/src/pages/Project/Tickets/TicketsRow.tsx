@@ -1,8 +1,8 @@
 import { Link, useParams } from 'react-router-dom';
 import { ITicket } from '.'
-import formatDate from '../../utils/formatDate';
-import TicketAction from '../../components/utils/TicketAction';
-import labelsColors from '../../utils/labelsColors';
+import formatDate from '../../../utils/formatDate';
+import TicketAction from '../../../components/utils/TicketAction';
+import labelsColors from '../../../utils/labelsColors';
 
 interface ITicketsRowProps {
     ticket: ITicket;

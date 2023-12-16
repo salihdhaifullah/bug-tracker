@@ -1,8 +1,8 @@
 import { IActionProps } from ".";
 import { useRef, useState } from "react";
-import useOnClickOutside from "../../utils/hooks/useOnClickOutside";
+import useOnClickOutside from "../../../utils/hooks/useOnClickOutside";
 import { FiMoreVertical } from "react-icons/fi";
-import Button from "../../components/utils/Button";
+import Button from "../../../components/utils/Button";
 import DeleteModal from "./DeleteModal";
 import RoleModal from "./RoleModal";
 

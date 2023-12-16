@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom"
-import formatDate from "../../utils/formatDate"
+import formatDate from "../../../utils/formatDate"
 import { IMember } from "."
 import Action from "./Action";
 

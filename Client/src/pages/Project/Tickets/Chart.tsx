@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
-import useFetchApi from "../../utils/hooks/useFetchApi";
-import CircleProgress from "../../components/utils/CircleProgress";
+import useFetchApi from "../../../utils/hooks/useFetchApi";
+import CircleProgress from "../../../components/utils/CircleProgress";
 import { IChartsData, isData } from ".";
 import TypeChart from "./TypeChart";
 import StatusChart from "./StatusChart";

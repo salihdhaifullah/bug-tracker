@@ -1,12 +1,12 @@
 import { useParams } from "react-router-dom"
-import Button from "../../components/utils/Button";
+import Button from "../../../components/utils/Button";
 import { useEffect, useState } from "react";
-import useFetchApi from "../../utils/hooks/useFetchApi";
-import CircleProgress from "../../components/utils/CircleProgress";
+import useFetchApi from "../../../utils/hooks/useFetchApi";
+import CircleProgress from "../../../components/utils/CircleProgress";
 import { AiOutlineArrowLeft, AiOutlineArrowRight } from "react-icons/ai";
-import SelectButton from "../../components/utils/SelectButton";
-import SearchFiled from "../../components/utils/SearchFiled";
-import roles from "../../utils/roles";
+import SelectButton from "../../../components/utils/SelectButton";
+import SearchFiled from "../../../components/utils/SearchFiled";
+import roles from "../../../utils/roles";
 import InviteModal from "./InviteModal";
 import MembersRow from "./MembersRow";
 import RolesPieChart from "./RolesPieChart";

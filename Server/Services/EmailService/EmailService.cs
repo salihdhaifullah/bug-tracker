@@ -6,21 +6,23 @@ using Buegee.Utils.Enums;
 namespace Buegee.Services.EmailService;
 public class EmailService : IEmailService
 {
-    private readonly string? _appEmail;
-    private readonly string? _appPassword;
     private SmtpClient _smtpClient;
 
     private readonly string _verificationEmailHtml;
     private readonly string _resetPasswordHtml;
     private readonly string _ticketAssignedToYouHtml;
+    private readonly string _appEmail;
+    private readonly string _appPassword;
 
     public EmailService(IConfiguration config)
     {
-        _appPassword = config.GetSection("EmailService").GetValue<string>("AppPassword");
-        _appEmail = config.GetSection("EmailService").GetValue<string>("AppEmail");
+        var isAppPassword = config.GetSection("EmailService").GetValue<string>("AppPassword");
+        var isAppEmail = config.GetSection("EmailService").GetValue<string>("AppEmail");
 
-        if (_appPassword is null || _appEmail is null) throw new Exception("email service is not configured");
+        if (String.IsNullOrEmpty(isAppPassword) || String.IsNullOrEmpty(isAppEmail)) throw new Exception("email service is not configured");
 
+        _appPassword = isAppPassword;
+        _appEmail = isAppEmail;
 
         _smtpClient = new SmtpClient("smtp.gmail.com", 587)
         {
