@@ -4,24 +4,19 @@ import useFetchApi from "../../utils/hooks/useFetchApi";
 import formatDate from "../../utils/formatDate";
 import CircleProgress from "../../components/utils/CircleProgress";
 import Content from "../../components/utils/Content";
-import Members from "./Members";
-import Tickets from "./Tickets";
-import DangerZone from "./DangerZone";
 import { useUser } from "../../utils/context/user";
-import { FaTasks } from "react-icons/fa";
-import Activities from "./Activities";
+import { FaListUl, FaTasks } from "react-icons/fa";
 import Action from "./Action";
+import Button from "../../components/utils/Button";
+import { MdOutlineWarning } from "react-icons/md";
+import { FiUsers } from "react-icons/fi";
+import { RxActivityLog } from 'react-icons/rx';
 
 interface IProject {
     id: string;
     createdAt: string;
     name: string;
-    isPrivate: boolean;
     isReadOnly: boolean;
-    members: number;
-    tickets: number;
-    markdown: string;
-    isMember: boolean;
     owner: {
         avatarUrl: string;
         name: string;
@@ -47,6 +42,45 @@ const Project = () => {
         : payload.result === null ? null : (
             <section className="flex flex-col w-full h-full my-10 p-2 flex-grow">
 
+                <div className="flex flex-row justify-end ml-10 items-center gap-6 mb-6">
+
+                    <Link to={`/my-tasks/${projectId}`}>
+                        <Button className="flex-row flex gap-2 justify-center items-center">
+                            <p>your tasks</p>
+                            <FaTasks />
+                        </Button>
+                    </Link>
+
+                    <Link to={`/members/${projectId}`}>
+                        <Button className="flex-row flex gap-2 justify-center items-center">
+                            <p>members</p>
+                            <FiUsers />
+                        </Button>
+                    </Link>
+
+                    <Link to={`/tickets/${projectId}`}>
+                        <Button className="flex-row flex gap-2 justify-center items-center">
+                            <p>tickets</p>
+                            <FaListUl />
+                        </Button>
+                    </Link>
+
+                    <Link to={`/activities/${projectId}`}>
+                        <Button className="flex-row flex gap-2 justify-center items-center">
+                            <p>activities</p>
+                            <RxActivityLog />
+                        </Button>
+                    </Link>
+
+                    <Link to={`/danger-zone/${projectId}`}>
+                        <Button className="flex-row flex gap-2 justify-center items-center">
+                            <p>danger zone</p>
+                            <MdOutlineWarning />
+                        </Button>
+                    </Link>
+
+                </div>
+
                 <div className="flex flex-row w-full h-full gap-3">
 
                     <Link to={`/profile/${payload.result.owner.id}`} className="w-fit h-fit min-w-[2.5rem] min-h-[2.5rem] flex">
@@ -69,13 +103,6 @@ const Project = () => {
                                 </Link>
 
                                 <p title="created at" className="text-gray-600 dark:text-gray-400 text-sm font-normal">{formatDate(payload.result.createdAt)}</p>
-
-                                <Link to={`/my-tasks/${projectId}`}>
-                                    <div className="flex flex-row justify-center rounded-md font-bold hover:bg-slate-200 dark:hover:bg-slate-800 text-primary dark:text-secondary p-1 items-center gap-2">
-                                        <p>your tasks</p>
-                                        <FaTasks />
-                                    </div>
-                                </Link>
 
                             </div>
 
@@ -101,11 +128,6 @@ const Project = () => {
                     </div>
 
                 </div>
-
-                <Members />
-                <Tickets />
-                <Activities />
-                <DangerZone {...payload.result} isOwner={Boolean(isOwnerPayload.result)} />
 
             </section >
         );

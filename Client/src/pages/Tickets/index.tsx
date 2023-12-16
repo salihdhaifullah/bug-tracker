@@ -1,12 +1,12 @@
 import { useParams } from "react-router-dom"
-import Button from "../../../components/utils/Button";
-import useFetchApi from "../../../utils/hooks/useFetchApi";
+import Button from "../../components/utils/Button";
+import useFetchApi from "../../utils/hooks/useFetchApi";
 import { useEffect, useState } from "react";
-import CircleProgress from "../../../components/utils/CircleProgress";
+import CircleProgress from "../../components/utils/CircleProgress";
 import { AiOutlineArrowLeft, AiOutlineArrowRight } from "react-icons/ai";
-import SelectButton from "../../../components/utils/SelectButton";
-import CreateTicketModal, { priorityOptions, statusOptions, typeOptions } from "../../../components/utils/CreateTicketModal";
-import SearchFiled from "../../../components/utils/SearchFiled";
+import SelectButton from "../../components/utils/SelectButton";
+import CreateTicketModal, { priorityOptions, statusOptions, typeOptions } from "../../components/utils/CreateTicketModal";
+import SearchFiled from "../../components/utils/SearchFiled";
 import Charts from "./Chart";
 import TicketsRow from "./TicketsRow";
 
@@ -96,8 +96,7 @@ const Tickets = () => {
     const [isOpenCreateTicketModal, setIsOpenCreateTicketModal] = useState(false);
 
     return (
-        <div className="my-10">
-            <h2 className="text-3xl font-bold w-full mb-10 text-center text-primary dark:text-secondary">Tickets</h2>
+        <section className="h-full w-full py-4 px-8 mt-10 gap-8 flex flex-col">
 
             <Charts />
 
@@ -170,8 +169,7 @@ const Tickets = () => {
                 </div>
             </div>
 
-
-        </div>
+        </section>
     )
 }
 

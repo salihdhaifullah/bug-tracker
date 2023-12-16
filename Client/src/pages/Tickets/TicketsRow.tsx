@@ -1,8 +1,8 @@
 import { Link, useParams } from 'react-router-dom';
 import { ITicket } from '.'
-import formatDate from '../../../utils/formatDate';
-import TicketAction from '../../../components/utils/TicketAction';
-import labelsColors from '../../../utils/labelsColors';
+import formatDate from '../../utils/formatDate';
+import TicketAction from '../../components/utils/TicketAction';
+import labelsColors from '../../utils/labelsColors';
 
 interface ITicketsRowProps {
     ticket: ITicket;
@@ -17,7 +17,7 @@ const TicketsRow = (props: ITicketsRowProps) => {
         <tr className="dark:bg-black dark:hover:bg-gray-950 bg-white border-b dark:border-gray-600 hover:bg-gray-50">
 
             <td className="px-6 py-4 min-w-[150px]">
-                <Link to={`/tickets/${props.ticket.id}`} className="link">
+                <Link to={`/ticket/${props.ticket.id}`} className="link">
                     {props.ticket.name}
                 </Link>
             </td>

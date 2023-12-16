@@ -31,8 +31,8 @@ public class MemberController : Controller
         _auth = auth;
     }
 
-    [HttpPost("invent/{projectId}"), BodyValidation, Authorized]
-    public async Task<IActionResult> Invent([FromBody] InventDTO dto, [FromRoute] string projectId)
+    [HttpPost("invite/{projectId}"), BodyValidation, Authorized]
+    public async Task<IActionResult> Invite([FromBody] InviteDTO dto, [FromRoute] string projectId)
     {
         try
         {
@@ -45,19 +45,19 @@ public class MemberController : Controller
 
             if (!isOwner) return HttpResult.UnAuthorized();
 
-            var invented = await _ctx.Users
-                    .Where(u => u.Id == dto.InventedId)
+            var invited = await _ctx.Users
+                    .Where(u => u.Id == dto.InvitedId)
                     .Select(u => new { name = $"{u.FirstName} {u.LastName}" })
                     .FirstOrDefaultAsync();
 
-            if (invented is null) return HttpResult.BadRequest("user to invent is not exist");
+            if (invited is null) return HttpResult.BadRequest("user to invite is not exist");
 
             var project = await _ctx.Projects
                     .Where(p => p.Id == projectId)
                     .Select(p => new { name = p.Name, p.IsReadOnly })
                     .FirstOrDefaultAsync();
 
-            if (project is null) return HttpResult.Forbidden(massage: "you are not authorized to invent users");
+            if (project is null) return HttpResult.Forbidden(massage: "you are not authorized to invite users");
 
             if (project.IsReadOnly) return HttpResult.BadRequest("this project is archived");
 
@@ -65,16 +65,16 @@ public class MemberController : Controller
 
             var memberId = Ulid.NewUlid().ToString();
 
-            if (!await _ctx.Members.AnyAsync(m => m.ProjectId == projectId && m.UserId == dto.InventedId))
+            if (!await _ctx.Members.AnyAsync(m => m.ProjectId == projectId && m.UserId == dto.InvitedId))
             {
-                await _ctx.Members.AddAsync(new Member() { ProjectId = projectId, UserId = dto.InventedId, Role = role, Id = memberId });
+                await _ctx.Members.AddAsync(new Member() { ProjectId = projectId, UserId = dto.InvitedId, Role = role, Id = memberId });
                 await _data.AddActivity(projectId,
-                            $"user [{invented.name}](/profile/{dto.InventedId}) joined the project",
+                            $"user [{invited.name}](/profile/{dto.InvitedId}) joined the project",
                             _ctx);
                 await _ctx.SaveChangesAsync();
             }
 
-            return HttpResult.Ok("successfully invented user");
+            return HttpResult.Ok("successfully invited user");
         }
         catch (Exception e)
         {

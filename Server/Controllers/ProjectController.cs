@@ -84,7 +84,8 @@ public class ProjectController : Controller
                                 members = p.Members.Count,
                                 tickets = p.Tickets.Count,
                                 content = p.Content.Markdown,
-                                owner = p.Members.Where(m => m.Role == Role.owner).Select(m => new {
+                                owner = p.Members.Where(m => m.Role == Role.owner).Select(m => new
+                                {
                                     id = m.UserId,
                                     avatarUrl = m.User.AvatarUrl,
                                     name = $"{m.User.FirstName} {m.User.LastName}"
@@ -110,15 +111,13 @@ public class ProjectController : Controller
         {
             _auth.TryGetId(Request, out string? currentUserId);
 
-            var projectsCount = await _ctx.Projects.Where((p) =>
+            var count = await _ctx.Projects.Where((p) =>
                             p.Members.Any(m => m.UserId != currentUserId)
                             && !p.IsPrivate
                             && EF.Functions.ILike(p.Name, $"%{search}%")
                             ).CountAsync();
 
-            int pages = (int)Math.Ceiling((double)projectsCount / take);
-
-            return HttpResult.Ok(body: pages);
+            return HttpResult.Ok(body: count);
         }
         catch (Exception e)
         {
@@ -202,7 +201,7 @@ public class ProjectController : Controller
             if (!string.IsNullOrEmpty(status) && status == "archived") isReadOnly = true;
             else if (!string.IsNullOrEmpty(status) && status == "unarchive") isReadOnly = false;
 
-            var projectsCount = await _ctx.Projects.Where((p) =>
+            var count = await _ctx.Projects.Where((p) =>
                             (!p.IsPrivate || (currentUserId != null && p.Members.Any(m => m.UserId == currentUserId)))
                             && p.Members.Any(m => m.UserId == userId && (role == null || m.Role == role))
                             && (isPrivate == null || p.IsPrivate == isPrivate)
@@ -211,9 +210,7 @@ public class ProjectController : Controller
                             )
                             .CountAsync();
 
-            int pages = (int)Math.Ceiling((double)projectsCount / take);
-
-            return HttpResult.Ok(body: pages);
+            return HttpResult.Ok(body: count);
         }
         catch (Exception e)
         {
@@ -221,6 +218,38 @@ public class ProjectController : Controller
             return HttpResult.InternalServerError();
         }
     }
+
+    [HttpGet("danger-zone/{projectId}")]
+    public async Task<IActionResult> DangerZone([FromRoute] string projectId)
+    {
+        try
+        {
+            _auth.TryGetId(Request, out string? userId);
+
+            var project = await _ctx.Projects
+                            .Where((p) => p.Id == projectId && (!p.IsPrivate || p.Members.Any(m => userId != null && m.UserId == userId)))
+                            .Select((p) => new
+                            {
+                                name = p.Name,
+                                isPrivate = p.IsPrivate,
+                                isReadOnly = p.IsReadOnly,
+                                isOwner = userId != null && p.Members.Any(m => m.UserId == userId && m.Role == Role.owner),
+                                isMember = userId != null && p.Members.Any(m => m.UserId == userId)
+                            })
+                            .FirstOrDefaultAsync();
+
+            if (project is null) return HttpResult.NotFound("sorry, project not found");
+
+            return HttpResult.Ok(body: project);
+
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.Message);
+            return HttpResult.InternalServerError();
+        }
+    }
+
 
     [HttpGet("{projectId}")]
     public async Task<IActionResult> GetProject([FromRoute] string projectId)
@@ -235,13 +264,8 @@ public class ProjectController : Controller
                             {
                                 name = p.Name,
                                 id = p.Id,
-                                isPrivate = p.IsPrivate,
                                 isReadOnly = p.IsReadOnly,
-                                members = p.Members.Count,
-                                tickets = p.Tickets.Count,
                                 createdAt = p.CreatedAt,
-                                markdown = p.Content.Markdown,
-                                isMember = userId != null && p.Members.Any(m => m.UserId == userId),
                                 owner = p.Members.Where(m => m.Role == Role.owner).Select(m => new
                                 {
                                     name = $"{m.User.FirstName} {m.User.LastName}",

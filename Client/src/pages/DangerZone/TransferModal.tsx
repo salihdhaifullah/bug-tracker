@@ -1,11 +1,14 @@
 import { useCallback, useEffect, useState } from "react";
-import Button from "../../../components/utils/Button"
-import Modal from "../../../components/utils/Modal";
-import useFetchApi from "../../../utils/hooks/useFetchApi";
-import SelectUser from "../../../components/utils/SelectUser";
+import Button from "../../components/utils/Button"
+import Modal from "../../components/utils/Modal";
+import useFetchApi from "../../utils/hooks/useFetchApi";
+import SelectUser from "../../components/utils/SelectUser";
 import { IModalProps } from ".";
+import { useParams } from "react-router-dom";
 
 const TransferModal = (props: IModalProps) => {
+    const {projectId} = useParams()
+
     const [transferProjectPayload, callTransferProject] = useFetchApi<unknown, { projectId: string, memberId: string }>("POST", "project/transfer");
 
     const [isSubmit, setIsSubmit] = useState(false);
@@ -14,7 +17,7 @@ const TransferModal = (props: IModalProps) => {
 
     const handelTransferProject = useCallback(() => {
         props.setIsOpenModal(false);
-        callTransferProject({ projectId: props.id, memberId });
+        callTransferProject({ projectId: projectId!, memberId });
     }, [memberId])
 
     useEffect(() => {
@@ -47,7 +50,7 @@ const TransferModal = (props: IModalProps) => {
                         </div>
 
                         <div className="flex flex-col gap-8 p-2 w-full items-start">
-                            <SelectUser notMe setIsValid={setIsValidId} required label="select user" route={`members/${props.id}`} setId={setMemberId} id={memberId} />
+                            <SelectUser notMe setIsValid={setIsValidId} required label="select user" route={`members/${projectId}`} setId={setMemberId} id={memberId} />
                             <Button isValid={isValidId} onClick={() => setIsSubmit(true)}>Transfer</Button>
                         </div>
                     </>

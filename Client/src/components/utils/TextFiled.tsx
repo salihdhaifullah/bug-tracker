@@ -1,4 +1,4 @@
-import { ChangeEventHandler, ForwardedRef, HTMLProps, ReactNode, forwardRef, useEffect, useId, useMemo, useState } from "react";
+import { ChangeEventHandler, ForwardedRef, HTMLProps, KeyboardEvent, ReactNode, forwardRef, useEffect, useId, useMemo, useState } from "react";
 import { IconType } from "react-icons";
 
 export interface IValidate {
@@ -84,6 +84,10 @@ const TextFiled = forwardRef((props: TextFiledProps, ref: ForwardedRef<HTMLDivEl
         }
     }, [props.value])
 
+    const handelKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+        e.key === "Enter" && e.preventDefault()
+    }
+
     return (
         <div ref={ref} className={`flex flex-col justify-center items-center ${props.small ? "p-1 px-3" : "p-2 px-6"} w-full gap-2 ${props.className || ""}`}>
             <div className="flex flex-row gap-2 w-full justify-center items-center relative">
@@ -95,6 +99,7 @@ const TextFiled = forwardRef((props: TextFiledProps, ref: ForwardedRef<HTMLDivEl
                 {!props?.icon ? null : <props.icon className="text-gray-700 dark:text-gray-50 text-2xl font-bold" />}
                 {!props?.InElement ? null : props.InElement}
                 <input
+                    onKeyDown={props.inputProps?.onKeyDown || handelKeyDown}
                     {...props.inputProps}
                     className={`${props.small ? "p-1" : "p-2"} dark:text-white dark:bg-black border h-fit rounded-sm w-full focus:border-none focus:outline-solid focus:outline-2 ${(isError && isFocus) ? "border-red-600 hover:border-red-800 dark:border-red-400 dark:hover:border-red-500 focus:outline-red-600 dark:focus:outline-red-400" : "dark:border-gray-300 dark:hover:border-white border-gray-700 hover:border-gray-900 focus:outline-primary dark:focus:outline-secondary"}`}
                     id={Id}

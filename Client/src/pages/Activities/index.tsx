@@ -1,8 +1,8 @@
 import { useParams } from "react-router-dom";
-import useFetchApi from "../../../utils/hooks/useFetchApi";
+import useFetchApi from "../../utils/hooks/useFetchApi";
 import { useEffect, useMemo, useState } from "react";
-import CircleProgress from "../../../components/utils/CircleProgress";
-import SelectButton from "../../../components/utils/SelectButton";
+import CircleProgress from "../../components/utils/CircleProgress";
+import SelectButton from "../../components/utils/SelectButton";
 import { AiOutlineArrowLeft, AiOutlineArrowRight } from "react-icons/ai";
 import ActivitiesRow from "./ActivitiesRow";
 
@@ -44,8 +44,8 @@ const Activities = () => {
     }
 
     return (
-        <div className="my-10">
-            <h2 className="text-3xl font-bold w-full mb-10 text-center text-primary dark:text-secondary">Activities</h2>
+        <section className="h-full w-full py-4 px-8 mt-10 gap-8 flex flex-col">
+
             <div className="w-full bg-white dark:bg-black border border-gray-500 shadow-md dark:shadow-secondary/40 rounded-md justify-center items-center flex flex-col p-2">
 
                 <div className="flex flex-row gap-4 w-full flex-wrap items-center pb-4 p-2 bg-white dark:bg-black justify-between">
@@ -95,7 +95,7 @@ const Activities = () => {
                 </div>
             </div>
 
-        </div>
+        </section>
     )
 }
 

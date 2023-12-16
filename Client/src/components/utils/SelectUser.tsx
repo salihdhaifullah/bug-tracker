@@ -4,7 +4,7 @@ import useFetchApi from "../../utils/hooks/useFetchApi";
 import TextFiled from "./TextFiled";
 import CircleProgress from "./CircleProgress";
 
-interface ISelectToInventProps {
+interface ISelectToInviteProps {
     setId: (value: string) => void;
     id: string;
     route: string;
@@ -22,20 +22,6 @@ interface Option {
     id: string;
 }
 
-
-// function useCompare(val: any) {
-    // const prevVal = usePrevious(val)
-    // return prevVal !== val
-// }
-//
-// function usePrevious(value: any) {
-    // const ref = useRef();
-    // useEffect(() => {
-        // ref.current = value;
-    // }, [value]);
-    // return ref.current;
-// }
-
 const scrollToEle = (container: HTMLElement, ele: HTMLElement) => {
     const containerRect = container.getBoundingClientRect();
     const elementRect = ele.getBoundingClientRect();
@@ -45,7 +31,7 @@ const scrollToEle = (container: HTMLElement, ele: HTMLElement) => {
     container.scrollTop = yAxisPosition;
 }
 
-const SelectUser = (props: ISelectToInventProps) => {
+const SelectUser = (props: ISelectToInviteProps) => {
     const id = useId();
     const [isOpen, setIsOpen] = useState(false);
     const [activeOption, setActiveOption] = useState(0);

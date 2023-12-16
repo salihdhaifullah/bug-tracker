@@ -1,6 +1,6 @@
 import { IActivity } from ".";
-import formatDate from "../../../utils/formatDate";
-import useMarkdown from "../../../components/utils/markdown/useMarkdown";
+import formatDate from "../../utils/formatDate";
+import useMarkdown from "../../components/utils/markdown/useMarkdown";
 
 const ActivitiesRow = (props: IActivity) => {
     const jsx = useMarkdown(props.content);

@@ -5,8 +5,8 @@ import useFetchApi from "../../utils/hooks/useFetchApi";
 import Button from "./Button";
 import Select from "./Select";
 import SelectUser from "./SelectUser";
-import { MdOutlineCreateNewFolder } from "react-icons/md";
 import Modal from "./Modal";
+import { FaClipboardList } from "react-icons/fa";
 
 export const typeOptions = ["bug", "feature"];
 export const priorityOptions = ["low", "medium", "high", "critical"];
@@ -41,11 +41,6 @@ const CreateTicketModal = (props: ICreateTicketModalProps) => {
 
   const [payload, call] = useFetchApi<any, ICreateTicket>("POST", `ticket/${projectId}`, [], () => {
     props.setIsOpenModal(false);
-    setName("");
-    setType(typeOptions[0]);
-    setPriority(priorityOptions[1]);
-    setStatus(statusOptions[0]);
-    setMemberId("");
   });
 
   useEffect(() => {
@@ -63,6 +58,10 @@ const CreateTicketModal = (props: ICreateTicketModalProps) => {
     call({ name, type, priority, status, memberId: !memberId.length ? undefined : memberId })
   }
 
+  const handelCancel = () => {
+    props.setIsOpenModal(false)
+  }
+
   return (
     <Modal isOpen={props.isOpenModal} setIsOpen={props.setIsOpenModal}>
       <div className="rounded-xl bg-white dark:bg-black flex flex-col gap-4 w-80 p-2 pt-6 items-center justify-center">
@@ -71,7 +70,7 @@ const CreateTicketModal = (props: ICreateTicketModalProps) => {
 
           <h1 className="text-primary dark:text-secondary font-bold text-3xl text-center mb-4">Create Ticket</h1>
           <div className="flex w-full justify-center items-center mb-4">
-            <MdOutlineCreateNewFolder className="text-3xl text-gray-800 dark:text-gray-200 font-extrabold" />
+            <FaClipboardList className="text-3xl text-primary dark:text-secondary font-extrabold" />
           </div>
 
           <TextFiled
@@ -119,14 +118,17 @@ const CreateTicketModal = (props: ICreateTicketModalProps) => {
             label="ticket status"
           />
 
-          <SelectUser label="chose user to assign this ticket to" route={`members/${projectId}`} setId={setMemberId} id={memberId} />
+          <SelectUser label="assign to" route={`members/${projectId}`} setId={setMemberId} id={memberId} />
 
-          <div className="flex flex-col justify-center items-center w-full mt-2">
-            <Button
+          <div className="flex flex-row justify-evenly items-center w-full mt-2">
+          <Button
               buttonProps={{ type: "submit" }}
               isLoading={payload.isLoading}
               isValid={isValidName && isValidType && isValidStatus && isValidPriority}
             >submit</Button>
+
+            <Button onClick={handelCancel}>cancel</Button>
+
           </div>
 
         </form>

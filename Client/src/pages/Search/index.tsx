@@ -27,10 +27,10 @@ const Search = () => {
   const [page, setPage] = useState(1)
 
   const [projectsPayload, callProjects] = useFetchApi<IProject[]>("GET", `project/projects/explore/${page}/?take=${take}&search=${query.get("search") || ""}`, [page, take, query.get("search")]);
-  const [PagesCountPayload, callPagesCount] = useFetchApi<number>("GET", `project/count/explore/?take=${take}&search=${query.get("search") || ""}`, [take, query.get("search")]);
+  const [CountPayload, callCount] = useFetchApi<number>("GET", `project/count/explore/?take=${take}&search=${query.get("search") || ""}`, [take, query.get("search")]);
 
   useEffect(() => { callProjects() }, [page, take, query.get("search")])
-  useEffect(() => { callPagesCount() }, [take, query.get("search")])
+  useEffect(() => { callCount() }, [take, query.get("search")])
 
   return (
     <section className="flex flex-col justify-center items-center w-full gap-8 my-10">
@@ -51,7 +51,7 @@ const Search = () => {
 
       <Pagination
         currentPage={page}
-        pages={PagesCountPayload.result || 0}
+        pages={CountPayload.result ? Math.ceil(CountPayload.result/take) : 0}
         handelOnChange={(newPage) => setPage(newPage)}
       />
     </section>

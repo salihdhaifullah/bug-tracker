@@ -1,11 +1,14 @@
 import { useCallback } from "react";
-import Button from "../../../components/utils/Button"
-import Modal from "../../../components/utils/Modal";
-import useFetchApi from "../../../utils/hooks/useFetchApi";
+import Button from "../../components/utils/Button"
+import Modal from "../../components/utils/Modal";
+import useFetchApi from "../../utils/hooks/useFetchApi";
 import { IModalProps } from ".";
+import { useParams } from "react-router-dom";
 
 const DeleteModal = (props: IModalProps) => {
-    const [deleteProjectPayload, callDeleteProject] = useFetchApi("DELETE", `project/${props.id}`, [props]);
+    const {projectId} = useParams()
+
+    const [deleteProjectPayload, callDeleteProject] = useFetchApi("DELETE", `project/${projectId}`, [props]);
     const handelDeleteProject = useCallback(() => {
         props.setIsOpenModal(false);
         callDeleteProject();

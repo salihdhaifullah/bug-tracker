@@ -1,13 +1,13 @@
 import { useParams } from "react-router-dom"
-import Button from "../../../components/utils/Button";
+import Button from "../../components/utils/Button";
 import { useEffect, useState } from "react";
-import useFetchApi from "../../../utils/hooks/useFetchApi";
-import CircleProgress from "../../../components/utils/CircleProgress";
+import useFetchApi from "../../utils/hooks/useFetchApi";
+import CircleProgress from "../../components/utils/CircleProgress";
 import { AiOutlineArrowLeft, AiOutlineArrowRight } from "react-icons/ai";
-import SelectButton from "../../../components/utils/SelectButton";
-import SearchFiled from "../../../components/utils/SearchFiled";
-import roles from "../../../utils/roles";
-import InventModal from "./InventModal";
+import SelectButton from "../../components/utils/SelectButton";
+import SearchFiled from "../../components/utils/SearchFiled";
+import roles from "../../utils/roles";
+import InviteModal from "./InviteModal";
 import MembersRow from "./MembersRow";
 import RolesPieChart from "./RolesPieChart";
 
@@ -63,13 +63,11 @@ const Members = () => {
 
 
     return (
-        <div className="my-10">
-            <h2 className="text-3xl font-bold w-full mb-10 text-center text-primary dark:text-secondary">Members</h2>
-
+        <section className="h-full w-full py-4 px-8 mt-10 gap-8 flex flex-col">
             <div className="w-full bg-white dark:bg-black border border-gray-500 shadow-md dark:shadow-secondary/40 rounded-md justify-center items-center flex flex-col p-2">
 
                 <div className="flex flex-row gap-4 w-full flex-wrap items-center pb-4 p-2 justify-between">
-                    <InventModal isOpenModal={isOpenInviteModal} setIsOpenModal={setIsOpenInviteModal} />
+                    <InviteModal isOpenModal={isOpenInviteModal} setIsOpenModal={setIsOpenInviteModal} />
                     <Button onClick={() => setIsOpenInviteModal(true)}>invite member</Button>
 
                     <div className="flex items-center justify-center w-full sm:w-auto">
@@ -100,7 +98,7 @@ const Members = () => {
 
                                     <tbody className="before:block before:h-4 after:block after:mb-2">
                                         {membersPayload.result !== null && isOwnerPayload.result !== null && membersPayload.result.map((member, index) => (
-                                            <MembersRow key={index} callMembers={callMembers} member={member} isOwner={isOwnerPayload.result as boolean}/>
+                                            <MembersRow key={index} callMembers={callMembers} member={member} isOwner={isOwnerPayload.result as boolean} />
                                         ))}
                                     </tbody>
                                 </table>
@@ -130,8 +128,11 @@ const Members = () => {
 
             </div>
 
-            <RolesPieChart />
-        </div>
+
+            <div className="w-full flex justify-center items-center">
+                <RolesPieChart />
+            </div>
+        </section>
     )
 }
 

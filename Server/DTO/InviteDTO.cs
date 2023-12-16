@@ -4,10 +4,10 @@ using Buegee.Utils.Attributes;
 
 namespace Buegee.DTO;
 
-public class InventDTO
+public class InviteDTO
 {
-    [JsonPropertyName("inventedId"), Required(ErrorMessage = "user to invent is required"), IdValidation(ErrorMessage = "un-valid Invented id")]
-    public string InventedId {get; set;} = null!;
+    [JsonPropertyName("invitedId"), Required(ErrorMessage = "user to invite is required"), IdValidation(ErrorMessage = "un-valid Invited id")]
+    public string InvitedId {get; set;} = null!;
 
     [JsonPropertyName("role"), Required(ErrorMessage = "role is required"), RegularExpression(@"^(tester|project_manger|developer)$", ErrorMessage = "un-valid role")]
     public string Role { get; set; } = null!;

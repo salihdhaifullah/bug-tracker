@@ -1,11 +1,14 @@
 import { useCallback } from "react";
-import Button from "../../../components/utils/Button"
-import Modal from "../../../components/utils/Modal";
-import useFetchApi from "../../../utils/hooks/useFetchApi";
+import Button from "../../components/utils/Button"
+import Modal from "../../components/utils/Modal";
+import useFetchApi from "../../utils/hooks/useFetchApi";
 import { IModalProps } from ".";
+import { useParams } from "react-router-dom";
 
 const ArchiveModal = (props: IModalProps & { isReadOnly: boolean }) => {
-    const [archiveProjectPayload, callArchiveProject] = useFetchApi("GET", `project/archive/${props.id}`, [props]);
+    const {projectId} = useParams()
+
+    const [archiveProjectPayload, callArchiveProject] = useFetchApi("GET", `project/archive/${projectId}`, [props]);
     const handelArchiveProject = useCallback(() => {
         props.setIsOpenModal(false);
         callArchiveProject();

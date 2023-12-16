@@ -1,11 +1,14 @@
 import { useCallback } from "react";
-import Button from "../../../components/utils/Button"
-import Modal from "../../../components/utils/Modal";
-import useFetchApi from "../../../utils/hooks/useFetchApi";
+import Button from "../../components/utils/Button"
+import Modal from "../../components/utils/Modal";
+import useFetchApi from "../../utils/hooks/useFetchApi";
 import { IModalProps } from ".";
+import { useParams } from "react-router-dom";
 
 const LeaveModal = (props: IModalProps & { isOwner: boolean }) => {
-    const [leaveProjectPayload, callLeaveProject] = useFetchApi("PATCH", `member/leave/${props.id}`, [props]);
+    const {projectId} = useParams()
+
+    const [leaveProjectPayload, callLeaveProject] = useFetchApi("PATCH", `member/leave/${projectId}`, [props]);
     const handelLeaveProject = useCallback(() => {
         props.setIsOpenModal(false);
         callLeaveProject();

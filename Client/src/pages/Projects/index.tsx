@@ -33,14 +33,14 @@ const Projects = () => {
   const [type, setType] = useState("all");
 
   const [projectsPayload, callProjects] = useFetchApi<IProject[]>("GET", `project/projects/${page}/?take=${take}&userId=${userId}&search=${search}&role=${role}&status=${status}&type=${type}`, [page, take, userId, search, role, type, status]);
-  const [PagesCountPayload, callPagesCount] = useFetchApi<number>("GET", `project/count/?take=${take}&userId=${userId}&search=${search}&role=${role}&status=${status}&type=${type}`, [take, userId, search, role, type, status]);
+  const [CountPayload, callCount] = useFetchApi<number>("GET", `project/count/?take=${take}&userId=${userId}&search=${search}&role=${role}&status=${status}&type=${type}`, [take, userId, search, role, type, status]);
 
   useEffect(() => { callProjects() }, [page, take, role, type, status])
-  useEffect(() => { callPagesCount() }, [take, role, type, status])
+  useEffect(() => { callCount() }, [take, role, type, status])
 
   const handelSearch = () => {
     callProjects()
-    callPagesCount()
+    callCount()
   }
 
   const [isOpenCreateModal, setIsOpenCreateModal] = useState(false);
@@ -91,7 +91,7 @@ const Projects = () => {
 
       <Pagination
         currentPage={page}
-        pages={PagesCountPayload.result || 0}
+        pages={CountPayload.result ? Math.ceil(CountPayload.result/take) : 0}
         handelOnChange={(newPage) => setPage(newPage)}
       />
 
