@@ -1,4 +1,4 @@
-import { ChangeEvent, Dispatch, SetStateAction, useRef, useState } from "react";
+import { ChangeEvent, Dispatch, FormEvent, SetStateAction, useRef, useState } from "react";
 import Button from "../../../components/utils/Button";
 import Modal from "../../../components/utils/Modal";
 import useFetchApi from "../../../utils/hooks/useFetchApi";
@@ -51,7 +51,9 @@ const UpdateModal = (props: IUpdateModalProps) => {
         setContentType("")
     }
 
-    const handelSubmit = () => {
+    const handelSubmit = (e: FormEvent) => {
+        e.preventDefault();
+
         const obj = {
             title: title === props.title ? undefined : title,
             data: isFileChange ? data : undefined,

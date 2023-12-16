@@ -21,9 +21,5 @@ public class Attachment
     [Required, ForeignKey("Ticket"), Column("ticket_id"), StringLength(26)]
     public required string TicketId { get; set; } = null!;
     public Ticket Ticket { get; set; } = null!;
-
-    [Required, ForeignKey("Creator"), Column("creator_id"), StringLength(26)]
-    public required string CreatorId { get; set; } = null!;
-    public User Creator { get; set; } = null!;
 }
 

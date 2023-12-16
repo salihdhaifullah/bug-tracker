@@ -56,9 +56,9 @@ callback?: (arg: R) => void): [payload: IPayload<R>, call: (body?: B) => void] {
                 }
             });
 
-            if(response?.redirectTo) navigate(response?.redirectTo);
-
             callback && callback(response.body as R);
+
+            if (response?.redirectTo) navigate(response?.redirectTo);
 
         } catch (err) {
             console.log(err)

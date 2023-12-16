@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useState } from "react";
 import TextFiled from "../../components/utils/TextFiled"
 import { MdEmail } from "react-icons/md";
 import { RiLockPasswordFill } from "react-icons/ri";
@@ -16,7 +16,9 @@ const Login = () => {
   const [isValidEmail, setIsValidEmail] = useState(false);
   const [isValidPassword, setIsValidPassword] = useState(false);
 
-  const [payload, call] = useFetchApi<IUser, { email: string, password: string }>("POST", "auth/login", []);
+  const [payload, call] = useFetchApi<IUser, { email: string, password: string }>("POST", "auth/login", [], (result) => {
+    if (result) dispatchUser({ type: "add", payload: result });
+  });
 
   const dispatchUser = useUserDispatch();
 
@@ -24,11 +26,6 @@ const Login = () => {
     e.preventDefault();
     call({ email, password })
   }
-
-
-  useEffect(() => {
-    if (payload.result) dispatchUser({ type: "add", payload: payload.result });
-  }, [payload.result])
 
 
   return (

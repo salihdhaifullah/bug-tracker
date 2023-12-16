@@ -38,6 +38,7 @@ interface IButtonProps {
 const Button = (props: IButtonProps) => {
     return (
         <button
+            type={props.buttonProps?.type || 'button'}
             {...(props.isValid === false ? {} : props.buttonProps)}
             disabled={props.isValid === false || props.isLoading}
             onClick={props.onClick}

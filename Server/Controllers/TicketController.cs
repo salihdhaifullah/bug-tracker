@@ -101,10 +101,6 @@ public class TicketController : Controller
                 assignedToText = $"assigned to [{assignedTo.name}](/profile/{assignedTo.userId}), ";
             }
 
-            if (!await _ctx.Members.AnyAsync(m => m.ProjectId == projectId && m.UserId == userId
-            && (m.Role == Role.project_manger || m.Role == Role.owner)))
-                return HttpResult.Forbidden("you are not authorized to create a ticket in this project");
-
 
             var contentId = Ulid.NewUlid().ToString();
             var ticketId = Ulid.NewUlid().ToString();
@@ -296,7 +292,7 @@ public class TicketController : Controller
                                 {
                                     name = $"{t.Creator.User.FirstName} {t.Creator.User.LastName}",
                                     avatarUrl = t.Creator.User.AvatarUrl,
-                                    id = t.Creator.Id,
+                                    id = t.Creator.UserId,
                                 },
                                 project = new
                                 {

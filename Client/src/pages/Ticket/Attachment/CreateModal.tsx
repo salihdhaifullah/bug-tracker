@@ -1,4 +1,4 @@
-import { ChangeEvent, Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
+import { ChangeEvent, Dispatch, FormEvent, SetStateAction, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import useFetchApi from "../../../utils/hooks/useFetchApi";
 import getContentType from "../../../utils/getContentType";
@@ -39,7 +39,8 @@ const CreateModal = (props: ICreateModalProps) => {
         props.call();
     })
 
-    const handelSubmit = () => {
+    const handelSubmit = (e: FormEvent) => {
+        e.preventDefault()
         call({ title, data, ticketId: ticketId!, contentType });
     }
 
@@ -57,7 +58,6 @@ const CreateModal = (props: ICreateModalProps) => {
     const handleButtonClick = () => {
         if (fileInputRef.current) fileInputRef.current.click();
     };
-
 
     return (
         <Modal isOpen={props.isOpen} setIsOpen={props.setIsOpen}>
@@ -101,7 +101,8 @@ const CreateModal = (props: ICreateModalProps) => {
                     <Button
                         isLoading={payload.isLoading}
                         isValid={data.length > 0 && isValidTitle && contentType.length > 0}
-                        buttonProps={{type: "submit"}}>add</Button>
+                        buttonProps={{ type: "submit" }}
+                    >add</Button>
                 </div>
             </form>
 

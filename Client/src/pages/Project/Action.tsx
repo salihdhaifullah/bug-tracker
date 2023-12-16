@@ -2,7 +2,7 @@ import { FiMoreVertical } from "react-icons/fi";
 import Button from "../../components/utils/Button";
 import Modal from "../../components/utils/Modal";
 import TextFiled from "../../components/utils/TextFiled";
-import { useEffect, useRef, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import useFetchApi from "../../utils/hooks/useFetchApi";
 import useOnClickOutside from "../../utils/hooks/useOnClickOutside";
 
@@ -33,6 +33,12 @@ const Action = (props: IActionProps) => {
         }
     }, [isOpenUpdateModal])
 
+
+    const handelSubmit = (e: FormEvent) => {
+        e.preventDefault();
+        call({ projectId: props.projectId, name })
+    }
+
     return (
         <div ref={targetRef} className="flex w-fit relative">
             <div onClick={() => setIsOpen(!isOpen)} className="p-1 font-normal text-lg dark:text-gray-400 hover:dark:text-gray-200 text-gray-600 hover:text-gray-800 rounded-md hover:bg-slate-200 dark:hover:bg-slate-800 cursor-pointer">
@@ -44,7 +50,7 @@ const Action = (props: IActionProps) => {
             </div>
 
             <Modal isOpen={isOpenUpdateModal} setIsOpen={setIsOpenUpdateModal}>
-                <form onSubmit={() => call({ projectId: props.projectId, name })} className="flex flex-col justify-center items-center pt-4 pb-2 px-4 w-[400px] text-center h-full gap-4">
+                <form onSubmit={handelSubmit} className="flex flex-col justify-center items-center pt-4 pb-2 px-4 w-[400px] text-center h-full gap-4">
                     <h1 className="text-3xl py-8 font-bold text-primary dark:text-secondary">change name</h1>
 
                     <TextFiled

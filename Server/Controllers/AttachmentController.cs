@@ -44,7 +44,6 @@ public class AttachmentController : Controller
             {
                 Id = Ulid.NewUlid().ToString(),
                 Title = dto.Title,
-                CreatorId = userId,
                 Url = fileUrl,
                 TicketId = dto.TicketId
             });
@@ -68,7 +67,7 @@ public class AttachmentController : Controller
             var userId = _auth.GetId(Request);
 
             var attachment = await _ctx.Attachments
-                    .Where(a => a.Id == attachmentId && a.CreatorId == userId)
+                    .Where(a => a.Id == attachmentId && a.Ticket.Creator.UserId == userId)
                     .FirstOrDefaultAsync();
 
             if (attachment == null) return HttpResult.NotFound("attachment not found");
@@ -105,7 +104,7 @@ public class AttachmentController : Controller
             var userId = _auth.GetId(Request);
 
             var attachment = await _ctx.Attachments
-                    .Where(a => a.Id == attachmentId && a.CreatorId == userId)
+                    .Where(a => a.Id == attachmentId && a.Ticket.Creator.UserId == userId)
                     .FirstOrDefaultAsync();
 
             if (attachment == null) return HttpResult.NotFound("attachment not found");
@@ -126,53 +125,20 @@ public class AttachmentController : Controller
     }
 
     [HttpGet("attachments/{ticketId}")]
-    public async Task<IActionResult> Attachments([FromRoute] string ticketId, [FromQuery] string? search, [FromQuery] int take = 10, [FromQuery] int page = 1, [FromQuery] string sort = "oldest")
+    public async Task<IActionResult> Attachments([FromRoute] string ticketId)
     {
         try
         {
-
-            _auth.TryGetId(Request, out string? userId);
-
-            var query = _ctx.Attachments.Where(a => a.TicketId == ticketId && EF.Functions.ILike(a.Title, $"%{search}%"));
-
-            if (sort == "latest") query = query.OrderByDescending(a => a.CreatedAt);
-            else query = query.OrderBy(a => a.CreatedAt);
-
-            var attachments = await query.Select(a => new
+            var attachments = await _ctx.Attachments.Where(a => a.TicketId == ticketId).Select(a => new
             {
-                creator = new
-                {
-                    name = $"{a.Creator.FirstName} {a.Creator.LastName}",
-                    id = a.CreatorId
-                },
                 id = a.Id,
                 title = a.Title,
                 url = a.Url,
                 createdAt = a.CreatedAt,
             })
-            .Skip((page - 1) * take)
-            .Take(take)
             .ToListAsync();
 
             return HttpResult.Ok(body: attachments);
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e.Message);
-            return HttpResult.InternalServerError();
-        }
-    }
-
-    [HttpGet("attachments-count/{ticketId}")]
-    public async Task<IActionResult> AttachmentsCount([FromRoute] string ticketId)
-    {
-        try
-        {
-            _auth.TryGetId(Request, out string? userId);
-
-            var count = await _ctx.Attachments.Where(a => a.TicketId == ticketId).CountAsync();
-
-            return HttpResult.Ok(body: count);
         }
         catch (Exception e)
         {

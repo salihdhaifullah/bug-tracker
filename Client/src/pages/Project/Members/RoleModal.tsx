@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useEffect, useState } from 'react'
+import { Dispatch, FormEvent, SetStateAction, useEffect, useState } from 'react'
 import { IChangeRole, IMember } from '.';
 import useFetchApi from '../../../utils/hooks/useFetchApi';
 import { Link, useParams } from 'react-router-dom';
@@ -30,13 +30,14 @@ const RoleModal = (props: IRoleModalProps) => {
         if (!props.isOpenModal) setRole("")
     }, [props.isOpenModal])
 
-    const handelRole = () => {
+    const handelSubmit = (e: FormEvent) => {
+        e.preventDefault();
         callRole({ role, memberId: props.member.id });
     }
 
     return (
         <Modal isOpen={props.isOpenModal} setIsOpen={props.setIsOpenModal}>
-            <form onSubmit={() => handelRole()} className="flex flex-col dark:bg-black justify-center items-center py-8 px-4 w-[400px] text-center h-full">
+            <form onSubmit={handelSubmit} className="flex flex-col dark:bg-black justify-center items-center py-8 px-4 w-[400px] text-center h-full">
 
                 <div className="pt-4 pb-8 gap-4 flex flex-col w-full justify-center items-center">
                     <h1 className="text-3xl font-black text-blue-700 dark:text-blue-300">change member role</h1>

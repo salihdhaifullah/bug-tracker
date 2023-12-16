@@ -108,13 +108,14 @@ const Ticket = () => {
                         <Link className="font-bold w-fit h-fit text-primary dark:text-secondary text-lg hover:underline" title="project" to={`/project/${payload.result.project.id}`}>{payload.result.project.name}</Link>
 
                         <Content editable={isOwnerOrMangerPayload.result || payload.result.creator.id === user?.id} url={`ticket/content/${ticketId}`} />
+
+                        <Attachment isCreator={payload.result.creator.id === user?.id} />
                     </div>
 
                 </div>
 
             </div>
 
-            <Attachment />
             <Comments />
 
         </section>

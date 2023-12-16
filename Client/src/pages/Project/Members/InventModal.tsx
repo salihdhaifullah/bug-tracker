@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, FormEvent, SetStateAction, useEffect, useState } from "react";
 import Select from "../../../components/utils/Select";
 import Button from "../../../components/utils/Button";
 import useFetchApi from "../../../utils/hooks/useFetchApi";
@@ -35,7 +35,9 @@ const InventModal = (props: IInventModalProps) => {
         }
     }, [props.isOpenModal])
 
-    const handelSubmit = () => {
+
+    const handelSubmit = (e: FormEvent) => {
+        e.preventDefault();
         call({ inventedId, role });
     }
 

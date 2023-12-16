@@ -3,16 +3,13 @@ import Button from "../components/utils/Button"
 import { MdTry } from "react-icons/md"
 import useFetchApi from "../utils/hooks/useFetchApi"
 import { useUserDispatch } from "../utils/context/user"
-import { useEffect } from "react"
 import { Link } from "react-router-dom"
 
 const Home = () => {
   const dispatchUser = useUserDispatch();
-  const [demoPayload, callDemo] = useFetchApi("GET", "auth/demo");
-
-  useEffect(() => {
-    if (demoPayload.result) dispatchUser({ type: "add", payload: demoPayload.result });
-  }, [demoPayload.result])
+  const [demoPayload, callDemo] = useFetchApi("GET", "auth/demo", [], (result) => {
+    if (result) dispatchUser({ type: "add", payload: result });
+  });
 
   return (
     <section className="h-full w-full py-4 px-8 mt-10 mx-auto gap-2 flex flex-row">

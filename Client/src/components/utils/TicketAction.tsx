@@ -6,7 +6,7 @@ import Select from "./Select";
 import SelectUser from "./SelectUser";
 import TextFiled from "./TextFiled";
 import useOnClickOutside from "../../utils/hooks/useOnClickOutside";
-import { useEffect, useRef, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import useFetchApi from "../../utils/hooks/useFetchApi";
 import { Link } from "react-router-dom";
 
@@ -81,7 +81,8 @@ const TicketAction = (props: IActionProps) => {
 
     useOnClickOutside(targetRef, () => setIsOpen(false));
 
-    const handelSubmit = () => {
+    const handelSubmit = (e: FormEvent) => {
+        e.preventDefault();
         callUpdateTicket({ name, type, priority, status, memberId: !memberId.length ? undefined : memberId })
     }
 
