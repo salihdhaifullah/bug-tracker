@@ -34,7 +34,7 @@ public class AttachmentController : Controller
         {
             var userId = _auth.GetId(Request);
 
-            var isUser = await _ctx.Users.AnyAsync(u => u.Id == userId);
+            var isUser = await _ctx.Tickets.AnyAsync(t => t.Creator.UserId == userId);
 
             if (!isUser) return HttpResult.UnAuthorized();
 
@@ -67,7 +67,9 @@ public class AttachmentController : Controller
         {
             var userId = _auth.GetId(Request);
 
-            var attachment = await _ctx.Attachments.Where(a => a.Id == attachmentId && a.CreatorId == userId).FirstOrDefaultAsync();
+            var attachment = await _ctx.Attachments
+                    .Where(a => a.Id == attachmentId && a.CreatorId == userId)
+                    .FirstOrDefaultAsync();
 
             if (attachment == null) return HttpResult.NotFound("attachment not found");
 
@@ -102,7 +104,9 @@ public class AttachmentController : Controller
         {
             var userId = _auth.GetId(Request);
 
-            var attachment = await _ctx.Attachments.Where(a => a.Id == attachmentId && a.CreatorId == userId).FirstOrDefaultAsync();
+            var attachment = await _ctx.Attachments
+                    .Where(a => a.Id == attachmentId && a.CreatorId == userId)
+                    .FirstOrDefaultAsync();
 
             if (attachment == null) return HttpResult.NotFound("attachment not found");
 

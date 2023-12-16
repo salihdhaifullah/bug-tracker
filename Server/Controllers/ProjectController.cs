@@ -241,6 +241,7 @@ public class ProjectController : Controller
                                 tickets = p.Tickets.Count,
                                 createdAt = p.CreatedAt,
                                 markdown = p.Content.Markdown,
+                                isMember = userId != null && p.Members.Any(m => m.UserId == userId),
                                 owner = p.Members.Where(m => m.Role == Role.owner).Select(m => new
                                 {
                                     name = $"{m.User.FirstName} {m.User.LastName}",
