@@ -11,8 +11,8 @@ public class EmailService : IEmailService
 
     public EmailService(IConfiguration config)
     {
-        var isAppPassword = config.GetSection("EmailService").GetValue<string>("AppPassword");
-        var isAppEmail = config.GetSection("EmailService").GetValue<string>("AppEmail");
+        var isAppPassword = config.GetSection("EmailApp").GetValue<string>("Password");
+        var isAppEmail = config.GetSection("EmailApp").GetValue<string>("Email");
 
         if (string.IsNullOrEmpty(isAppPassword) || string.IsNullOrEmpty(isAppEmail))
         throw new Exception("email service is not configured");
@@ -27,7 +27,7 @@ public class EmailService : IEmailService
         };
     }
 
-    private Task mail(string to, string subject, string template)
+    private Task Mail(string to, string subject, string template)
     {
         var stringBuilder = new StringBuilder(template);
 
@@ -47,11 +47,11 @@ public class EmailService : IEmailService
 
     public void Verification(string to, string name, string code)
     {
-        mail(to, "activate your account", new VerificationEmail(name, code, DateTime.UtcNow.ToString("dd-MM-yyyy hh:mm")).Get());
+        Mail(to, "activate your account", new VerificationEmail(name, code, DateTime.UtcNow.ToString("dd-MM-yyyy hh:mm")).Get());
     }
 
     public void ResetPassword(string to, string name, string code)
     {
-        mail(to, "reset your password", new VerificationEmail(name, code, DateTime.UtcNow.ToString("dd-MM-yyyy hh:mm")).Get());
+        Mail(to, "reset your password", new VerificationEmail(name, code, DateTime.UtcNow.ToString("dd-MM-yyyy hh:mm")).Get());
     }
 }
