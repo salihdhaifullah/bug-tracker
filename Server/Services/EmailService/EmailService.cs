@@ -14,8 +14,8 @@ public class EmailService : IEmailService
         var isAppPassword = config.GetSection("EmailApp").GetValue<string>("Password");
         var isAppEmail = config.GetSection("EmailApp").GetValue<string>("Email");
 
-        if (string.IsNullOrEmpty(isAppPassword) || string.IsNullOrEmpty(isAppEmail))
-        throw new Exception("email service is not configured");
+        if (string.IsNullOrEmpty(isAppEmail)) throw new Exception("email service is not configured");
+        if (string.IsNullOrEmpty(isAppPassword)) throw new Exception("email service is not configured");
 
         _appPassword = isAppPassword;
         _appEmail = isAppEmail;
