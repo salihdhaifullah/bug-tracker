@@ -20,7 +20,7 @@ import Search from "./pages/Search";
 import Members from "./pages/Members";
 import Activities from "./pages/Activities";
 import Tickets from "./pages/Tickets";
-import DangerZone from "./pages/Project/DangerZone";
+import DangerZone from "./pages/DangerZone";
 
 const router = createBrowserRouter([{
     path: "/",
