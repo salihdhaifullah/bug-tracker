@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
-import Button from "../../../components/utils/Button"
-import Modal from "../../../components/utils/Modal";
-import useFetchApi from "../../../utils/hooks/useFetchApi";
-import SelectUser from "../../../components/utils/SelectUser";
+import Button from "../../components/utils/Button"
+import Modal from "../../components/utils/Modal";
+import useFetchApi from "../../utils/hooks/useFetchApi";
+import SelectUser from "../../components/utils/SelectUser";
 import { IModalProps } from ".";
 import { useParams } from "react-router-dom";
 

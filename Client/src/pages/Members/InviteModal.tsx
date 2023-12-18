@@ -1,11 +1,11 @@
 import { Dispatch, FormEvent, SetStateAction, useEffect, useState } from "react";
-import Select from "../../../components/utils/Select";
-import Button from "../../../components/utils/Button";
-import useFetchApi from "../../../utils/hooks/useFetchApi";
+import Select from "../../components/utils/Select";
+import Button from "../../components/utils/Button";
+import useFetchApi from "../../utils/hooks/useFetchApi";
 import { useParams } from "react-router-dom";
-import SelectUser from "../../../components/utils/SelectUser";
-import roles from "../../../utils/roles";
-import Modal from "../../../components/utils/Modal";
+import SelectUser from "../../components/utils/SelectUser";
+import roles from "../../utils/roles";
+import Modal from "../../components/utils/Modal";
 import { FaAddressCard } from "react-icons/fa";
 
 interface IInviteModalProps {

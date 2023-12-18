@@ -1,13 +1,13 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import Button from "../../../components/utils/Button"
+import Button from "../../components/utils/Button"
 import DeleteModal from "./DeleteModal";
 import ArchiveModal from "./ArchiveModal";
 import VisibilityModal from "./VisibilityModal";
 import TransferModal from "./TransferModal";
 import LeaveModal from "./LeaveModal";
-import useFetchApi from "../../../utils/hooks/useFetchApi";
+import useFetchApi from "../../utils/hooks/useFetchApi";
 import { useParams } from "react-router-dom";
-import CircleProgress from "../../../components/utils/CircleProgress";
+import CircleProgress from "../../components/utils/CircleProgress";
 
 export interface IData {
     name: string;

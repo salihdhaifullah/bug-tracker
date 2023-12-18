@@ -1,12 +1,12 @@
 import { useParams } from "react-router-dom"
-import Button from "../../../components/utils/Button";
-import useFetchApi from "../../../utils/hooks/useFetchApi";
+import Button from "../../components/utils/Button";
+import useFetchApi from "../../utils/hooks/useFetchApi";
 import { useEffect, useState } from "react";
-import CircleProgress from "../../../components/utils/CircleProgress";
+import CircleProgress from "../../components/utils/CircleProgress";
 import { AiOutlineArrowLeft, AiOutlineArrowRight } from "react-icons/ai";
-import SelectButton from "../../../components/utils/SelectButton";
-import CreateTicketModal, { priorityOptions, statusOptions, typeOptions } from "../../../components/utils/CreateTicketModal";
-import SearchFiled from "../../../components/utils/SearchFiled";
+import SelectButton from "../../components/utils/SelectButton";
+import CreateTicketModal, { priorityOptions, statusOptions, typeOptions } from "../../components/utils/CreateTicketModal";
+import SearchFiled from "../../components/utils/SearchFiled";
 import Charts from "./Chart";
 import TicketsRow from "./TicketsRow";
 
