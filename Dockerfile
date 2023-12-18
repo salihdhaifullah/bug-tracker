@@ -24,7 +24,6 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 COPY --from=client-build /app/dist ./dist
-COPY --from=build /src/Emails ./Emails
 RUN rm -r -f ./Client
 ENV ASPNETCORE_URLS=http://+:5018
 ENTRYPOINT ["dotnet", "Buegee.dll"]
