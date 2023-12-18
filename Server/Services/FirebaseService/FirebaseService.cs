@@ -9,11 +9,17 @@ public class FirebaseService : IFirebaseService
     private readonly FirebaseStorage _storage;
     private readonly ILogger<FirebaseService> _logger;
 
-    public FirebaseService(IConfiguration config, ILogger<FirebaseService> logger)
+    public FirebaseService(IConfiguration config, IWebHostEnvironment environment, ILogger<FirebaseService> logger)
     {
         var uid = config.GetSection("Firebase").GetValue<string>("Id");
 
-        var defaultApp = FirebaseApp.Create(new AppOptions() { Credential = GoogleCredential.FromFile("firebase-sdk.json") });
+        var path = "/etc/secrets/firebase-sdk.json";
+        if (environment.IsDevelopment())
+        {
+            path = "firebase-sdk.json";
+        }
+
+        var defaultApp = FirebaseApp.Create(new AppOptions() { Credential = GoogleCredential.FromFile(path) });
 
         var defaultAuth = FirebaseAuth.GetAuth(defaultApp);
 
