@@ -142,8 +142,6 @@ public class TicketController : Controller
 
             await _ctx.SaveChangesAsync();
 
-            if (assignedTo is not null) _email.TicketAssignation(assignedTo.email, assignedTo.name, dto.Name, ticketType, ticketStatus, ticketPriority);
-
             return HttpResult.Ok("successfully created ticket", redirectTo: $"/tickets/{ticketId}");
         }
         catch (Exception e)
@@ -461,9 +459,6 @@ public class TicketController : Controller
                 await _data.AddActivity(ticket.ProjectId, sb.ToString(), _ctx);
                 await _ctx.SaveChangesAsync();
             }
-
-
-            if (assignedTo is not null) _email.TicketAssignation(assignedTo.email, assignedTo.name, dto.Name, ticketType, ticketStatus, ticketPriority);
 
             return HttpResult.Ok("successfully updated ticket");
         }
