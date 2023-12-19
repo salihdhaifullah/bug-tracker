@@ -11,17 +11,19 @@ import { FaAddressCard } from "react-icons/fa";
 interface IInviteModalProps {
     isOpenModal: boolean;
     setIsOpenModal: Dispatch<SetStateAction<boolean>>;
+    call: () => void;
 }
 
 const InviteModal = (props: IInviteModalProps) => {
-    const [inventedId, setInvitedId] = useState("");
+    const [invitedId, setInvitedId] = useState("");
     const [role, setRole] = useState("developer");
     const { projectId } = useParams();
 
     const [isValidRole, setIsValidRole] = useState(true);
     const [isValidId, setIsValidId] = useState(true);
 
-    const [payload, call] = useFetchApi<any, { inventedId: string, role: string }>("POST", `member/invent/${projectId}`, [projectId], () => {
+    const [payload, call] = useFetchApi<any, { invitedId: string, role: string }>("POST", `member/invite/${projectId}`, [projectId], () => {
+        props.call();
         props.setIsOpenModal(false);
     });
 
@@ -35,16 +37,12 @@ const InviteModal = (props: IInviteModalProps) => {
 
     const handelSubmit = (e: FormEvent) => {
         e.preventDefault();
-        call({ inventedId, role });
-    }
-
-    const handelCancel = () => {
-        props.setIsOpenModal(false);
+        call({ invitedId, role });
     }
 
     return (
         <Modal isOpen={props.isOpenModal} setIsOpen={props.setIsOpenModal}>
-            <div className="rounded-xl bg-white dark:bg-black flex flex-col gap-4 w-80 p-2 pt-6 items-center justify-center">
+            <div className="rounded-xl bg-white dark:bg-black flex flex-col gap-4 w-80 p-2 items-center justify-center">
 
                 <form className="flex-col flex w-full justify-center items-center" onSubmit={handelSubmit}>
 
@@ -54,10 +52,10 @@ const InviteModal = (props: IInviteModalProps) => {
                         <FaAddressCard className="text-3xl text-primary dark:text-secondary font-extrabold" />
                     </div>
 
-                    <SelectUser setIsValid={setIsValidId} required label="invent user" route={`not-members/${projectId}`} setId={setInvitedId} id={inventedId} />
+                    <SelectUser setIsValid={setIsValidId} required label="invite user" route={`not-members/${projectId}`} setId={setInvitedId} id={invitedId} />
 
                     <Select
-                        label="role for user to invent"
+                        label="role for user to invite"
                         validation={[{ validate: (str) => roles.includes(str), massage: "un-valid role" }]}
                         options={roles}
                         value={role}
@@ -65,13 +63,11 @@ const InviteModal = (props: IInviteModalProps) => {
                         setIsValid={setIsValidRole}
                     />
 
-                    <div className="flex mt-2 flex-row justify-evenly items-center w-full">
+                    <div className="flex mt-2 flex-row justify-center items-center w-full">
                         <Button
                             buttonProps={{ type: "submit" }}
                             isLoading={payload.isLoading}
                             isValid={isValidRole && isValidId}>Invite</Button>
-
-                        <Button onClick={handelCancel}>cancel</Button>
                     </div>
 
                 </form>

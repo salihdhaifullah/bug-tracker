@@ -26,19 +26,17 @@ const TransferModal = (props: IModalProps) => {
 
     return (
         <Modal isOpen={props.isOpenModal} setIsOpen={props.setIsOpenModal}>
-            <div className="flex flex-col justify-center  items-center pt-4 pb-2 px-4 w-[400px] text-center h-full">
+            <div className="flex flex-col justify-center items-center pb-2 px-8 text-center h-full">
 
                 {isSubmit ? (
                     <>
-
                         <div className="pt-4 pb-14 gap-4 flex flex-col w-full justify-center items-center">
                             <h1 className="text-3xl font-black text-blue-700 dark:text-blue-300">{props.name}</h1>
                             <h2 className="text-xl font-bold text-primary dark:text-secondary">are you sure you want to transfer this project</h2>
                         </div>
 
-                        <div className="flex flex-row items-center mt-10 justify-between w-full px-4">
+                        <div className="flex flex-row items-center mt-10 justify-center w-full px-4">
                             <Button isLoading={transferProjectPayload.isLoading} onClick={() => handelTransferProject()} className="!bg-red-600">transfer</Button>
-                            <Button onClick={() => props.setIsOpenModal(false)}>cancel</Button>
                         </div>
 
                     </>

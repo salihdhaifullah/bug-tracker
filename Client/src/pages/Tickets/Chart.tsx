@@ -15,7 +15,7 @@ const Charts = () => {
 
     return (
         !payload.isLoading && !payload.result ? null :
-            <div className="flex flex-row justify-between items-center my-4">
+            <div className="flex flex-row flex-wrap gap-2 justify-center items-center my-4">
                 {payload.isLoading ? <CircleProgress size="lg" /> : (
                     <>
                         {!isData(payload.result!.type) ? null : <TypeChart {...payload.result!.type} />}

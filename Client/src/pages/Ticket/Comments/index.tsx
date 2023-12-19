@@ -29,10 +29,9 @@ const Comments = () => {
     useEffect(() => { callComment() }, [commentPage, commentTake])
 
     return (
-        <>
-            <div className="flex w-full justify-center my-10 items-center">
-                <div className="flex w-full flex-col max-w-[800px]">
-                    <h2 className="text-primary dark:text-secondary text-2xl font-bold text-start w-full">Comment</h2>
+        <div className="flex flex-col justify-center items-center w-full h-auto my-10">
+            <div className="flex w-full h-full justify-center items-center">
+                <div className="flex w-full h-full flex-col max-w-[800px]">
                     <Content call={callComment} form url={`comment/${ticketId}`} />
                 </div>
             </div>
@@ -52,7 +51,7 @@ const Comments = () => {
                             </>
                         )}
             </div>
-        </>
+        </div>
     )
 }
 

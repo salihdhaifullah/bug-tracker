@@ -37,14 +37,14 @@ const RoleModal = (props: IRoleModalProps) => {
 
     return (
         <Modal isOpen={props.isOpenModal} setIsOpen={props.setIsOpenModal}>
-            <form onSubmit={handelSubmit} className="flex flex-col dark:bg-black justify-center items-center py-8 px-4 w-[400px] text-center h-full">
+            <form onSubmit={handelSubmit} className="flex flex-col dark:bg-black justify-center items-center pb-2 px-8 text-center h-full">
 
-                <div className="pt-4 pb-8 gap-4 flex flex-col w-full justify-center items-center">
+                <div className="pb-8 gap-4 flex flex-col w-full justify-center items-center">
                     <h1 className="text-3xl font-black text-blue-700 dark:text-blue-300">change member role</h1>
 
-                    <div className="flex flex-col gap-2 text-xl font-bold text-primary dark:text-secondary">
+                    <div className="flex flex-col gap-6 mt-6 text-xl font-bold text-primary dark:text-secondary">
 
-                        <div className="flex flex-row justify-start items-center gap-2">
+                        <div className="flex flex-row justify-start items-center gap-4">
                             <img className="rounded-full shadow-md dark:shadow-secondary/40 w-10 h-10 object-contain" src={props.member.avatarUrl} alt={props.member.name} />
                             <Link className="link" to={`/profile/${props.member.id}`}>{props.member.name}</Link>
                         </div>
@@ -68,12 +68,7 @@ const RoleModal = (props: IRoleModalProps) => {
                     />
                 </div>
 
-                <div className="flex flex-row items-center mt-4 justify-between w-full px-4">
-                    <Button onClick={() => {
-                        setRole("")
-                        props.setIsOpenModal(false)
-                    }}>cancel</Button>
-
+                <div className="flex flex-row items-center mt-4 justify-center w-full px-4">
                     <Button
                         isLoading={payloadRole.isLoading}
                         isValid={isValidRole}

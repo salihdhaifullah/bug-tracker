@@ -63,11 +63,11 @@ const Members = () => {
 
 
     return (
-        <section className="h-full w-full py-4 px-8 mt-10 gap-8 flex flex-col">
+        <section className="h-full w-full py-4 md:px-8 px-3 mt-10 gap-8 flex flex-col">
             <div className="w-full bg-white dark:bg-black border border-gray-500 shadow-md dark:shadow-secondary/40 rounded-md justify-center items-center flex flex-col p-2">
 
                 <div className="flex flex-row gap-4 w-full flex-wrap items-center pb-4 p-2 justify-between">
-                    <InviteModal isOpenModal={isOpenInviteModal} setIsOpenModal={setIsOpenInviteModal} />
+                    <InviteModal call={handelSearch} isOpenModal={isOpenInviteModal} setIsOpenModal={setIsOpenInviteModal} />
                     <Button onClick={() => setIsOpenInviteModal(true)}>invite member</Button>
 
                     <div className="flex items-center justify-center w-full sm:w-auto">
@@ -132,6 +132,8 @@ const Members = () => {
             <div className="w-full flex justify-center items-center">
                 <RolesPieChart />
             </div>
+
+
         </section>
     )
 }

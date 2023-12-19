@@ -29,14 +29,14 @@ const RolesPieChart = () => {
                 label: 'of members',
                 data: [0, 0, 0],
                 backgroundColor: [
-                    '#d946ef',
-                    '#eab308',
-                    '#3b82f6'
+                    "#3b82f6",
+                    "#d946ef",
+                    "#eab308"
                 ],
                 borderColor: [
-                    '#701a75',
-                    '#713f12',
-                    '#1e3a8a'
+                    "#1d4ed8",
+                    "#a21caf",
+                    "#a16207"
                 ],
                 borderWidth: 2,
             },
@@ -53,9 +53,9 @@ const RolesPieChart = () => {
 
     return (
         isNoMembers ? null :
-            <div className="flex justify-center items-center text-center my-4 w-[400px] h-fit rounded-md p-4 shadow-lg bg-white dark:bg-black">
+            <div className="flex justify-center items-center text-center my-4 min-h-[350px] min-w-[350px] rounded-md p-2 shadow-lg bg-white dark:bg-black">
                 {rolesPayload.result && !rolesPayload.isLoading
-                    ? <Pie data={getData(rolesPayload.result)} />
+                    ? <Pie data={getData(rolesPayload.result)} width={350} height={350} />
                     : <CircleProgress size="lg" />
                 }
             </div>

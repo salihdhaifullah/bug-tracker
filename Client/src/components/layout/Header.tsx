@@ -102,7 +102,7 @@ const Header = () => {
 
 
             <Modal isOpen={isOpenModal} setIsOpen={setIsOpenModal}>
-                <div className="rounded-xl bg-white dark:bg-black h-full flex-1 flex flex-col gap-4 p-2 pt-6 items-start justify-evenly">
+                <div className="rounded-xl bg-white dark:bg-black h-full flex-1 flex flex-col gap-4 p-2 items-start justify-evenly">
 
                     <ButtonBase
                         onClick={() => {

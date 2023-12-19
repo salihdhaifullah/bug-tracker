@@ -38,7 +38,7 @@ const CreateProjectModal = (props: ICreateProjectModal) => {
 
     return (
         <Modal isOpen={props.isOpenModal} setIsOpen={props.setIsOpenModal}>
-            <div className="rounded-xl bg-white dark:bg-black flex flex-col gap-4 w-80 p-2 pt-6 items-center justify-center">
+            <div className="rounded-xl bg-white dark:bg-black flex flex-col gap-4 w-80 p-2 items-center justify-center">
 
                 <form className="flex-col flex w-full justify-center items-center" onSubmit={handelSubmit}>
 
@@ -75,8 +75,6 @@ const CreateProjectModal = (props: ICreateProjectModal) => {
                             }
                         ]}
                     />
-
-
 
                     <div className="flex flex-col justify-center items-center w-full my-1">
                         <Button

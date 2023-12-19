@@ -42,7 +42,7 @@ const Project = () => {
         : payload.result === null ? null : (
             <section className="flex flex-col w-full h-full my-10 p-2 flex-grow">
 
-                <div className="flex flex-row justify-end ml-10 items-center gap-6 mb-6">
+                <div className="flex flex-wrap-reverse flex-row justify-end sm:ml-10 items-center sm:gap-6 gap-2 mb-6">
 
                     <Link to={`/my-tasks/${projectId}`}>
                         <Button className="flex-row flex gap-2 justify-center items-center">
@@ -83,7 +83,7 @@ const Project = () => {
 
                 <div className="flex flex-row w-full h-full gap-3">
 
-                    <Link to={`/profile/${payload.result.owner.id}`} className="w-fit h-fit min-w-[2.5rem] min-h-[2.5rem] flex">
+                    <Link to={`/profile/${payload.result.owner.id}`} className="w-10 h-10 hidden sm:flex">
                         <img
                             title="owner"
                             className="rounded-full bg-white dark:bg-black shadow-md w-10 h-10 object-contain"
@@ -92,10 +92,20 @@ const Project = () => {
                         />
                     </Link>
 
-                    <div className="rounded-lg relative w-full h-full gap-4 flex flex-col shadow-md dark:shadow-secondary/40 bg-white dark:bg-black after:w-0 after:h-0 after:border-t-[7px] after:border-t-transparent after:border-r-[14px] after:border-r-white dark:after:border-r-black after:border-b-[7px] after:border-b-transparent after:absolute after:top-3 after:-left-3">
+                    <div className="rounded-lg w-full h-full gap-4 flex flex-col shadow-md dark:shadow-secondary/40 bg-white dark:bg-black sm:left-arrow">
 
                         <div className="flex flex-row justify-between items-center border-b-gray-400 dark:border-b-gray-600 p-2 border-b">
                             <div className="flex flex-row gap-2 justify-start items-center">
+
+                                <Link to={`/profile/${payload.result.owner.id}`} className="w-10 h-10 sm:hidden flex">
+                                    <img
+                                        title="owner"
+                                        className="rounded-full bg-white dark:bg-black shadow-md dark:shadow-secondary/40 w-10 h-10 object-contain"
+                                        src={payload.result.owner.avatarUrl}
+                                        alt={`${payload.result.owner.name}`}
+                                    />
+                                </Link>
+
                                 <Link className="w-fit h-fit" to={`/profile/${payload.result.owner.id}`}>
                                     <span
                                         title="owner"

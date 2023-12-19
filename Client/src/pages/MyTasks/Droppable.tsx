@@ -1,4 +1,4 @@
-import { DragEvent, useRef } from "react";
+import { DragEvent, useRef, useState } from "react";
 import { IItem } from ".";
 import Draggable from "./Draggable";
 import { Link } from "react-router-dom";
@@ -11,23 +11,34 @@ interface IDroppableProps {
 }
 
 const Droppable = (props: IDroppableProps) => {
+    const [isOver, setIsOver] = useState(false)
+
     const ref = useRef<HTMLDivElement>(null);
 
     const dragOverHandler = (event: DragEvent<HTMLDivElement>) => {
         event.preventDefault();
         event.dataTransfer.dropEffect = "move";
+        setIsOver(true)
     };
 
     const dropHandler = (event: DragEvent<HTMLDivElement>) => {
         event.preventDefault();
         const itemIndex = Number(event.dataTransfer.getData("text/plain"));
         props.handelDrop(itemIndex, props.col)
+        setIsOver(false)
     };
 
     return (
-        <div className="flex flex-col min-h-screen h-auto rounded-md p-2 gap-2 w-60">
-            <h2 className="text-xl font-bold text-center text-primary dark:text-secondary rounded-sm hover:bg-slate-200 dark:hover:bg-slate-800 w-full p-2">{props.col}</h2>
-            <div ref={ref} onDragOver={dragOverHandler} onDrop={dropHandler} id={`droppable-${props.col}`} className="flex gap-2 justify-start flex-col flex-1">
+        <div
+        ref={ref}
+        onDragOver={dragOverHandler}
+        onDrop={dropHandler}
+        onDragLeave={() => setIsOver(false)}
+        id={`droppable-${props.col}`}
+        className={`flex flex-col pb-20 p-4 h-fit rounded-md gap-2 w-60 ${isOver ? "dark:bg-slate-800 bg-slate-200" :""}`}
+        >
+            <h2 className="text-2xl font-bold text-center text-primary dark:text-secondary w-full">{props.col}</h2>
+            <div className="flex gap-2 justify-start flex-col flex-1">
                 {props.items && props.items.map((item, index) => {
                     if (item.status === props.col) return (
                         <Draggable index={index} key={index}>

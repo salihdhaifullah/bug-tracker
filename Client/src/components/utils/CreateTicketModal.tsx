@@ -58,13 +58,9 @@ const CreateTicketModal = (props: ICreateTicketModalProps) => {
     call({ name, type, priority, status, memberId: !memberId.length ? undefined : memberId })
   }
 
-  const handelCancel = () => {
-    props.setIsOpenModal(false)
-  }
-
   return (
     <Modal isOpen={props.isOpenModal} setIsOpen={props.setIsOpenModal}>
-      <div className="rounded-xl bg-white dark:bg-black flex flex-col gap-4 w-80 p-2 pt-6 items-center justify-center">
+      <div className="rounded-xl bg-white dark:bg-black flex flex-col gap-4 w-80 p-2 items-center justify-center">
 
         <form className="flex-col flex w-full justify-center items-center" onSubmit={handelSubmit}>
 
@@ -120,15 +116,12 @@ const CreateTicketModal = (props: ICreateTicketModalProps) => {
 
           <SelectUser label="assign to" route={`members/${projectId}`} setId={setMemberId} id={memberId} />
 
-          <div className="flex flex-row justify-evenly items-center w-full mt-2">
-          <Button
+          <div className="flex flex-row justify-center items-center w-full mt-2">
+            <Button
               buttonProps={{ type: "submit" }}
               isLoading={payload.isLoading}
               isValid={isValidName && isValidType && isValidStatus && isValidPriority}
             >submit</Button>
-
-            <Button onClick={handelCancel}>cancel</Button>
-
           </div>
 
         </form>

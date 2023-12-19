@@ -22,16 +22,14 @@ const CreateModal = (props: ICreateModalProps) => {
     const [contentType, setContentType] = useState("")
     const [fileName, setFileName] = useState("")
 
-    const resetState = () => {
-        setTitle("")
-        setIsValidTitle(false)
-        setData("")
-        setFileName("")
-        setContentType("")
-    }
-
     useEffect(() => {
-        if (!props.isOpen) resetState();
+        if (!props.isOpen) {
+            setTitle("")
+            setIsValidTitle(false)
+            setData("")
+            setFileName("")
+            setContentType("")
+        }
     }, [props.isOpen])
 
     const [payload, call] = useFetchApi<unknown, { title: string, data: string, ticketId: string, contentType: string }>("POST", "attachment", [], () => {
@@ -61,7 +59,7 @@ const CreateModal = (props: ICreateModalProps) => {
 
     return (
         <Modal isOpen={props.isOpen} setIsOpen={props.setIsOpen}>
-            <form className="flex flex-col justify-center  items-center pt-4 pb-2 px-4 w-[400px] text-center h-full" onSubmit={handelSubmit}>
+            <form className="flex flex-col justify-center items-center pb-2 px-4 w-[400px] text-center h-full" onSubmit={handelSubmit}>
                 <div className="pt-4 pb-8 gap-4 flex flex-col w-full justify-center items-center">
                     <h1 className="text-3xl font-black text-blue-700 dark:text-blue-300">add attachment</h1>
                 </div>
@@ -95,9 +93,7 @@ const CreateModal = (props: ICreateModalProps) => {
                     </div>
                 </div>
 
-                <div className="flex flex-row items-center mt-4  justify-between w-full px-4">
-                    <Button onClick={() => props.setIsOpen(false)}>cancel</Button>
-
+                <div className="flex flex-row items-center mt-4 justify-center w-full px-4">
                     <Button
                         isLoading={payload.isLoading}
                         isValid={data.length > 0 && isValidTitle && contentType.length > 0}

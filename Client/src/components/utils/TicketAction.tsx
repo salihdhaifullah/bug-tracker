@@ -45,17 +45,14 @@ const TicketAction = (props: IActionProps) => {
 
     const targetRef = useRef<HTMLDivElement>(null);
 
-    const handelCancel = () => {
-        setName(props.ticket.name);
-        setType(props.ticket.type);
-        setPriority(props.ticket.priority);
-        setStatus(props.ticket.status);
-        setMemberId(props.ticket.assignedTo?.memberId || "");
-        setIsOpenUpdateModal(false)
-    }
-
     useEffect(() => {
-        if (!isOpenUpdateModal) handelCancel()
+        if (!isOpenUpdateModal) {
+            setName(props.ticket.name);
+            setType(props.ticket.type);
+            setPriority(props.ticket.priority);
+            setStatus(props.ticket.status);
+            setMemberId(props.ticket.assignedTo?.memberId || "");
+        }
     }, [isOpenUpdateModal])
 
     const [isDelete, setIsDelete] = useState(false);
@@ -98,23 +95,22 @@ const TicketAction = (props: IActionProps) => {
             </div>
 
             <Modal isOpen={isOpenDeleteModal} setIsOpen={setIsOpenDeleteModal}>
-                <div className="flex flex-col bg-white dark:bg-black justify-center items-center pt-4 pb-2 px-4 w-[400px] text-center h-full">
-                    <div className="pt-4 pb-14 gap-4 flex flex-col w-full justify-center items-center">
+                <div className="flex flex-col bg-white dark:bg-black justify-center items-center pb-2 text-center h-full">
+                    <div className="pt-4 pb-12 gap-4 flex flex-col w-full justify-center items-center">
                         <h1 className="text-3xl font-black text-blue-700 dark:text-blue-300">
                             <Link to={`/ticket/${props.ticket.id}`}>{props.ticket.name}</Link>
                         </h1>
                         <h2 className="text-xl font-bold text-primary dark:text-secondary">are you sure you want to delete this ticket</h2>
                     </div>
 
-                    <div className="flex flex-row items-center mt-4  justify-between w-full px-4">
-                        <Button onClick={() => setIsOpenDeleteModal(false)}>cancel</Button>
+                    <div className="flex flex-row items-center mt-4  justify-center w-full px-4">
                         <Button isLoading={deleteTicketPayload.isLoading} onClick={() => callDeleteTicket()} className="!bg-red-500">delete</Button>
                     </div>
                 </div>
             </Modal>
 
             <Modal isOpen={isOpenUpdateModal} setIsOpen={setIsOpenUpdateModal}>
-                <div className="rounded-xl bg-white dark:bg-black flex flex-col gap-4 w-80 p-2 pt-6 items-center justify-center">
+                <div className="rounded-xl bg-white dark:bg-black flex flex-col gap-4 pb-2 items-center justify-center">
                     <div className="pb-4 gap-4 flex flex-col w-full text-center justify-center items-center">
                         <h1 className="text-3xl font-black text-blue-700 dark:text-blue-300">{props.ticket.name}</h1>
                         <h2 className="text-xl font-bold text-primary dark:text-secondary">are you sure you want to update this ticket</h2>
@@ -168,8 +164,7 @@ const TicketAction = (props: IActionProps) => {
 
                         <SelectUser search={props.ticket.assignedTo?.name} label="assign to" route={`members/${props.ticket.projectId}`} setId={setMemberId} id={memberId} />
 
-                        <div className="flex flex-row items-center mt-4  justify-between w-full px-4">
-                            <Button onClick={handelCancel}>cancel</Button>
+                        <div className="flex flex-row items-center mt-4 justify-center w-full px-4">
                             <Button
                                 isValid={isValidName && isValidType && isValidStatus && isValidPriority}
                                 isLoading={updateTicketPayload.isLoading}

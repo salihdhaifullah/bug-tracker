@@ -1,4 +1,4 @@
-import { ChangeEvent, Dispatch, FormEvent, SetStateAction, useRef, useState } from "react";
+import { ChangeEvent, Dispatch, FormEvent, SetStateAction, useEffect, useRef, useState } from "react";
 import Button from "../../../components/utils/Button";
 import Modal from "../../../components/utils/Modal";
 import useFetchApi from "../../../utils/hooks/useFetchApi";
@@ -43,13 +43,15 @@ const UpdateModal = (props: IUpdateModalProps) => {
         if (fileInputRef.current) fileInputRef.current.click();
     };
 
-    const resetState = () => {
-        setTitle(props.title)
-        setIsValidTitle(false)
-        setData("")
-        setFileName("")
-        setContentType("")
-    }
+    useEffect(() => {
+        if (!props.isOpen) {
+            setTitle(props.title)
+            setIsValidTitle(false)
+            setData("")
+            setFileName("")
+            setContentType("")
+        }
+    }, [props.isOpen])
 
     const handelSubmit = (e: FormEvent) => {
         e.preventDefault();
@@ -60,14 +62,13 @@ const UpdateModal = (props: IUpdateModalProps) => {
             contentType: isFileChange ? contentType : undefined,
         }
 
-        resetState();
         callUpdate(obj);
     }
 
 
     return (
         <Modal isOpen={props.isOpen} setIsOpen={props.setIsOpen}>
-            <form onSubmit={handelSubmit} className="flex flex-col justify-center items-center pt-4 pb-2 px-4 w-[400px] text-center h-full">
+            <form onSubmit={handelSubmit} className="flex flex-col justify-center items-center pb-2 px-4 w-[400px] text-center h-full">
                 <div className="pt-4 pb-8 gap-4 flex flex-col w-full justify-center items-center">
                     <h1 className="text-3xl font-black text-blue-700 dark:text-blue-300">update attachment</h1>
                 </div>
@@ -101,12 +102,7 @@ const UpdateModal = (props: IUpdateModalProps) => {
 
                 </div>
 
-                <div className="flex flex-row items-center mt-4  justify-between w-full px-4">
-                    <Button onClick={() => {
-                        resetState()
-                        props.setIsOpen(false)
-                    }}>cancel</Button>
-
+                <div className="flex flex-row items-center mt-4 justify-center w-full px-4">
                     <Button
                         isLoading={updatePayload.isLoading}
                         isValid={(data.length > 0 && contentType.length > 0) || (isValidTitle && title !== props.title)}

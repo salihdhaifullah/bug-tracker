@@ -50,7 +50,7 @@ const Action = (props: IActionProps) => {
             </div>
 
             <Modal isOpen={isOpenUpdateModal} setIsOpen={setIsOpenUpdateModal}>
-                <form onSubmit={handelSubmit} className="flex flex-col justify-center items-center pt-4 pb-2 px-4 w-[400px] text-center h-full gap-4">
+                <form onSubmit={handelSubmit} className="flex flex-col justify-center items-center pb-2 px-4 text-center h-full gap-4">
                     <h1 className="text-3xl py-8 font-bold text-primary dark:text-secondary">change name</h1>
 
                     <TextFiled
@@ -64,8 +64,7 @@ const Action = (props: IActionProps) => {
                         setIsValid={setIsValidName}
                     />
 
-                    <div className="flex flex-row items-center mt-4 justify-between w-full px-4">
-                        <Button onClick={() => setIsOpenUpdateModal(false)}>cancel</Button>
+                    <div className="flex flex-row items-center mt-4 justify-center w-full px-4">
                         <Button
                         isLoading={payload.isLoading}
                         buttonProps={{ type: "submit" }}

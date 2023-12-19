@@ -12,12 +12,12 @@ const TypeChart = (props: ITypeChart) => {
                 label: 'of Tickets',
                 data: [props.bugs, props.features],
                 backgroundColor: [
-                    'rgba(255, 99, 132, 0.2)',
-                    'rgba(54, 162, 235, 0.2)'
+                    "#f43f5e",
+                    "#84cc16"
                 ],
                 borderColor: [
-                    'rgba(255, 99, 132, 1)',
-                    'rgba(54, 162, 235, 1)'
+                    "#be123c",
+                    "#4d7c0f"
                 ],
                 borderWidth: 2,
             },
@@ -25,8 +25,8 @@ const TypeChart = (props: ITypeChart) => {
     };
 
     return (
-        <div className="flex justify-center items-center w-[400px] h-fit rounded-md p-4 shadow-lg bg-white dark:bg-black">
-            <Pie data={data} />
+        <div className="flex justify-center items-center rounded-md p-2 shadow-lg bg-white dark:bg-black">
+            <Pie data={data} width={350} height={350} />
         </div>
     )
 }

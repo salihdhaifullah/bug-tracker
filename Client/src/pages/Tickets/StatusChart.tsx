@@ -12,18 +12,18 @@ const StatusChart = (props: IStatusChart) => {
                 label: 'of Tickets',
                 data: [props.review, props.active, props.progress, props.resolved, props.closed],
                 backgroundColor: [
-                    'rgba(255, 99, 132, 0.2)',
-                    'rgba(54, 162, 235, 0.2)',
-                    'rgba(255, 206, 86, 0.2)',
-                    'rgba(75, 192, 192, 0.2)',
-                    'rgba(153, 102, 255, 0.2)'
+                    "#6366f1",
+                    "#3b82f6",
+                    "#06b6d4",
+                    "#10b981",
+                    "#6b7280"
                 ],
                 borderColor: [
-                    'rgba(255, 99, 132, 1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(255, 206, 86, 1)',
-                    'rgba(75, 192, 192, 1)',
-                    'rgba(153, 102, 255, 1)',
+                    "#4338ca",
+                    "#1d4ed8",
+                    "#0e7490",
+                    "#047857",
+                    "#374151"
                 ],
                 borderWidth: 2,
             },
@@ -32,8 +32,8 @@ const StatusChart = (props: IStatusChart) => {
 
 
     return (
-        <div className="flex justify-center items-center w-[400px] h-fit rounded-md p-4 shadow-lg bg-white dark:bg-black">
-            <Pie data={data} />
+        <div className="flex justify-center items-center rounded-md p-2 shadow-lg bg-white dark:bg-black">
+            <Pie data={data} width={350} height={350} />
         </div>
     )
 }

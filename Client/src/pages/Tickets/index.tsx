@@ -96,9 +96,7 @@ const Tickets = () => {
     const [isOpenCreateTicketModal, setIsOpenCreateTicketModal] = useState(false);
 
     return (
-        <section className="h-full w-full py-4 px-8 mt-10 gap-8 flex flex-col">
-
-            <Charts />
+        <section className="h-full w-full py-4 md:px-8 px-3 mt-10 gap-8 flex flex-col">
 
             <div className="w-full dark:bg-black bg-white border border-gray-500 shadow-md dark:shadow-secondary/40 rounded-md justify-center items-center flex flex-col p-2">
 
@@ -106,7 +104,7 @@ const Tickets = () => {
                     <Button onClick={() => setIsOpenCreateTicketModal(prev => !prev)}>create ticket</Button>
                     <CreateTicketModal isOpenModal={isOpenCreateTicketModal} setIsOpenModal={setIsOpenCreateTicketModal} />
 
-                    <div className="flex items-center justify-center w-full sm:w-auto">
+                    <div className="flex items-center justify-center gap-4 flex-wrap-reverse w-full md:w-auto">
                         <div className="max-w-[400px]">
                             <SearchFiled onClick={handelSearch} label="Search for tickets" value={search} onChange={(e) => setSearch(e.target.value)} />
                         </div>
@@ -168,6 +166,8 @@ const Tickets = () => {
                     )}
                 </div>
             </div>
+
+            <Charts />
 
         </section>
     )

@@ -44,7 +44,7 @@ const Activities = () => {
     }
 
     return (
-        <section className="h-full w-full py-4 px-8 mt-10 gap-8 flex flex-col">
+        <section className="h-full w-full py-4 md:px-8 px-3 mt-10 gap-8 flex flex-col">
 
             <div className="w-full bg-white dark:bg-black border border-gray-500 shadow-md dark:shadow-secondary/40 rounded-md justify-center items-center flex flex-col p-2">
 
