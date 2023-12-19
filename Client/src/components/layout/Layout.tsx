@@ -9,7 +9,7 @@ const Layout = () => {
         <Provider>
             <Header />
             <Notifications />
-            <main className="flex flex-col min-h-[85vh] mt-[8vh] mb-[6vh] h-auto">
+            <main className="flex flex-col min-h-[85vh] mt-16 mb-8 h-auto">
                 <Outlet />
             </main>
             <Footer />

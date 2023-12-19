@@ -64,7 +64,7 @@ const Editor = ({ md, setMd, files, onSubmit, onCancel, isLoading }: IEditorProp
                         <Button onClick={() => setIsPreview(!isPreview)}>{isPreview ? "write" : "preview"}</Button>
                     </div>
 
-                    <div className="flex h-auto max-w-[250px] relative w-fit items-center">
+                    <div className="flex h-auto sm:max-w-[250px] max-w-[200px] relative w-fit items-center">
                         <div className="flex flex-row gap-2 w-full thin-scrollbar overflow-x-auto overflow-y-hidden items-center">
                             {textarea === null ? null : (
                                 <TextareaProvider textarea={textarea}>

@@ -15,6 +15,8 @@ const Bold = () => {
       const {boundaryStart, boundaryEnd} = findWordBoundaries(text, start);
       start = boundaryStart;
       end = boundaryEnd + 2;
+    } else {
+      end += 2
     }
 
     setRange(textarea, start);

@@ -4,7 +4,7 @@ const Footer = () => {
   return (
     <footer className="bg-white w-full dark:bg-black p-4 shadow-xl dark:shadow-secondary/40">
 
-        <div className="flex items-center justify-between">
+        <div className="flex sm:flex-row flex-col items-center justify-between">
           <Link to="/" className="flex items-center mb-2 gap-2">
             <img src="/logo.svg" className="h-12 w-12" alt="Buegee Logo" />
             <span className="text-center text-2xl font-semibold whitespace-nowrap dark:text-secondary text-primary">Buegee</span>

@@ -24,22 +24,26 @@ export default function useMarkdown(md: string): JSX.Element {
 
   const markdownComponents: Components = {
     h1: ({ children }) => {
-      return <h1 className='my-2 text-6xl dark:text-white'>{children}</h1>
+      return <h1 className='my-2 text-4xl dark:text-white'>{children}</h1>
     },
     h2: ({ children }) => {
-      return <h2 className='my-2 text-5xl dark:text-white'>{children}</h2>
+      return <h2 className='my-2 text-3xl dark:text-white'>{children}</h2>
     },
     h3: ({ children }) => {
-      return <h3 className='my-2 text-4xl dark:text-white'>{children}</h3>
+      return <h3 className='my-2 text-2xl dark:text-white'>{children}</h3>
     },
     h4: ({ children }) => {
-      return <h4 className='my-2 text-3xl dark:text-white'>{children}</h4>
+      return <h4 className='my-2 text-xl dark:text-white'>{children}</h4>
     },
     h5: ({ children }) => {
-      return <h5 className='my-2 text-2xl dark:text-white'>{children}</h5>
+      return <h5 className='my-2 text-lg dark:text-white'>{children}</h5>
     },
     h6: ({ children }) => {
-      return <h6 className='my-2 text-xl dark:text-white'>{children}</h6>
+      return <h6 className='my-2 text-base dark:text-white'>{children}</h6>
+    },
+
+    p: ({ children }) => {
+      return <p className='text-base text-gray-800 dark:text-gray-200 my-1'>{children}</p>
     },
 
     ul: ({ children }) => {
@@ -57,10 +61,6 @@ export default function useMarkdown(md: string): JSX.Element {
       bg-slate-100 dark:bg-slate-900 rounded-sm dark:border-l-gray-600 border-l-gray-400 border-l-[10px] mx-2.5 my-6 px-2.5 py-2
       after:dark:text-gray-600 after:content-[close-quote] after:text-gray-400 after:text-4xl after:align-[-0.5rem]
       '>{children}</blockquote>
-    },
-
-    p: ({ children }) => {
-      return <p className='text-base text-gray-800 dark:text-gray-200 my-1'>{children}</p>
     },
 
     strong: ({children}) => {

@@ -13,13 +13,7 @@ public class FirebaseService : IFirebaseService
     {
         var uid = config.GetSection("Firebase").GetValue<string>("Id");
 
-        var path = "/etc/secrets/firebase-sdk.json";
-        if (environment.IsDevelopment())
-        {
-            path = "firebase-sdk.json";
-        }
-
-        var defaultApp = FirebaseApp.Create(new AppOptions() { Credential = GoogleCredential.FromFile(path) });
+        var defaultApp = FirebaseApp.Create(new AppOptions() { Credential = GoogleCredential.FromFile("firebase-sdk.json") });
 
         var defaultAuth = FirebaseAuth.GetAuth(defaultApp);
 

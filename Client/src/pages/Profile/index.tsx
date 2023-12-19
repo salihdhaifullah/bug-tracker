@@ -40,10 +40,10 @@ const Profile = () => {
         </Link>
       </div>
 
-      <div className="lg:grid lg:grid-cols-7 flex flex-col gap-2 w-full h-full">
+      <div className="lg:grid lg:grid-cols-8 flex flex-col gap-2 w-full h-full">
 
-        <div className="flex flex-col col-span-2 h-fit justify-center items-center my-2">
-          <div className="flex flex-col h-auto w-fit px-2 sm:px-4 md:px-8 lg:px-2 gap-2 rounded-2xl justify-center items-center bg-white dark:bg-black py-2 shadow-lg dark:shadow-secondary/40">
+        <div className="flex flex-col col-span-3 h-fit justify-center items-center my-2">
+          <div className="flex flex-col h-auto w-fit px-4 gap-2 rounded-2xl justify-center items-center bg-white dark:bg-black py-2 shadow-lg dark:shadow-secondary/40">
             <Image data={payload.result} editable={editable} />
             <h1 className="text-gray-800 dark:text-gray-200 font-medium text-2xl">{payload.result.name}</h1>
             <Bio userId={userId} editable={editable} />

@@ -7,7 +7,7 @@ interface IPagination {
 }
 
 const Pagination = (props: IPagination) => {
-    return (
+    return props.pages < 2 ? null : (
         <nav aria-label="Page navigation" className="flex flex-row w-full h-8 justify-center items-center">
 
             <div

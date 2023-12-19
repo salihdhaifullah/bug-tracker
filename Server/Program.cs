@@ -9,7 +9,6 @@ using Buegee.Services.RedisCacheService;
 
 var builder = WebApplication.CreateBuilder(args);
 
-if (!builder.Environment.IsDevelopment()) builder.Configuration.SetBasePath("/etc/secrets");
 builder.Services.AddControllers();
 builder.Services.AddSpaStaticFiles(config => config.RootPath = "dist");
 builder.Services.AddDbContext<DataContext>();

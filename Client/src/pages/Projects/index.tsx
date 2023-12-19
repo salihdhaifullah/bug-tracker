@@ -48,9 +48,9 @@ const Projects = () => {
   return (
     <section className="flex flex-col justify-center items-center w-full gap-8 my-10">
 
-      <div className="flex flex-row gap-4 w-full flex-wrap items-center justify-between px-4">
+      <div className="flex flex-row gap-6 w-full flex-wrap items-center justify-between px-4">
 
-        <div className="flex items-center justify-center">
+        <div className="flex w-full items-center sm:justify-between justify-center flex-row flex-wrap-reverse sm:flex-nowrap gap-6">
 
           <div className="max-w-[400px]">
             <SearchFiled onClick={handelSearch} label="Search for projects" value={search} onChange={(e) => setSearch(e.target.value)} />
@@ -67,7 +67,7 @@ const Projects = () => {
         <CreateProjectModal isOpenModal={isOpenCreateModal} setIsOpenModal={setIsOpenCreateModal} />
 
         <div className="flex items-center justify-center">
-          <Button size="lg" onClick={() => setIsOpenCreateModal((prev) => !prev)} className="flex-row flex justify-center items-center gap-1">
+          <Button size="md" onClick={() => setIsOpenCreateModal((prev) => !prev)} className="flex-row flex justify-center items-center gap-1">
             <MdOutlineCreateNewFolder />
             <p>create projects</p>
           </Button>
@@ -76,10 +76,10 @@ const Projects = () => {
       </div>
 
       {projectsPayload.isLoading ? (
-        <CircleProgress size="lg" />
+        <CircleProgress size="lg" className="my-20" />
       ) : (
         (!projectsPayload.result || projectsPayload.result.length === 0) ? (
-          <h1> No Project Found </h1>
+          <h1 className="my-20 dark:text-white text-3xl"> no project found </h1>
         ) : (
           <div className="gap-2 flex flex-col justify-center items-center w-full p-4">
             {projectsPayload.result.map((item, index) => (

@@ -23,23 +23,23 @@ export interface IProject {
 const take = 10;
 
 const Search = () => {
-  const query = useQuery();
+  const search = useQuery().get("search") || "";
   const [page, setPage] = useState(1)
 
-  const [projectsPayload, callProjects] = useFetchApi<IProject[]>("GET", `project/projects/explore/${page}/?take=${take}&search=${query.get("search") || ""}`, [page, take, query.get("search")]);
-  const [CountPayload, callCount] = useFetchApi<number>("GET", `project/count/explore/?take=${take}&search=${query.get("search") || ""}`, [take, query.get("search")]);
+  const [projectsPayload, callProjects] = useFetchApi<IProject[]>("GET", `project/projects/explore/${page}/?take=${take}&search=${search}`, [page, take, search]);
+  const [CountPayload, callCount] = useFetchApi<number>("GET", `project/count/explore/?take=${take}&search=${search}`, [take, search]);
 
-  useEffect(() => { callProjects() }, [page, take, query.get("search")])
-  useEffect(() => { callCount() }, [take, query.get("search")])
+  useEffect(() => { callProjects() }, [page, take, search])
+  useEffect(() => { callCount() }, [take, search])
 
   return (
     <section className="flex flex-col justify-center items-center w-full gap-8 my-10">
 
       {projectsPayload.isLoading ? (
-        <CircleProgress size="lg" />
+        <CircleProgress size="lg" className="my-20" />
       ) : (
         (!projectsPayload.result || projectsPayload.result.length === 0) ? (
-          <h1> Sorry No Project Found </h1>
+          <h1 className="my-20 dark:text-white text-3xl"> no project found </h1>
         ) : (
           <div className="gap-6 flex flex-col justify-center items-center w-full p-4">
             {projectsPayload.result.map((item, index) => (
@@ -54,6 +54,7 @@ const Search = () => {
         pages={CountPayload.result ? Math.ceil(CountPayload.result/take) : 0}
         handelOnChange={(newPage) => setPage(newPage)}
       />
+
     </section>
   )
 }
