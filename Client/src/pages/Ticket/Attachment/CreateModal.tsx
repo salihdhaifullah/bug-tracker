@@ -59,8 +59,8 @@ const CreateModal = (props: ICreateModalProps) => {
 
     return (
         <Modal isOpen={props.isOpen} setIsOpen={props.setIsOpen}>
-            <form className="flex flex-col justify-center items-center pb-2 px-4 w-[400px] text-center h-full" onSubmit={handelSubmit}>
-                <div className="pt-4 pb-8 gap-4 flex flex-col w-full justify-center items-center">
+            <form className="flex flex-col justify-center items-center pb-2 px-4 text-center h-full" onSubmit={handelSubmit}>
+                <div className="pb-8 gap-4 flex flex-col w-full justify-center items-center">
                     <h1 className="text-3xl font-black text-blue-700 dark:text-blue-300">add attachment</h1>
                 </div>
 

@@ -27,7 +27,7 @@ const CodeLanguage = () => {
 
             <div
                 className={`${isOpen ? "h-auto thin-scrollbar w-auto shadow-md dark:shadow-secondary/40 overflow-y-auto p-2" : ""} w-0 h-0 max-h-40 left-[30%] top-4 absolute transition-all ease-in-out bg-white dark:bg-black rounded-md`}>
-                {programmingLanguages.map((Lang, index) => (
+                {isOpen && programmingLanguages.map((Lang, index) => (
                     <div
                         onClick={() => {
                             insertCodeLanguage(Lang.name)

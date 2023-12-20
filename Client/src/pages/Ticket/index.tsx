@@ -52,7 +52,7 @@ const Ticket = () => {
         <section className="flex flex-col w-full h-full my-10 p-2 flex-grow">
             <div className="flex flex-row w-full h-full gap-3">
 
-                <Link to={`/profile/${payload.result.creator.id}`} className="w-10 h-10 hidden sm:flex">
+                <Link to={`/profile/${payload.result.creator.id}`} className="w-12 h-12 hidden sm:flex">
                     <img
                         title="creator"
                         className="rounded-full bg-white dark:bg-black shadow-md w-10 h-10 object-contain"
@@ -65,7 +65,7 @@ const Ticket = () => {
 
                     <div className="flex flex-row justify-between items-center border-b-gray-400 dark:border-b-gray-600 p-2 border-b">
                         <div className="flex flex-row gap-2 justify-start items-center">
-                            <Link to={`/profile/${payload.result.creator.id}`} className="w-10 h-10 sm:hidden flex">
+                            <Link to={`/profile/${payload.result.creator.id}`} className="w-12 h-12 sm:hidden flex">
                                 <img
                                     title="creator"
                                     className="rounded-full bg-white dark:bg-black shadow-md w-10 h-10 object-contain"

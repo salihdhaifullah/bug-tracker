@@ -26,7 +26,7 @@ const Link = () => {
 
             <div className={`${isOpen ? "h-auto w-auto p-2 shadow-md" : ""} w-0 h-0 max-h-40 left-[30%] top-4 absolute transition-all ease-in-out bg-white dark:bg-black rounded-md`}>
 
-                {[true, false].map(
+                {isOpen && [true, false].map(
                     (linkType, index) => (
                         <p key={index}
                             title={linkType ? "external" : "internal"}

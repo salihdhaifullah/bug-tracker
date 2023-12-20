@@ -37,17 +37,15 @@ const Attachment = (props: { isCreator: boolean }) => {
 
                     <div className="flex flex-col justify-center items-start w-full gap-4">
                         {attachmentsPayload.result.map((attachment, index) => (
-                            <div className="flex flex-row" key={index}>
+                            <div className="flex flex-row justify-between w-full items-center" key={index}>
 
-                                <div className="px-6 py-4 min-w-[150px]">
-                                    <a target="_blank" className="link" href={attachment.url}>
-                                        {attachment.title}
-                                    </a>
-                                </div>
+                                <a target="_blank" className="link w-[50%]" href={attachment.url}>
+                                    {attachment.title}
+                                </a>
 
-                                <div className="px-6 py-4 min-w-[150px] dark:text-gray-200 text-gray-800"> {formatDate(attachment.createdAt)} </div>
+                                <p className="dark:text-gray-200 text-gray-800 w-[30%]"> {formatDate(attachment.createdAt)} </p>
 
-                                {props.isCreator && <div className="px-6 py-4 min-w-[150px]"> <Action call={callAttachments} id={attachment.id} title={attachment.title} /> </div>}
+                                {props.isCreator && <Action call={callAttachments} id={attachment.id} title={attachment.title} />}
                             </div>
                         ))}
                     </div>

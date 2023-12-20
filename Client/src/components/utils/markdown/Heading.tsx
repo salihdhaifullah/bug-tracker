@@ -29,7 +29,7 @@ const Heading = () => {
 
             <div className={`${isOpen ? "h-auto w-auto p-2 shadow-md" : ""} w-0 h-0 max-h-40 left-[30%] top-4 absolute transition-all ease-in-out bg-white dark:bg-black rounded-md`}>
 
-                {["text-2xl", "text-xl", "text-lg", "text-base", "text-sm", "text-xs"].map(
+                {isOpen && ["text-2xl", "text-xl", "text-lg", "text-base", "text-sm", "text-xs"].map(
                     (textType, index) => (
                         <p key={index}
                             className={`text-gray-700 dark:text-gray-300 dark:hover:bg-slate-800 hover:bg-slate-200 hover:text-primary dark:hover:text-secondary p-1 flex justify-center items-center rounded-sm cursor-pointer ${textType} `}

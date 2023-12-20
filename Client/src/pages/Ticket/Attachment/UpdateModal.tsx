@@ -68,8 +68,8 @@ const UpdateModal = (props: IUpdateModalProps) => {
 
     return (
         <Modal isOpen={props.isOpen} setIsOpen={props.setIsOpen}>
-            <form onSubmit={handelSubmit} className="flex flex-col justify-center items-center pb-2 px-4 w-[400px] text-center h-full">
-                <div className="pt-4 pb-8 gap-4 flex flex-col w-full justify-center items-center">
+            <form onSubmit={handelSubmit} className="flex flex-col justify-center items-center pb-2 px-4 text-center h-full">
+                <div className="pb-8 gap-4 flex flex-col w-full justify-center items-center">
                     <h1 className="text-3xl font-black text-blue-700 dark:text-blue-300">update attachment</h1>
                 </div>
 

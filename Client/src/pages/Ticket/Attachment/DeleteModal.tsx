@@ -19,8 +19,8 @@ const DeleteModal = (props: IDeleteModalProps) => {
 
     return (
         <Modal isOpen={props.isOpen} setIsOpen={props.setIsOpen}>
-            <div className="flex flex-col justify-center items-center pb-2 px-4 w-[400px] text-center h-full">
-                <div className="pt-4 pb-14 gap-4 flex flex-col w-full justify-center items-center">
+            <div className="flex flex-col justify-center items-center pb-2 px-4 text-center h-full">
+                <div className="pb-14 gap-4 flex flex-col w-full justify-center items-center">
                     <h1 className="text-3xl font-black text-blue-700 dark:text-blue-300">{props.title}</h1>
                     <h2 className="text-xl font-bold text-primary dark:text-secondary">are you sure you want to delete this attachment</h2>
                 </div>

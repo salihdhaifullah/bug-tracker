@@ -46,15 +46,15 @@ const SelectUser = (props: ISelectToInviteProps) => {
 
     useEffect(() => {
         call();
-    }, [])
+    }, [search])
 
     const onChange = (e: ChangeEvent<HTMLInputElement>) => {
         setSearch(e.target.value)
         props.setId("")
-        call();
     };
 
     useEffect(() => {
+        console.log(isOpen)
         if (!isOpen && !props.id) setSearch("");
     }, [isOpen])
 
@@ -98,7 +98,7 @@ const SelectUser = (props: ISelectToInviteProps) => {
             ref={targetRef}
             className="flex flex-row gap-2 w-full justify-center items-center relative">
             <TextFiled
-                onFocus={() => setIsOpen(true)}
+                onFocus={() => setIsOpen(true) }
                 inputProps={{
                     autoComplete: "off",
                     onKeyUp: handleKeyUp,
