@@ -14,7 +14,7 @@ public class JWTService : IJWTService
     {
         var isFoundSecretKey = config.GetSection("JWT").GetValue<string>("SecretKey");
 
-        if (String.IsNullOrEmpty(isFoundSecretKey)) throw new Exception("Secret Key Not Configured");
+        if (string.IsNullOrEmpty(isFoundSecretKey)) throw new Exception("Secret Key Not Configured");
 
         _secretKey = isFoundSecretKey;
     }
@@ -32,7 +32,6 @@ public class JWTService : IJWTService
         tokenStringBuilder.Append(Helper.UrlEncode(JsonSerializer.Serialize(claims)));
 
         var token = tokenStringBuilder.ToString();
-
         var signature = Convert.ToBase64String(
             new HMACSHA256(Encoding.UTF8.GetBytes(_secretKey))
                 .ComputeHash(Encoding.UTF8.GetBytes(token))
@@ -71,5 +70,4 @@ public class JWTService : IJWTService
 
         return payload;
     }
-
 }

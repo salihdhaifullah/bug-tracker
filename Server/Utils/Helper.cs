@@ -35,9 +35,4 @@ public static class Helper
             MaxAge = duration
         };
     }
-
-    public static string BaseUrl(HttpRequest request)
-    {
-        return $"{request.Scheme}://{request.Host.Value}";
-    }
 }

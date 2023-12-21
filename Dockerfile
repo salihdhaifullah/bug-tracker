@@ -14,6 +14,7 @@ WORKDIR /src
 COPY ["Server/Buegee.csproj", "Server/"]
 RUN dotnet restore "./Server/Buegee.csproj"
 COPY ./Server .
+COPY ./ .
 WORKDIR "/src/."
 RUN dotnet build "Buegee.csproj" -c Release -o /app/build
 

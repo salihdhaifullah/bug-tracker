@@ -204,7 +204,6 @@ public class MemberController : Controller
             .Select((p) => new
             {
                 developers = p.Members.Where(m => m.Role == Role.developer).Count(),
-                testers = p.Members.Where(m => m.Role == Role.tester).Count(),
                 projectMangers = p.Members.Where(m => m.Role == Role.project_manger).Count(),
             })
             .FirstOrDefaultAsync();
@@ -236,6 +235,27 @@ public class MemberController : Controller
                     ).CountAsync();
 
             return HttpResult.Ok(body: count);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.Message);
+            return HttpResult.InternalServerError();
+        }
+    }
+
+    [HttpGet("role/{projectId}")]
+    public async Task<IActionResult> GetRole([FromRoute] string projectId)
+    {
+        try
+        {
+            var role = "";
+
+            if (_auth.TryGetId(Request, out string? userId))
+            {
+                role = await _ctx.Members.Where(m => m.ProjectId == projectId && m.UserId == userId).Select(m => m.Role.ToString()).FirstOrDefaultAsync();
+            }
+
+            return HttpResult.Ok(body: role);
         }
         catch (Exception e)
         {

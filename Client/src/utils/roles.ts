@@ -1,3 +1,3 @@
-const roles = ["tester", "project_manger", "developer"];
+const roles = ["project_manger", "developer"];
 
 export default roles;

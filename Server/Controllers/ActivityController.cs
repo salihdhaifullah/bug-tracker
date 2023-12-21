@@ -21,7 +21,7 @@ public class ActivityController : Controller
         _logger = logger;
         _auth = auth;
     }
-
+    // users/{userId}/projects/{projectId}/activities
     [HttpGet("activities/{projectId}")]
     public async Task<IActionResult> Activities([FromRoute] string projectId, [FromQuery] int take = 10, [FromQuery] int page = 1, [FromQuery] string sort = "oldest")
     {
@@ -29,7 +29,9 @@ public class ActivityController : Controller
         {
             _auth.TryGetId(Request, out string? userId);
 
-            var query = _ctx.Activities.Where(a => a.ProjectId == projectId && (!a.Project.IsPrivate || a.Project.Members.Any(m => userId != null && m.UserId == userId)));
+            var query = _ctx.Activities.Where(a =>
+                        a.ProjectId == projectId &&
+                        _auth.CanUserAccessProject(a.Project, userId));
 
             if (sort == "oldest") query = query.OrderBy(a => a.CreatedAt);
             else query = query.OrderByDescending(a => a.CreatedAt);
@@ -42,6 +44,10 @@ public class ActivityController : Controller
             .Skip((page - 1) * take)
             .Take(take)
             .ToListAsync();
+
+            if (activities is null) {
+                return HttpResult.NotFound("page not found", redirectTo: "/404");
+            }
 
             return HttpResult.Ok(body: activities);
         }
@@ -59,7 +65,10 @@ public class ActivityController : Controller
         {
             _auth.TryGetId(Request, out string? userId);
 
-            var count = await _ctx.Activities.Where(a => a.ProjectId == projectId && (!a.Project.IsPrivate || a.Project.Members.Any(m => userId != null && m.UserId == userId))).CountAsync();
+            var count = await _ctx.Activities.Where(a =>
+                a.ProjectId == projectId &&
+                _auth.CanUserAccessProject(a.Project, userId)
+                ).CountAsync();
 
             return HttpResult.Ok(body: count);
         }

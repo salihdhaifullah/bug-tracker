@@ -34,9 +34,9 @@ public class AttachmentController : Controller
         {
             var userId = _auth.GetId(Request);
 
-            var isUser = await _ctx.Tickets.AnyAsync(t => t.Creator.UserId == userId);
-
-            if (!isUser) return HttpResult.UnAuthorized();
+            if (!await _ctx.Tickets.AnyAsync(t => t.Creator.UserId == userId)) {
+                return HttpResult.BadRequest("can't add attachment to this ticket");
+            }
 
             var fileUrl = await _firebase.Upload(Convert.FromBase64String(dto.Data), dto.ContentType);
 
@@ -70,7 +70,7 @@ public class AttachmentController : Controller
                     .Where(a => a.Id == attachmentId && a.Ticket.Creator.UserId == userId)
                     .FirstOrDefaultAsync();
 
-            if (attachment == null) return HttpResult.NotFound("attachment not found");
+            if (attachment == null) return HttpResult.BadRequest("attachment not found");
 
             if (dto.Title != null) attachment.Title = dto.Title;
             if (dto.ContentType != null && dto.Data != null)
@@ -129,14 +129,15 @@ public class AttachmentController : Controller
     {
         try
         {
-            var attachments = await _ctx.Attachments.Where(a => a.TicketId == ticketId).Select(a => new
-            {
-                id = a.Id,
-                title = a.Title,
-                url = a.Url,
-                createdAt = a.CreatedAt,
-            })
-            .ToListAsync();
+            var attachments = await _ctx.Attachments
+                .Where(a => a.TicketId == ticketId)
+                .Select(a => new {
+                    id = a.Id,
+                    title = a.Title,
+                    url = a.Url,
+                    createdAt = a.CreatedAt,
+                })
+                .ToListAsync();
 
             return HttpResult.Ok(body: attachments);
         }

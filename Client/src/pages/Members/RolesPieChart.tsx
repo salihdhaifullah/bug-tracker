@@ -7,7 +7,6 @@ import CircleProgress from '../../components/utils/CircleProgress';
 
 interface IData {
     developers: number;
-    testers: number;
     projectMangers: number;
 }
 
@@ -23,19 +22,17 @@ const RolesPieChart = () => {
     ChartJS.register(ArcElement, Tooltip, Legend);
 
     const config = {
-        labels: ['developers', 'testers', 'project mangers'],
+        labels: ['developers', 'project mangers'],
         datasets: [
             {
                 label: 'of members',
-                data: [0, 0, 0],
+                data: [0, 0],
                 backgroundColor: [
                     "#3b82f6",
-                    "#d946ef",
                     "#eab308"
                 ],
                 borderColor: [
                     "#1d4ed8",
-                    "#a21caf",
                     "#a16207"
                 ],
                 borderWidth: 2,
@@ -43,11 +40,11 @@ const RolesPieChart = () => {
         ],
     }
 
-    const getData = (result: { developers: number, testers: number, projectMangers: number }) => {
-        if (result.developers + result.testers + result.projectMangers === 0) {
+    const getData = (result: { developers: number, projectMangers: number }) => {
+        if (result.developers + result.projectMangers === 0) {
             setIsNoMembers(true)
         };
-        config.datasets[0].data = [result.developers, result.testers, result.projectMangers]
+        config.datasets[0].data = [result.developers, result.projectMangers]
         return config;
     }
 
