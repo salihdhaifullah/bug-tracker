@@ -13,12 +13,13 @@ export interface IProfileResult {
   bio: string;
   avatarUrl: string;
   name: string;
+  contentId: string;
 }
 
 const Profile = () => {
   const userId = useParams().userId!;
   const user = useUser();
-  const [payload, call] = useFetchApi<IProfileResult>("GET", `user/profile-page/${userId}`)
+  const [payload, call] = useFetchApi<IProfileResult>("GET", `users/${userId}`)
 
   useEffect(() => { call() }, [])
 
@@ -46,13 +47,13 @@ const Profile = () => {
           <div className="flex flex-col h-auto w-fit px-4 gap-2 rounded-2xl justify-center items-center bg-white dark:bg-black py-2 shadow-lg dark:shadow-secondary/40">
             <Image data={payload.result} editable={editable} />
             <h1 className="text-gray-800 dark:text-gray-200 font-medium text-2xl">{payload.result.name}</h1>
-            <Bio userId={userId} editable={editable} />
+            <Bio bio={payload.result.bio} userId={userId} editable={editable} />
           </div>
         </div>
 
         <div className="flex flex-col mb-6 col-span-5 items-center justify-center gap-4 w-full h-auto">
           <div className="bg-white dark:bg-black rounded-lg shadow-lg w-full h-fit p-2 lg:m-3 mb-3 dark:shadow-secondary/40">
-            <Content editable={editable} url={`user/profile/${userId}`} />
+            <Content editable={editable} contentId={payload.result.contentId} />
           </div>
         </div>
 

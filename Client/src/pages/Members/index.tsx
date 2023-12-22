@@ -10,6 +10,7 @@ import roles from "../../utils/roles";
 import InviteModal from "./InviteModal";
 import MembersRow from "./MembersRow";
 import RolesPieChart from "./RolesPieChart";
+import { useUser } from "../../utils/context/user";
 
 export interface IMember {
     avatarUrl: string;
@@ -32,19 +33,18 @@ export interface IChangeRole {
 
 
 const Members = () => {
-    const { projectId } = useParams();
+    const { projectId, userId } = useParams();
+    const isOwner = userId === useUser()?.id;
     const [search, setSearch] = useState("");
     const [role, setRole] = useState("all");
     const [take, setTake] = useState(10);
     const [page, setPage] = useState(1);
 
-    const [isOwnerPayload, callIsOwner] = useFetchApi<boolean>("GET", `project/is-owner/${projectId}`);
-    const [membersPayload, callMembers] = useFetchApi<IMember[]>("GET", `member/members-table/${projectId}?take=${take}&page=${page}&role=${role}&search=${search}`, [take, page, role, search]);
-    const [countPayload, callCount] = useFetchApi<number>("GET", `member/members-count/${projectId}?role=${role}&search=${search}`, [role, search]);
+    const [membersPayload, callMembers] = useFetchApi<IMember[]>("GET", `users/${userId}/projects/${projectId}/members/table?take=${take}&page=${page}&role=${role}&search=${search}`, [take, page, role, search]);
+    const [countPayload, callCount] = useFetchApi<number>("GET", `users/${userId}/projects/${projectId}/members/table/count/${projectId}?role=${role}&search=${search}`, [role, search]);
 
     const [isOpenInviteModal, setIsOpenInviteModal] = useState(false);
 
-    useEffect(() => { callIsOwner() }, [])
     useEffect(() => { callMembers() }, [take, page, role])
     useEffect(() => { callCount() }, [role])
 
@@ -81,7 +81,7 @@ const Members = () => {
                 </div>
 
                 <div className="flex flex-col justify-center items-center w-full gap-4">
-                    {membersPayload.isLoading || isOwnerPayload.isLoading ? <CircleProgress size="lg" className="mb-4" /> : (
+                    {membersPayload.isLoading ? <CircleProgress size="lg" className="mb-4" /> : (
                         <>
                             <div className="overflow-x-scroll dark-scrollbar overflow-y-hidden w-full">
                                 <table className="text-sm text-left text-gray-500 w-full">
@@ -92,13 +92,13 @@ const Members = () => {
                                             <th scope="col" className="px-6 py-3 min-w-[150px]"> full name </th>
                                             <th scope="col" className="px-6 py-3 min-w-[150px]"> email </th>
                                             <th scope="col" className="px-6 py-3 min-w-[150px]"> joined at </th>
-                                            {isOwnerPayload.result ? <th scope="col" className="px-6 py-3  min-w-[150px]"> action </th> : null}
+                                            {isOwner ? <th scope="col" className="px-6 py-3  min-w-[150px]"> action </th> : null}
                                         </tr>
                                     </thead>
 
                                     <tbody className="before:block before:h-4 after:block after:mb-2">
-                                        {membersPayload.result !== null && isOwnerPayload.result !== null && membersPayload.result.map((member, index) => (
-                                            <MembersRow key={index} callMembers={callMembers} member={member} isOwner={isOwnerPayload.result as boolean} />
+                                        {membersPayload.result !== null && membersPayload.result.map((member, index) => (
+                                            <MembersRow key={index} callMembers={callMembers} member={member} isOwner={isOwner} />
                                         ))}
                                     </tbody>
                                 </table>

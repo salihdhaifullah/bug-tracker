@@ -13,9 +13,6 @@ public class AttachmentDTO
     [JsonPropertyName("data"), Required(ErrorMessage = "file is required")]
     public string Data { get; set; } = null!;
 
-    [Required(ErrorMessage = "ticket id is required"), JsonPropertyName("ticketId"), IdValidation(ErrorMessage = "un-valid ticket id")]
-    public string TicketId { get; set; } = null!;
-
     [JsonPropertyName("title")]
     [Required(ErrorMessage = "title is required"),
     MaxLength(100, ErrorMessage = "maximum length of attachment title is 100 characters"),

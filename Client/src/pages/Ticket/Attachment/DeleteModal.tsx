@@ -2,6 +2,7 @@ import { Dispatch, SetStateAction } from "react";
 import Button from "../../../components/utils/Button";
 import Modal from "../../../components/utils/Modal";
 import useFetchApi from "../../../utils/hooks/useFetchApi";
+import { useParams } from "react-router-dom";
 
 interface IDeleteModalProps {
     isOpen: boolean;
@@ -12,7 +13,8 @@ interface IDeleteModalProps {
 }
 
 const DeleteModal = (props: IDeleteModalProps) => {
-    const [deletePayload, callDelete] = useFetchApi("DELETE", `attachment/${props.id}`, [], () => {
+    const {ticketId, userId, projectId} = useParams();
+    const [deletePayload, callDelete] = useFetchApi("DELETE", `users/${userId}/projects/${projectId}/tickets/${ticketId}/attachments/${props.id}`, [], () => {
         props.setIsOpen(false);
         props.call();
     })

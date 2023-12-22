@@ -30,7 +30,6 @@ callback?: (arg: R) => void): [payload: IPayload<R>, call: (body?: B) => void] {
         setIsLoading(true);
 
         try {
-
             const responseBlob = await fetch(`${window.origin}/api/${url}`, {
                 method: method,
                 body: body ? JSON.stringify(body) : undefined,
@@ -40,8 +39,6 @@ callback?: (arg: R) => void): [payload: IPayload<R>, call: (body?: B) => void] {
             });
 
             const response = await responseBlob.json() as IResult<R>;
-
-            setIsLoading(false);
 
             if (response?.type === "ok" && response?.body) {
                 setResult(response.body);
@@ -61,7 +58,8 @@ callback?: (arg: R) => void): [payload: IPayload<R>, call: (body?: B) => void] {
             if (response?.redirectTo) navigate(response?.redirectTo);
 
         } catch (err) {
-            console.log(err)
+            console.error(err)
+        } finally {
             setIsLoading(false);
         }
 

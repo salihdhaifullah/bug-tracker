@@ -8,7 +8,7 @@ import TextFiled from "./TextFiled";
 import useOnClickOutside from "../../utils/hooks/useOnClickOutside";
 import { FormEvent, useEffect, useRef, useState } from "react";
 import useFetchApi from "../../utils/hooks/useFetchApi";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 interface ITicket {
     name: string;
@@ -62,7 +62,9 @@ const TicketAction = (props: IActionProps) => {
         if (isDelete && props?.onDelete) props.onDelete();
     }, [isDelete])
 
-    const [deleteTicketPayload, callDeleteTicket] = useFetchApi("DELETE", `ticket/${props.ticket.id}`, [], () => {
+    const {userId, projectId} = useParams();
+
+    const [deleteTicketPayload, callDeleteTicket] = useFetchApi("DELETE", `users/${userId}/projects/${projectId}/tickets/${props.ticket.id}`, [], () => {
         setIsOpenDeleteModal(false);
         setIsDelete(true);
     })
@@ -71,7 +73,7 @@ const TicketAction = (props: IActionProps) => {
         if (isUpdate && props?.onUpdate) props.onUpdate();
     }, [isUpdate])
 
-    const [updateTicketPayload, callUpdateTicket] = useFetchApi<unknown, { name: string, type: string, priority: string, status: string, memberId?: string }>("PATCH", `ticket/${props.ticket.id}`, [], () => {
+    const [updateTicketPayload, callUpdateTicket] = useFetchApi<unknown, { name: string, type: string, priority: string, status: string, memberId?: string }>("PATCH", `users/${userId}/projects/${projectId}/tickets/${props.ticket.id}`, [], () => {
         setIsOpenUpdateModal(false);
         setIsUpdate(true);
     });
@@ -162,7 +164,7 @@ const TicketAction = (props: IActionProps) => {
                             label="ticket status"
                         />
 
-                        <SelectUser search={props.ticket.assignedTo?.name} label="assign to" route={`members/${props.ticket.projectId}`} setId={setMemberId} id={memberId} />
+                        <SelectUser search={props.ticket.assignedTo?.name} label="assign to" members={true} setId={setMemberId} id={memberId} />
 
                         <div className="flex flex-row items-center mt-4 justify-center w-full px-4">
                             <Button

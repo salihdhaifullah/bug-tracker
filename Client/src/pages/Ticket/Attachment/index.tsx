@@ -15,9 +15,9 @@ interface IAttachment {
 }
 
 const Attachment = (props: { isCreator: boolean }) => {
-    const { ticketId } = useParams();
+    const { ticketId, userId, projectId } = useParams();
     const [isOpenCreateAttachmentModal, setIsOpenCreateAttachmentModal] = useState(false);
-    const [attachmentsPayload, callAttachments] = useFetchApi<IAttachment[]>("GET", `attachment/attachments/${ticketId}`);
+    const [attachmentsPayload, callAttachments] = useFetchApi<IAttachment[]>("GET", `users/${userId}/projects/${projectId}/tickets/${ticketId}/attachments`);
 
     useEffect(() => { callAttachments() }, [])
 

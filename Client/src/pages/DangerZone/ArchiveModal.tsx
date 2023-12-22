@@ -6,9 +6,9 @@ import { IModalProps } from ".";
 import { useParams } from "react-router-dom";
 
 const ArchiveModal = (props: IModalProps & { isReadOnly: boolean }) => {
-    const { projectId } = useParams()
+    const { projectId, userId } = useParams()
 
-    const [archiveProjectPayload, callArchiveProject] = useFetchApi("GET", `project/archive/${projectId}`, [props]);
+    const [archiveProjectPayload, callArchiveProject] = useFetchApi("PATCH", `users/${userId}/projects/${projectId}/danger-zone/archive`, [props]);
 
     const handelArchiveProject = useCallback(() => {
         props.setIsOpenModal(false);

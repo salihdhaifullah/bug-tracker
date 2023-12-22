@@ -19,7 +19,7 @@ const Header = () => {
     const themeDispatch = useThemeDispatch();
     const navigate = useNavigate();
     const userDispatch = useUserDispatch();
-    const [logoutPayload, callLogout] = useFetchApi("GET", "auth/logout", [], () => {
+    const [logoutPayload, callLogout] = useFetchApi("DELETE", "auth/logout", [], () => {
         userDispatch({ type: "logout" })
         setIsOpenModal(false)
     });

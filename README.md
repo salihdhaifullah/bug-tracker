@@ -41,8 +41,8 @@ users/{userId} GET
 users/{userId}/avatar PATCH
 users/{userId}/bio PATCH
 
-users/{userId}/content GET
-users/{userId}/content DELETE
+contents/{contentId} GET
+contents/{contentId} PATCH
 
 users/{userId}/projects POST
 users/{userId}/projects/{page} GET
@@ -52,9 +52,6 @@ users/{userId}/projects/{projectId} GET
 users/{userId}/projects/{projectId} PATCH
 users/{userId}/projects/{projectId} DELETE
 
-users/{userId}/projects/{projectId}/content PATCH
-users/{userId}/projects/{projectId}/content GET
-
 users/{userId}/projects/{projectId}/danger-zone GET
 users/{userId}/projects/{projectId}/danger-zone/visibility PATCH
 users/{userId}/projects/{projectId}/danger-zone/archive PATCH
@@ -63,10 +60,9 @@ users/{userId}/projects/{projectId}/danger-zone/transfer PATCH
 explore/{page} GET
 explore/count GET
 
-users/{userId}/projects/{projectId}/members GET
+users/{userId}/projects/{projectId}/members/{page} GET
 users/{userId}/projects/{projectId}/members POST
 users/{userId}/projects/{projectId}/members DELETE
-
 users/{userId}/projects/{projectId}/members/none-members GET
 users/{userId}/projects/{projectId}/members/chart GET
 
@@ -77,7 +73,7 @@ users/{userId}/projects/{projectId}/members/{memberId}/role GET
 users/{userId}/projects/{projectId}/members/{memberId} DELETE
 users/{userId}/projects/{projectId}/members/{memberId} PATCH
 
-users/{userId}/projects/{projectId}/activities GET
+users/{userId}/projects/{projectId}/activities/{page} GET
 users/{userId}/projects/{projectId}/activities/count GET
 
 users/{userId}/projects/{projectId}/tickets/{ticketId} POST
@@ -85,13 +81,10 @@ users/{userId}/projects/{projectId}/tickets/{ticketId} PATCH
 users/{userId}/projects/{projectId}/tickets/{ticketId} GET
 users/{userId}/projects/{projectId}/tickets/{ticketId} DELETE
 
-users/{userId}/projects/{projectId}/tickets/{ticketId}/content PATCH
-users/{userId}/projects/{projectId}/tickets/{ticketId}/content GET
-
 users/{userId}/projects/{projectId}/tickets/assigned/{userId} GET
 users/{userId}/projects/{projectId}/tickets/assigned/{userId}/{ticketId} PATCH
 
-users/{userId}/projects/{projectId}/tickets/table GET
+users/{userId}/projects/{projectId}/tickets/table/{page} GET
 users/{userId}/projects/{projectId}/tickets/table/count GET
 
 users/{userId}/projects/{projectId}/tickets/{ticketId}/chart GET
@@ -102,10 +95,7 @@ users/{userId}/projects/{projectId}/tickets/{ticketId}/attachments POST
 users/{userId}/projects/{projectId}/tickets/{ticketId}/attachments/{attachmentId} DELETE
 users/{userId}/projects/{projectId}/tickets/{ticketId}/attachments/{attachmentId} PATCH
 
-users/{userId}/projects/{projectId}/tickets/{ticketId}/comments GET
+users/{userId}/projects/{projectId}/tickets/{ticketId}/comments/{page} GET
 users/{userId}/projects/{projectId}/tickets/{ticketId}/comments POST
 users/{userId}/projects/{projectId}/tickets/{ticketId}/comments/count GET
-
 users/{userId}/projects/{projectId}/tickets/{ticketId}/comments/{commentId} DELETE
-users/{userId}/projects/{projectId}/tickets/{ticketId}/comments/{commentId}/content GET
-users/{userId}/projects/{projectId}/tickets/{ticketId}/comments/{commentId}/content PATCH

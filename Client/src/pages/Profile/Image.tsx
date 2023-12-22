@@ -3,6 +3,7 @@ import { useUser, useUserDispatch } from "../../utils/context/user";
 import useFetchApi from "../../utils/hooks/useFetchApi";
 import toWEBPImage from "../../utils/toWEBPImage";
 import { IProfileResult } from ".";
+import { useParams } from "react-router-dom";
 
 interface IImageProps {
     editable: boolean;
@@ -10,11 +11,12 @@ interface IImageProps {
 }
 
 const Image = (props: IImageProps) => {
+    const { userId } = useParams();
     const [base64, setBase64] = useState("")
     const dispatchUser = useUserDispatch();
     const user = useUser();
 
-    const [_, call] = useFetchApi<{ avatarUrl: string }, { data: string, contentType: string }>("POST", "user/avatar", [], (payload) => {
+    const [_, call] = useFetchApi<{ avatarUrl: string }, { data: string, contentType: string }>("POST", `users/${userId}/avatar`, [], (payload) => {
         dispatchUser({
             type: "add",
             payload: {

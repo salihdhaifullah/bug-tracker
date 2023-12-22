@@ -7,10 +7,8 @@ import { IModalProps } from ".";
 import { useParams } from "react-router-dom";
 
 const TransferModal = (props: IModalProps) => {
-    const {projectId} = useParams()
-
-    const [transferProjectPayload, callTransferProject] = useFetchApi<unknown, { projectId: string, memberId: string }>("POST", "project/transfer");
-
+    const {projectId, userId} = useParams()
+    const [transferProjectPayload, callTransferProject] = useFetchApi<unknown, { projectId: string, memberId: string }>("PATCH", `users/${userId}/projects/${projectId}/danger-zone/transfer`);
     const [isSubmit, setIsSubmit] = useState(false);
     const [isValidId, setIsValidId] = useState(true);
     const [memberId, setMemberId] = useState("")
@@ -48,7 +46,7 @@ const TransferModal = (props: IModalProps) => {
                         </div>
 
                         <div className="flex flex-col gap-8 p-2 w-full items-start">
-                            <SelectUser notMe setIsValid={setIsValidId} required label="select user" route={`members/${projectId}`} setId={setMemberId} id={memberId} />
+                            <SelectUser notMe setIsValid={setIsValidId} required label="select user" members={true} setId={setMemberId} id={memberId} />
                             <Button isValid={isValidId} onClick={() => setIsSubmit(true)}>Transfer</Button>
                         </div>
                     </>

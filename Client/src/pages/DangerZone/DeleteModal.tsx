@@ -6,9 +6,9 @@ import { IModalProps } from ".";
 import { useParams } from "react-router-dom";
 
 const DeleteModal = (props: IModalProps) => {
-    const { projectId } = useParams()
+    const { projectId, userId } = useParams()
 
-    const [deleteProjectPayload, callDeleteProject] = useFetchApi("DELETE", `project/${projectId}`, [props]);
+    const [deleteProjectPayload, callDeleteProject] = useFetchApi("DELETE", `users/${userId}/projects/${projectId}`, [props]);
     const handelDeleteProject = useCallback(() => {
         props.setIsOpenModal(false);
         callDeleteProject();

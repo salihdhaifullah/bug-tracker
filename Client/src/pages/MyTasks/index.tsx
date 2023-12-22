@@ -37,14 +37,13 @@ export interface IItem {
 }
 
 const MyTasks = () => {
-    const {projectId} = useParams();
+    const {projectId, userId} = useParams();
     const [data, setData] = useState<IItem[]>([])
     const [search, setSearch] = useState("");
     const [ticketType, setTicketType] = useState("all");
     const [ticketPriority, setTicketPriority] = useState("all");
 
-    const [_, callUpdate] = useFetchApi<unknown, { id: string, status: Status }>("PATCH", "ticket/status", [])
-    const [tasksPayload, callTasks] = useFetchApi<IItem[], unknown>("GET", `ticket/my-tickets/${projectId}?search=${search}&type=${ticketType}&priority=${ticketPriority}`, [search, ticketType, ticketPriority], (result) => { setData(result) })
+    const [tasksPayload, callTasks] = useFetchApi<IItem[], unknown>("GET", `users/${userId}/projects/${projectId}/tickets/assigned?search=${search}&type=${ticketType}&priority=${ticketPriority}`, [search, ticketType, ticketPriority], (result) => { setData(result) })
 
     useEffect(() => { callTasks() }, [ticketType, ticketPriority])
 
@@ -76,7 +75,9 @@ const MyTasks = () => {
         if (data[index].status === col) return;
         const dataCopy = Array.from(data);
 
+        const [_, callUpdate] = useFetchApi<unknown, { id: string, status: Status }>("PATCH", `users/${userId}/projects/${projectId}/tickets/assigned/${dataCopy[index].id}`, [])
         callUpdate({ id: dataCopy[index].id, status: col as Status })
+
         dataCopy[index].status = col as Status;
         setData(dataCopy);
     }

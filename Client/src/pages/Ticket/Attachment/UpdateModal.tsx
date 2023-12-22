@@ -5,6 +5,7 @@ import useFetchApi from "../../../utils/hooks/useFetchApi";
 import TextFiled from "../../../components/utils/TextFiled";
 import toBase64 from "../../../utils/toBase64";
 import getContentType from "../../../utils/getContentType";
+import { useParams } from "react-router-dom";
 
 interface IUpdateModalProps {
     isOpen: boolean;
@@ -15,6 +16,8 @@ interface IUpdateModalProps {
 }
 
 const UpdateModal = (props: IUpdateModalProps) => {
+    const {ticketId, userId, projectId} = useParams();
+
     const [isFileChange, setIsFileChange] = useState(false)
     const [title, setTitle] = useState(props.title)
     const [isValidTitle, setIsValidTitle] = useState(false)
@@ -22,7 +25,7 @@ const UpdateModal = (props: IUpdateModalProps) => {
     const [contentType, setContentType] = useState("")
     const [fileName, setFileName] = useState("")
 
-    const [updatePayload, callUpdate] = useFetchApi<unknown, { title?: string, data?: string, contentType?: string }>("PATCH", `attachment/${props.id}`, [], () => {
+    const [updatePayload, callUpdate] = useFetchApi<unknown, { title?: string, data?: string, contentType?: string }>("PATCH", `users/${userId}/projects/${projectId}/tickets/${ticketId}/attachments/${props.id}`, [], () => {
         props.setIsOpen(false);
         props.call();
     })

@@ -51,7 +51,7 @@ const Comment = (props: ICommentProps) => {
                 </div>
 
                 <div className="flex w-full h-full pl-2">
-                    <Content editable={props.comment.commenter.id === user?.id} url={`comment/content/${props.comment.id}`} />
+                    <Content editable={props.comment.commenter.id === user?.id} contentId={props.comment.contentId} />
                 </div>
             </div>
         </div>

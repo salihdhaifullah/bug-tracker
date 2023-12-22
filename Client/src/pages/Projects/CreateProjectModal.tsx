@@ -7,6 +7,7 @@ import { FiLock } from "react-icons/fi";
 import Button from "../../components/utils/Button";
 import { MdOutlineCreateNewFolder, MdOutlineDriveFileRenameOutline } from "react-icons/md";
 import Modal from "../../components/utils/Modal";
+import { useParams } from "react-router-dom";
 
 interface ICreateProjectModal {
     isOpenModal: boolean;
@@ -14,11 +15,12 @@ interface ICreateProjectModal {
 }
 
 const CreateProjectModal = (props: ICreateProjectModal) => {
+    const {userId} = useParams()
     const [name, setName] = useState("");
     const [projectState, setProjectState] = useState("public");
     const [isValidName, setIsValidName] = useState(false);
 
-    const [payload, call] = useFetchApi<unknown, { name: string, isPrivate: boolean }>("POST", "project", [], () => {
+    const [payload, call] = useFetchApi<unknown, { name: string, isPrivate: boolean }>("POST", `users/${userId}/projects`, [], () => {
         props.setIsOpenModal(false);
         setName("");
         setProjectState("public");

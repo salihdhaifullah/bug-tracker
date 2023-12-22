@@ -1,10 +1,10 @@
 import { useParams } from "react-router-dom";
 import Pagination from "../../../components/utils/Pagination";
-import Content from "../../../components/utils/Content";
 import useFetchApi from "../../../utils/hooks/useFetchApi";
 import CircleProgress from "../../../components/utils/CircleProgress";
 import { useEffect, useState } from "react";
 import Comment from "./Comment";
+import CreateComment from "./CreateComment";
 
 export interface IComment {
     commenter: {
@@ -12,6 +12,7 @@ export interface IComment {
         avatarUrl: string;
         id: string;
     };
+    contentId: string;
     createdAt: string;
     id: string;
 }
@@ -28,11 +29,16 @@ const Comments = () => {
     useEffect(() => { callCount() }, [])
     useEffect(() => { callComment() }, [commentPage, commentTake])
 
+    const call = () => {
+        callComment()
+        callCount()
+    }
+
     return (
         <div className="flex flex-col justify-center items-center w-full h-auto my-10">
             <div className="flex w-full h-full justify-center items-center">
                 <div className="flex w-full h-full flex-col max-w-[800px]">
-                    <Content call={callComment} form url={`comment/${ticketId}`} />
+                    <CreateComment call={call} />
                 </div>
             </div>
 

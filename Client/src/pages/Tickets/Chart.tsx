@@ -8,8 +8,8 @@ import StatusChart from "./StatusChart";
 import PriorityChart from "./PriorityChart";
 
 const Charts = () => {
-    const { projectId } = useParams();
-    const [payload, call] = useFetchApi<IChartsData>("GET", `ticket/chart/${projectId}`);
+    const { projectId, userId } = useParams();
+    const [payload, call] = useFetchApi<IChartsData>("GET", `users/${userId}/projects/${projectId}/tickets/chart`);
 
     useEffect(() => { call() }, [])
 

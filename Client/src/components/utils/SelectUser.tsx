@@ -3,11 +3,12 @@ import useOnClickOutside from "../../utils/hooks/useOnClickOutside";
 import useFetchApi from "../../utils/hooks/useFetchApi";
 import TextFiled from "./TextFiled";
 import CircleProgress from "./CircleProgress";
+import { useParams } from "react-router-dom";
 
-interface ISelectToInviteProps {
+interface ISelectUserProps {
     setId: (value: string) => void;
     id: string;
-    route: string;
+    members: boolean;
     required?: boolean;
     notMe?: boolean;
     search?: string;
@@ -31,8 +32,9 @@ const scrollToEle = (container: HTMLElement, ele: HTMLElement) => {
     container.scrollTop = yAxisPosition;
 }
 
-const SelectUser = (props: ISelectToInviteProps) => {
+const SelectUser = (props: ISelectUserProps) => {
     const id = useId();
+    const {userId, projectId} = useParams();
     const [isOpen, setIsOpen] = useState(false);
     const [activeOption, setActiveOption] = useState(0);
     const [search, setSearch] = useState(props.search || "");
@@ -42,7 +44,7 @@ const SelectUser = (props: ISelectToInviteProps) => {
 
     useOnClickOutside(targetRef, () => setIsOpen(false));
 
-    const [payload, call] = useFetchApi<Option[]>("GET", `member/${props.route}?email=${search}&not-me=${props.notMe || false}`, [search]);
+    const [payload, call] = useFetchApi<Option[]>("GET", `users/${userId}/projects/${projectId}/members${props.members ? "/none-members" : ""}?email=${search}&not-me=${props.notMe || false}`, [search]);
 
     useEffect(() => {
         call();

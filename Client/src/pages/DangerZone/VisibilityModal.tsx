@@ -6,9 +6,9 @@ import { IModalProps } from ".";
 import { useParams } from "react-router-dom";
 
 const VisibilityModal = (props: IModalProps & { isPrivate: boolean }) => {
-    const { projectId } = useParams()
+    const { projectId, userId } = useParams()
 
-    const [visibilityProjectPayload, callVisibilityProject] = useFetchApi("GET", `project/visibility/${projectId}`, [props]);
+    const [visibilityProjectPayload, callVisibilityProject] = useFetchApi("PATCH", `users/${userId}/projects/${projectId}/danger-zone/visibility`, [props]);
 
     const handelVisibilityProject = useCallback(() => {
         props.setIsOpenModal(false);

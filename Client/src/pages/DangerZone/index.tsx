@@ -24,14 +24,14 @@ export interface IModalProps {
 }
 
 const DangerZone = () => {
-    const { projectId } = useParams()
+    const { projectId, userId } = useParams()
     const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
     const [isOpenArchiveModal, setIsOpenArchiveModal] = useState(false);
     const [isOpenVisibilityModal, setIsOpenVisibilityModal] = useState(false);
     const [isOpenTransferModal, setIsOpenTransferModal] = useState(false);
     const [isOpenLeaveModal, setIsOpenLeaveModal] = useState(false);
 
-    const [payload, call] = useFetchApi<IData>("GET", `project/danger-zone/${projectId}`);
+    const [payload, call] = useFetchApi<IData>("GET", `users/${userId}/projects/${projectId}/danger-zone`);
 
     useEffect(() => {
         call();

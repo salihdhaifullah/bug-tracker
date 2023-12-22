@@ -63,19 +63,19 @@ export const isData = (data: any) => {
 
 
 const Tickets = () => {
-    const { projectId } = useParams();
+    const {userId, projectId } = useParams();
     const [take, setTake] = useState(10);
     const [page, setPage] = useState(1);
     const [search, setSearch] = useState("");
     const [ticketType, setTicketType] = useState("all");
     const [ticketStatus, setTicketStatus] = useState("all");
     const [ticketPriority, setTicketPriority] = useState("all");
-    const [isOwnerOrMangerPayload, callIsOwnerOrManger] = useFetchApi<boolean>("GET", `project/is-owner-or-manger/${projectId}`);
+    const [rolePayload, callRole] = useFetchApi<string>("GET", `users/${userId}/projects/${projectId}/members`);
 
-    const [countPayload, callCount] = useFetchApi<number>("GET", `ticket/tickets-count/${projectId}?search=${search}&type=${ticketType}&status=${ticketStatus}&priority=${ticketPriority}`, [search, ticketType, ticketStatus, ticketPriority]);
-    const [ticketsPayload, callTickets] = useFetchApi<ITicket[]>("GET", `ticket/tickets/${projectId}?page=${page}&take=${take}&search=${search}&type=${ticketType}&status=${ticketStatus}&priority=${ticketPriority}`, [page, take, search, ticketType, ticketStatus, ticketPriority]);
+    const [countPayload, callCount] = useFetchApi<number>("GET", `users/${userId}/projects/${projectId}/tickets/table/count?search=${search}&type=${ticketType}&status=${ticketStatus}&priority=${ticketPriority}`, [search, ticketType, ticketStatus, ticketPriority]);
+    const [ticketsPayload, callTickets] = useFetchApi<ITicket[]>("GET", `users/${userId}/projects/${projectId}/tickets/table/${page}?take=${take}&search=${search}&type=${ticketType}&status=${ticketStatus}&priority=${ticketPriority}`, [page, take, search, ticketType, ticketStatus, ticketPriority]);
 
-    useEffect(() => { callIsOwnerOrManger() }, [])
+    useEffect(() => { callRole() }, [])
     useEffect(() => { callTickets() }, [page, take, ticketType, ticketStatus, ticketPriority])
     useEffect(() => { callCount() }, [ticketType, ticketStatus, ticketPriority])
 
@@ -131,13 +131,13 @@ const Tickets = () => {
                                             <th scope="col" className="px-6 py-3 min-w-[150px]"> priority </th>
                                             <th scope="col" className="px-6 py-3 min-w-[150px]"> status </th>
                                             <th scope="col" className="px-6 py-3 min-w-[150px]"> type </th>
-                                            {isOwnerOrMangerPayload.result ? <th scope="col" className="px-6 py-3  min-w-[150px]"> action </th> : null}
+                                            {rolePayload.result !== null && ["project_manger", "owner"].includes(rolePayload.result) ? <th scope="col" className="px-6 py-3  min-w-[150px]"> action </th> : null}
                                         </tr>
                                     </thead>
 
                                     <tbody className="before:block before:h-4 after:block after:mb-2">
                                         {ticketsPayload.result !== null && ticketsPayload.result.map((ticket, index) => (
-                                            <TicketsRow key={index} isOwnerOrManger={isOwnerOrMangerPayload.result} ticket={ticket} call={callTickets}/>
+                                            <TicketsRow key={index} isOwnerOrManger={rolePayload.result !== null && ["project_manger", "owner"].includes(rolePayload.result)} ticket={ticket} call={callTickets}/>
                                         ))}
                                     </tbody>
                                 </table>

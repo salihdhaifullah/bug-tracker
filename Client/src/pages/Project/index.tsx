@@ -17,6 +17,7 @@ interface IProject {
     createdAt: string;
     name: string;
     isReadOnly: boolean;
+    contentId: string;
     owner: {
         avatarUrl: string;
         name: string;
@@ -25,17 +26,12 @@ interface IProject {
 }
 
 const Project = () => {
-    const { projectId } = useParams();
-    const [payload, call] = useFetchApi<IProject>("GET", `project/${projectId}`);
-    const [isOwnerPayload, callIsOwner] = useFetchApi<boolean>("GET", `project/is-owner/${projectId}`);
-
-    useEffect(() => {
-        call()
-        callIsOwner()
-    }, [])
-
+    const { projectId, userId } = useParams();
+    const [payload, call] = useFetchApi<IProject>("GET", `users/${userId}/projects/${projectId}`);
     const user = useUser();
+    const isOwner = user?.id == userId;
 
+    useEffect(() => call(), [])
 
     return payload.isLoading
         ? <CircleProgress size="lg" />
@@ -131,7 +127,7 @@ const Project = () => {
                                 </div>
                             ) : null}
 
-                            <Content editable={Boolean(isOwnerPayload?.result)} url={`project/content/${projectId}`} />
+                            <Content editable={isOwner} contentId={payload.result.contentId} />
 
                         </div>
 

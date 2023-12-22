@@ -32,14 +32,14 @@ const CreateTicketModal = (props: ICreateTicketModalProps) => {
   const [status, setStatus] = useState(statusOptions[0]);
   const [memberId, setMemberId] = useState("");
 
-  const { projectId } = useParams()
+  const { projectId, userId } = useParams()
 
   const [isValidName, setIsValidName] = useState(false);
   const [isValidType, setIsValidType] = useState(true);
   const [isValidPriority, setIsValidPriority] = useState(true);
   const [isValidStatus, setIsValidStatus] = useState(true);
 
-  const [payload, call] = useFetchApi<any, ICreateTicket>("POST", `ticket/${projectId}`, [], () => {
+  const [payload, call] = useFetchApi<any, ICreateTicket>("POST", `users/${userId}/projects/${projectId}/tickets`, [], () => {
     props.setIsOpenModal(false);
   });
 
@@ -114,7 +114,7 @@ const CreateTicketModal = (props: ICreateTicketModalProps) => {
             label="ticket status"
           />
 
-          <SelectUser label="assign to" route={`members/${projectId}`} setId={setMemberId} id={memberId} />
+          <SelectUser label="assign to" members={true} setId={setMemberId} id={memberId} />
 
           <div className="flex flex-row justify-center items-center w-full mt-2">
             <Button

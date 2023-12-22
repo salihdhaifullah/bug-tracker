@@ -14,9 +14,9 @@ interface IDeleteModalProps {
 }
 
 const DeleteModal = (props: IDeleteModalProps) => {
-    const { projectId } = useParams();
+    const { projectId, userId } = useParams();
 
-    const [payloadDelete, callDelete] = useFetchApi("DELETE", `member/delete-member/${projectId}/${props.member.id}`, [], () => {
+    const [payloadDelete, callDelete] = useFetchApi("DELETE", `users/${userId}/projects/${projectId}/members/${props.member.id}`, [], () => {
         props.setIsOpenModal(false)
         props.call()
     })

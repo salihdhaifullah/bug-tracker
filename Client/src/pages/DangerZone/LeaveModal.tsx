@@ -6,14 +6,13 @@ import { IModalProps } from ".";
 import { useParams } from "react-router-dom";
 
 const LeaveModal = (props: IModalProps & { isOwner: boolean }) => {
-    const {projectId} = useParams()
+    const {projectId, userId} = useParams()
 
-    const [leaveProjectPayload, callLeaveProject] = useFetchApi("PATCH", `member/leave/${projectId}`, [props]);
+    const [leaveProjectPayload, callLeaveProject] = useFetchApi("DELETE", `users/${userId}/projects/${projectId}/members`, [props]);
     const handelLeaveProject = useCallback(() => {
         props.setIsOpenModal(false);
         callLeaveProject();
     }, [])
-
 
     return (
         <Modal isOpen={props.isOpenModal} setIsOpen={props.setIsOpenModal}>

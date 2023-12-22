@@ -284,7 +284,7 @@ public class AuthController : Controller
     }
 
 
-    [HttpPost("reset-password"), BodyValidation]
+    [HttpPatch("reset-password"), BodyValidation]
     public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDTO dto)
     {
         try
@@ -317,7 +317,7 @@ public class AuthController : Controller
         }
     }
 
-    [HttpGet("logout")]
+    [HttpDelete("logout")]
     public IActionResult Logout()
     {
         try

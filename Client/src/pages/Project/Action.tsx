@@ -5,6 +5,7 @@ import TextFiled from "../../components/utils/TextFiled";
 import { FormEvent, useEffect, useRef, useState } from "react";
 import useFetchApi from "../../utils/hooks/useFetchApi";
 import useOnClickOutside from "../../utils/hooks/useOnClickOutside";
+import { useParams } from "react-router-dom";
 
 interface IActionProps {
     projectId: string;
@@ -18,11 +19,13 @@ const Action = (props: IActionProps) => {
     const [isOpenUpdateModal, setIsOpenUpdateModal] = useState(false);
     const [isValidName, setIsValidName] = useState(false);
 
+    const {userId, projectId} = useParams();
+
     const targetRef = useRef<HTMLDivElement>(null);
 
     useOnClickOutside(targetRef, () => setIsOpen(false));
 
-    const [payload, call] = useFetchApi<unknown, { projectId: string, name: string }>("PATCH", "project/name", [], () => {
+    const [payload, call] = useFetchApi<unknown, { projectId: string, name: string }>("PATCH", `users/${userId}/projects/${projectId}`, [], () => {
         setIsOpenUpdateModal(false)
         props.call()
     });

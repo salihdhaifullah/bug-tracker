@@ -17,12 +17,12 @@ interface IInviteModalProps {
 const InviteModal = (props: IInviteModalProps) => {
     const [invitedId, setInvitedId] = useState("");
     const [role, setRole] = useState("developer");
-    const { projectId } = useParams();
+    const { projectId, userId } = useParams();
 
     const [isValidRole, setIsValidRole] = useState(true);
     const [isValidId, setIsValidId] = useState(true);
 
-    const [payload, call] = useFetchApi<any, { invitedId: string, role: string }>("POST", `member/invite/${projectId}`, [projectId], () => {
+    const [payload, call] = useFetchApi<any, { invitedId: string, role: string }>("POST", `users/${userId}/projects/${projectId}/members`, [projectId], () => {
         props.call();
         props.setIsOpenModal(false);
     });
@@ -52,7 +52,7 @@ const InviteModal = (props: IInviteModalProps) => {
                         <FaAddressCard className="text-3xl text-primary dark:text-secondary font-extrabold" />
                     </div>
 
-                    <SelectUser setIsValid={setIsValidId} required label="invite user" route={`not-members/${projectId}`} setId={setInvitedId} id={invitedId} />
+                    <SelectUser setIsValid={setIsValidId} required label="invite user" members={true} setId={setInvitedId} id={invitedId} />
 
                     <Select
                         label="role for user to invite"

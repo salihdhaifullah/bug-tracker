@@ -15,6 +15,8 @@ interface ICreateModalProps {
 
 const CreateModal = (props: ICreateModalProps) => {
     const { ticketId } = useParams();
+    const { projectId } = useParams();
+    const { userId } = useParams();
 
     const [title, setTitle] = useState("")
     const [isValidTitle, setIsValidTitle] = useState(false)
@@ -32,14 +34,14 @@ const CreateModal = (props: ICreateModalProps) => {
         }
     }, [props.isOpen])
 
-    const [payload, call] = useFetchApi<unknown, { title: string, data: string, ticketId: string, contentType: string }>("POST", "attachment", [], () => {
+    const [payload, call] = useFetchApi<unknown, { title: string, data: string, contentType: string }>("POST", `users/${userId}/projects/${projectId}/tickets/${ticketId}/attachments`, [], () => {
         props.setIsOpen(false);
         props.call();
     })
 
     const handelSubmit = (e: FormEvent) => {
         e.preventDefault()
-        call({ title, data, ticketId: ticketId!, contentType });
+        call({ title, data, contentType });
     }
 
     const handelChangeFile = async (e: ChangeEvent<HTMLInputElement>) => {

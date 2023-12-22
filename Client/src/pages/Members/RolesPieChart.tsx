@@ -11,11 +11,11 @@ interface IData {
 }
 
 const RolesPieChart = () => {
-    const { projectId } = useParams();
+    const { projectId, userId } = useParams();
 
     const [isNoMembers, setIsNoMembers] = useState(false);
 
-    const [rolesPayload, callRoles] = useFetchApi<IData>("GET", `member/chart/${projectId}`);
+    const [rolesPayload, callRoles] = useFetchApi<IData>("GET", `users/${userId}/projects/${projectId}/members/chart/`);
 
     useEffect(() => { callRoles() }, [])
 

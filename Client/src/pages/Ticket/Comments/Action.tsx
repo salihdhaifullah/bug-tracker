@@ -3,6 +3,7 @@ import useFetchApi from "../../../utils/hooks/useFetchApi";
 import useOnClickOutside from "../../../utils/hooks/useOnClickOutside";
 import { FiMoreVertical } from "react-icons/fi";
 import Button from "../../../components/utils/Button";
+import { useParams } from "react-router-dom";
 
 interface IActionProps {
     commentId: string;
@@ -10,9 +11,11 @@ interface IActionProps {
 }
 
 const Action = (props: IActionProps) => {
+    const {userId, projectId, ticketId} = useParams();
+
     const [isOpen, setIsOpen] = useState(false);
 
-    const [deletePayload, callDelete] = useFetchApi("DELETE", `comment/${props.commentId}`, [], () => {
+    const [deletePayload, callDelete] = useFetchApi("DELETE", `users/${userId}/projects/${projectId}/tickets/${ticketId}/comments/${props.commentId}`, [], () => {
         props.call();
     });
 

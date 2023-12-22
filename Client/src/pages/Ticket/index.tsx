@@ -27,6 +27,7 @@ interface ITicket {
         id: string;
         memberId: string;
     };
+    contentId: string;
     name: string;
     priority: string;
     status: string;
@@ -36,14 +37,14 @@ interface ITicket {
 
 
 const Ticket = () => {
-    const { ticketId } = useParams();
-    const [payload, call] = useFetchApi<ITicket>("GET", `ticket/${ticketId}`, []);
-    const [isOwnerOrMangerPayload, callIsOwnerOrManger] = useFetchApi<boolean>("GET", `project/is-owner-or-manger/${payload.result?.project.id}`, [payload.result]);
+    const { ticketId, projectId, userId } = useParams();
+    const [payload, call] = useFetchApi<ITicket>("GET", `users/${userId}/projects/${projectId}/tickets/${ticketId}`, []);
+    const [rolePayload, callRole] = useFetchApi<string>("GET", `users/${userId}/projects/${projectId}/members`);
 
     useEffect(() => { call() }, [])
 
     useEffect(() => {
-        if (payload.result) callIsOwnerOrManger();
+        if (payload.result) callRole();
     }, [payload.result])
 
     const user = useUser();
@@ -83,7 +84,7 @@ const Ticket = () => {
                             <p title="created at" className="text-gray-600 dark:text-gray-400 text-sm font-normal">{formatDate(payload.result.createdAt)}</p>
                         </div>
 
-                        {(isOwnerOrMangerPayload.result || payload.result.creator.id === user?.id) ?
+                        {(rolePayload.result !== null && ["owner", "project_manger"].includes(rolePayload.result) || payload.result.creator.id === user?.id) ?
                             <TicketAction onUpdate={call} ticket={{ ...payload.result, id: ticketId!, projectId: payload.result.project.id }} />
                             : null}
 
@@ -116,7 +117,7 @@ const Ticket = () => {
 
                         <Link className="font-bold w-fit h-fit text-primary dark:text-secondary text-lg hover:underline" title="project" to={`/project/${payload.result.project.id}`}>{payload.result.project.name}</Link>
 
-                        <Content editable={isOwnerOrMangerPayload.result || payload.result.creator.id === user?.id} url={`ticket/content/${ticketId}`} />
+                        <Content editable={rolePayload.result !== null && ["owner", "project_manger"].includes(rolePayload.result) || payload.result.creator.id === user?.id} contentId={payload.result.contentId} />
 
                         <Attachment isCreator={payload.result.creator.id === user?.id} />
                     </div>

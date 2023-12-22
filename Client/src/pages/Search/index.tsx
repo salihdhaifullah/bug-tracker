@@ -26,8 +26,8 @@ const Search = () => {
   const search = useQuery().get("search") || "";
   const [page, setPage] = useState(1)
 
-  const [projectsPayload, callProjects] = useFetchApi<IProject[]>("GET", `project/projects/explore/${page}/?take=${take}&search=${search}`, [page, take, search]);
-  const [CountPayload, callCount] = useFetchApi<number>("GET", `project/count/explore/?take=${take}&search=${search}`, [take, search]);
+  const [projectsPayload, callProjects] = useFetchApi<IProject[]>("GET", `explore/${page}/?take=${take}&search=${search}`, [page, take, search]);
+  const [CountPayload, callCount] = useFetchApi<number>("GET", `explore/?take=${take}&search=${search}`, [take, search]);
 
   useEffect(() => { callProjects() }, [page, take, search])
   useEffect(() => { callCount() }, [take, search])

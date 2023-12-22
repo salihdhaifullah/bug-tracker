@@ -1,5 +1,5 @@
 import { Dispatch, FormEvent, SetStateAction, useEffect, useState } from 'react'
-import { IChangeRole, IMember } from '.';
+import { IMember } from '.';
 import useFetchApi from '../../utils/hooks/useFetchApi';
 import { Link, useParams } from 'react-router-dom';
 import Modal from '../../components/utils/Modal';
@@ -17,9 +17,9 @@ interface IRoleModalProps {
 }
 
 const RoleModal = (props: IRoleModalProps) => {
-    const { projectId } = useParams();
+    const { projectId, userId } = useParams();
     const [role, setRole] = useState("");
-    const [payloadRole, callRole] = useFetchApi<any, IChangeRole>("PATCH", `member/change-role/${projectId}`, [], () => {
+    const [payloadRole, callRole] = useFetchApi<any, {role: string}>("PATCH", `users/${userId}/projects/${projectId}/members/${props.member.id}`, [], () => {
         props.setIsOpenModal(false)
         props.call()
     })
@@ -32,7 +32,7 @@ const RoleModal = (props: IRoleModalProps) => {
 
     const handelSubmit = (e: FormEvent) => {
         e.preventDefault();
-        callRole({ role, memberId: props.member.id });
+        callRole({ role });
     }
 
     return (

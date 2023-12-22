@@ -1,32 +1,25 @@
-import { useEffect, useRef, useState, KeyboardEvent, useMemo, FormEvent } from "react";
+import { useRef, useState, KeyboardEvent, FormEvent } from "react";
 import useFetchApi from "../../utils/hooks/useFetchApi";
 import useOnClickOutside from "../../utils/hooks/useOnClickOutside";
 import TextFiled from "../../components/utils/TextFiled";
 import { MdOutlineModeEditOutline, MdOutlineSubtitles } from "react-icons/md";
 import Button from "../../components/utils/Button";
+import { useParams } from "react-router-dom";
 
 interface IBioProps {
     userId: string;
     editable: boolean;
+    bio: string;
 }
 
 const Bio = (props: IBioProps) => {
+    const {userId} = useParams();
     const [bio, setBio] = useState("");
     const [isEditing, setIsEditing] = useState(false)
     const bioRef = useRef<null | HTMLFormElement>(null);
     const iconRef = useRef<null | HTMLDivElement>(null);
 
-    const [updateBioPayload, call] = useFetchApi<any, { bio: string }>("POST", "user/bio", []);
-    const [getBioPayload, callGetBio] = useFetchApi<{ bio: string }>("GET", `user/bio/${props.userId}`, []);
-
-    useEffect(() => { callGetBio() }, [])
-
-    useEffect(() => {
-        if (!getBioPayload.isLoading && getBioPayload.result) {
-            setIsEditing(false)
-            setBio(getBioPayload.result.bio)
-        }
-    }, [getBioPayload.isLoading])
+    const [updateBioPayload, call] = useFetchApi<any, { bio: string }>("POST", `users/${userId}/bio`, []);
 
     useOnClickOutside([bioRef, iconRef], () => { setIsEditing(false) });
 
@@ -44,12 +37,10 @@ const Bio = (props: IBioProps) => {
         SubmitChanges()
     }
 
-    const Editing = useMemo(() => isEditing && !getBioPayload.isLoading, [isEditing, getBioPayload]);
-
     return props.editable ? (
         <>
-            <div className={`"flex flex-col w-80 " ${Editing ? "h-full" : "h-fit"}`}>
-                {Editing ? (
+            <div className={`"flex flex-col w-80 " ${isEditing ? "h-full" : "h-fit"}`}>
+                {isEditing ? (
                     <form ref={bioRef} onSubmit={handelSubmit} className="flex flex-row gap-0 justify-start items-start w-full h-full">
                         <TextFiled
                             icon={MdOutlineSubtitles}
