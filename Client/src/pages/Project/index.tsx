@@ -40,35 +40,35 @@ const Project = () => {
 
                 <div className="flex flex-wrap-reverse flex-row justify-end sm:ml-10 items-center sm:gap-6 gap-2 mb-6">
 
-                    <Link to={`/my-tasks/${projectId}`}>
+                    <Link to={`/users/${userId}/projects/${projectId}/tickets/assigned`}>
                         <Button className="flex-row flex gap-2 justify-center items-center">
                             <p>your tasks</p>
                             <FaTasks />
                         </Button>
                     </Link>
 
-                    <Link to={`/members/${projectId}`}>
+                    <Link to={`/users/${userId}/projects/${projectId}/members`}>
                         <Button className="flex-row flex gap-2 justify-center items-center">
                             <p>members</p>
                             <FiUsers />
                         </Button>
                     </Link>
 
-                    <Link to={`/tickets/${projectId}`}>
+                    <Link to={`/users/${userId}/projects/${projectId}/tickets`}>
                         <Button className="flex-row flex gap-2 justify-center items-center">
                             <p>tickets</p>
                             <FaListUl />
                         </Button>
                     </Link>
 
-                    <Link to={`/activities/${projectId}`}>
+                    <Link to={`/users/${userId}/projects/${projectId}/activities`}>
                         <Button className="flex-row flex gap-2 justify-center items-center">
                             <p>activities</p>
                             <RxActivityLog />
                         </Button>
                     </Link>
 
-                    <Link to={`/danger-zone/${projectId}`}>
+                    <Link to={`/users/${userId}/projects/${projectId}/danger-zone`}>
                         <Button className="flex-row flex gap-2 justify-center items-center">
                             <p>danger zone</p>
                             <MdOutlineWarning />
@@ -79,7 +79,7 @@ const Project = () => {
 
                 <div className="flex flex-row w-full h-full gap-3">
 
-                    <Link to={`/profile/${payload.result.owner.id}`} className="w-12 h-12 hidden sm:flex">
+                    <Link to={`/users/${payload.result.owner.id}`} className="w-12 h-12 hidden sm:flex">
                         <img
                             title="owner"
                             className="rounded-full bg-white dark:bg-black shadow-md w-10 h-10 object-contain"
@@ -93,7 +93,7 @@ const Project = () => {
                         <div className="flex flex-row justify-between items-center border-b-gray-400 dark:border-b-gray-600 p-2 border-b">
                             <div className="flex flex-row gap-2 justify-start items-center">
 
-                                <Link to={`/profile/${payload.result.owner.id}`} className="w-12 h-12 sm:hidden flex">
+                                <Link to={`/users/${payload.result.owner.id}`} className="w-12 h-12 sm:hidden flex">
                                     <img
                                         title="owner"
                                         className="rounded-full bg-white dark:bg-black shadow-md dark:shadow-secondary/40 w-10 h-10 object-contain"
@@ -102,7 +102,7 @@ const Project = () => {
                                     />
                                 </Link>
 
-                                <Link className="w-fit h-fit" to={`/profile/${payload.result.owner.id}`}>
+                                <Link className="w-fit h-fit" to={`/users/${payload.result.owner.id}`}>
                                     <span
                                         title="owner"
                                         className="text-primary dark:text-secondary font-bold hover:underline">{payload.result.owner.name}</span>

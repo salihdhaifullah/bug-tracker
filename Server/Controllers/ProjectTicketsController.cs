@@ -9,7 +9,9 @@ using Buegee.Utils.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-[Route("users/{userId}/projects/{projectId}/tickets")]
+namespace Buegee.Controllers;
+[Consumes("application/json")]
+[ApiRoute("users/{userId}/projects/{projectId}/tickets")]
 [ApiController]
 public class ProjectTicketsController : ControllerBase
 {
@@ -86,9 +88,9 @@ public class ProjectTicketsController : ControllerBase
 
             await _data.AddActivity(
                 projectId,
-                $"created ticket [{ticket.Entity.Name}](/tickets/{ticket.Entity.Id}) " +
+                $"created ticket [{ticket.Entity.Name}](/users/{userId}/projects/{projectId}/tickets/{ticket.Entity.Id}) " +
                 $"of type **{ticket.Entity.Type.ToString()}**, " +
-                $"created by [{creator.name}](/profile/{userId}), " +
+                $"created by [{creator.name}](/users/{userId}), " +
                 $"{assignedToText}" +
                 $"status is **{ticket.Entity.Status.ToString()}** and " +
                 $"priority is **{ticket.Entity.Priority.ToString()}**"
@@ -96,7 +98,7 @@ public class ProjectTicketsController : ControllerBase
 
             await _ctx.SaveChangesAsync();
 
-            return HttpResult.Ok("successfully created ticket", redirectTo: $"/tickets/{ticketId}");
+            return HttpResult.Ok("successfully created ticket", redirectTo: $"/users/{userId}/projects/{projectId}/tickets/{ticketId}");
         }
         catch (Exception e)
         {

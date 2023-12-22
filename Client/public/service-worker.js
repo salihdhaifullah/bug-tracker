@@ -23,13 +23,15 @@ self.addEventListener('install', (event) => {
       try {
         await cache.addAll(urlsToCache);
 
-        if (await cache.add('/script.js')) {
+        if (await cache.match('/script.js')) {
+          await cache.add('/script.js')
           console.log('/script.js is cached');
         } else {
           console.warn('/script.js is not cached');
         }
 
-        if (await cache.add('/style.css')) {
+        if (await cache.match('/style.css')) {
+          await cache.add('/style.css')
           console.log('/style.css is cached');
         } else {
           console.warn('/style.css is not cached');

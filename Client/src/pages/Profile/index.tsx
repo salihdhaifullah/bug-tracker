@@ -33,7 +33,7 @@ const Profile = () => {
     <section className="flex flex-col gap-2 w-full h-full mt-10 p-2">
 
       <div className="flex flex-row justify-end w-full items-center">
-        <Link to={`/projects/${userId}`}>
+        <Link to={`/users/${userId}/projects`}>
           <Button size="lg" className="flex-row flex justify-center items-center gap-1">
             <TbFolders />
             <p>projects</p>

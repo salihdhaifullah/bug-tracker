@@ -11,7 +11,9 @@ using Buegee.Utils.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-[Route("users/{userId}/projects/{projectId}/tickets/{ticketId}")]
+namespace Buegee.Controllers;
+[Consumes("application/json")]
+[ApiRoute("users/{userId}/projects/{projectId}/tickets/{ticketId}")]
 [ApiController]
 public class TicketController : ControllerBase
 {
@@ -97,15 +99,15 @@ public class TicketController : ControllerBase
             if (ticket.AssignedToId != dto.MemberId)
             {
                 changes.Add(new Change("assignation",
-                ticket.AssignedTo != null ? $"[{ticket.AssignedTo.User.FirstName} {ticket.AssignedTo.User.LastName}](/profile/{ticket.AssignedTo.UserId})" : "**none**",
-                assignedTo != null ? $"[{assignedTo.name}](/profile/{assignedTo.userId})" : "**none**"));
+                ticket.AssignedTo != null ? $"[{ticket.AssignedTo.User.FirstName} {ticket.AssignedTo.User.LastName}](/users/{ticket.AssignedTo.UserId})" : "**none**",
+                assignedTo != null ? $"[{assignedTo.name}](/users/{assignedTo.userId})" : "**none**"));
 
                 ticket.AssignedToId = dto.MemberId;
             }
 
             if (changes.Count > 0)
             {
-                sb.Append($"ticket [{ticket.Name}](/tickets/{ticket.Id}) ");
+                sb.Append($"ticket [{ticket.Name}](/users/{userId}/projects/{ticket.ProjectId}/tickets/{ticket.Id}) ");
 
                 for (var i = 0; i < changes.Count; i++)
                 {
@@ -186,12 +188,12 @@ public class TicketController : ControllerBase
             _ctx.Tickets.Remove(ticket);
 
             await _data.AddActivity(ticket.ProjectId,
-            $"ticket **{ticket.Name.Trim()}** deleted by [{ticket.Creator.User.FirstName} {ticket.Creator.User.LastName}](/profile/{ticket.Creator.UserId})",
+            $"ticket **{ticket.Name.Trim()}** deleted by [{ticket.Creator.User.FirstName} {ticket.Creator.User.LastName}](/users/{ticket.Creator.UserId})",
              _ctx);
 
             await _ctx.SaveChangesAsync();
 
-            return HttpResult.Ok("successfully deleted ticket", redirectTo: $"/project/{ticket.ProjectId}");
+            return HttpResult.Ok("successfully deleted ticket", redirectTo: $"/users/{userId}/projects/{ticket.ProjectId}");
         }
         catch (Exception e)
         {

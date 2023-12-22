@@ -9,7 +9,9 @@ using Buegee.Utils.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-[Route("users/{userId}/projects")]
+namespace Buegee.Controllers;
+[Consumes("application/json")]
+[ApiRoute("users/{userId}/projects")]
 [ApiController]
 public class UserProjectsController : ControllerBase
 {
@@ -51,7 +53,7 @@ public class UserProjectsController : ControllerBase
 
             await _ctx.SaveChangesAsync();
 
-            return HttpResult.Ok("successfully created project", redirectTo: $"/project/{projectId}");
+            return HttpResult.Ok("successfully created project", redirectTo: $"/users/{userId}/projects/{projectId}");
         }
         catch (Exception e)
         {
@@ -60,13 +62,13 @@ public class UserProjectsController : ControllerBase
         }
     }
 
-    [HttpGet("{page}")]
+    [HttpGet]
     public async Task<IActionResult> GetUserProjects(
         [FromRoute] string userId, [FromQuery(Name = "type")] string? type,
         [FromQuery(Name = "role")] string? roleQuery,
         [FromQuery] string? search, [FromQuery(Name = "status")] string? status,
         [FromQuery] int take = 10,
-        [FromRoute] int page = 1)
+        [FromQuery] int page = 1)
     {
         try
         {

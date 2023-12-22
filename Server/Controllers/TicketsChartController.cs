@@ -1,10 +1,13 @@
 using Buegee.Data;
 using Buegee.Utils;
+using Buegee.Utils.Attributes;
 using Buegee.Utils.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-[Route("users/{userId}/projects/{projectId}/tickets/chart")]
+namespace Buegee.Controllers;
+[Consumes("application/json")]
+[ApiRoute("users/{userId}/projects/{projectId}/tickets/chart")]
 [ApiController]
 public class TicketsChartController : ControllerBase
 {

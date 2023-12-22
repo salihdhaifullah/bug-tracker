@@ -8,7 +8,9 @@ using Buegee.Utils.Attributes;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-[Route("users/{userId}/projects/{projectId}/tickets/{ticketId}/comments")]
+namespace Buegee.Controllers;
+[Consumes("application/json")]
+[ApiRoute("users/{userId}/projects/{projectId}/tickets/{ticketId}/comments")]
 [ApiController]
 public class CommentController : ControllerBase
 {
@@ -30,7 +32,7 @@ public class CommentController : ControllerBase
     {
         try
         {
-            var content = await _data.CreateContent(dto, _ctx);
+            var content = await _data.CreateContent(dto, _auth.GetId(Request), _ctx);
 
             await _ctx.Comments.AddAsync(new Comment()
             {

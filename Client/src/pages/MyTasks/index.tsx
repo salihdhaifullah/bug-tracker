@@ -103,7 +103,7 @@ const MyTasks = () => {
                         <Button onClick={() => setIsOpenCreateTicketModal(prev => !prev)}>create ticket</Button>
                         <CreateTicketModal isOpenModal={isOpenCreateTicketModal} setIsOpenModal={setIsOpenCreateTicketModal} />
 
-                    <Link to={`/project/${projectId}`}>
+                    <Link to={`/users/${userId}/projects/${projectId}`}>
                         <Button>project</Button>
                     </Link>
                 </div>

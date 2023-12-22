@@ -1,11 +1,7 @@
 using System.Text.Json;
-using Buegee.Data;
-using Buegee.Models;
 using Buegee.Services.JWTService;
 using Buegee.Services.RedisCacheService;
 using Buegee.Utils;
-using Buegee.Utils.Enums;
-using Microsoft.EntityFrameworkCore;
 
 namespace Buegee.Services.AuthService;
 
@@ -13,11 +9,9 @@ public class AuthService : IAuthService
 {
     private readonly IJWTService _jwt;
     private readonly IRedisCacheService _cache;
-    private readonly DataContext _ctx;
-    public AuthService(IJWTService jwt, DataContext ctx, IRedisCacheService cache)
+    public AuthService(IJWTService jwt, IRedisCacheService cache)
     {
         _jwt = jwt;
-        _ctx = ctx;
         _cache = cache;
     }
 
@@ -75,25 +69,5 @@ public class AuthService : IAuthService
         if (!request.Cookies.TryGetValue("auth", out var token) || String.IsNullOrEmpty(token)) throw new Exception("token is not found");
         if (!_jwt.VerifyJwt(token).TryGetValue("id", out var id) || String.IsNullOrEmpty(id) || id.Length != 26) throw new Exception("un-valid token");
         return id;
-    }
-
-    public async Task<bool> CanUserAccessProject(IQueryable<Project> projects, string? userId)
-    {
-        return await projects.AnyAsync(p => !p.IsPrivate || p.Members.Any(m => userId != null && m.UserId == userId));
-    }
-
-    public bool CanUserAccessProject(Project project, string? userId)
-    {
-        return !project.IsPrivate || project.Members.Any(m => userId != null && m.UserId == userId);
-    }
-
-    public async Task<bool> CanUserMutateProject(IQueryable<Project> projects, string userId, List<Role> roles)
-    {
-        return await projects.AnyAsync(p => p.Members.Any(m => m.UserId == userId && roles.Any(r => r == m.Role)));
-    }
-
-    public bool CanUserMutateProject(Project project, string userId, List<Role> roles)
-    {
-        return project.Members.Any(m => m.UserId == userId && roles.Any(r => r == m.Role));
     }
 }

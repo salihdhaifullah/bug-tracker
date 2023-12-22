@@ -3,11 +3,14 @@ using Buegee.Services.AuthService;
 using Buegee.Services.DataService;
 using Buegee.Services.EmailService;
 using Buegee.Utils;
+using Buegee.Utils.Attributes;
 using Buegee.Utils.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-[Route("users/{userId}/projects/{projectId}/tickets/table")]
+namespace Buegee.Controllers;
+[Consumes("application/json")]
+[ApiRoute("users/{userId}/projects/{projectId}/tickets/table")]
 [ApiController]
 public class TicketsTableController : ControllerBase
 {

@@ -83,7 +83,7 @@ public class Seed
                 imageName = await _firebase.Upload(imageBytes, ContentType.svg.ToString());
             }
 
-            var content = await _ctx.Contents.AddAsync(new Content() { Id = contentId });
+            var content = await _ctx.Contents.AddAsync(new Content() { Id = contentId, UserId = userId });
             var user = await _ctx.Users.AddAsync(new User
             {
                 FirstName = item.FirstName,
@@ -107,8 +107,6 @@ public class Seed
             var contentId = Ulid.NewUlid().ToString();
             var projectId = Ulid.NewUlid().ToString();
 
-
-            await _ctx.Contents.AddAsync(new Content() { Id = contentId, Markdown = item.Content });
             await _ctx.Projects.AddAsync(new Project()
             {
                 Name = item.Name,
@@ -127,9 +125,15 @@ public class Seed
                 var role = Enum.Parse<Role>(member.Role);
 
                 await _data.AddActivity(projectId,
-                $"user [{user.fullName}](/profile/{user.Id}) joined the project", _ctx);
+                $"user [{user.fullName}](/users/{user.Id}) joined the project", _ctx);
 
                 await _ctx.Members.AddAsync(new Member() { UserId = user.Id, Id = memberId, ProjectId = projectId, Role = role });
+                if (role == Role.owner)
+                {
+
+                    await _ctx.Contents.AddAsync(new Content() { Id = contentId, Markdown = item.Content, UserId = user.Id });
+
+                }
             }
         }
 

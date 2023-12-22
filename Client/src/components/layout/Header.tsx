@@ -46,7 +46,7 @@ const Header = () => {
 
                     {user && (
                         <div className="flex justify-center items-center">
-                            <Link to={`/profile/${user.id}`} title="your profile">
+                            <Link to={`/users/${user.id}`} title="your profile">
                                 <img
                                     className="rounded-full dark:shadow-secondary/40 shadow-md w-8 h-8 object-contain"
                                     src={user.avatarUrl}
@@ -90,7 +90,7 @@ const Header = () => {
 
                 {user && (
                     <div className="flex justify-center items-center">
-                        <Link to={`/profile/${user.id}`} title="your profile">
+                        <Link to={`/users/${user.id}`} title="your profile">
                             <img
                                 className="rounded-full dark:shadow-secondary/40 shadow-md w-8 h-8 object-contain"
                                 src={user.avatarUrl}

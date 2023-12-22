@@ -11,26 +11,26 @@ interface ITicketsRowProps {
 };
 
 const TicketsRow = (props: ITicketsRowProps) => {
-    const { projectId } = useParams();
+    const { projectId, userId } = useParams();
 
     return (
         <tr className="dark:bg-black dark:hover:bg-gray-950 bg-white border-b dark:border-gray-600 hover:bg-gray-50">
 
             <td className="px-6 py-4 min-w-[150px]">
-                <Link to={`/ticket/${props.ticket.id}`} className="link">
+                <Link to={`/users/${userId}/projects/${projectId}/tickets/${props.ticket.id}`} className="link">
                     {props.ticket.name}
                 </Link>
             </td>
 
             <td className="px-6 py-4 min-w-[150px]">
-                <Link to={`/profile/${props.ticket.creator.id}`} className="link">
+                <Link to={`/users/${props.ticket.creator.id}`} className="link">
                     {props.ticket.creator.name}
                 </Link>
             </td>
 
             <td className="px-6 py-4 min-w-[150px]">
                 {props.ticket.assignedTo ?
-                    <Link to={`/profile/${props.ticket.assignedTo.id}`} className="link">
+                    <Link to={`/users/${props.ticket.assignedTo.id}`} className="link">
                         {props.ticket.assignedTo.name}
                     </Link>
                     : 'None'}

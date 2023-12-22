@@ -2,11 +2,14 @@ using Buegee.Data;
 using Buegee.Services.AuthService;
 using Buegee.Services.DataService;
 using Buegee.Utils;
+using Buegee.Utils.Attributes;
 using Buegee.Utils.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-[Route("users/{userId}/projects/{projectId}/members/table")]
+namespace Buegee.Controllers;
+[Consumes("application/json")]
+[ApiRoute("users/{userId}/projects/{projectId}/members/table")]
 [ApiController]
 public class MembersTableController : ControllerBase
 {

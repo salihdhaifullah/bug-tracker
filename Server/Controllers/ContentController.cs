@@ -7,7 +7,9 @@ using Buegee.Utils.Attributes;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-[Route("contents/{contentId}")]
+namespace Buegee.Controllers;
+[Consumes("application/json")]
+[ApiRoute("contents/{contentId}")]
 [ApiController]
 public class ContentController : ControllerBase
 {

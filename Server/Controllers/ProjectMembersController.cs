@@ -10,7 +10,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 
-[Route("users/{userId}/projects/{projectId}/members")]
+namespace Buegee.Controllers;
+[Consumes("application/json")]
+[ApiRoute("users/{userId}/projects/{projectId}/members")]
 [ApiController]
 public class ProjectMembersController : ControllerBase
 {
@@ -93,7 +95,7 @@ public class ProjectMembersController : ControllerBase
             {
                 await _ctx.Members.AddAsync(new Member() { ProjectId = projectId, UserId = dto.InvitedId, Role = role, Id = memberId });
                 await _data.AddActivity(projectId,
-                            $"user [{invited.name}](/profile/{dto.InvitedId}) joined the project",
+                            $"user [{invited.name}](/users/{dto.InvitedId}) joined the project",
                             _ctx);
                 await _ctx.SaveChangesAsync();
             }
@@ -128,7 +130,7 @@ public class ProjectMembersController : ControllerBase
                 if (project is null) return HttpResult.NotFound(redirectTo: "/404");
                 _ctx.Remove(project);
                 await _ctx.SaveChangesAsync();
-                return HttpResult.Ok(massage: "successfully deleted project", redirectTo: $"/profile/{userId}");
+                return HttpResult.Ok(massage: "successfully deleted project", redirectTo: $"/users/{userId}");
             }
             else
             {
@@ -141,10 +143,10 @@ public class ProjectMembersController : ControllerBase
 
                 await _ctx.SaveChangesAsync();
                 await _data.AddActivity(projectId,
-                        $"user [{member.User.FirstName} {member.User.LastName}](/profile/{userId}) left the project",
+                        $"user [{member.User.FirstName} {member.User.LastName}](/users/{userId}) left the project",
                          _ctx);
 
-                return HttpResult.Ok(massage: "successfully left project", redirectTo: $"/profile/{userId}");
+                return HttpResult.Ok(massage: "successfully left project", redirectTo: $"/users/{userId}");
             }
         }
         catch (Exception e)

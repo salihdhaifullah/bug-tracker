@@ -1,11 +1,12 @@
 using Buegee.Data;
 using Buegee.Utils;
+using Buegee.Utils.Attributes;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace Buegee.Controllers;
-
-[Route("users/{userId}/projects/{projectId}/activities")]
+[Consumes("application/json")]
+[ApiRoute("users/{userId}/projects/{projectId}/activities")]
 [ApiController]
 public class ActivitiesController : ControllerBase
 {

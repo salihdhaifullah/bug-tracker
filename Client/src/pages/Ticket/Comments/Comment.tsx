@@ -16,7 +16,7 @@ const Comment = (props: ICommentProps) => {
     return (
         <div className="flex flex-row w-full gap-3">
 
-            <Link to={`/profile/${props.comment.commenter.id}`} className="w-12 h-12 hidden sm:flex">
+            <Link to={`/users/${props.comment.commenter.id}`} className="w-12 h-12 hidden sm:flex">
                 <img
                     title="commenter"
                     className="rounded-full bg-white dark:bg-black shadow-md w-10 h-10 object-contain"
@@ -30,7 +30,7 @@ const Comment = (props: ICommentProps) => {
                 <div className="flex flex-row justify-between items-center border-b-gray-400 dark:border-b-gray-600 p-2 border-b">
                     <div className="flex flex-row gap-2 justify-start items-center">
 
-                        <Link to={`/profile/${props.comment.commenter.id}`} className="w-12 h-12 sm:hidden flex">
+                        <Link to={`/users/${props.comment.commenter.id}`} className="w-12 h-12 sm:hidden flex">
                             <img
                                 title="commenter"
                                 className="rounded-full bg-white dark:bg-black shadow-md w-10 h-10 object-contain"
@@ -39,7 +39,7 @@ const Comment = (props: ICommentProps) => {
                             />
                         </Link>
 
-                        <Link to={`/profile/${props.comment.commenter.id}`}>
+                        <Link to={`/users/${props.comment.commenter.id}`}>
                             <span
                                 title="commenter"
                                 className="text-primary dark:text-secondary font-bold hover:underline">{props.comment.commenter.name}</span>

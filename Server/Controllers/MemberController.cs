@@ -8,7 +8,9 @@ using Buegee.Utils.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-[Route("users/{userId}/projects/{projectId}/members/{memberId}")]
+namespace Buegee.Controllers;
+[Consumes("application/json")]
+[ApiRoute("users/{userId}/projects/{projectId}/members/{memberId}")]
 [ApiController]
 public class MembersController : ControllerBase
 {
@@ -44,7 +46,7 @@ public class MembersController : ControllerBase
             if (member is null) return HttpResult.NotFound("the member to delete is not found");
 
             await _data.AddActivity(projectId,
-                $"member [{member.User.FirstName} {member.User.LastName}](/profile/{member.UserId})" +
+                $"member [{member.User.FirstName} {member.User.LastName}](/users/{member.UserId})" +
                 $"deleted from the project",
                 _ctx);
 
@@ -84,7 +86,7 @@ public class MembersController : ControllerBase
             var newRole = Enum.Parse<Role>(dto.Role);
 
             await _data.AddActivity(projectId,
-            $"member [{member.User.FirstName} {member.User.LastName}](/profile/{member.UserId}) " +
+            $"member [{member.User.FirstName} {member.User.LastName}](/users/{member.UserId}) " +
             $"role changed from **{member.Role.ToString()}** to **{newRole.ToString()}**",
             _ctx);
 

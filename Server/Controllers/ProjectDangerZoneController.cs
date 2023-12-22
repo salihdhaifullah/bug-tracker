@@ -8,7 +8,9 @@ using Buegee.Utils.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-[Route("users/{userId}/projects/{projectId}/danger-zone")]
+namespace Buegee.Controllers;
+[Consumes("application/json")]
+[ApiRoute("users/{userId}/projects/{projectId}/danger-zone")]
 [ApiController]
 public class ProjectDangerZoneController : ControllerBase
 {
@@ -147,8 +149,8 @@ public class ProjectDangerZoneController : ControllerBase
 
             await _data.AddActivity(dto.ProjectId,
                 $"transferred project " +
-                $"from [{currentOwner.User.FirstName} {currentOwner.User.LastName}](/profile/{currentOwner.User.Id}) " +
-                $"to [{newOwner.User.FirstName} {newOwner.User.LastName}](/profile/{newOwner.User.Id})", _ctx);
+                $"from [{currentOwner.User.FirstName} {currentOwner.User.LastName}](/users/{currentOwner.User.Id}) " +
+                $"to [{newOwner.User.FirstName} {newOwner.User.LastName}](/users/{newOwner.User.Id})", _ctx);
 
             await _ctx.SaveChangesAsync();
 

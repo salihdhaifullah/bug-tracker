@@ -7,6 +7,6 @@ namespace Buegee.Services.DataService;
 
 public interface IDataService {
     public Task EditContent(ContentDTO dto, Content content, DataContext ctx);
-    public Task<EntityEntry<Content>> CreateContent(ContentDTO dto, DataContext ctx);
+    public Task<EntityEntry<Content>> CreateContent(ContentDTO dto, string userId, DataContext ctx);
     public Task AddActivity(string projectId, string markdown, DataContext ctx);
 }

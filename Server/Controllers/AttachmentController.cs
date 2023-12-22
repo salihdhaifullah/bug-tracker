@@ -3,10 +3,13 @@ using Buegee.DTO;
 using Buegee.Services.AuthService;
 using Buegee.Services.FirebaseService;
 using Buegee.Utils;
+using Buegee.Utils.Attributes;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-[Route("users/{userId}/projects/{projectId}/tickets/{ticketId}/attachments/{attachmentId}")]
+namespace Buegee.Controllers;
+[Consumes("application/json")]
+[ApiRoute("users/{userId}/projects/{projectId}/tickets/{ticketId}/attachments/{attachmentId}")]
 [ApiController]
 public class AttachmentController : ControllerBase
 {

@@ -9,7 +9,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 
-[Route("users/{userId}/projects/{projectId}/tickets/assigned")]
+namespace Buegee.Controllers;
+[Consumes("application/json")]
+[ApiRoute("users/{userId}/projects/{projectId}/tickets/assigned")]
 [ApiController]
 public class AssignedTicketsController : ControllerBase
 {
@@ -82,7 +84,7 @@ public class AssignedTicketsController : ControllerBase
             if (ticketStatus != ticket.Status)
             {
                 await _data.AddActivity(ticket.ProjectId,
-                $"changed ticket [{ticket.Name}](/tickets/{ticket.Id}) " +
+                $"changed ticket [{ticket.Name}](/users/{userId}/projects/{ticket.ProjectId}/tickets/{ticket.Id}) " +
                 $"status from **{ticket.Status}** to **{ticketStatus}**", _ctx);
                 ticket.Status = ticketStatus;
 

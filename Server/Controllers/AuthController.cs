@@ -12,9 +12,8 @@ using Buegee.Utils.Enums;
 using Buegee.Utils;
 
 namespace Buegee.Controllers;
-
-[ApiRoute("auth")]
 [Consumes("application/json")]
+[ApiRoute("auth")]
 public class AuthController : Controller
 {
     private readonly DataContext _ctx;
@@ -120,7 +119,7 @@ public class AuthController : Controller
                     imageName = await _firebase.Upload(imageBytes, ContentType.svg.ToString());
                 }
 
-                var content = await _ctx.Contents.AddAsync(new Content() { Id = contentId });
+                var content = await _ctx.Contents.AddAsync(new Content() { Id = contentId, UserId = userId });
 
                 var user = await _ctx.Users.AddAsync(new User
                 {
@@ -144,7 +143,7 @@ public class AuthController : Controller
                     avatarUrl = imageName,
                     email = demo,
                     name = "demo",
-                }, redirectTo: $"/profile/{userId}");
+                }, redirectTo: $"/users/{userId}");
             }
             else
             {
@@ -156,7 +155,7 @@ public class AuthController : Controller
                     avatarUrl = isFound.avatarUrl,
                     email = isFound.email,
                     name = isFound.name,
-                }, redirectTo: $"/profile/{isFound.id}");
+                }, redirectTo: $"/users/{isFound.id}");
             }
 
         }
@@ -221,7 +220,7 @@ public class AuthController : Controller
                 imageName = await _firebase.Upload(imageBytes, ContentType.svg.ToString());
             }
 
-            var content = await _ctx.Contents.AddAsync(new Content() { Id = contentId });
+            var content = await _ctx.Contents.AddAsync(new Content() { Id = contentId, UserId = userId });
 
             var user = await _ctx.Users.AddAsync(new User
             {

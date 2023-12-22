@@ -8,7 +8,9 @@ using Buegee.Utils.Attributes;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-[Route("users/{userId}/projects/{projectId}/tickets/{ticketId}/attachments")]
+namespace Buegee.Controllers;
+[Consumes("application/json")]
+[ApiRoute("users/{userId}/projects/{projectId}/tickets/{ticketId}/attachments")]
 [ApiController]
 public class TicketAttachmentsController : ControllerBase
 {

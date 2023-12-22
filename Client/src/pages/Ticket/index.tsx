@@ -53,7 +53,7 @@ const Ticket = () => {
         <section className="flex flex-col w-full h-full my-10 p-2 flex-grow">
             <div className="flex flex-row w-full h-full gap-3">
 
-                <Link to={`/profile/${payload.result.creator.id}`} className="w-12 h-12 hidden sm:flex">
+                <Link to={`/users/${payload.result.creator.id}`} className="w-12 h-12 hidden sm:flex">
                     <img
                         title="creator"
                         className="rounded-full bg-white dark:bg-black shadow-md w-10 h-10 object-contain"
@@ -66,7 +66,7 @@ const Ticket = () => {
 
                     <div className="flex flex-row justify-between items-center border-b-gray-400 dark:border-b-gray-600 p-2 border-b">
                         <div className="flex flex-row gap-2 justify-start items-center">
-                            <Link to={`/profile/${payload.result.creator.id}`} className="w-12 h-12 sm:hidden flex">
+                            <Link to={`/users/${payload.result.creator.id}`} className="w-12 h-12 sm:hidden flex">
                                 <img
                                     title="creator"
                                     className="rounded-full bg-white dark:bg-black shadow-md w-10 h-10 object-contain"
@@ -75,7 +75,7 @@ const Ticket = () => {
                                 />
                             </Link>
 
-                            <Link className="w-fit h-fit" to={`/profile/${payload.result.creator.id}`}>
+                            <Link className="w-fit h-fit" to={`/users/${payload.result.creator.id}`}>
                                 <span
                                     title="creator"
                                     className="text-primary dark:text-secondary font-bold hover:underline">{payload.result.creator.name}</span>
@@ -104,7 +104,7 @@ const Ticket = () => {
 
                         {payload.result.assignedTo ? (
                             <>
-                                <Link title="assigned to" className="flex gap-2 w-fit h-fit items-center flex-row" to={`/profile/${payload.result.assignedTo.id}`}>
+                                <Link title="assigned to" className="flex gap-2 w-fit h-fit items-center flex-row" to={`/users/${payload.result.assignedTo.id}`}>
                                     <img
                                         className="rounded-full shadow-md w-10 h-10 object-contain"
                                         src={payload.result.assignedTo.avatarUrl}
@@ -115,7 +115,7 @@ const Ticket = () => {
                             </>
                         ) : <p className="font-bold text-primary dark:text-secondary">unassigned</p>}
 
-                        <Link className="font-bold w-fit h-fit text-primary dark:text-secondary text-lg hover:underline" title="project" to={`/project/${payload.result.project.id}`}>{payload.result.project.name}</Link>
+                        <Link className="font-bold w-fit h-fit text-primary dark:text-secondary text-lg hover:underline" title="project" to={`/users/${userId}/projects/${payload.result.project.id}`}>{payload.result.project.name}</Link>
 
                         <Content editable={rolePayload.result !== null && ["owner", "project_manger"].includes(rolePayload.result) || payload.result.creator.id === user?.id} contentId={payload.result.contentId} />
 

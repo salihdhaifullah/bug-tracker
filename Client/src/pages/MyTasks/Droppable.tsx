@@ -1,7 +1,7 @@
 import { DragEvent, useRef, useState } from "react";
 import { IItem } from ".";
 import Draggable from "./Draggable";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import labelsColors from "../../utils/labelsColors";
 
 interface IDroppableProps {
@@ -12,7 +12,7 @@ interface IDroppableProps {
 
 const Droppable = (props: IDroppableProps) => {
     const [isOver, setIsOver] = useState(false)
-
+    const {userId, projectId} = useParams();
     const ref = useRef<HTMLDivElement>(null);
 
     const dragOverHandler = (event: DragEvent<HTMLDivElement>) => {
@@ -44,7 +44,7 @@ const Droppable = (props: IDroppableProps) => {
                         <Draggable index={index} key={index}>
                             <div className="flex flex-col gap-2 w-full">
 
-                                <Link className="link text-base" to={`/ticket/${item.id}`}>{item.name}</Link>
+                                <Link className="link text-base" to={`/users/${userId}/projects/${projectId}/tickets/${item.id}`}>{item.name}</Link>
 
                                 <div className="flex text-sm flex-row justify-start gap-1 flex-wrap">
                                     <span title="type" className={`rounded-sm font-bold border-black dark:border-white w-fit p-1 text-white dark:text-black ${(labelsColors.TYPE as any)[item.type]}`}>{item.type}</span>

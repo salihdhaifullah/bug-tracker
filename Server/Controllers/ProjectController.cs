@@ -8,7 +8,9 @@ using Buegee.Utils.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-[Route("users/{userId}/projects/{projectId}")]
+namespace Buegee.Controllers;
+[Consumes("application/json")]
+[ApiRoute("users/{userId}/projects/{projectId}")]
 [ApiController]
 public class ProjectController : ControllerBase
 {
@@ -111,7 +113,7 @@ public class ProjectController : ControllerBase
 
             await _ctx.SaveChangesAsync();
 
-            return HttpResult.Ok("successfully deleted project", redirectTo: $"/profile/{userId}");
+            return HttpResult.Ok("successfully deleted project", redirectTo: $"/users/{userId}");
         }
         catch (Exception e)
         {

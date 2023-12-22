@@ -46,7 +46,7 @@ const RoleModal = (props: IRoleModalProps) => {
 
                         <div className="flex flex-row justify-start items-center gap-4">
                             <img className="rounded-full shadow-md dark:shadow-secondary/40 w-10 h-10 object-contain" src={props.member.avatarUrl} alt={props.member.name} />
-                            <Link className="link" to={`/profile/${props.member.id}`}>{props.member.name}</Link>
+                            <Link className="link" to={`/users/${props.member.id}`}>{props.member.name}</Link>
                         </div>
 
                         <div className={`font-bold px-1 py-px rounded-xl shadow-md dark:shadow-secondary/40 ${(rolesColors as any)[props.member.role]}`}>

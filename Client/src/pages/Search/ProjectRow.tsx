@@ -11,7 +11,7 @@ const ProjectRow = (props: IProject) => {
 
     return (
         <div className="flex flex-row h-auto w-full gap-3">
-            <Link to={`/profile/${props.owner.id}`} className="hidden sm:flex w-12 h-12">
+            <Link to={`/users/${props.owner.id}`} className="hidden sm:flex w-12 h-12">
                 <img
                     title="owner"
                     className="rounded-full bg-white dark:shadow-secondary/40 shadow-md dark:bg-black w-10 h-10 object-contain"
@@ -23,7 +23,7 @@ const ProjectRow = (props: IProject) => {
             <div className="flex w-full rounded-md shadow-md dark:shadow-secondary/40 bg-white dark:bg-black p-4 flex-col gap-4 sm:left-arrow">
 
 
-                <Link to={`/profile/${props.owner.id}`} className="sm:hidden flex w-12 h-12">
+                <Link to={`/users/${props.owner.id}`} className="sm:hidden flex w-12 h-12">
                     <img
                         title="owner"
                         className="rounded-full bg-white dark:shadow-secondary/40 shadow-md dark:bg-black w-10 h-10 object-contain"
@@ -35,7 +35,7 @@ const ProjectRow = (props: IProject) => {
                 <div className="flex w-full flex-row gap-2 items-center justify-between">
 
                     <div className="flex flex-col gap-2 justify-start">
-                        <Link className="link text-4xl" to={`/project/${props.id}`}>{props.name}</Link>
+                        <Link className="link text-4xl" to={`/users/${props.owner.id}/projects/${props.id}`}>{props.name}</Link>
 
                         <div className="flex justify-start gap-2 items-center">
 
