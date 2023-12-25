@@ -14,7 +14,7 @@ const ProjectRow = (props: IProject) => {
             <Link to={`/users/${props.owner.id}`} className="hidden sm:flex w-12 h-12">
                 <img
                     title="owner"
-                    className="rounded-full bg-white dark:shadow-secondary/40 shadow-md dark:bg-black w-10 h-10 object-contain"
+                    className="rounded-full bg-white dark:shadow-secondary/40 shadow-md dark:bg-black w-10 h-10 object-cover"
                     src={props.owner.avatarUrl}
                     alt={`${props.owner.name}`}
                 />
@@ -26,7 +26,7 @@ const ProjectRow = (props: IProject) => {
                 <Link to={`/users/${props.owner.id}`} className="sm:hidden flex w-12 h-12">
                     <img
                         title="owner"
-                        className="rounded-full bg-white dark:shadow-secondary/40 shadow-md dark:bg-black w-10 h-10 object-contain"
+                        className="rounded-full bg-white dark:shadow-secondary/40 shadow-md dark:bg-black w-10 h-10 object-cover"
                         src={props.owner.avatarUrl}
                         alt={`${props.owner.name}`}
                     />

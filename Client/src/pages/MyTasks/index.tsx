@@ -44,6 +44,7 @@ const MyTasks = () => {
     const [ticketPriority, setTicketPriority] = useState("all");
 
     const [tasksPayload, callTasks] = useFetchApi<IItem[], unknown>("GET", `users/${userId}/projects/${projectId}/tickets/assigned?search=${search}&type=${ticketType}&priority=${ticketPriority}`, [search, ticketType, ticketPriority], (result) => { setData(result) })
+    const [_, callUpdate] = useFetchApi<unknown, { id: string, status: Status }>("PATCH", `users/${userId}/projects/${projectId}/tickets/assigned`, [])
 
     useEffect(() => { callTasks() }, [ticketType, ticketPriority])
 
@@ -74,10 +75,7 @@ const MyTasks = () => {
         if (!(col in Status)) return;
         if (data[index].status === col) return;
         const dataCopy = Array.from(data);
-
-        const [_, callUpdate] = useFetchApi<unknown, { id: string, status: Status }>("PATCH", `users/${userId}/projects/${projectId}/tickets/assigned/${dataCopy[index].id}`, [])
         callUpdate({ id: dataCopy[index].id, status: col as Status })
-
         dataCopy[index].status = col as Status;
         setData(dataCopy);
     }

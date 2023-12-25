@@ -20,8 +20,8 @@ public class TicketsChartController : ControllerBase
         _logger = logger;
     }
 
-    [HttpGet]
-    public async Task<IActionResult> GetTicketsChart(string projectId)
+    [HttpGet, ProjectRead]
+    public async Task<IActionResult> GetTicketsChart([FromRoute] string projectId)
     {
         try
         {

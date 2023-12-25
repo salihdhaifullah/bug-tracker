@@ -19,7 +19,7 @@ const Comment = (props: ICommentProps) => {
             <Link to={`/users/${props.comment.commenter.id}`} className="w-12 h-12 hidden sm:flex">
                 <img
                     title="commenter"
-                    className="rounded-full bg-white dark:bg-black shadow-md w-10 h-10 object-contain"
+                    className="rounded-full bg-white dark:bg-black shadow-md w-10 h-10 object-cover"
                     src={props.comment.commenter.avatarUrl}
                     alt={`${props.comment.commenter.name}`}
                 />
@@ -33,7 +33,7 @@ const Comment = (props: ICommentProps) => {
                         <Link to={`/users/${props.comment.commenter.id}`} className="w-12 h-12 sm:hidden flex">
                             <img
                                 title="commenter"
-                                className="rounded-full bg-white dark:bg-black shadow-md w-10 h-10 object-contain"
+                                className="rounded-full bg-white dark:bg-black shadow-md w-10 h-10 object-cover"
                                 src={props.comment.commenter.avatarUrl}
                                 alt={`${props.comment.commenter.name}`}
                             />

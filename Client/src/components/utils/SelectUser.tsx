@@ -44,7 +44,7 @@ const SelectUser = (props: ISelectUserProps) => {
 
     useOnClickOutside(targetRef, () => setIsOpen(false));
 
-    const [payload, call] = useFetchApi<Option[]>("GET", `users/${userId}/projects/${projectId}/members${props.members ? "/none-members" : ""}?email=${search}&not-me=${props.notMe || false}`, [search]);
+    const [payload, call] = useFetchApi<Option[]>("GET", `users/${userId}/projects/${projectId}/members${props.members ? "" : "/none-members"}?email=${search}&not-me=${props.notMe || false}`, [search]);
 
     useEffect(() => {
         call();
@@ -124,7 +124,7 @@ const SelectUser = (props: ISelectUserProps) => {
                     >
 
                         <div className="flex flex-row w-full gap-4">
-                            <img className="rounded-full flex shadow-md dark:shadow-secondary/40 w-10 h-10 object-contain" src={option.avatarUrl} alt={option.name} />
+                            <img className="rounded-full flex shadow-md dark:shadow-secondary/40 w-10 h-10 object-cover" src={option.avatarUrl} alt={option.name} />
                             <p className="font-bold">{option.name}</p>
                         </div>
                         <p className="text-sm font-light -mt-2 -ml-8">{option.email}</p>

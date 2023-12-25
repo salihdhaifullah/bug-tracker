@@ -16,7 +16,7 @@ const Image = (props: IImageProps) => {
     const dispatchUser = useUserDispatch();
     const user = useUser();
 
-    const [_, call] = useFetchApi<{ avatarUrl: string }, { data: string, contentType: string }>("POST", `users/${userId}/avatar`, [], (payload) => {
+    const [_, call] = useFetchApi<{ avatarUrl: string }, { data: string, contentType: string }>("PATCH", `users/${userId}/avatar`, [], (payload) => {
         dispatchUser({
             type: "add",
             payload: {
@@ -44,16 +44,16 @@ const Image = (props: IImageProps) => {
                 <label htmlFor="file-upload">
                     <img
                         title="change image"
-                        className="rounded-full cursor-pointer shadow-md w-60 h-60 object-contain"
-                        src={props.data.avatarUrl}
-                        alt={props.data.name} />
+                        className="rounded-full cursor-pointer shadow-md w-60 h-60 object-cover"
+                        src={user?.avatarUrl}
+                        alt={user?.name} />
                 </label>
             </>
         ) : (
             <>
                 <img
                     title="change image"
-                    className="rounded-full cursor-pointer shadow-md w-60 h-60 object-contain"
+                    className="rounded-full cursor-pointer shadow-md w-60 h-60 object-cover"
                     src={props.data.avatarUrl}
                     alt={props.data.name} />
             </>

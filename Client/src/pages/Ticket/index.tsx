@@ -56,7 +56,7 @@ const Ticket = () => {
                 <Link to={`/users/${payload.result.creator.id}`} className="w-12 h-12 hidden sm:flex">
                     <img
                         title="creator"
-                        className="rounded-full bg-white dark:bg-black shadow-md w-10 h-10 object-contain"
+                        className="rounded-full bg-white dark:bg-black shadow-md w-10 h-10 object-cover"
                         src={payload.result.creator.avatarUrl}
                         alt={`${payload.result.creator.name}`}
                     />
@@ -69,7 +69,7 @@ const Ticket = () => {
                             <Link to={`/users/${payload.result.creator.id}`} className="w-12 h-12 sm:hidden flex">
                                 <img
                                     title="creator"
-                                    className="rounded-full bg-white dark:bg-black shadow-md w-10 h-10 object-contain"
+                                    className="rounded-full bg-white dark:bg-black shadow-md w-10 h-10 object-cover"
                                     src={payload.result.creator.avatarUrl}
                                     alt={`${payload.result.creator.name}`}
                                 />
@@ -106,7 +106,7 @@ const Ticket = () => {
                             <>
                                 <Link title="assigned to" className="flex gap-2 w-fit h-fit items-center flex-row" to={`/users/${payload.result.assignedTo.id}`}>
                                     <img
-                                        className="rounded-full shadow-md w-10 h-10 object-contain"
+                                        className="rounded-full shadow-md w-10 h-10 object-cover"
                                         src={payload.result.assignedTo.avatarUrl}
                                         alt={`${payload.result.assignedTo.name}`}
                                     />

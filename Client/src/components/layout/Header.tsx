@@ -48,7 +48,7 @@ const Header = () => {
                         <div className="flex justify-center items-center">
                             <Link to={`/users/${user.id}`} title="your profile">
                                 <img
-                                    className="rounded-full dark:shadow-secondary/40 shadow-md w-8 h-8 object-contain"
+                                    className="rounded-full dark:shadow-secondary/40 shadow-md w-8 h-8 object-cover"
                                     src={user.avatarUrl}
                                     alt={user.name} />
                             </Link>
@@ -92,7 +92,7 @@ const Header = () => {
                     <div className="flex justify-center items-center">
                         <Link to={`/users/${user.id}`} title="your profile">
                             <img
-                                className="rounded-full dark:shadow-secondary/40 shadow-md w-8 h-8 object-contain"
+                                className="rounded-full dark:shadow-secondary/40 shadow-md w-8 h-8 object-cover"
                                 src={user.avatarUrl}
                                 alt={user.name} />
                         </Link>

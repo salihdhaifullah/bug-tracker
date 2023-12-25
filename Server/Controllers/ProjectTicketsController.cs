@@ -36,11 +36,10 @@ public class ProjectTicketsController : ControllerBase
                     .Select(m => new AssignedTo(m.User.Email, $"{m.User.FirstName} {m.User.LastName}", m.UserId))
                     .FirstOrDefaultAsync();
 
-
         return assignedTo;
     }
 
-    [HttpPost, BodyValidation, Authorized]
+    [HttpPost, BodyValidation, Authorized, ProjectArchive, ProjectRole(Role.owner, Role.project_manger)]
     public async Task<IActionResult> CreateTicket([FromBody] CreateTicketDTO dto, [FromRoute] string projectId)
     {
         try

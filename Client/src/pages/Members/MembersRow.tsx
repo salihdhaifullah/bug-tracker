@@ -15,7 +15,7 @@ const MembersRow = (props: IMemberRowProps) => {
 
             <td className="flex items-center px-6 py-4 min-w-[150px] justify-center text-gray-900 dark:text-gray-100 whitespace-nowrap">
                 <Link to={`/users/${props.member.id}`}>
-                    <img className="rounded-full shadow-md dark:shadow-secondary/40 w-10 h-10 object-contain" src={props.member.avatarUrl} alt={props.member.name} />
+                    <img className="rounded-full shadow-md dark:shadow-secondary/40 w-10 h-10 object-cover" src={props.member.avatarUrl} alt={props.member.name} />
                 </Link>
             </td>
 

@@ -35,4 +35,14 @@ public static class Helper
             MaxAge = duration
         };
     }
+
+    public static T? ParseEnum<T>(string? type) where T : struct, Enum
+    {
+        T? result = null;
+        if (!string.IsNullOrEmpty(type) && Enum.TryParse(type, true, out T parsedType))
+        {
+            result = parsedType;
+        }
+        return result;
+    }
 }

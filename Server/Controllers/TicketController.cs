@@ -44,7 +44,8 @@ public class TicketController : ControllerBase
         return assignedTo;
     }
     record Change(string Property, string OldValue, string NewValue);
-    [HttpPatch]
+
+    [HttpPatch, Authorized, ProjectArchive, ProjectRole(Role.owner, Role.project_manger)]
     public async Task<IActionResult> UpdateTicket([FromRoute] string ticketId, [FromBody] UpdateTicketDTO dto)
     {
         try
@@ -52,11 +53,9 @@ public class TicketController : ControllerBase
             var userId = _auth.GetId(Request);
 
             var ticket = await _ctx.Tickets
-            .Where((t) => t.Id == ticketId
-            && (t.Project.Members.Any(m => (m.Role == Role.owner || m.Role == Role.project_manger) && m.UserId == userId))
-            )
-            .Include(t => t.AssignedTo != null ? t.AssignedTo.User : null)
-            .FirstOrDefaultAsync();
+                .Where((t) => t.Id == ticketId)
+                .Include(t => t.AssignedTo != null ? t.AssignedTo.User : null)
+                .FirstOrDefaultAsync();
 
             if (ticket is null) return HttpResult.NotFound("sorry, ticket not found");
 
@@ -128,7 +127,7 @@ public class TicketController : ControllerBase
         }
     }
 
-    [HttpGet]
+    [HttpGet, ProjectRead]
     public async Task<IActionResult> GetTicket([FromRoute] string ticketId)
     {
         try
@@ -158,6 +157,7 @@ public class TicketController : ControllerBase
                                 } : null,
                                 name = t.Name,
                                 priority = t.Priority.ToString(),
+                                contentId = t.ContentId,
                                 status = t.Status.ToString(),
                                 type = t.Type.ToString()
                             })
@@ -174,14 +174,16 @@ public class TicketController : ControllerBase
         }
     }
 
-    [HttpDelete]
+    [HttpDelete, ProjectArchive, ProjectRole(Role.owner, Role.project_manger)]
     public async Task<IActionResult> DeleteTicket([FromRoute] string ticketId)
     {
         try
         {
             var userId = _auth.GetId(Request);
 
-            var ticket = await _ctx.Tickets.Where((t) => t.Id == ticketId && t.Creator.UserId == userId).Include(t => t.Creator).ThenInclude(c => c.User).FirstOrDefaultAsync();
+            var ticket = await _ctx.Tickets
+                    .Where((t) => t.Id == ticketId)
+                    .FirstOrDefaultAsync();
 
             if (ticket is null) return HttpResult.NotFound("sorry, ticket not found");
 

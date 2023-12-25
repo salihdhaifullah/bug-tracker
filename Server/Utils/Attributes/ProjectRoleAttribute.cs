@@ -1,13 +1,19 @@
 using Buegee.Data;
 using Buegee.Services.AuthService;
+using Buegee.Utils.Enums;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
 
 namespace Buegee.Utils.Attributes;
 
 [AttributeUsage(AttributeTargets.Method)]
-public class ProjectReadAttribute : Attribute, IAsyncActionFilter
+public class ProjectRoleAttribute : Attribute, IAsyncActionFilter
 {
+    private readonly Role[] _roles;
+    public ProjectRoleAttribute(params Role[] roles) {
+        _roles = roles;
+    }
+
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
 
@@ -21,14 +27,13 @@ public class ProjectReadAttribute : Attribute, IAsyncActionFilter
 
             var projectId = projectIdObj.ToString();
 
-            var canViewProject = await _ctx.Projects
+            var havePermission = await _ctx.Projects
                 .Where(p => p.Id == projectId)
-                .Select(p => !p.IsPrivate || p.Members.Any(m => userId != null && m.UserId == userId))
-                .FirstOrDefaultAsync();
+                .AnyAsync(p => p.Members.Any(m => m.UserId == userId && _roles.Contains(m.Role)));
 
-            if (!canViewProject)
+            if (!havePermission)
             {
-                context.Result = HttpResult.Forbidden("you can not access this project", redirectTo: "/403");
+                context.Result = HttpResult.Forbidden("you don't have permission to do this action", redirectTo: "/403");
                 return;
             }
         }

@@ -1,12 +1,11 @@
 using Buegee.Data;
+using Buegee.Models;
 using Buegee.Services.AuthService;
-using Buegee.Services.DataService;
 using Buegee.Utils;
 using Buegee.Utils.Attributes;
 using Buegee.Utils.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Threading.Tasks;
 
 namespace Buegee.Controllers;
 [Consumes("application/json")]
@@ -30,16 +29,21 @@ public class ExploreController : ControllerBase
     {
         try
         {
-            _auth.TryGetId(Request, out string? currentUserId);
+            _auth.TryGetId(Request, out string? userId);
+
+            var searchQuery = (Project p) => EF.Functions.ILike(p.Name, $"%{search}%");
+
+            if (search != null && search.Length > 2) {
+                searchQuery = (Project p) => {
+                    return EF.Functions.ILike(p.Name, $"%{search}%") || EF.Functions.ILike(p.Content.Markdown, $"%{search}%");
+                };
+            }
 
             var projects = await _ctx.Projects
-                            .Where((p) => p.Members.Any(m => m.UserId != currentUserId)
-                            && !p.IsPrivate
-                            && (EF.Functions.ILike(p.Name, $"%{search}%")
-                            || (search != null
-                            && search.Length >= 3
-                            && EF.Functions.ILike(p.Content.Markdown, $"%{search}%")))
-                            ).OrderByDescending((p) => p.Activities.Max(a => a.CreatedAt))
+                            .Where(p => p.Members.Any(m => m.UserId != userId))
+                            .Where(p => !p.IsPrivate)
+                            .Where(p => searchQuery(p))
+                            .OrderByDescending((p) => p.Activities.Max(a => a.CreatedAt))
                             .Select((p) => new
                             {
                                 createdAt = p.CreatedAt,

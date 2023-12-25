@@ -5,6 +5,7 @@ using Buegee.Services.AuthService;
 using Buegee.Services.FirebaseService;
 using Buegee.Utils;
 using Buegee.Utils.Attributes;
+using Buegee.Utils.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -27,7 +28,7 @@ public class TicketAttachmentsController : ControllerBase
         _firebase = firebase;
     }
 
-    [HttpGet]
+    [HttpGet, ProjectRead]
     public async Task<IActionResult> GetTicketAttachments([FromRoute] string ticketId)
     {
         try
@@ -51,7 +52,7 @@ public class TicketAttachmentsController : ControllerBase
         }
     }
 
-    [HttpPost, Authorized, BodyValidation]
+    [HttpPost, Authorized, BodyValidation, ProjectArchive, ProjectRole(Role.owner, Role.project_manger)]
     public async Task<IActionResult> UploadTicketAttachment([FromRoute] string ticketId, [FromBody] AttachmentDTO dto)
     {
         try

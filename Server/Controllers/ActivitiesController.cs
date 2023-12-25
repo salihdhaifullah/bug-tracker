@@ -19,7 +19,7 @@ public class ActivitiesController : ControllerBase
         _logger = logger;
     }
 
-    [HttpGet("{page}")]
+    [HttpGet("{page}"), ProjectRead]
     public async Task<IActionResult> GetActivities([FromRoute] string projectId, [FromRoute] int page, [FromQuery] int take, [FromQuery] string sort)
     {
         try
@@ -47,7 +47,7 @@ public class ActivitiesController : ControllerBase
         }
     }
 
-    [HttpGet("count")]
+    [HttpGet("count"), ProjectRead]
     public async Task<IActionResult> GetActivityCount([FromRoute] string projectId)
     {
         try

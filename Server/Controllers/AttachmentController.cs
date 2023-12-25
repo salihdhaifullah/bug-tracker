@@ -4,6 +4,7 @@ using Buegee.Services.AuthService;
 using Buegee.Services.FirebaseService;
 using Buegee.Utils;
 using Buegee.Utils.Attributes;
+using Buegee.Utils.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,7 +15,6 @@ namespace Buegee.Controllers;
 public class AttachmentController : ControllerBase
 {
     private readonly DataContext _ctx;
-    private readonly IAuthService _auth;
     private readonly IFirebaseService _firebase;
     private readonly ILogger<AttachmentController> _logger;
 
@@ -22,20 +22,17 @@ public class AttachmentController : ControllerBase
     {
         _ctx = ctx;
         _logger = logger;
-        _auth = auth;
         _firebase = firebase;
     }
 
-    [HttpDelete]
+    [HttpDelete, Authorized, ProjectArchive, ProjectRole(Role.owner, Role.project_manger)]
     public async Task<IActionResult> DeleteAttachment([FromRoute] string attachmentId)
     {
         try
         {
-            var userId = _auth.GetId(Request);
-
             var attachment = await _ctx.Attachments
-                    .Where(a => a.Id == attachmentId && a.Ticket.Creator.UserId == userId)
-                    .FirstOrDefaultAsync();
+                .Where(a => a.Id == attachmentId)
+                .FirstOrDefaultAsync();
 
             if (attachment == null) return HttpResult.NotFound("attachment not found");
 
@@ -54,15 +51,13 @@ public class AttachmentController : ControllerBase
         }
     }
 
-    [HttpPatch]
+    [HttpPatch, Authorized, ProjectArchive, ProjectRole(Role.owner, Role.project_manger)]
     public async Task<IActionResult> UpdateAttachment([FromRoute] string attachmentId, [FromBody] UpdateAttachmentDTO dto)
     {
         try
         {
-            var userId = _auth.GetId(Request);
-
             var attachment = await _ctx.Attachments
-                    .Where(a => a.Id == attachmentId && a.Ticket.Creator.UserId == userId)
+                    .Where(a => a.Id == attachmentId)
                     .FirstOrDefaultAsync();
 
             if (attachment == null) return HttpResult.BadRequest("attachment not found");

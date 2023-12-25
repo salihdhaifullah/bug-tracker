@@ -14,12 +14,12 @@ interface IBioProps {
 
 const Bio = (props: IBioProps) => {
     const {userId} = useParams();
-    const [bio, setBio] = useState("");
+    const [bio, setBio] = useState(props.bio);
     const [isEditing, setIsEditing] = useState(false)
     const bioRef = useRef<null | HTMLFormElement>(null);
     const iconRef = useRef<null | HTMLDivElement>(null);
 
-    const [updateBioPayload, call] = useFetchApi<any, { bio: string }>("POST", `users/${userId}/bio`, []);
+    const [updateBioPayload, call] = useFetchApi<any, { bio: string }>("PATCH", `users/${userId}/bio`, []);
 
     useOnClickOutside([bioRef, iconRef], () => { setIsEditing(false) });
 

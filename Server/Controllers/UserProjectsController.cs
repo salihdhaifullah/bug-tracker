@@ -74,8 +74,7 @@ public class UserProjectsController : ControllerBase
         {
             _auth.TryGetId(Request, out string? currentUserId);
 
-            Role? role = null;
-            if (!string.IsNullOrEmpty(roleQuery) && Enum.TryParse<Role>(roleQuery, out Role parsedRole)) role = parsedRole;
+            var role = Helper.ParseEnum<Role>(roleQuery);
 
             bool? isPrivate = null;
             if (!string.IsNullOrEmpty(type) && type == "private") isPrivate = true;
@@ -126,8 +125,7 @@ public class UserProjectsController : ControllerBase
         {
             _auth.TryGetId(Request, out string? currentUserId);
 
-            Role? role = null;
-            if (!string.IsNullOrEmpty(roleQuery) && Enum.TryParse<Role>(roleQuery, out Role parsedRole)) role = parsedRole;
+            var role = Helper.ParseEnum<Role>(roleQuery);
 
             bool? isPrivate = null;
             if (!string.IsNullOrEmpty(type) && type == "private") isPrivate = true;

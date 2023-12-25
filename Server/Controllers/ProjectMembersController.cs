@@ -8,7 +8,6 @@ using Buegee.Utils.Attributes;
 using Buegee.Utils.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Threading.Tasks;
 
 namespace Buegee.Controllers;
 [Consumes("application/json")]
@@ -30,9 +29,9 @@ public class ProjectMembersController : ControllerBase
     }
 
 
-    [HttpGet]
+    [HttpGet, ProjectRead]
     public async Task<IActionResult> GetMembers([FromRoute] string projectId,
-    [FromQuery] string email, [FromQuery(Name = "not-me")] bool notMe = false)
+    [FromQuery] string? email, [FromQuery(Name = "not-me")] bool notMe = false)
     {
         try
         {
@@ -64,13 +63,11 @@ public class ProjectMembersController : ControllerBase
         }
     }
 
-    [HttpPost, BodyValidation, Authorized]
-    public async Task<IActionResult> AddMember([FromBody] InviteDTO dto, [FromRoute] string userId, [FromRoute] string projectId)
+    [HttpPost, BodyValidation, Authorized, ProjectArchive, ProjectRole(Role.owner)]
+    public async Task<IActionResult> AddMember([FromBody] InviteDTO dto, [FromRoute] string projectId)
     {
         try
         {
-            if (_auth.GetId(Request) != userId) return HttpResult.UnAuthorized();
-
             var invited = await _ctx.Users
                     .Where(u => u.Id == dto.InvitedId)
                     .Select(u => new { name = $"{u.FirstName} {u.LastName}" })
@@ -110,7 +107,7 @@ public class ProjectMembersController : ControllerBase
     }
 
     [HttpDelete, Authorized]
-    public async Task<IActionResult> RemoveMember(string projectId)
+    public async Task<IActionResult> LeaveProject([FromRoute] string projectId)
     {
         try
         {
@@ -156,8 +153,8 @@ public class ProjectMembersController : ControllerBase
         }
     }
 
-    [HttpGet("none-members")]
-    public async Task<IActionResult> GetNonMembers([FromQuery] string email, [FromRoute] string projectId)
+    [HttpGet("none-members"), ProjectRead]
+    public async Task<IActionResult> GetNonMembers([FromQuery] string? email, [FromRoute] string projectId)
     {
         try
         {
@@ -186,8 +183,8 @@ public class ProjectMembersController : ControllerBase
     }
 
 
-    [HttpGet("role")]
-    public async Task<IActionResult> GetRole(string projectId, string memberId)
+    [HttpGet("role"), ProjectRead]
+    public async Task<IActionResult> GetRole([FromRoute] string projectId, [FromRoute] string memberId)
     {
         try
         {
@@ -206,8 +203,8 @@ public class ProjectMembersController : ControllerBase
         }
     }
 
-    [HttpGet("chart")]
-    public async Task<IActionResult> GetMembersChart(string projectId)
+    [HttpGet("chart"), ProjectRead]
+    public async Task<IActionResult> GetMembersChart([FromRoute] string projectId)
     {
         try
         {

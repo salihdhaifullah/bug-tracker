@@ -15,32 +15,23 @@ namespace Buegee.Controllers;
 public class TicketsTableController : ControllerBase
 {
     private readonly DataContext _ctx;
-    private readonly IDataService _data;
-    private readonly IEmailService _email;
-    private readonly IAuthService _auth;
     private readonly ILogger<TicketsTableController> _logger;
 
-    public TicketsTableController(DataContext ctx, ILogger<TicketsTableController> logger, IEmailService email, IDataService data, IAuthService auth)
+    public TicketsTableController(DataContext ctx, ILogger<TicketsTableController> logger)
     {
         _ctx = ctx;
         _logger = logger;
-        _data = data;
-        _email = email;
-        _auth = auth;
     }
 
 
-    [HttpGet("{page}")]
+    [HttpGet("{page}"), ProjectRead]
     public async Task<IActionResult> GetTicketsTable([FromRoute] string projectId, [FromRoute] int page, [FromQuery(Name = "status")] string? statusQuery, [FromQuery(Name = "type")] string? typeQuery, [FromQuery(Name = "priority")] string? priorityQuery, [FromQuery] string? search, [FromQuery] int take = 10)
     {
         try
         {
-            Status? status = null;
-            if (!string.IsNullOrEmpty(statusQuery) && Enum.TryParse<Status>(statusQuery, out Status parsedStatus)) status = parsedStatus;
-            TicketType? type = null;
-            if (!string.IsNullOrEmpty(typeQuery) && Enum.TryParse<TicketType>(typeQuery, out TicketType parsedType)) type = parsedType;
-            Priority? priority = null;
-            if (!string.IsNullOrEmpty(priorityQuery) && Enum.TryParse<Priority>(priorityQuery, out Priority parsedPriority)) priority = parsedPriority;
+            var status = Helper.ParseEnum<Status>(statusQuery);
+            var type = Helper.ParseEnum<TicketType>(typeQuery);
+            var priority = Helper.ParseEnum<Priority>(priorityQuery);
 
             var tickets = await _ctx.Tickets.Where(t => t.ProjectId == projectId
                           && (status == null || t.Status == status)
@@ -84,18 +75,14 @@ public class TicketsTableController : ControllerBase
         }
     }
 
-    [HttpGet("count")]
+    [HttpGet("count"), ProjectRead]
     public async Task<IActionResult> GetTicketsTableCount([FromRoute] string projectId, [FromQuery(Name = "status")] string? statusQuery, [FromQuery(Name = "type")] string? typeQuery, [FromQuery(Name = "priority")] string? priorityQuery, [FromQuery] string? search)
     {
         try
         {
-            Status? status = null;
-            if (!string.IsNullOrEmpty(statusQuery) && Enum.TryParse<Status>(statusQuery, out Status parsedStatus)) status = parsedStatus;
-            TicketType? type = null;
-            if (!string.IsNullOrEmpty(typeQuery) && Enum.TryParse<TicketType>(typeQuery, out TicketType parsedType)) type = parsedType;
-            Priority? priority = null;
-            if (!string.IsNullOrEmpty(priorityQuery) && Enum.TryParse<Priority>(priorityQuery, out Priority parsedPriority)) priority = parsedPriority;
-
+            var status = Helper.ParseEnum<Status>(statusQuery);
+            var type = Helper.ParseEnum<TicketType>(typeQuery);
+            var priority = Helper.ParseEnum<Priority>(priorityQuery);
 
             var count = await _ctx.Tickets.Where(t => t.ProjectId == projectId
                                             && (status == null || t.Status == status)

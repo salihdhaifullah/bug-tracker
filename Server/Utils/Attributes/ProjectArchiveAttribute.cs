@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Buegee.Utils.Attributes;
 
 [AttributeUsage(AttributeTargets.Method)]
-public class ProjectReadAttribute : Attribute, IAsyncActionFilter
+public class ProjectArchiveAttribute : Attribute, IAsyncActionFilter
 {
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
@@ -21,14 +21,13 @@ public class ProjectReadAttribute : Attribute, IAsyncActionFilter
 
             var projectId = projectIdObj.ToString();
 
-            var canViewProject = await _ctx.Projects
+            var isArchived = await _ctx.Projects
                 .Where(p => p.Id == projectId)
-                .Select(p => !p.IsPrivate || p.Members.Any(m => userId != null && m.UserId == userId))
-                .FirstOrDefaultAsync();
+                .AnyAsync(p => p.IsReadOnly);
 
-            if (!canViewProject)
+            if (isArchived)
             {
-                context.Result = HttpResult.Forbidden("you can not access this project", redirectTo: "/403");
+                context.Result = HttpResult.BadRequest("this project is archived");
                 return;
             }
         }

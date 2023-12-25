@@ -29,7 +29,7 @@ public class UserController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetUser(string userId)
+    public async Task<IActionResult> GetUser([FromRoute] string userId)
     {
         try
         {

@@ -27,6 +27,12 @@ dotnet ef migrations add InitialCreate
 dotnet ef database update
 ```
 
+### if project is private only members can see data related to the project
+### if project is archived no changes can be made to data related to the project
+
+### owner can add and remove new members, create tickets, update, delete, change setting of project, comment in tickets, view every thing in the project
+### project manger can create tickets, update, delete,  comment in tickets, view every thing in the project
+### developer can change status of tickets assigned to them,  comment in tickets, view every thing in the project
 
 ## REST API
 auth/login POST

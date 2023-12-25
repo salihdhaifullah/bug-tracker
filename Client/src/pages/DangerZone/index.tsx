@@ -8,6 +8,7 @@ import LeaveModal from "./LeaveModal";
 import useFetchApi from "../../utils/hooks/useFetchApi";
 import { useParams } from "react-router-dom";
 import CircleProgress from "../../components/utils/CircleProgress";
+import { useUser } from "../../utils/context/user";
 
 export interface IData {
     name: string;
@@ -33,6 +34,8 @@ const DangerZone = () => {
 
     const [payload, call] = useFetchApi<IData>("GET", `users/${userId}/projects/${projectId}/danger-zone`);
 
+    const user = useUser();
+
     useEffect(() => {
         call();
     }, [])
@@ -48,7 +51,7 @@ const DangerZone = () => {
                     <TransferModal {...payload.result} isOpenModal={isOpenTransferModal} setIsOpenModal={setIsOpenTransferModal} />
                     <LeaveModal {...payload.result} isOpenModal={isOpenLeaveModal} setIsOpenModal={setIsOpenLeaveModal} />
 
-                    {!payload.result.isOwner ? null : (
+                    {user?.id != userId ? null : (
                         <>
                             <div className='flex flex-row w-full items-center justify-between p-2 border-b border-gray-500'>
                                 <div className="flex flex-col">

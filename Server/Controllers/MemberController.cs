@@ -27,13 +27,11 @@ public class MembersController : ControllerBase
         _auth = auth;
     }
 
-    [HttpDelete, Authorized]
-    public async Task<IActionResult> DeleteMember([FromRoute] string projectId, [FromRoute] string userId, [FromRoute] string memberId)
+    [HttpDelete, Authorized, ProjectArchive, ProjectRole(Role.owner)]
+    public async Task<IActionResult> DeleteMember([FromRoute] string projectId, [FromRoute] string memberId)
     {
         try
         {
-            if (userId != _auth.GetId(Request)) return HttpResult.Forbidden("you are not authorized to delete a member");
-
             var isReadOnly = await _ctx.Projects.AnyAsync(p => p.Id == projectId && p.IsReadOnly);
 
             if (isReadOnly) return HttpResult.BadRequest("this project is archived");
@@ -65,13 +63,11 @@ public class MembersController : ControllerBase
 
 
 
-    [HttpPatch, Authorized, BodyValidation]
-    public async Task<IActionResult> UpdateMember([FromRoute] string projectId, [FromRoute] string userId, [FromBody] ChangeRoleDTO dto)
+    [HttpPatch, Authorized, BodyValidation, ProjectArchive, ProjectRole(Role.owner)]
+    public async Task<IActionResult> UpdateMember([FromRoute] string projectId, [FromBody] ChangeRoleDTO dto)
     {
         try
         {
-           if (userId != _auth.GetId(Request)) return HttpResult.Forbidden("you are not authorized to edit members roles in this project");
-
             var isReadOnly = await _ctx.Projects.AnyAsync(p => p.Id == projectId && p.IsReadOnly);
 
             if (isReadOnly) return HttpResult.BadRequest("this project is archived");

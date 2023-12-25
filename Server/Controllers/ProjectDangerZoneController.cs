@@ -27,7 +27,7 @@ public class ProjectDangerZoneController : ControllerBase
         _auth = auth;
     }
 
-    [HttpGet]
+    [HttpGet, ProjectMember]
     public async Task<IActionResult> GetDangerZone([FromRoute] string projectId)
     {
         try
@@ -57,14 +57,14 @@ public class ProjectDangerZoneController : ControllerBase
         }
     }
 
-    [HttpPatch("visibility")]
-    public async Task<IActionResult> UpdateVisibility(string userId, string projectId)
+    [HttpPatch("visibility"), Authorized, ProjectArchive, ProjectRole(Role.owner)]
+    public async Task<IActionResult> UpdateVisibility([FromRoute] string projectId)
     {
         try
         {
-            if (userId != _auth.GetId(Request)) return HttpResult.Forbidden("you are not allowed to do this action");
-
-            var project = await _ctx.Projects.Where(p => p.Id == projectId).FirstOrDefaultAsync();
+            var project = await _ctx.Projects
+                .Where(p => p.Id == projectId)
+                .FirstOrDefaultAsync();
 
             if (project == null) return HttpResult.NotFound("project not found");
 
@@ -89,14 +89,14 @@ public class ProjectDangerZoneController : ControllerBase
         }
     }
 
-    [HttpPatch("archive")]
-    public async Task<IActionResult> UpdateArchive(string userId, string projectId)
+    [HttpPatch("archive"), Authorized, ProjectRole(Role.owner)]
+    public async Task<IActionResult> UpdateArchive([FromRoute] string projectId)
     {
         try
         {
-            if (userId != _auth.GetId(Request)) return HttpResult.Forbidden("you are not allowed to do this action");
-
-            var project = await _ctx.Projects.Where(p => p.Id == projectId).FirstOrDefaultAsync();
+            var project = await _ctx.Projects
+            .Where(p => p.Id == projectId)
+            .FirstOrDefaultAsync();
 
             if (project == null) return HttpResult.NotFound("project not found");
 
@@ -116,28 +116,31 @@ public class ProjectDangerZoneController : ControllerBase
         }
     }
 
-    [HttpPatch("transfer"), Authorized, BodyValidation]
+    [HttpPatch("transfer"), Authorized, BodyValidation, ProjectArchive, ProjectRole(Role.owner)]
     public async Task<IActionResult> TransferProjectOwnerShip([FromBody] TransferProjectOwnerShipDTO dto)
     {
         try
         {
+            var userId = _auth.GetId(Request);
+
             var newOwner = await _ctx.Members
-                .Where(m => m.ProjectId == dto.ProjectId && m.Role != Role.owner && m.Id == dto.MemberId)
+                .Where(m => m.Id == dto.MemberId)
                 .Include(m => m.User)
                 .FirstOrDefaultAsync();
 
             if (newOwner == null) return HttpResult.NotFound("user not found to transfer project to");
 
-            var userId = _auth.GetId(Request);
-
             var currentOwner = await _ctx.Members
-                .Where(m => m.ProjectId == dto.ProjectId && m.UserId == userId && m.Role == Role.owner)
+                .Where(m => m.UserId == userId)
                 .Include(m => m.User)
                 .FirstOrDefaultAsync();
 
             if (currentOwner == null) return HttpResult.Forbidden("you are not allowed to do this action");
 
-            var project = await _ctx.Projects.Where(p => p.Id == dto.ProjectId).Select(p => new { p.Name, p.IsReadOnly }).FirstOrDefaultAsync();
+            var project = await _ctx.Projects
+                .Where(p => p.Id == dto.ProjectId)
+                .Select(p => new { p.Name, p.IsReadOnly })
+                .FirstOrDefaultAsync();
 
             if (project == null) return HttpResult.NotFound("project not found");
 

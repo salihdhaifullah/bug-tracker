@@ -32,7 +32,7 @@ const Projects = () => {
   const [status, setStatus] = useState("all");
   const [type, setType] = useState("all");
 
-  const [projectsPayload, callProjects] = useFetchApi<IProject[]>("GET", `users/${userId}/projects/${page}/?take=${take}&search=${search}&role=${role}&status=${status}&type=${type}`, [page, take, userId, search, role, type, status]);
+  const [projectsPayload, callProjects] = useFetchApi<IProject[]>("GET", `users/${userId}/projects/?take=${take}&page=${page}&search=${search}&role=${role}&status=${status}&type=${type}`, [page, take, userId, search, role, type, status]);
   const [CountPayload, callCount] = useFetchApi<number>("GET", `users/${userId}/projects/count/?take=${take}&search=${search}&role=${role}&status=${status}&type=${type}`, [take, userId, search, role, type, status]);
 
   useEffect(() => { callProjects() }, [page, take, role, type, status])

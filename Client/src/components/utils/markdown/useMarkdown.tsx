@@ -96,7 +96,7 @@ export default function useMarkdown(md: string): JSX.Element {
     },
 
     img: ({ children, src, alt }) => {
-      return <img src={src} alt={alt} className='my-6 max-w-[400px] max-h-[400px] mr-auto object-contain border border-slate-100 dark:border-slate-900 overflow-x-auto'>{children}</img>
+      return <img src={src} alt={alt} className='my-6 max-w-[400px] max-h-[400px] mr-auto object-cover border border-slate-100 dark:border-slate-900 overflow-x-auto'>{children}</img>
     },
 
     a: ({ href, children }) => {

@@ -27,8 +27,8 @@ public class ProjectController : ControllerBase
         _auth = auth;
     }
 
-    [HttpGet]
-    public async Task<IActionResult> GetProject(string projectId)
+    [HttpGet, ProjectRead]
+    public async Task<IActionResult> GetProject([FromRoute] string projectId)
     {
         try
         {
@@ -42,6 +42,7 @@ public class ProjectController : ControllerBase
                                 id = p.Id,
                                 isReadOnly = p.IsReadOnly,
                                 createdAt = p.CreatedAt,
+                                contentId = p.ContentId,
                                 owner = p.Members.Where(m => m.Role == Role.owner).Select(m => new
                                 {
                                     name = $"{m.User.FirstName} {m.User.LastName}",
@@ -64,13 +65,11 @@ public class ProjectController : ControllerBase
         }
     }
 
-    [HttpPatch, Authorized, BodyValidation]
-    public async Task<IActionResult> UpdateProject(string userId, [FromBody] ChangeProjectNameDTO dto)
+    [HttpPatch, Authorized, BodyValidation, ProjectArchive, ProjectRole(Role.owner)]
+    public async Task<IActionResult> UpdateProject([FromBody] ChangeProjectNameDTO dto)
     {
         try
         {
-            if (userId != _auth.GetId(Request)) return HttpResult.Forbidden("you are not allowed to do this action");
-
             var project = await _ctx.Projects.Where(p => p.Id == dto.ProjectId).FirstOrDefaultAsync();
 
             if (project == null) return HttpResult.NotFound("project not found");
@@ -94,16 +93,16 @@ public class ProjectController : ControllerBase
 
     }
 
-    [HttpDelete]
-    public async Task<IActionResult> DeleteProject(string projectId)
+    [HttpDelete, Authorized, ProjectArchive, ProjectRole(Role.owner)]
+    public async Task<IActionResult> DeleteProject([FromRoute] string projectId)
     {
         try
         {
             var userId = _auth.GetId(Request);
 
             var project = await _ctx.Projects
-            .Where((p) => p.Id == projectId && p.Members.Any(m => m.UserId == userId && m.Role == Role.owner))
-            .FirstOrDefaultAsync();
+                .Where(p => p.Id == projectId)
+                .FirstOrDefaultAsync();
 
             if (project is null) return HttpResult.NotFound("sorry, project not found");
 

@@ -7,7 +7,6 @@ using Buegee.Utils.Attributes;
 using Buegee.Utils.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Threading.Tasks;
 
 namespace Buegee.Controllers;
 [Consumes("application/json")]
@@ -28,25 +27,23 @@ public class AssignedTicketsController : ControllerBase
         _data = data;
     }
 
-    [HttpGet]
+    [HttpGet, Authorized, ProjectMember]
     public async Task<IActionResult> GetAssignedTickets([FromRoute] string projectId, [FromQuery(Name = "type")] string? typeQuery, [FromQuery(Name = "priority")] string? priorityQuery, [FromQuery] string? search)
     {
         try
         {
-            TicketType? type = null;
-            if (!string.IsNullOrEmpty(typeQuery) && Enum.TryParse<TicketType>(typeQuery, out TicketType parsedType)) type = parsedType;
-            Priority? priority = null;
-            if (!string.IsNullOrEmpty(priorityQuery) && Enum.TryParse<Priority>(priorityQuery, out Priority parsedPriority)) priority = parsedPriority;
-
             var userId = _auth.GetId(Request);
+
+            var type = Helper.ParseEnum<TicketType>(typeQuery);
+            var priority = Helper.ParseEnum<Priority>(priorityQuery);
+
             var tickets = await _ctx.Tickets
-                        .Where(t =>
-                        t.ProjectId == projectId
-                        && t.AssignedTo != null
-                        && t.AssignedTo.UserId == userId
-                        && (type == null || t.Type == type)
-                        && (priority == null || t.Priority == priority)
-                        && EF.Functions.ILike(t.Name, $"%{search}%"))
+                        .Where(t => t.ProjectId == projectId)
+                        .Where(t => t.AssignedTo != null)
+                        .Where(t => t.AssignedTo!.UserId == userId)
+                        .Where(t => type == null || t.Type == type)
+                        .Where(t => priority == null || t.Priority == priority)
+                        .Where(t => EF.Functions.ILike(t.Name, $"%{search}%"))
                         .OrderBy(t => t.Priority)
                         .ThenBy(t => t.CreatedAt)
                         .Select(t => new
@@ -68,16 +65,20 @@ public class AssignedTicketsController : ControllerBase
         }
     }
 
-    [HttpPatch("{ticketId}"), BodyValidation, Authorized]
+    [HttpPatch, BodyValidation, Authorized, ProjectArchive]
     public async Task<IActionResult> UpdateAssignedTicket([FromBody] TicketStatusDTO dto)
     {
         try
         {
             var userId = _auth.GetId(Request);
 
-            var ticket = await _ctx.Tickets.Where((t) => t.Id == dto.TicketId && t.Creator.UserId == userId).FirstOrDefaultAsync();
+            var ticket = await _ctx.Tickets
+                .Where(t => t.Id == dto.TicketId)
+                .Where(t => t.AssignedTo != null)
+                .Where(t => t.AssignedTo!.UserId == userId)
+                .FirstOrDefaultAsync();
 
-            if (ticket is null) return HttpResult.NotFound("sorry, ticket not found");
+            if (ticket is null) return HttpResult.NotFound("ticket not found");
 
             var ticketStatus = Enum.Parse<Status>(dto.Status);
 
@@ -86,6 +87,7 @@ public class AssignedTicketsController : ControllerBase
                 await _data.AddActivity(ticket.ProjectId,
                 $"changed ticket [{ticket.Name}](/users/{userId}/projects/{ticket.ProjectId}/tickets/{ticket.Id}) " +
                 $"status from **{ticket.Status}** to **{ticketStatus}**", _ctx);
+
                 ticket.Status = ticketStatus;
 
                 await _ctx.SaveChangesAsync();

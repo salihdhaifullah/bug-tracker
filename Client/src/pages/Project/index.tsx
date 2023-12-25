@@ -31,7 +31,7 @@ const Project = () => {
     const user = useUser();
     const isOwner = user?.id == userId;
 
-    useEffect(() => call(), [])
+    useEffect(() => { call() }, [])
 
     return payload.isLoading
         ? <CircleProgress size="lg" />
@@ -82,7 +82,7 @@ const Project = () => {
                     <Link to={`/users/${payload.result.owner.id}`} className="w-12 h-12 hidden sm:flex">
                         <img
                             title="owner"
-                            className="rounded-full bg-white dark:bg-black shadow-md w-10 h-10 object-contain"
+                            className="rounded-full bg-white dark:bg-black shadow-md w-10 h-10 object-cover"
                             src={payload.result.owner.avatarUrl}
                             alt={`${payload.result.owner.name}`}
                         />
@@ -96,7 +96,7 @@ const Project = () => {
                                 <Link to={`/users/${payload.result.owner.id}`} className="w-12 h-12 sm:hidden flex">
                                     <img
                                         title="owner"
-                                        className="rounded-full bg-white dark:bg-black shadow-md dark:shadow-secondary/40 w-10 h-10 object-contain"
+                                        className="rounded-full bg-white dark:bg-black shadow-md dark:shadow-secondary/40 w-10 h-10 object-cover"
                                         src={payload.result.owner.avatarUrl}
                                         alt={`${payload.result.owner.name}`}
                                     />
