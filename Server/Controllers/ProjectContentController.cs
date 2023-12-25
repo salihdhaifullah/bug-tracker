@@ -1,6 +1,5 @@
 using Buegee.Data;
 using Buegee.DTO;
-using Buegee.Services.AuthService;
 using Buegee.Services.DataService;
 using Buegee.Utils;
 using Buegee.Utils.Attributes;

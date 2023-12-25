@@ -69,12 +69,12 @@ public class AuthController : Controller
 
             _auth.LogIn(isFound.id, HttpContext);
 
-            return HttpResult.Ok("logged in successfully", new
-            {
-                id = isFound.id,
-                avatarUrl = isFound.avatarUrl,
-                email = isFound.email,
-                name = isFound.name,
+            return HttpResult.Ok("logged in successfully",
+            new {
+                isFound.id,
+                isFound.avatarUrl,
+                isFound.email,
+                isFound.name,
             }, redirectTo: $"/profile/{isFound.id}");
         }
         catch (Exception e)
@@ -137,7 +137,7 @@ public class AuthController : Controller
 
                 _auth.LogIn(userId, HttpContext);
 
-                return HttpResult.Ok("logged in successfully as demo", new
+                return HttpResult.Created("logged in successfully as demo", new
                 {
                     id = userId,
                     avatarUrl = imageName,
@@ -151,10 +151,10 @@ public class AuthController : Controller
 
                 return HttpResult.Ok("logged in successfully as demo", new
                 {
-                    id = isFound.id,
-                    avatarUrl = isFound.avatarUrl,
-                    email = isFound.email,
-                    name = isFound.name,
+                    isFound.id,
+                    isFound.avatarUrl,
+                    isFound.email,
+                    isFound.name,
                 }, redirectTo: $"/users/{isFound.id}");
             }
 
@@ -256,9 +256,9 @@ public class AuthController : Controller
                 .Where(u => u.Email == dto.Email)
                 .Select(u => new
                 {
-                    Email = u.Email,
-                    FirstName = u.FirstName,
-                    LastName = u.LastName
+                    u.Email,
+                    u.FirstName,
+                    u.LastName
                 })
                 .FirstOrDefaultAsync();
 

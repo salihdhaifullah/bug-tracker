@@ -60,7 +60,7 @@ public class AttachmentController : ControllerBase
                     .Where(a => a.Id == attachmentId)
                     .FirstOrDefaultAsync();
 
-            if (attachment == null) return HttpResult.BadRequest("attachment not found");
+            if (attachment == null) return HttpResult.NotFound("attachment not found");
 
             if (dto.Title != null) attachment.Title = dto.Title;
             if (dto.ContentType != null && dto.Data != null)

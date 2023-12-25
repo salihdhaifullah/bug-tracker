@@ -52,7 +52,7 @@ public class ProjectController : ControllerBase
                             })
                             .FirstOrDefaultAsync();
 
-            if (project is null) return HttpResult.NotFound("sorry, project not found");
+            if (project is null) return HttpResult.NotFound("project not found", redirectTo: "/404");
 
             return HttpResult.Ok(body: project);
 
@@ -69,11 +69,11 @@ public class ProjectController : ControllerBase
     {
         try
         {
-            var project = await _ctx.Projects.Where(p => p.Id == dto.ProjectId).FirstOrDefaultAsync();
+            var project = await _ctx.Projects
+                .Where(p => p.Id == dto.ProjectId)
+                .FirstOrDefaultAsync();
 
             if (project == null) return HttpResult.NotFound("project not found");
-
-            if (project.IsReadOnly) return HttpResult.BadRequest("this project is archived");
 
             await _data.AddActivity(dto.ProjectId,
              $"updated the name of project from **{project.Name.Trim()}** to **{dto.Name.Trim()}**", _ctx);
@@ -103,9 +103,7 @@ public class ProjectController : ControllerBase
                 .Where(p => p.Id == projectId)
                 .FirstOrDefaultAsync();
 
-            if (project is null) return HttpResult.NotFound("sorry, project not found");
-
-            if (project.IsReadOnly) return HttpResult.BadRequest("this project is archived");
+            if (project is null) return HttpResult.NotFound("project not found");
 
             _ctx.Projects.Remove(project);
 

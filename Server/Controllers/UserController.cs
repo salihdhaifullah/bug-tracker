@@ -43,7 +43,7 @@ public class UserController : ControllerBase
                         })
                         .FirstOrDefaultAsync();
 
-            if (user is null) return HttpResult.NotFound("page not found");
+            if (user is null) return HttpResult.NotFound("user not found", redirectTo: "/404");
 
             return HttpResult.Ok(body: user);
         }

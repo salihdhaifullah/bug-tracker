@@ -1,6 +1,5 @@
 using Buegee.Data;
 using Buegee.DTO;
-using Buegee.Services.AuthService;
 using Buegee.Services.DataService;
 using Buegee.Utils;
 using Buegee.Utils.Attributes;
@@ -17,14 +16,12 @@ public class MembersController : ControllerBase
     private readonly DataContext _ctx;
     private readonly ILogger<MembersController> _logger;
     private readonly IDataService _data;
-    private readonly IAuthService _auth;
 
-    public MembersController(DataContext ctx, ILogger<MembersController> logger, IDataService data, IAuthService auth)
+    public MembersController(DataContext ctx, ILogger<MembersController> logger, IDataService data)
     {
         _ctx = ctx;
         _logger = logger;
         _data = data;
-        _auth = auth;
     }
 
     [HttpDelete, Authorized, ProjectArchive, ProjectRole(Role.owner)]
@@ -32,10 +29,6 @@ public class MembersController : ControllerBase
     {
         try
         {
-            var isReadOnly = await _ctx.Projects.AnyAsync(p => p.Id == projectId && p.IsReadOnly);
-
-            if (isReadOnly) return HttpResult.BadRequest("this project is archived");
-
             var member = await _ctx.Members
                     .Where(m => m.ProjectId == projectId && m.UserId == memberId)
                     .Include(m => m.User)
@@ -68,10 +61,6 @@ public class MembersController : ControllerBase
     {
         try
         {
-            var isReadOnly = await _ctx.Projects.AnyAsync(p => p.Id == projectId && p.IsReadOnly);
-
-            if (isReadOnly) return HttpResult.BadRequest("this project is archived");
-
             var member = await _ctx.Members
                     .Where(m => m.ProjectId == projectId && m.UserId == dto.MemberId)
                     .Include(m => m.User)

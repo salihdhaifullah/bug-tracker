@@ -57,7 +57,7 @@ public class TicketController : ControllerBase
                 .Include(t => t.AssignedTo != null ? t.AssignedTo.User : null)
                 .FirstOrDefaultAsync();
 
-            if (ticket is null) return HttpResult.NotFound("sorry, ticket not found");
+            if (ticket is null) return HttpResult.NotFound("ticket not found");
 
             AssignedTo? assignedTo = null;
 
@@ -162,7 +162,7 @@ public class TicketController : ControllerBase
                             })
                             .FirstOrDefaultAsync();
 
-            if (ticket is null) return HttpResult.NotFound("ticket not found");
+            if (ticket is null) return HttpResult.NotFound("ticket not found", redirectTo: "/404");
 
             return HttpResult.Ok(body: ticket);
         }
@@ -184,7 +184,7 @@ public class TicketController : ControllerBase
                     .Where((t) => t.Id == ticketId)
                     .FirstOrDefaultAsync();
 
-            if (ticket is null) return HttpResult.NotFound("sorry, ticket not found");
+            if (ticket is null) return HttpResult.NotFound("ticket not found");
 
             _ctx.Tickets.Remove(ticket);
 

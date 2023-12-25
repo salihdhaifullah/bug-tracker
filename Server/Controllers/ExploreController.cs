@@ -74,7 +74,7 @@ public class ExploreController : ControllerBase
     }
 
     [HttpGet("count")]
-    public async Task<IActionResult> ExploreCount([FromQuery] string? search, [FromQuery] int take = 10)
+    public async Task<IActionResult> ExploreCount([FromQuery] string? search)
     {
         try
         {

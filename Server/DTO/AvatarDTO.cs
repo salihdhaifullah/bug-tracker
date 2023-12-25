@@ -11,6 +11,6 @@ public class AvatarDTO
     public string ContentType { get; set; } = null!;
 
     [JsonPropertyName("data")]
-    [Required(ErrorMessage = "image is required"), MaxLength(2796202, ErrorMessage = "sorry, maximum size of profile image is 2.0 MB")]
+    [Required(ErrorMessage = "image is required"), MaxLength(2796202, ErrorMessage = "maximum size of profile image is 2.0 MB")]
     public string Data { get; set; } = null!;
 }

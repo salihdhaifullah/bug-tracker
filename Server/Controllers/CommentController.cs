@@ -44,7 +44,7 @@ public class CommentController : ControllerBase
 
             await _ctx.SaveChangesAsync();
 
-            return HttpResult.Ok("Successfully commented");
+            return HttpResult.Created("Successfully commented");
         }
         catch (Exception e)
         {

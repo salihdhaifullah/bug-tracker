@@ -45,7 +45,7 @@ public class ProjectDangerZoneController : ControllerBase
                             })
                             .FirstOrDefaultAsync();
 
-            if (project is null) return HttpResult.NotFound("sorry, project not found");
+            if (project is null) return HttpResult.NotFound("project not found", redirectTo: "/404");
 
             return HttpResult.Ok(body: project);
 
@@ -67,8 +67,6 @@ public class ProjectDangerZoneController : ControllerBase
                 .FirstOrDefaultAsync();
 
             if (project == null) return HttpResult.NotFound("project not found");
-
-            if (project.IsReadOnly) return HttpResult.BadRequest("this project is archived");
 
             await _data.AddActivity(projectId,
                 $"project visibility changed from " +
@@ -117,13 +115,14 @@ public class ProjectDangerZoneController : ControllerBase
     }
 
     [HttpPatch("transfer"), Authorized, BodyValidation, ProjectArchive, ProjectRole(Role.owner)]
-    public async Task<IActionResult> TransferProjectOwnerShip([FromBody] TransferProjectOwnerShipDTO dto)
+    public async Task<IActionResult> TransferProjectOwnerShip([FromBody] TransferProjectOwnerShipDTO dto, [FromRoute] string projectId)
     {
         try
         {
             var userId = _auth.GetId(Request);
 
             var newOwner = await _ctx.Members
+                .Where(m => m.ProjectId == projectId)
                 .Where(m => m.Id == dto.MemberId)
                 .Include(m => m.User)
                 .FirstOrDefaultAsync();
@@ -131,6 +130,7 @@ public class ProjectDangerZoneController : ControllerBase
             if (newOwner == null) return HttpResult.NotFound("user not found to transfer project to");
 
             var currentOwner = await _ctx.Members
+                .Where(m => m.ProjectId == projectId)
                 .Where(m => m.UserId == userId)
                 .Include(m => m.User)
                 .FirstOrDefaultAsync();
@@ -138,13 +138,11 @@ public class ProjectDangerZoneController : ControllerBase
             if (currentOwner == null) return HttpResult.Forbidden("you are not allowed to do this action");
 
             var project = await _ctx.Projects
-                .Where(p => p.Id == dto.ProjectId)
-                .Select(p => new { p.Name, p.IsReadOnly })
+                .Where(p => p.Id == projectId)
+                .Select(p => new { p.Name })
                 .FirstOrDefaultAsync();
 
             if (project == null) return HttpResult.NotFound("project not found");
-
-            if (project.IsReadOnly) return HttpResult.BadRequest("this project is archived");
 
             currentOwner.Role = Role.project_manger;
 

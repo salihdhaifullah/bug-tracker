@@ -57,12 +57,6 @@ public class TicketAttachmentsController : ControllerBase
     {
         try
         {
-            var userId = _auth.GetId(Request);
-
-            if (!await _ctx.Tickets.AnyAsync(t => t.Id == ticketId && t.Creator.UserId == userId)) {
-                return HttpResult.BadRequest("can't add attachment to this ticket");
-            }
-
             var fileUrl = await _firebase.Upload(Convert.FromBase64String(dto.Data), dto.ContentType);
 
             await _ctx.Attachments.AddAsync(new Attachment
@@ -75,7 +69,7 @@ public class TicketAttachmentsController : ControllerBase
 
             await _ctx.SaveChangesAsync();
 
-            return HttpResult.Ok("successfully added attachment");
+            return HttpResult.Created("successfully added attachment");
         }
         catch (Exception e)
         {

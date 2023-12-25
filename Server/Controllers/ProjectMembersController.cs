@@ -77,12 +77,10 @@ public class ProjectMembersController : ControllerBase
 
             var project = await _ctx.Projects
                     .Where(p => p.Id == projectId)
-                    .Select(p => new { name = p.Name, p.IsReadOnly })
+                    .Select(p => new { name = p.Name })
                     .FirstOrDefaultAsync();
 
-            if (project is null) return HttpResult.Forbidden(massage: "you are not authorized to invite users");
-
-            if (project.IsReadOnly) return HttpResult.BadRequest("this project is archived");
+            if (project is null) return HttpResult.Forbidden("you are not authorized to invite users");
 
             var role = Enum.Parse<Role>(dto.Role);
 
@@ -91,13 +89,15 @@ public class ProjectMembersController : ControllerBase
             if (!await _ctx.Members.AnyAsync(m => m.ProjectId == projectId && m.UserId == dto.InvitedId))
             {
                 await _ctx.Members.AddAsync(new Member() { ProjectId = projectId, UserId = dto.InvitedId, Role = role, Id = memberId });
+
                 await _data.AddActivity(projectId,
                             $"user [{invited.name}](/users/{dto.InvitedId}) joined the project",
                             _ctx);
+
                 await _ctx.SaveChangesAsync();
             }
 
-            return HttpResult.Ok("successfully invited user");
+            return HttpResult.Created("successfully invited user");
         }
         catch (Exception e)
         {
@@ -119,12 +119,12 @@ public class ProjectMembersController : ControllerBase
             .Include(m => m.AssignedTo)
             .FirstOrDefaultAsync();
 
-            if (member is null) return HttpResult.NotFound(redirectTo: "/404");
+            if (member is null) return HttpResult.BadRequest("account is not found");
 
             if (member.Role == Role.owner)
             {
                 var project = await _ctx.Projects.Where(p => p.Id == projectId).FirstOrDefaultAsync();
-                if (project is null) return HttpResult.NotFound(redirectTo: "/404");
+                if (project is null) return HttpResult.NotFound("project is not found", redirectTo: "/404");
                 _ctx.Remove(project);
                 await _ctx.SaveChangesAsync();
                 return HttpResult.Ok(massage: "successfully deleted project", redirectTo: $"/users/{userId}");
