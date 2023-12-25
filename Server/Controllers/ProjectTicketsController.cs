@@ -71,7 +71,7 @@ public class ProjectTicketsController : ControllerBase
 
             if (creator is null) return HttpResult.Forbidden("you are not authorized to create a ticket in this project");
 
-            var content = await _ctx.Contents.AddAsync(new Content() { Id = contentId, UserId = userId });
+            var content = await _ctx.Contents.AddAsync(new Content() { Id = contentId });
             var ticket = await _ctx.Tickets.AddAsync(new Ticket()
             {
                 Name = dto.Name,

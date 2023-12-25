@@ -4,22 +4,23 @@ using Buegee.Services.AuthService;
 using Buegee.Services.DataService;
 using Buegee.Utils;
 using Buegee.Utils.Attributes;
+using Buegee.Utils.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace Buegee.Controllers;
 [Consumes("application/json")]
-[ApiRoute("contents/{contentId}")]
+[ApiRoute("users/{userId}/content")]
 [ApiController]
-public class ContentController : ControllerBase
+public class UserContentController : ControllerBase
 {
     private readonly DataContext _ctx;
     private readonly IDataService _data;
     private readonly IAuthService _auth;
-    private readonly ILogger<ContentController> _logger;
+    private readonly ILogger<UserContentController> _logger;
 
 
-    public ContentController(DataContext ctx, ILogger<ContentController> logger, IAuthService auth, IDataService data)
+    public UserContentController(DataContext ctx, ILogger<UserContentController> logger, IAuthService auth, IDataService data)
     {
         _ctx = ctx;
         _logger = logger;
@@ -28,13 +29,13 @@ public class ContentController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetContent([FromRoute] string contentId)
+    public async Task<IActionResult> GetContent([FromRoute] string userId)
     {
         try
         {
-            var content = await _ctx.Contents
-                        .Where(c => c.Id == contentId)
-                        .Select(c => new { markdown = c.Markdown })
+            var content = await _ctx.Users
+                        .Where(u => u.Id == userId)
+                        .Select(u => new { markdown = u.Content.Markdown })
                         .FirstOrDefaultAsync();
 
             if (content is null) return HttpResult.NotFound("content not found");
@@ -49,22 +50,25 @@ public class ContentController : ControllerBase
     }
 
     [HttpPatch, Authorized, BodyValidation]
-    public async Task<IActionResult> UpdateContent([FromBody] ContentDTO dto, [FromRoute] string contentId)
+    public async Task<IActionResult> UpdateContent([FromBody] ContentDTO dto, [FromRoute] string userId)
     {
         try
         {
-            var userId = _auth.GetId(Request);
+            if (_auth.GetId(Request) != userId) return HttpResult.Forbidden("you can not edit this content");
 
-            var content = await _ctx.Contents
-                    .Where(c => c.Id == contentId && c.UserId == userId)
-                    .Include(c => c.Documents)
+            var content = await _ctx.Users
+                    .Where(u => u.Id == userId)
+                    .Include(u => u.Content)
+                    .ThenInclude(c => c.Documents)
+                    .Select(u => u.Content)
                     .FirstOrDefaultAsync();
 
-            if (content is null) return HttpResult.UnAuthorized();
+            if (content is null) return HttpResult.NotFound("content not found");
 
             await _data.EditContent(dto, content, _ctx);
 
             await _ctx.SaveChangesAsync();
+
             return HttpResult.Ok("successfully updated content");
         }
         catch (Exception e)

@@ -40,7 +40,6 @@ public class UserController : ControllerBase
                             bio = u.Bio,
                             name = $"{u.FirstName} {u.LastName}",
                             avatarUrl = u.AvatarUrl,
-                            contentId = u.ContentId
                         })
                         .FirstOrDefaultAsync();
 

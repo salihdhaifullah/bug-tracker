@@ -12,19 +12,18 @@ export interface IComment {
         avatarUrl: string;
         id: string;
     };
-    contentId: string;
     createdAt: string;
     id: string;
 }
 
 const Comments = () => {
-    const { ticketId } = useParams();
+    const { ticketId, projectId, userId } = useParams();
 
     const [commentPage, setCommentPage] = useState(1);
     const [commentTake, _] = useState(10);
 
-    const [commentPayload, callComment] = useFetchApi<IComment[]>("GET", `comment/${ticketId}`, [commentPage, commentTake]);
-    const [countPayload, callCount] = useFetchApi<number>("GET", `comment/${ticketId}/count`);
+    const [commentPayload, callComment] = useFetchApi<IComment[]>("GET", `users/${userId}/projects/${projectId}/tickets/${ticketId}/comments`, [commentPage, commentTake]);
+    const [countPayload, callCount] = useFetchApi<number>("GET", `users/${userId}/projects/${projectId}/tickets/${ticketId}/comments/count`);
 
     useEffect(() => { callCount() }, [])
     useEffect(() => { callComment() }, [commentPage, commentTake])

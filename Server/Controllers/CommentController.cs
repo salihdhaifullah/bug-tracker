@@ -32,7 +32,7 @@ public class CommentController : ControllerBase
     {
         try
         {
-            var content = await _data.CreateContent(dto, _auth.GetId(Request), _ctx);
+            var content = await _data.CreateContent(dto, _ctx);
 
             await _ctx.Comments.AddAsync(new Comment()
             {
@@ -97,7 +97,6 @@ public class CommentController : ControllerBase
                         avatarUrl = c.Commenter.AvatarUrl,
                         id = c.Commenter.Id
                     },
-                    contentId = c.ContentId,
                     createdAt = c.CreatedAt,
                     id = c.Id
                 })

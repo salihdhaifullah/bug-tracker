@@ -14,17 +14,17 @@ WORKDIR /src
 COPY ["Server/Buegee.csproj", "Server/"]
 RUN dotnet restore "./Server/Buegee.csproj"
 COPY ./Server .
-COPY ./ .
 WORKDIR "/src/."
 RUN dotnet build "Buegee.csproj" -c Release -o /app/build
-
 FROM build AS publish
 RUN dotnet publish "Buegee.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
+COPY ./ .
 COPY --from=publish /app/publish .
 COPY --from=client-build /app/dist ./dist
 RUN rm -r -f ./Client
+RUN rm -r -f ./Server
 ENV ASPNETCORE_URLS=http://+:5018
 ENTRYPOINT ["dotnet", "Buegee.dll"]

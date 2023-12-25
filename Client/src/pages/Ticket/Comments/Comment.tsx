@@ -1,6 +1,6 @@
 import { useUser } from "../../../utils/context/user";
 import Content from "../../../components/utils/Content";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import formatDate from "../../../utils/formatDate";
 import Action from "./Action";
 import { IComment } from ".";
@@ -12,6 +12,7 @@ interface ICommentProps {
 
 const Comment = (props: ICommentProps) => {
     const user = useUser();
+    const { userId, projectId, ticketId } = useParams();
 
     return (
         <div className="flex flex-row w-full gap-3">
@@ -51,7 +52,7 @@ const Comment = (props: ICommentProps) => {
                 </div>
 
                 <div className="flex w-full h-full pl-2">
-                    <Content editable={props.comment.commenter.id === user?.id} contentId={props.comment.contentId} />
+                    <Content editable={props.comment.commenter.id === user?.id} url={`users/${userId}/projects/${projectId}/tickets/${ticketId}/comments/${props.comment.id}/content`} />
                 </div>
             </div>
         </div>

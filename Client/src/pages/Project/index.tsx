@@ -17,7 +17,6 @@ interface IProject {
     createdAt: string;
     name: string;
     isReadOnly: boolean;
-    contentId: string;
     owner: {
         avatarUrl: string;
         name: string;
@@ -127,7 +126,7 @@ const Project = () => {
                                 </div>
                             ) : null}
 
-                            <Content editable={isOwner} contentId={payload.result.contentId} />
+                            <Content editable={isOwner} url={`users/${userId}/projects/${projectId}/content`} />
 
                         </div>
 

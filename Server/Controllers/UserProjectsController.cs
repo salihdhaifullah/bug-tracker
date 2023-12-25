@@ -40,7 +40,7 @@ public class UserProjectsController : ControllerBase
             var memberId = Ulid.NewUlid().ToString();
 
             await _ctx.Members.AddAsync(new Member() { UserId = userId, Id = memberId, ProjectId = projectId, Role = Role.owner });
-            await _ctx.Contents.AddAsync(new Content() { Id = contentId, UserId = userId });
+            await _ctx.Contents.AddAsync(new Content() { Id = contentId });
             await _ctx.Projects.AddAsync(new Project()
             {
                 Name = dto.Name,

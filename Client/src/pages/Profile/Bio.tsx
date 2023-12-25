@@ -84,3 +84,10 @@ const Bio = (props: IBioProps) => {
 }
 
 export default Bio;
+
+/*
+    user -> userId
+    project -> ownerId
+    comment -> commenterId
+    ticket -> ownerId / project_mangerIds
+*/

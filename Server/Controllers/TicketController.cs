@@ -157,7 +157,6 @@ public class TicketController : ControllerBase
                                 } : null,
                                 name = t.Name,
                                 priority = t.Priority.ToString(),
-                                contentId = t.ContentId,
                                 status = t.Status.ToString(),
                                 type = t.Type.ToString()
                             })

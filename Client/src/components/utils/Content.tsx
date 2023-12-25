@@ -7,20 +7,20 @@ import useMarkdown from "./markdown/useMarkdown";
 import CircleProgress from "./CircleProgress";
 
 interface IContentProps {
-    contentId: string;
     editable?: boolean;
     call?: () => void;
+    url: string;
 }
 
 const Content = (props: IContentProps) => {
     const [md, setMd] = useState("");
     const [isEditing, setIsEditing] = useState(false);
-    const [payload, callGet] = useFetchApi<{ markdown: string }>("GET", `contents/${props.contentId}`, [])
+    const [payload, callGet] = useFetchApi<{ markdown: string }>("GET", props.url, [])
 
 
     const files = useRef<{ base64: string, previewUrl: string }[]>([]);
 
-    const [createPayload, call] = useFetchApi<any, { markdown: string, files: { base64: string, previewUrl: string }[] }>("PATCH", `contents/${props.contentId}`, [], () => {
+    const [createPayload, call] = useFetchApi<any, { markdown: string, files: { base64: string, previewUrl: string }[] }>("PATCH", props.url, [], () => {
         if (props?.call) props.call();
     })
 

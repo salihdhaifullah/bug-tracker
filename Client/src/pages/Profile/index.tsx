@@ -13,7 +13,6 @@ export interface IProfileResult {
   bio: string;
   avatarUrl: string;
   name: string;
-  contentId: string;
 }
 
 const Profile = () => {
@@ -53,7 +52,7 @@ const Profile = () => {
 
         <div className="flex flex-col mb-6 col-span-5 items-center justify-center gap-4 w-full h-auto">
           <div className="bg-white dark:bg-black rounded-lg shadow-lg w-full h-fit p-2 lg:m-3 mb-3 dark:shadow-secondary/40">
-            <Content editable={editable} contentId={payload.result.contentId} />
+            <Content editable={editable} url={`users/${userId}/content`} />
           </div>
         </div>
 

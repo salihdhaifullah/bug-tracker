@@ -14,7 +14,4 @@ public class Content
 
     [Column("documents")]
     public List<Document> Documents { get; set; } = new List<Document>();
-
-    [Column("user_id"), StringLength(26)]
-    public required string UserId { get; set; } = string.Empty;
 }

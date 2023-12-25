@@ -45,9 +45,9 @@ public class DataService : IDataService
         content.Markdown = dto.Markdown;
     }
 
-    public async Task<EntityEntry<Content>> CreateContent(ContentDTO dto, string userId, DataContext ctx)
+    public async Task<EntityEntry<Content>> CreateContent(ContentDTO dto, DataContext ctx)
     {
-        var content = await ctx.Contents.AddAsync(new Content() { Id = Ulid.NewUlid().ToString(), UserId = userId });
+        var content = await ctx.Contents.AddAsync(new Content() { Id = Ulid.NewUlid().ToString() });
 
         for (var i = 0; i < dto.Files.Count; i++)
         {

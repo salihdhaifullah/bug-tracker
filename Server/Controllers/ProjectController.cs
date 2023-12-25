@@ -42,7 +42,6 @@ public class ProjectController : ControllerBase
                                 id = p.Id,
                                 isReadOnly = p.IsReadOnly,
                                 createdAt = p.CreatedAt,
-                                contentId = p.ContentId,
                                 owner = p.Members.Where(m => m.Role == Role.owner).Select(m => new
                                 {
                                     name = $"{m.User.FirstName} {m.User.LastName}",

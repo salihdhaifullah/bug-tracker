@@ -27,7 +27,6 @@ interface ITicket {
         id: string;
         memberId: string;
     };
-    contentId: string;
     name: string;
     priority: string;
     status: string;
@@ -117,7 +116,7 @@ const Ticket = () => {
 
                         <Link className="font-bold w-fit h-fit text-primary dark:text-secondary text-lg hover:underline" title="project" to={`/users/${userId}/projects/${payload.result.project.id}`}>{payload.result.project.name}</Link>
 
-                        <Content editable={rolePayload.result !== null && ["owner", "project_manger"].includes(rolePayload.result) || payload.result.creator.id === user?.id} contentId={payload.result.contentId} />
+                        <Content editable={rolePayload.result !== null && ["owner", "project_manger"].includes(rolePayload.result) || payload.result.creator.id === user?.id} url={`users/${userId}/projects/${projectId}/tickets/${ticketId}/content`} />
 
                         <Attachment isCreator={payload.result.creator.id === user?.id} />
                     </div>
