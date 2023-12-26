@@ -1,5 +1,4 @@
 using Buegee.Data;
-using Buegee.Models;
 using Buegee.Services.AuthService;
 using Buegee.Utils;
 using Buegee.Utils.Attributes;
@@ -31,38 +30,37 @@ public class ExploreController : ControllerBase
         {
             _auth.TryGetId(Request, out string? userId);
 
-            var searchQuery = (Project p) => EF.Functions.ILike(p.Name, $"%{search}%");
+            var baseQuery = _ctx.Projects
+                .Where(p => p.Members.Any(m => m.UserId != userId))
+                .Where(p => !p.IsPrivate);
 
-            if (search != null && search.Length > 2) {
-                searchQuery = (Project p) => {
-                    return EF.Functions.ILike(p.Name, $"%{search}%") || EF.Functions.ILike(p.Content.Markdown, $"%{search}%");
-                };
-            }
+            if (search != null && search.Length > 2) baseQuery = baseQuery
+                .Where(p => EF.Functions.ILike(p.Name, $"%{search}%")
+                || EF.Functions.ILike(p.Content.Markdown, $"%{search}%"));
 
-            var projects = await _ctx.Projects
-                            .Where(p => p.Members.Any(m => m.UserId != userId))
-                            .Where(p => !p.IsPrivate)
-                            .Where(p => searchQuery(p))
-                            .OrderByDescending((p) => p.Activities.Max(a => a.CreatedAt))
-                            .Select((p) => new
-                            {
-                                createdAt = p.CreatedAt,
-                                id = p.Id,
-                                isReadOnly = p.IsReadOnly,
-                                name = p.Name,
-                                members = p.Members.Count,
-                                tickets = p.Tickets.Count,
-                                content = p.Content.Markdown,
-                                owner = p.Members.Where(m => m.Role == Role.owner).Select(m => new
-                                {
-                                    id = m.UserId,
-                                    avatarUrl = m.User.AvatarUrl,
-                                    name = $"{m.User.FirstName} {m.User.LastName}"
-                                }).FirstOrDefault()
-                            })
-                            .Skip((page - 1) * take)
-                            .Take(take)
-                            .ToListAsync();
+            var projects = await baseQuery
+                .OrderByDescending(p => p.Activities.Max(a => a.CreatedAt))
+                .Select(p => new
+                {
+                    createdAt = p.CreatedAt,
+                    id = p.Id,
+                    isReadOnly = p.IsReadOnly,
+                    name = p.Name,
+                    members = p.Members.Count,
+                    tickets = p.Tickets.Count,
+                    content = p.Content.Markdown,
+                    owner = p.Members.Where(m => m.Role == Role.owner)
+                        .Select(m => new
+                        {
+                            id = m.UserId,
+                            avatarUrl = m.User.AvatarUrl,
+                            name = $"{m.User.FirstName} {m.User.LastName}"
+                        })
+                        .FirstOrDefault()
+                })
+                .Skip((page - 1) * take)
+                .Take(take)
+                .ToListAsync();
 
             return HttpResult.Ok(body: projects);
         }

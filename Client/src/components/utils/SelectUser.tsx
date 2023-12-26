@@ -56,7 +56,6 @@ const SelectUser = (props: ISelectUserProps) => {
     };
 
     useEffect(() => {
-        console.log(isOpen)
         if (!isOpen && !props.id) setSearch("");
     }, [isOpen])
 

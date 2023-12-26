@@ -1,16 +1,14 @@
-import { Dispatch, FormEvent, SetStateAction, useEffect, useState } from "react";
+import { FormEvent, useState } from "react";
 import Select from "../../components/utils/Select";
 import Button from "../../components/utils/Button";
 import useFetchApi from "../../utils/hooks/useFetchApi";
 import { useParams } from "react-router-dom";
 import SelectUser from "../../components/utils/SelectUser";
 import roles from "../../utils/roles";
-import Modal from "../../components/utils/Modal";
 import { FaAddressCard } from "react-icons/fa";
+import { useModalDispatch } from "../../utils/context/modal";
 
 interface IInviteModalProps {
-    isOpenModal: boolean;
-    setIsOpenModal: Dispatch<SetStateAction<boolean>>;
     call: () => void;
 }
 
@@ -22,18 +20,12 @@ const InviteModal = (props: IInviteModalProps) => {
     const [isValidRole, setIsValidRole] = useState(true);
     const [isValidId, setIsValidId] = useState(true);
 
+    const dispatchModal = useModalDispatch();
+
     const [payload, call] = useFetchApi<any, { invitedId: string, role: string }>("POST", `users/${userId}/projects/${projectId}/members`, [projectId], () => {
+        dispatchModal({ type: "close", payload: null })
         props.call();
-        props.setIsOpenModal(false);
     });
-
-    useEffect(() => {
-        if (!props.isOpenModal) {
-            setRole("developer");
-            setInvitedId("");
-        }
-    }, [props.isOpenModal])
-
 
     const handelSubmit = (e: FormEvent) => {
         e.preventDefault();
@@ -41,39 +33,37 @@ const InviteModal = (props: IInviteModalProps) => {
     }
 
     return (
-        <Modal isOpen={props.isOpenModal} setIsOpen={props.setIsOpenModal}>
-            <div className="rounded-xl bg-white dark:bg-black flex flex-col gap-4 w-80 p-2 items-center justify-center">
+        <div className="rounded-xl bg-white dark:bg-black flex flex-col gap-4 w-80 p-2 items-center justify-center">
 
-                <form className="flex-col flex w-full justify-center items-center" onSubmit={handelSubmit}>
+            <form className="flex-col flex w-full justify-center items-center" onSubmit={handelSubmit}>
 
-                    <h1 className="text-primary dark:text-secondary font-bold text-3xl text-center mb-4">Invite User</h1>
+                <h1 className="text-primary dark:text-secondary font-bold text-3xl text-center mb-4">Invite User</h1>
 
-                    <div className="flex w-full justify-center items-center mb-4">
-                        <FaAddressCard className="text-3xl text-primary dark:text-secondary font-extrabold" />
-                    </div>
+                <div className="flex w-full justify-center items-center mb-4">
+                    <FaAddressCard className="text-3xl text-primary dark:text-secondary font-extrabold" />
+                </div>
 
-                    <SelectUser setIsValid={setIsValidId} required label="invite user" members={true} setId={setInvitedId} id={invitedId} />
+                <SelectUser setIsValid={setIsValidId} required label="invite user" members={true} setId={setInvitedId} id={invitedId} />
 
-                    <Select
-                        label="role for user to invite"
-                        validation={[{ validate: (str) => roles.includes(str), massage: "un-valid role" }]}
-                        options={roles}
-                        value={role}
-                        setValue={setRole}
-                        setIsValid={setIsValidRole}
-                    />
+                <Select
+                    label="role for user to invite"
+                    validation={[{ validate: (str) => roles.includes(str), massage: "un-valid role" }]}
+                    options={roles}
+                    value={role}
+                    setValue={setRole}
+                    setIsValid={setIsValidRole}
+                />
 
-                    <div className="flex mt-2 flex-row justify-center items-center w-full">
-                        <Button
-                            buttonProps={{ type: "submit" }}
-                            isLoading={payload.isLoading}
-                            isValid={isValidRole && isValidId}>Invite</Button>
-                    </div>
+                <div className="flex mt-2 flex-row justify-center items-center w-full">
+                    <Button
+                        buttonProps={{ type: "submit" }}
+                        isLoading={payload.isLoading}
+                        isValid={isValidRole && isValidId}>Invite</Button>
+                </div>
 
-                </form>
+            </form>
 
-            </div>
-        </Modal>
+        </div>
     )
 }
 

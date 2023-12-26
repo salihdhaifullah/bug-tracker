@@ -27,7 +27,9 @@ const useOnClickOutside = (ref: RefObject<HTMLElement> | RefObject<HTMLElement>[
 
   useEffect(() => {
     document.addEventListener("click", listener, { capture: true });
-    return () => { document.removeEventListener("click", listener) };
+    return () => {
+      document.removeEventListener("click", listener, { capture: true });
+    };
   }, [listener]);
 }
 

@@ -1,21 +1,18 @@
-import { useCallback } from "react";
 import Button from "../../components/utils/Button"
-import Modal from "../../components/utils/Modal";
 import useFetchApi from "../../utils/hooks/useFetchApi";
-import { IModalProps } from ".";
+import { IDangerZoneData } from ".";
 import { useParams } from "react-router-dom";
+import { useModalDispatch } from "../../utils/context/modal";
 
-const LeaveModal = (props: IModalProps & { isOwner: boolean }) => {
+const LeaveModal = (props: IDangerZoneData) => {
     const {projectId, userId} = useParams()
+    const dispatchModal = useModalDispatch();
 
-    const [leaveProjectPayload, callLeaveProject] = useFetchApi("DELETE", `users/${userId}/projects/${projectId}/members`, [props]);
-    const handelLeaveProject = useCallback(() => {
-        props.setIsOpenModal(false);
-        callLeaveProject();
-    }, [])
+    const [leaveProjectPayload, callLeaveProject] = useFetchApi("DELETE", `users/${userId}/projects/${projectId}/members`, [props], () => {
+        dispatchModal({type: "close", payload: null})
+    });
 
     return (
-        <Modal isOpen={props.isOpenModal} setIsOpen={props.setIsOpenModal}>
             <div className="flex flex-col justify-center items-center pb-2 px-8 text-center h-full">
 
                 <div className="pt-4 pb-14 gap-4 flex flex-col w-full justify-center items-center">
@@ -28,11 +25,10 @@ const LeaveModal = (props: IModalProps & { isOwner: boolean }) => {
                 </div>
 
                 <div className="flex flex-row items-center mt-4 justify-center w-full px-4">
-                    <Button isLoading={leaveProjectPayload.isLoading} onClick={handelLeaveProject} className="!bg-red-600">{props.isOwner ? "delete" : "leave"}</Button>
+                    <Button isLoading={leaveProjectPayload.isLoading} onClick={() => callLeaveProject()} className="!bg-red-600">{props.isOwner ? "delete" : "leave"}</Button>
                 </div>
 
             </div>
-        </Modal>
     )
 }
 

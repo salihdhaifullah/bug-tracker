@@ -14,7 +14,8 @@ const Image = (props: IImageProps) => {
     const insertImage = async (file: File | null) => {
         if (file === null) return;
 
-        const previewUrl = URL.createObjectURL(file);
+        // because react markdown validate the urls
+        const previewUrl = `/${URL.createObjectURL(file)}`;
         const base64 = await toWEBPImage(file);
         props.files.current.push({base64, previewUrl});
 

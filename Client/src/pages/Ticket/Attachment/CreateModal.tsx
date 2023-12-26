@@ -1,16 +1,14 @@
-import { ChangeEvent, Dispatch, FormEvent, SetStateAction, useEffect, useRef, useState } from "react";
+import { ChangeEvent, FormEvent, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import useFetchApi from "../../../utils/hooks/useFetchApi";
 import getContentType from "../../../utils/getContentType";
 import toBase64 from "../../../utils/toBase64";
-import Modal from "../../../components/utils/Modal";
 import TextFiled from "../../../components/utils/TextFiled";
 import Button from "../../../components/utils/Button";
+import { useModalDispatch } from "../../../utils/context/modal";
 
 interface ICreateModalProps {
-    isOpen: boolean;
     call: () => void;
-    setIsOpen: Dispatch<SetStateAction<boolean>>
 }
 
 const CreateModal = (props: ICreateModalProps) => {
@@ -24,19 +22,11 @@ const CreateModal = (props: ICreateModalProps) => {
     const [contentType, setContentType] = useState("")
     const [fileName, setFileName] = useState("")
 
-    useEffect(() => {
-        if (!props.isOpen) {
-            setTitle("")
-            setIsValidTitle(false)
-            setData("")
-            setFileName("")
-            setContentType("")
-        }
-    }, [props.isOpen])
+    const dispatchModal = useModalDispatch();
 
     const [payload, call] = useFetchApi<unknown, { title: string, data: string, contentType: string }>("POST", `users/${userId}/projects/${projectId}/tickets/${ticketId}/attachments`, [], () => {
-        props.setIsOpen(false);
         props.call();
+        dispatchModal({type: "close", payload: null})
     })
 
     const handelSubmit = (e: FormEvent) => {
@@ -60,7 +50,6 @@ const CreateModal = (props: ICreateModalProps) => {
     };
 
     return (
-        <Modal isOpen={props.isOpen} setIsOpen={props.setIsOpen}>
             <form className="flex flex-col justify-center items-center pb-2 px-4 text-center h-full" onSubmit={handelSubmit}>
                 <div className="pb-8 gap-4 flex flex-col w-full justify-center items-center">
                     <h1 className="text-3xl font-black text-blue-700 dark:text-blue-300">add attachment</h1>
@@ -103,8 +92,6 @@ const CreateModal = (props: ICreateModalProps) => {
                     >add</Button>
                 </div>
             </form>
-
-        </Modal>
     )
 }
 

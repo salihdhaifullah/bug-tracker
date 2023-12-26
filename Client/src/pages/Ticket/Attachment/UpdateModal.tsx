@@ -1,15 +1,13 @@
-import { ChangeEvent, Dispatch, FormEvent, SetStateAction, useEffect, useRef, useState } from "react";
+import { ChangeEvent, FormEvent, useRef, useState } from "react";
 import Button from "../../../components/utils/Button";
-import Modal from "../../../components/utils/Modal";
 import useFetchApi from "../../../utils/hooks/useFetchApi";
 import TextFiled from "../../../components/utils/TextFiled";
 import toBase64 from "../../../utils/toBase64";
 import getContentType from "../../../utils/getContentType";
 import { useParams } from "react-router-dom";
+import { useModalDispatch } from "../../../utils/context/modal";
 
 interface IUpdateModalProps {
-    isOpen: boolean;
-    setIsOpen: Dispatch<SetStateAction<boolean>>;
     id: string;
     title: string;
     call: () => void;
@@ -25,9 +23,10 @@ const UpdateModal = (props: IUpdateModalProps) => {
     const [contentType, setContentType] = useState("")
     const [fileName, setFileName] = useState("")
 
+    const dispatchModal = useModalDispatch();
     const [updatePayload, callUpdate] = useFetchApi<unknown, { title?: string, data?: string, contentType?: string }>("PATCH", `users/${userId}/projects/${projectId}/tickets/${ticketId}/attachments/${props.id}`, [], () => {
-        props.setIsOpen(false);
         props.call();
+        dispatchModal({type: "close", payload: null})
     })
 
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -46,16 +45,6 @@ const UpdateModal = (props: IUpdateModalProps) => {
         if (fileInputRef.current) fileInputRef.current.click();
     };
 
-    useEffect(() => {
-        if (!props.isOpen) {
-            setTitle(props.title)
-            setIsValidTitle(false)
-            setData("")
-            setFileName("")
-            setContentType("")
-        }
-    }, [props.isOpen])
-
     const handelSubmit = (e: FormEvent) => {
         e.preventDefault();
 
@@ -70,7 +59,6 @@ const UpdateModal = (props: IUpdateModalProps) => {
 
 
     return (
-        <Modal isOpen={props.isOpen} setIsOpen={props.setIsOpen}>
             <form onSubmit={handelSubmit} className="flex flex-col justify-center items-center pb-2 px-4 text-center h-full">
                 <div className="pb-8 gap-4 flex flex-col w-full justify-center items-center">
                     <h1 className="text-3xl font-black text-blue-700 dark:text-blue-300">update attachment</h1>
@@ -113,7 +101,6 @@ const UpdateModal = (props: IUpdateModalProps) => {
                         >update</Button>
                 </div>
             </form>
-        </Modal>
     )
 }
 

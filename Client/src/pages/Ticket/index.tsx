@@ -9,6 +9,7 @@ import labelsColors from "../../utils/labelsColors";
 import TicketAction from "../../components/utils/TicketAction";
 import Comments from "./Comments";
 import Attachment from "./Attachment";
+import { Priority, Status, Type } from "../MyTasks";
 
 interface ITicket {
     createdAt: string;
@@ -28,9 +29,9 @@ interface ITicket {
         memberId: string;
     };
     name: string;
-    priority: string;
-    status: string;
-    type: string;
+    priority: Priority;
+    status: Status;
+    type: Type;
 }
 
 
@@ -40,11 +41,11 @@ const Ticket = () => {
     const [payload, call] = useFetchApi<ITicket>("GET", `users/${userId}/projects/${projectId}/tickets/${ticketId}`, []);
     const [rolePayload, callRole] = useFetchApi<string>("GET", `users/${userId}/projects/${projectId}/members`);
 
-    useEffect(() => { call() }, [])
+    useEffect(() => { call() }, [call])
 
     useEffect(() => {
         if (payload.result) callRole();
-    }, [payload.result])
+    }, [callRole, payload.result])
 
     const user = useUser();
 
@@ -84,7 +85,7 @@ const Ticket = () => {
                         </div>
 
                         {(rolePayload.result !== null && ["owner", "project_manger"].includes(rolePayload.result) || payload.result.creator.id === user?.id) ?
-                            <TicketAction onUpdate={call} ticket={{ ...payload.result, id: ticketId!, projectId: payload.result.project.id }} />
+                            <TicketAction onUpdate={() => call()} ticket={{ ...payload.result, id: ticketId as string, projectId: payload.result.project.id }} />
                             : null}
 
                     </div>
@@ -95,9 +96,9 @@ const Ticket = () => {
                         <h2 className="text-3xl font-bold text-primary dark:text-secondary">{payload.result.name}</h2>
 
                         <div className="flex text-sm mb-2 flex-row justify-start gap-1 flex-wrap">
-                            <span title="type" className={`rounded-sm font-bold border-black w-fit p-1 text-white dark:border-white dark:text-black ${(labelsColors.TYPE as any)[payload.result.type]}`}>{payload.result.type}</span>
-                            <span title="priority" className={`rounded-sm font-bold border-black w-fit p-1 text-white dark:border-white dark:text-black ${(labelsColors.PRIORITY as any)[payload.result.priority]}`}>{payload.result.priority}</span>
-                            <span title="status" className={`rounded-sm font-bold border-black w-fit p-1 text-white dark:border-white dark:text-black ${(labelsColors.STATUS as any)[payload.result.status]}`}>{payload.result.status}</span>
+                            <span title="type" className={`rounded-sm font-bold border-black w-fit p-1 text-white dark:border-white dark:text-black ${(labelsColors.TYPE)[payload.result.type]}`}>{payload.result.type}</span>
+                            <span title="priority" className={`rounded-sm font-bold border-black w-fit p-1 text-white dark:border-white dark:text-black ${(labelsColors.PRIORITY)[payload.result.priority]}`}>{payload.result.priority}</span>
+                            <span title="status" className={`rounded-sm font-bold border-black w-fit p-1 text-white dark:border-white dark:text-black ${(labelsColors.STATUS)[payload.result.status]}`}>{payload.result.status}</span>
                         </div>
 
 

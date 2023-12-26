@@ -9,6 +9,7 @@ import CreateTicketModal, { priorityOptions, statusOptions, typeOptions } from "
 import SearchFiled from "../../components/utils/SearchFiled";
 import Charts from "./Chart";
 import TicketsRow from "./TicketsRow";
+import { useModalDispatch } from "../../utils/context/modal";
 
 export interface ITypeChart {
     bugs: number;
@@ -47,20 +48,17 @@ export interface ITicket {
     id: string;
 }
 
-export const isData = (data: any) => {
-    const keys = Object.keys(data);
-    let isData = false;
+export const isData = (data: object): boolean => {
+    const values = Object.values(data);
 
-    for (const key of keys) {
-        if (data[key]! > 0) {
-            isData = true;
-            break;
+    for (const value of values) {
+        if (value as number > 0) {
+            return true;
         }
-    };
+    }
 
-    return isData;
-};
-
+    return false;
+}
 
 const Tickets = () => {
     const {userId, projectId } = useParams();
@@ -75,9 +73,9 @@ const Tickets = () => {
     const [countPayload, callCount] = useFetchApi<number>("GET", `users/${userId}/projects/${projectId}/tickets/table/count?search=${search}&type=${ticketType}&status=${ticketStatus}&priority=${ticketPriority}`, [search, ticketType, ticketStatus, ticketPriority]);
     const [ticketsPayload, callTickets] = useFetchApi<ITicket[]>("GET", `users/${userId}/projects/${projectId}/tickets/table/${page}?take=${take}&search=${search}&type=${ticketType}&status=${ticketStatus}&priority=${ticketPriority}`, [page, take, search, ticketType, ticketStatus, ticketPriority]);
 
-    useEffect(() => { callRole() }, [])
-    useEffect(() => { callTickets() }, [page, take, ticketType, ticketStatus, ticketPriority])
-    useEffect(() => { callCount() }, [ticketType, ticketStatus, ticketPriority])
+    useEffect(() => { callRole() }, [callRole])
+    useEffect(() => { callTickets() }, [page, take, ticketType, ticketStatus, ticketPriority, callTickets])
+    useEffect(() => { callCount() }, [ticketType, ticketStatus, ticketPriority, callCount])
 
 
     const handelSearch = () => {
@@ -93,7 +91,11 @@ const Tickets = () => {
         if (countPayload.result && !(page * take >= countPayload.result)) setPage((prev) => prev + 1)
     }
 
-    const [isOpenCreateTicketModal, setIsOpenCreateTicketModal] = useState(false);
+    const dispatchModal = useModalDispatch();
+
+    const handelOpenModal = () => {
+        dispatchModal({type: "open", payload: <CreateTicketModal />})
+    }
 
     return (
         <section className="h-full w-full py-4 md:px-8 px-3 mt-10 gap-8 flex flex-col">
@@ -101,8 +103,7 @@ const Tickets = () => {
             <div className="w-full dark:bg-black bg-white border border-gray-500 shadow-md dark:shadow-secondary/40 rounded-md justify-center items-center flex flex-col p-2">
 
                 <div className="flex flex-row gap-4 w-full flex-wrap items-center pb-4 p-2 bg-white dark:bg-black justify-between">
-                    <Button onClick={() => setIsOpenCreateTicketModal(prev => !prev)}>create ticket</Button>
-                    <CreateTicketModal isOpenModal={isOpenCreateTicketModal} setIsOpenModal={setIsOpenCreateTicketModal} />
+                    <Button onClick={handelOpenModal}>create ticket</Button>
 
                     <div className="flex items-center justify-center gap-4 flex-wrap-reverse w-full md:w-auto">
                         <div className="max-w-[400px]">
@@ -137,7 +138,7 @@ const Tickets = () => {
 
                                     <tbody className="before:block before:h-4 after:block after:mb-2">
                                         {ticketsPayload.result !== null && ticketsPayload.result.map((ticket, index) => (
-                                            <TicketsRow key={index} isOwnerOrManger={rolePayload.result !== null && ["project_manger", "owner"].includes(rolePayload.result)} ticket={ticket} call={callTickets}/>
+                                            <TicketsRow key={index} isOwnerOrManger={rolePayload.result !== null && ["project_manger", "owner"].includes(rolePayload.result)} ticket={ticket} call={() => callTickets()}/>
                                         ))}
                                     </tbody>
                                 </table>

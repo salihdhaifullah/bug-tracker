@@ -30,7 +30,7 @@ const Project = () => {
     const user = useUser();
     const isOwner = user?.id == userId;
 
-    useEffect(() => { call() }, [])
+    useEffect(() => { call() }, [call])
 
     return payload.isLoading
         ? <CircleProgress size="lg" />
@@ -111,7 +111,7 @@ const Project = () => {
 
                             </div>
 
-                            {payload.result.owner.id === user?.id ? <Action call={call} projectId={payload.result.id} name={payload.result.name} /> : null}
+                            {payload.result.owner.id === user?.id ? <Action call={() => call()} name={payload.result.name} /> : null}
                         </div>
 
                         <div className="w-full h-full gap-4 flex flex-col p-4">

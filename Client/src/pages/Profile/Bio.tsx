@@ -65,7 +65,7 @@ const Bio = (props: IBioProps) => {
                             <MdOutlineModeEditOutline className="text-2xl font-bold text-gray-600 hover:text-gray-800 dark:text-gray-300 dark:hover:text-gray-100" />
                         </div>
 
-                        <p className="text-lg text-gray-800 dark:text-gray-200 flex break-all text-center grid-cols-3">
+                        <p className="text-lg text-gray-800 dark:text-gray-200 flex text-center grid-cols-3">
                             {bio}
                         </p>
                     </div>
@@ -84,10 +84,3 @@ const Bio = (props: IBioProps) => {
 }
 
 export default Bio;
-
-/*
-    user -> userId
-    project -> ownerId
-    comment -> commenterId
-    ticket -> ownerId / project_mangerIds
-*/

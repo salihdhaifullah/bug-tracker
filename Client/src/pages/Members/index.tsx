@@ -11,6 +11,7 @@ import InviteModal from "./InviteModal";
 import MembersRow from "./MembersRow";
 import RolesPieChart from "./RolesPieChart";
 import { useUser } from "../../utils/context/user";
+import { useModalDispatch } from "../../utils/context/modal";
 
 export interface IMember {
     avatarUrl: string;
@@ -43,10 +44,8 @@ const Members = () => {
     const [membersPayload, callMembers] = useFetchApi<IMember[]>("GET", `users/${userId}/projects/${projectId}/members/table?take=${take}&page=${page}&role=${role}&search=${search}`, [take, page, role, search]);
     const [countPayload, callCount] = useFetchApi<number>("GET", `users/${userId}/projects/${projectId}/members/table/count/${projectId}?role=${role}&search=${search}`, [role, search]);
 
-    const [isOpenInviteModal, setIsOpenInviteModal] = useState(false);
-
-    useEffect(() => { callMembers() }, [take, page, role])
-    useEffect(() => { callCount() }, [role])
+    useEffect(() => { callMembers() }, [take, page, role, callMembers])
+    useEffect(() => { callCount() }, [callCount, role])
 
     const handelSearch = () => {
         callCount()
@@ -61,14 +60,18 @@ const Members = () => {
         if (countPayload.result && !(page * take >= countPayload.result)) setPage((prev) => prev + 1)
     }
 
+    const dispatchModal = useModalDispatch();
+
 
     return (
         <section className="h-full w-full py-4 md:px-8 px-3 mt-10 gap-8 flex flex-col">
             <div className="w-full bg-white dark:bg-black border border-gray-500 shadow-md dark:shadow-secondary/40 rounded-md justify-center items-center flex flex-col p-2">
 
                 <div className="flex flex-row gap-4 w-full flex-wrap items-center pb-4 p-2 justify-between">
-                    <InviteModal call={handelSearch} isOpenModal={isOpenInviteModal} setIsOpenModal={setIsOpenInviteModal} />
-                    <Button onClick={() => setIsOpenInviteModal(true)}>invite member</Button>
+
+                    <Button
+                        onClick={() => dispatchModal({ type: "open", payload: <InviteModal call={handelSearch} /> })}
+                    >invite member</Button>
 
                     <div className="flex items-center justify-center w-full sm:w-auto">
 
@@ -98,7 +101,7 @@ const Members = () => {
 
                                     <tbody className="before:block before:h-4 after:block after:mb-2">
                                         {membersPayload.result !== null && membersPayload.result.map((member, index) => (
-                                            <MembersRow key={index} callMembers={callMembers} member={member} isOwner={isOwner} />
+                                            <MembersRow key={index} callMembers={() => callMembers()} member={member} isOwner={isOwner} />
                                         ))}
                                     </tbody>
                                 </table>

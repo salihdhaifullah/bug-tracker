@@ -1,16 +1,12 @@
 import { FiMoreVertical } from "react-icons/fi";
-import { priorityOptions, statusOptions, typeOptions } from "./CreateTicketModal";
 import Button from "./Button";
-import Modal from "./Modal";
-import Select from "./Select";
-import SelectUser from "./SelectUser";
-import TextFiled from "./TextFiled";
 import useOnClickOutside from "../../utils/hooks/useOnClickOutside";
-import { FormEvent, useEffect, useRef, useState } from "react";
-import useFetchApi from "../../utils/hooks/useFetchApi";
-import { Link, useParams } from "react-router-dom";
+import { useRef, useState } from "react";
+import { useModalDispatch } from "../../utils/context/modal";
+import TicketDeleteModal from "./TicketDeleteModal";
+import TicketUpdateModal from "./TicketUpdateModal";
 
-interface ITicket {
+export interface ITicket {
     name: string;
     createdAt: string;
     creator: { name: string, id: string };
@@ -22,7 +18,6 @@ interface ITicket {
     projectId: string;
 }
 
-
 interface IActionProps {
     ticket: ITicket
     onDelete?: () => void;
@@ -31,59 +26,12 @@ interface IActionProps {
 
 const TicketAction = (props: IActionProps) => {
     const [isOpen, setIsOpen] = useState(false);
-    const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
-    const [isOpenUpdateModal, setIsOpenUpdateModal] = useState(false);
-    const [name, setName] = useState(props.ticket.name);
-    const [type, setType] = useState(props.ticket.type);
-    const [priority, setPriority] = useState(props.ticket.priority);
-    const [status, setStatus] = useState(props.ticket.status);
-    const [memberId, setMemberId] = useState(props.ticket.assignedTo?.memberId || "");
-    const [isValidName, setIsValidName] = useState(true);
-    const [isValidType, setIsValidType] = useState(true);
-    const [isValidPriority, setIsValidPriority] = useState(true);
-    const [isValidStatus, setIsValidStatus] = useState(true);
 
     const targetRef = useRef<HTMLDivElement>(null);
 
-    useEffect(() => {
-        if (!isOpenUpdateModal) {
-            setName(props.ticket.name);
-            setType(props.ticket.type);
-            setPriority(props.ticket.priority);
-            setStatus(props.ticket.status);
-            setMemberId(props.ticket.assignedTo?.memberId || "");
-        }
-    }, [isOpenUpdateModal])
-
-    const [isDelete, setIsDelete] = useState(false);
-    const [isUpdate, setIsUpdate] = useState(false);
-
-    useEffect(() => {
-        if (isDelete && props?.onDelete) props.onDelete();
-    }, [isDelete])
-
-    const {userId, projectId} = useParams();
-
-    const [deleteTicketPayload, callDeleteTicket] = useFetchApi("DELETE", `users/${userId}/projects/${projectId}/tickets/${props.ticket.id}`, [], () => {
-        setIsOpenDeleteModal(false);
-        setIsDelete(true);
-    })
-
-    useEffect(() => {
-        if (isUpdate && props?.onUpdate) props.onUpdate();
-    }, [isUpdate])
-
-    const [updateTicketPayload, callUpdateTicket] = useFetchApi<unknown, { name: string, type: string, priority: string, status: string, memberId?: string }>("PATCH", `users/${userId}/projects/${projectId}/tickets/${props.ticket.id}`, [], () => {
-        setIsOpenUpdateModal(false);
-        setIsUpdate(true);
-    });
-
     useOnClickOutside(targetRef, () => setIsOpen(false));
 
-    const handelSubmit = (e: FormEvent) => {
-        e.preventDefault();
-        callUpdateTicket({ name, type, priority, status, memberId: !memberId.length ? undefined : memberId })
-    }
+    const dispatchModal = useModalDispatch();
 
     return (
         <div ref={targetRef} className="flex w-fit relative">
@@ -92,92 +40,20 @@ const TicketAction = (props: IActionProps) => {
             </div>
 
             <div className={`${isOpen ? "scale-100" : "scale-0"} transition-all flex flex-col gap-2 py-2 px-4 bg-white dark:bg-black justify-center items-center absolute right-[80%] -bottom-[50%] rounded shadow-md dark:shadow-secondary/40`}>
-                <Button onClick={() => setIsOpenDeleteModal(true)} size="sm" className="w-full">delete</Button>
-                <Button onClick={() => setIsOpenUpdateModal(true)} size="sm" className="w-full">update</Button>
+                <Button
+                    onClick={() => dispatchModal({
+                        type: "open",
+                        payload: <TicketDeleteModal ticket={props.ticket} call={props.onDelete} />
+                    })}
+                    size="sm" className="w-full">delete</Button>
+
+                <Button onClick={() => dispatchModal({
+                    type: "open",
+                    payload: <TicketUpdateModal ticket={props.ticket} call={props.onUpdate} />
+                })}
+                    size="sm" className="w-full">update</Button>
             </div>
 
-            <Modal isOpen={isOpenDeleteModal} setIsOpen={setIsOpenDeleteModal}>
-                <div className="flex flex-col bg-white dark:bg-black justify-center items-center pb-2 text-center h-full">
-                    <div className="pt-4 pb-12 gap-4 flex flex-col w-full justify-center items-center">
-                        <h1 className="text-3xl font-black text-blue-700 dark:text-blue-300">
-                            <Link to={`/users/${userId}/projects/${projectId}/tickets/${props.ticket.id}`}>{props.ticket.name}</Link>
-                        </h1>
-                        <h2 className="text-xl font-bold text-primary dark:text-secondary">are you sure you want to delete this ticket</h2>
-                    </div>
-
-                    <div className="flex flex-row items-center mt-4  justify-center w-full px-4">
-                        <Button isLoading={deleteTicketPayload.isLoading} onClick={() => callDeleteTicket()} className="!bg-red-500">delete</Button>
-                    </div>
-                </div>
-            </Modal>
-
-            <Modal isOpen={isOpenUpdateModal} setIsOpen={setIsOpenUpdateModal}>
-                <div className="rounded-xl bg-white dark:bg-black flex flex-col gap-4 pb-2 items-center justify-center">
-                    <div className="pb-4 gap-4 flex flex-col w-full text-center justify-center items-center">
-                        <h1 className="text-3xl font-black text-blue-700 dark:text-blue-300">{props.ticket.name}</h1>
-                        <h2 className="text-xl font-bold text-primary dark:text-secondary">are you sure you want to update this ticket</h2>
-                    </div>
-
-                    <form className="flex-col flex w-full justify-center items-center" onSubmit={handelSubmit}>
-
-                        <TextFiled
-                            validation={[
-                                { validate: (str: string) => str.length <= 100, massage: "max length of ticket name is 100 characters" },
-                                { validate: (str: string) => str.length >= 3, massage: "min length of ticket name is 3 characters" }
-                            ]}
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            label="ticket name"
-                            setIsValid={setIsValidName}
-                        />
-
-                        <Select
-                            value={type}
-                            options={typeOptions}
-                            validation={[
-                                { validate: (str: string) => typeOptions.includes(str), massage: "un-valid ticket type" }
-                            ]}
-                            setIsValid={setIsValidType}
-                            setValue={setType}
-                            label="ticket type"
-                        />
-
-                        <Select
-                            value={priority}
-                            options={priorityOptions}
-                            validation={[
-                                { validate: (str: string) => priorityOptions.includes(str), massage: "un-valid ticket priority" }
-                            ]}
-                            setValue={setPriority}
-                            setIsValid={setIsValidPriority}
-                            label="ticket priority"
-                        />
-
-                        <Select
-                            value={status}
-                            options={statusOptions}
-                            validation={[
-                                { validate: (str: string) => statusOptions.includes(str), massage: "un-valid ticket status" }
-                            ]}
-                            setValue={setStatus}
-                            setIsValid={setIsValidStatus}
-                            label="ticket status"
-                        />
-
-                        <SelectUser search={props.ticket.assignedTo?.name} label="assign to" members={true} setId={setMemberId} id={memberId} />
-
-                        <div className="flex flex-row items-center mt-4 justify-center w-full px-4">
-                            <Button
-                                isValid={isValidName && isValidType && isValidStatus && isValidPriority}
-                                isLoading={updateTicketPayload.isLoading}
-                                buttonProps={{ type: "submit" }}
-                            >update</Button>
-                        </div>
-
-                    </form>
-
-                </div>
-            </Modal>
         </div>
     )
 }

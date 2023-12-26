@@ -10,6 +10,7 @@ import SearchFiled from "../../components/utils/SearchFiled";
 import CreateProjectModal from "./CreateProjectModal";
 import roles from "../../utils/roles";
 import ProjectsRow from "./ProjectsRow";
+import { useModalDispatch } from "../../utils/context/modal";
 
 export interface IProject {
   id: number;
@@ -35,15 +36,19 @@ const Projects = () => {
   const [projectsPayload, callProjects] = useFetchApi<IProject[]>("GET", `users/${userId}/projects/?take=${take}&page=${page}&search=${search}&role=${role}&status=${status}&type=${type}`, [page, take, userId, search, role, type, status]);
   const [CountPayload, callCount] = useFetchApi<number>("GET", `users/${userId}/projects/count/?take=${take}&search=${search}&role=${role}&status=${status}&type=${type}`, [take, userId, search, role, type, status]);
 
-  useEffect(() => { callProjects() }, [page, take, role, type, status])
-  useEffect(() => { callCount() }, [take, role, type, status])
+  useEffect(() => { callProjects() }, [page, role, type, status, callProjects])
+  useEffect(() => { callCount() }, [role, type, status, callCount])
 
   const handelSearch = () => {
     callProjects()
     callCount()
   }
 
-  const [isOpenCreateModal, setIsOpenCreateModal] = useState(false);
+  const dispatchModal = useModalDispatch();
+
+  const handelOpenModal = () => {
+    dispatchModal({ type: "open", payload: <CreateProjectModal /> })
+  }
 
   return (
     <section className="flex flex-col justify-center items-center w-full gap-8 my-10">
@@ -64,10 +69,8 @@ const Projects = () => {
 
         </div>
 
-        <CreateProjectModal isOpenModal={isOpenCreateModal} setIsOpenModal={setIsOpenCreateModal} />
-
         <div className="flex items-center justify-center">
-          <Button size="md" onClick={() => setIsOpenCreateModal((prev) => !prev)} className="flex-row flex justify-center items-center gap-1">
+          <Button size="md" onClick={handelOpenModal} className="flex-row flex justify-center items-center gap-1">
             <MdOutlineCreateNewFolder />
             <p>create projects</p>
           </Button>
@@ -91,7 +94,7 @@ const Projects = () => {
 
       <Pagination
         currentPage={page}
-        pages={CountPayload.result ? Math.ceil(CountPayload.result/take) : 0}
+        pages={CountPayload.result ? Math.ceil(CountPayload.result / take) : 0}
         handelOnChange={(newPage) => setPage(newPage)}
       />
 

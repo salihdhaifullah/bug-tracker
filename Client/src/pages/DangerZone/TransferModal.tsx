@@ -1,29 +1,23 @@
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 import Button from "../../components/utils/Button"
-import Modal from "../../components/utils/Modal";
 import useFetchApi from "../../utils/hooks/useFetchApi";
 import SelectUser from "../../components/utils/SelectUser";
-import { IModalProps } from ".";
+import { IDangerZoneData } from ".";
 import { useParams } from "react-router-dom";
+import { useModalDispatch } from "../../utils/context/modal";
 
-const TransferModal = (props: IModalProps) => {
+const TransferModal = (props: IDangerZoneData) => {
     const {projectId, userId} = useParams()
-    const [transferProjectPayload, callTransferProject] = useFetchApi<unknown, { projectId: string, memberId: string }>("PATCH", `users/${userId}/projects/${projectId}/danger-zone/transfer`);
     const [isSubmit, setIsSubmit] = useState(false);
     const [isValidId, setIsValidId] = useState(true);
     const [memberId, setMemberId] = useState("")
 
-    const handelTransferProject = useCallback(() => {
-        props.setIsOpenModal(false);
-        callTransferProject({ projectId: projectId!, memberId });
-    }, [memberId])
-
-    useEffect(() => {
-        setIsSubmit(false)
-    }, [props.isOpenModal])
+    const dispatchModal = useModalDispatch();
+    const [transferProjectPayload, callTransferProject] = useFetchApi<unknown, { projectId: string, memberId: string }>("PATCH", `users/${userId}/projects/${projectId}/danger-zone/transfer`, [], () => {
+        dispatchModal({type: "close", payload: null})
+    });
 
     return (
-        <Modal isOpen={props.isOpenModal} setIsOpen={props.setIsOpenModal}>
             <div className="flex flex-col justify-center items-center pb-2 px-8 text-center h-full">
 
                 {isSubmit ? (
@@ -34,7 +28,7 @@ const TransferModal = (props: IModalProps) => {
                         </div>
 
                         <div className="flex flex-row items-center mt-10 justify-center w-full px-4">
-                            <Button isLoading={transferProjectPayload.isLoading} onClick={() => handelTransferProject()} className="!bg-red-600">transfer</Button>
+                            <Button isLoading={transferProjectPayload.isLoading} onClick={() => callTransferProject({ projectId: projectId!, memberId })} className="!bg-red-600">transfer</Button>
                         </div>
 
                     </>
@@ -52,7 +46,6 @@ const TransferModal = (props: IModalProps) => {
                     </>
                 )}
             </div>
-        </Modal>
     )
 }
 

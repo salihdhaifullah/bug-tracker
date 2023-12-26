@@ -1,11 +1,12 @@
 import { useParams } from "react-router-dom"
 import formatDate from "../../../utils/formatDate"
 import Button from "../../../components/utils/Button";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import useFetchApi from "../../../utils/hooks/useFetchApi";
 import CircleProgress from "../../../components/utils/CircleProgress";
 import CreateAttachmentModal from "./CreateModal";
 import Action from "./Action";
+import { useModalDispatch } from "../../../utils/context/modal";
 
 interface IAttachment {
     id: string;
@@ -16,16 +17,18 @@ interface IAttachment {
 
 const Attachment = (props: { isCreator: boolean }) => {
     const { ticketId, userId, projectId } = useParams();
-    const [isOpenCreateAttachmentModal, setIsOpenCreateAttachmentModal] = useState(false);
     const [attachmentsPayload, callAttachments] = useFetchApi<IAttachment[]>("GET", `users/${userId}/projects/${projectId}/tickets/${ticketId}/attachments`);
 
-    useEffect(() => { callAttachments() }, [])
+    useEffect(() => { callAttachments() }, [callAttachments])
+
+    const dispatchModal = useModalDispatch();
 
     return (
         <>
             {props.isCreator && <div className="flex flex-row gap-4 w-full flex-wrap items-center pb-4 p-2 bg-white dark:bg-black justify-between">
-                <Button onClick={() => setIsOpenCreateAttachmentModal(prev => !prev)}>add attachment</Button>
-                <CreateAttachmentModal setIsOpen={setIsOpenCreateAttachmentModal} isOpen={isOpenCreateAttachmentModal} call={callAttachments} />
+                <Button
+                    onClick={() => dispatchModal({ type: "open", payload: <CreateAttachmentModal call={() => callAttachments()} /> })}
+                >add attachment</Button>
             </div>}
 
             {attachmentsPayload.result === null || attachmentsPayload.result.length === 0 ? (
@@ -45,7 +48,7 @@ const Attachment = (props: { isCreator: boolean }) => {
 
                                 <p className="dark:text-gray-200 text-gray-800 w-[30%]"> {formatDate(attachment.createdAt)} </p>
 
-                                {props.isCreator && <Action call={callAttachments} id={attachment.id} title={attachment.title} />}
+                                {props.isCreator && <Action call={() => callAttachments()} id={attachment.id} title={attachment.title} />}
                             </div>
                         ))}
                     </div>

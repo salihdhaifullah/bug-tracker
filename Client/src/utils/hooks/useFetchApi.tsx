@@ -56,13 +56,14 @@ callback?: (arg: R) => void): [payload: IPayload<R>, call: (body?: B) => void] {
             callback && callback(response.body as R);
 
             if (response?.redirectTo) navigate(response?.redirectTo);
-
         } catch (err) {
             console.error(err)
         } finally {
+
             setIsLoading(false);
         }
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, deps);
 
 

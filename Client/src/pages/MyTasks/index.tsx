@@ -7,8 +7,9 @@ import CreateTicketModal, { priorityOptions, typeOptions } from "../../component
 import Button from "../../components/utils/Button";
 import SearchFiled from "../../components/utils/SearchFiled";
 import Droppable from "./Droppable";
+import { useModalDispatch } from "../../utils/context/modal";
 
-enum Status {
+export enum Status {
     review = "review",
     active = "active",
     in_progress = "in_progress",
@@ -16,14 +17,14 @@ enum Status {
     closed = "closed"
 }
 
-enum Priority {
+export enum Priority {
     low = "low",
     medium = "medium",
     high = "high",
     critical = "critical"
 }
 
-enum Type {
+export enum Type {
     bug = "bug",
     feature = "feature"
 }
@@ -37,7 +38,7 @@ export interface IItem {
 }
 
 const MyTasks = () => {
-    const {projectId, userId} = useParams();
+    const { projectId, userId } = useParams();
     const [data, setData] = useState<IItem[]>([])
     const [search, setSearch] = useState("");
     const [ticketType, setTicketType] = useState("all");
@@ -80,7 +81,11 @@ const MyTasks = () => {
         setData(dataCopy);
     }
 
-    const [isOpenCreateTicketModal, setIsOpenCreateTicketModal] = useState(false);
+    const dispatchModal = useModalDispatch();
+
+    const handelOpenModal = () => {
+        dispatchModal({type: "open", payload: <CreateTicketModal />})
+    }
 
     return (
         <div className="flex flex-col w-full p-2 py-10 my-10">
@@ -98,8 +103,7 @@ const MyTasks = () => {
                 </div>
 
                 <div className="flex items-center justify-center gap-2">
-                        <Button onClick={() => setIsOpenCreateTicketModal(prev => !prev)}>create ticket</Button>
-                        <CreateTicketModal isOpenModal={isOpenCreateTicketModal} setIsOpenModal={setIsOpenCreateTicketModal} />
+                    <Button onClick={handelOpenModal}>create ticket</Button>
 
                     <Link to={`/users/${userId}/projects/${projectId}`}>
                         <Button>project</Button>
@@ -119,7 +123,7 @@ const MyTasks = () => {
                         <Droppable handelDrop={handelDrop} items={data} col={Status.closed} />
                     </>
                 ) : (
-                    <CircleProgress size="lg" className="my-20"/>
+                    <CircleProgress size="lg" className="my-20" />
                 )}
             </div>
         </div>

@@ -16,17 +16,18 @@ export interface IComment {
     id: string;
 }
 
+const commentTake = 10;
+
 const Comments = () => {
     const { ticketId, projectId, userId } = useParams();
 
     const [commentPage, setCommentPage] = useState(1);
-    const [commentTake, _] = useState(10);
 
     const [commentPayload, callComment] = useFetchApi<IComment[]>("GET", `users/${userId}/projects/${projectId}/tickets/${ticketId}/comments`, [commentPage, commentTake]);
     const [countPayload, callCount] = useFetchApi<number>("GET", `users/${userId}/projects/${projectId}/tickets/${ticketId}/comments/count`);
 
-    useEffect(() => { callCount() }, [])
-    useEffect(() => { callComment() }, [commentPage, commentTake])
+    useEffect(() => { callCount() }, [callCount])
+    useEffect(() => { callComment() }, [callComment, commentPage])
 
     const call = () => {
         callComment()
@@ -37,7 +38,7 @@ const Comments = () => {
         <div className="flex flex-col justify-center items-center w-full h-auto my-10">
             <div className="flex w-full h-full justify-center items-center">
                 <div className="flex w-full h-full flex-col max-w-[800px]">
-                    <CreateComment call={call} />
+                    <CreateComment call={() => call()} />
                 </div>
             </div>
 
@@ -46,7 +47,7 @@ const Comments = () => {
                     !(commentPayload.result && countPayload.result && commentPayload.result.length > 0) ? null
                         : (
                             <>
-                                {commentPayload.result.map((comment, _) => <Comment key={comment.id} comment={comment} call={callComment} />)}
+                                {commentPayload.result.map((comment) => <Comment key={comment.id} comment={comment} call={() => callComment()} />)}
 
                                 <Pagination
                                     currentPage={commentPage}

@@ -2,16 +2,18 @@ import { FaPlay } from "react-icons/fa"
 import Button from "../components/utils/Button"
 import { MdTry } from "react-icons/md"
 import useFetchApi from "../utils/hooks/useFetchApi"
-import { useUserDispatch } from "../utils/context/user"
+import { useUser, useUserDispatch } from "../utils/context/user"
 import { Link } from "react-router-dom"
+import Search from "./Search"
 
 const Home = () => {
+  const user = useUser();
   const dispatchUser = useUserDispatch();
   const [demoPayload, callDemo] = useFetchApi("GET", "auth/demo", [], (result) => {
     if (result) dispatchUser({ type: "add", payload: result });
   });
 
-  return (
+  return user != null ? <Search /> : (
     <section className="h-full w-full py-4 px-8 mt-10 mx-auto gap-2 flex flex-row">
       <div className="mr-auto place-self-center lg:col-span-7">
         <h1 className="max-w-2xl mb-2 text-4xl text-primary dark:text-secondary font-extrabold md:text-5xl xl:text-6xl">

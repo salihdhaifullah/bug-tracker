@@ -1,46 +1,23 @@
 import { FiMoreVertical } from "react-icons/fi";
 import Button from "../../components/utils/Button";
-import Modal from "../../components/utils/Modal";
-import TextFiled from "../../components/utils/TextFiled";
-import { FormEvent, useEffect, useRef, useState } from "react";
-import useFetchApi from "../../utils/hooks/useFetchApi";
+import { useRef, useState } from "react";
 import useOnClickOutside from "../../utils/hooks/useOnClickOutside";
-import { useParams } from "react-router-dom";
+import { useModalDispatch } from "../../utils/context/modal";
+import UpdateModal from "./UpdateModal";
 
 interface IActionProps {
-    projectId: string;
     name: string;
     call: () => void;
 }
 
 const Action = (props: IActionProps) => {
-    const [name, setName] = useState(props.name);
     const [isOpen, setIsOpen] = useState(false);
-    const [isOpenUpdateModal, setIsOpenUpdateModal] = useState(false);
-    const [isValidName, setIsValidName] = useState(false);
-
-    const {userId, projectId} = useParams();
 
     const targetRef = useRef<HTMLDivElement>(null);
 
     useOnClickOutside(targetRef, () => setIsOpen(false));
 
-    const [payload, call] = useFetchApi<unknown, { projectId: string, name: string }>("PATCH", `users/${userId}/projects/${projectId}`, [], () => {
-        setIsOpenUpdateModal(false)
-        props.call()
-    });
-
-    useEffect(() => {
-        if (!isOpenUpdateModal) {
-            setName("");
-        }
-    }, [isOpenUpdateModal])
-
-
-    const handelSubmit = (e: FormEvent) => {
-        e.preventDefault();
-        call({ projectId: props.projectId, name })
-    }
+    const dispatchModal = useModalDispatch();
 
     return (
         <div ref={targetRef} className="flex w-fit relative">
@@ -49,35 +26,13 @@ const Action = (props: IActionProps) => {
             </div>
 
             <div className={`${isOpen ? "scale-100" : "scale-0"} transition-all flex flex-col gap-2 py-2 px-4 bg-white dark:bg-black justify-center items-center absolute right-[80%] -bottom-[50%] rounded shadow-md dark:shadow-secondary/40`}>
-                <Button onClick={() => setIsOpenUpdateModal(true)} size="sm" className="w-full">update</Button>
+                <Button
+                    onClick={() => dispatchModal({ type: "open", payload: <UpdateModal {...props} /> })}
+                    size="sm" className="w-full">update</Button>
             </div>
 
-            <Modal isOpen={isOpenUpdateModal} setIsOpen={setIsOpenUpdateModal}>
-                <form onSubmit={handelSubmit} className="flex flex-col justify-center items-center pb-2 px-4 text-center h-full gap-4">
-                    <h1 className="text-3xl py-8 font-bold text-primary dark:text-secondary">change name</h1>
-
-                    <TextFiled
-                        validation={[
-                            { validate: (str: string) => str.length > 0, massage: "name is required" },
-                            { validate: (str: string) => str.length <= 100, massage: "max length of name is 100 character" }
-                        ]}
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        label="project name"
-                        setIsValid={setIsValidName}
-                    />
-
-                    <div className="flex flex-row items-center mt-4 justify-center w-full px-4">
-                        <Button
-                        isLoading={payload.isLoading}
-                        buttonProps={{ type: "submit" }}
-                        isValid={isValidName}>change</Button>
-                    </div>
-                </form>
-            </Modal>
         </div>
     )
 }
-
 
 export default Action;

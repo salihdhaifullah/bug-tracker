@@ -1,21 +1,17 @@
 import { useParams } from "react-router-dom"
-import { Dispatch, FormEvent, SetStateAction, useEffect, useState } from "react";
+import { FormEvent, useState } from "react";
 import TextFiled from "./TextFiled"
 import useFetchApi from "../../utils/hooks/useFetchApi";
 import Button from "./Button";
 import Select from "./Select";
 import SelectUser from "./SelectUser";
-import Modal from "./Modal";
 import { FaClipboardList } from "react-icons/fa";
+import { useModalDispatch } from "../../utils/context/modal";
 
 export const typeOptions = ["bug", "feature"];
 export const priorityOptions = ["low", "medium", "high", "critical"];
 export const statusOptions = ["review", "active", "in_progress", "resolved", "closed"];
 
-interface ICreateTicketModalProps {
-  isOpenModal: boolean;
-  setIsOpenModal: Dispatch<SetStateAction<boolean>>;
-}
 
 interface ICreateTicket {
   name: string;
@@ -25,7 +21,7 @@ interface ICreateTicket {
   memberId?: string;
 };
 
-const CreateTicketModal = (props: ICreateTicketModalProps) => {
+const CreateTicketModal = () => {
   const [name, setName] = useState("");
   const [type, setType] = useState(typeOptions[0]);
   const [priority, setPriority] = useState(priorityOptions[1]);
@@ -39,19 +35,11 @@ const CreateTicketModal = (props: ICreateTicketModalProps) => {
   const [isValidPriority, setIsValidPriority] = useState(true);
   const [isValidStatus, setIsValidStatus] = useState(true);
 
-  const [payload, call] = useFetchApi<any, ICreateTicket>("POST", `users/${userId}/projects/${projectId}/tickets`, [], () => {
-    props.setIsOpenModal(false);
-  });
+  const dispatchModal = useModalDispatch();
 
-  useEffect(() => {
-    if (!props.isOpenModal) {
-      setName("");
-      setType(typeOptions[0]);
-      setPriority(priorityOptions[1]);
-      setStatus(statusOptions[0]);
-      setMemberId("");
-    }
-  }, [props.isOpenModal])
+  const [payload, call] = useFetchApi<any, ICreateTicket>("POST", `users/${userId}/projects/${projectId}/tickets`, [], () => {
+    dispatchModal({ type: "close", payload: null })
+  });
 
   const handelSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -59,7 +47,6 @@ const CreateTicketModal = (props: ICreateTicketModalProps) => {
   }
 
   return (
-    <Modal isOpen={props.isOpenModal} setIsOpen={props.setIsOpenModal}>
       <div className="rounded-xl bg-white dark:bg-black flex flex-col gap-4 w-80 p-2 items-center justify-center">
 
         <form className="flex-col flex w-full justify-center items-center" onSubmit={handelSubmit}>
@@ -127,8 +114,6 @@ const CreateTicketModal = (props: ICreateTicketModalProps) => {
         </form>
 
       </div>
-
-    </Modal>
   )
 }
 

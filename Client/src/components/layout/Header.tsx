@@ -9,27 +9,31 @@ import { useState } from "react";
 import SearchFiled from "../utils/SearchFiled";
 import useQuery from "../../utils/hooks/useQuery";
 import { MdMoreVert } from "react-icons/md";
-import Modal from "../utils/Modal";
+import { useModalDispatch } from "../../utils/context/modal";
+import HeaderModal from "./HeaderModal";
 
 const Header = () => {
     const user = useUser();
     const theme = useTheme();
     const query = useQuery();
     const [search, setSearch] = useState(query.get("search") || "");
+
     const themeDispatch = useThemeDispatch();
     const navigate = useNavigate();
     const userDispatch = useUserDispatch();
+    const dispatchModal = useModalDispatch();
+
     const [logoutPayload, callLogout] = useFetchApi("DELETE", "auth/logout", [], () => {
         userDispatch({ type: "logout" })
-        setIsOpenModal(false)
     });
 
     const handelSearch = () => {
-        setIsOpenModal(false)
         navigate(`/search?search=${search}`)
     }
 
-    const [isOpenModal, setIsOpenModal] = useState(false)
+    const handelOpenModal = () => {
+        dispatchModal({type: "open", payload: <HeaderModal />})
+    }
 
     return (
         <header className="flex flex-row fixed top-0 w-full z-[11] justify-between items-center text-primary dark:bg-black bg-white p-2 shadow-lg dark:shadow-secondary/40">
@@ -40,7 +44,7 @@ const Header = () => {
                 </Link>
 
                 <div className="flex sm:hidden flex-row gap-4">
-                    <div onClick={() => setIsOpenModal(true)} className="flex dark:text-secondary p-1 h-fit self-center dark:hover:bg-slate-700 justify-center cursor-pointer items-center rounded-md hover:bg-slate-300 text-primary font-bold text-xl">
+                    <div onClick={handelOpenModal} className="flex dark:text-secondary p-1 h-fit self-center dark:hover:bg-slate-700 justify-center cursor-pointer items-center rounded-md hover:bg-slate-300 text-primary font-bold text-xl">
                         <MdMoreVert />
                     </div>
 
@@ -101,41 +105,6 @@ const Header = () => {
             </div>
 
 
-            <Modal isOpen={isOpenModal} setIsOpen={setIsOpenModal}>
-                <div className="rounded-xl bg-white dark:bg-black h-full flex-1 flex flex-col gap-4 p-2 items-start justify-evenly">
-
-                    <ButtonBase
-                        onClick={() => {
-                            setIsOpenModal(false)
-                            themeDispatch({ type: theme === "dark" ? "light" : "dark" })
-                        }} className="w-full text-primary dark:text-secondary hover:bg-slate-200 dark:hover:bg-slate-800 transition-all ease-in-out rounded-md text-xl flex-row flex gap-1 items-center">
-                        {theme === "dark" ? <FaMoon /> : <FaSun />}
-                        <p>change theme</p>
-                    </ButtonBase>
-
-                    {user === null ? (
-                        <Link
-                            to="/auth/login"
-                            onClick={() => setIsOpenModal(false)}
-                            className="w-full text-primary dark:text-secondary hover:bg-slate-200 dark:hover:bg-slate-800 transition-all ease-in-out rounded-md text-xl flex-row flex gap-1 items-center">
-                            <BiLogIn /> <p>login</p>
-                        </Link>
-                    ) : (
-                        <ButtonBase
-                            onClick={() => callLogout()}
-                            isLoading={logoutPayload.isLoading}
-                            className="w-full text-primary dark:text-secondary hover:bg-slate-200 dark:hover:bg-slate-800 transition-all ease-in-out rounded-md text-xl flex-row flex gap-1 items-center">
-                            <BiLogOut />
-                            <p>logout</p>
-                        </ButtonBase>
-                    )}
-
-                    <div className="w-full">
-                        <SearchFiled onClick={handelSearch} label="Search" value={search} onChange={(e) => setSearch(e.target.value)} />
-                    </div>
-
-                </div>
-            </Modal>
         </header>
     )
 }

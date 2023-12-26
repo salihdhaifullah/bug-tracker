@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { INotification, useNotificationDispatch } from "../../utils/context/notification";
 import { FaTimes, FaCheck } from 'react-icons/fa';
 
@@ -15,17 +15,17 @@ const Notification = ({ notification }: { notification: INotification }) => {
 
     setTimeout(() => deleteNotification(), 5000);
 
-    let intervalID: number | undefined;
+    const intervalIDRef = useRef<number>();
 
     const startTimer = useCallback(() => {
-        intervalID = setInterval(() => setWidth((prev) => (prev + 1)), 25);
+        intervalIDRef.current = setInterval(() => setWidth((prev) => (prev + 1)), 25);
     }, []);
 
-    const stopTimer = useCallback(() => clearInterval(intervalID), []);
+    const stopTimer = useCallback(() => clearInterval(intervalIDRef.current), []);
 
-    useEffect(() => { if (width === 100) stopTimer() }, [width])
+    useEffect(() => { if (width === 100) stopTimer() }, [stopTimer, width])
 
-    useEffect(() => startTimer(), [])
+    useEffect(() => startTimer(), [startTimer])
 
 
     return (
