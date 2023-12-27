@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Buegee.Data;
 using Buegee.Utils;
 using Buegee.Utils.Attributes;
@@ -42,7 +43,7 @@ public class ActivitiesController : ControllerBase
         }
         catch (Exception e)
         {
-            _logger.LogError(e.Message);
+            _logger.LogError(e,"");
             return HttpResult.InternalServerError();
         }
     }
@@ -57,7 +58,7 @@ public class ActivitiesController : ControllerBase
         }
         catch (Exception e)
         {
-            _logger.LogError(e.Message);
+            _logger.LogError(e, "");
             return HttpResult.InternalServerError();
         }
     }

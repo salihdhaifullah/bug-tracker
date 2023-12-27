@@ -57,7 +57,7 @@ public class UserProjectsController : ControllerBase
         }
         catch (Exception e)
         {
-            _logger.LogError(e.Message);
+            _logger.LogError(e,"");
             return HttpResult.InternalServerError();
         }
     }
@@ -99,6 +99,7 @@ public class UserProjectsController : ControllerBase
                                 isReadOnly = p.IsReadOnly,
                                 name = p.Name,
                                 role = p.Members.Where(m => m.UserId == userId).Select(m => m.Role.ToString()),
+                                ownerId = p.Members.Where(m => m.Role == Role.owner).Select(m => m.UserId),
                                 members = p.Members.Count,
                                 tickets = p.Tickets.Count
                             })
@@ -110,7 +111,7 @@ public class UserProjectsController : ControllerBase
         }
         catch (Exception e)
         {
-            _logger.LogError(e.Message);
+            _logger.LogError(e,"");
             return HttpResult.InternalServerError();
         }
     }
@@ -148,7 +149,7 @@ public class UserProjectsController : ControllerBase
         }
         catch (Exception e)
         {
-            _logger.LogError(e.Message);
+            _logger.LogError(e,"");
             return HttpResult.InternalServerError();
         }
     }

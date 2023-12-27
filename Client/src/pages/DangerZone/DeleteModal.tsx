@@ -1,10 +1,10 @@
 import Button from "../../components/utils/Button"
 import useFetchApi from "../../utils/hooks/useFetchApi";
-import { IDangerZoneData } from ".";
+import { IDangerZoneModalProps } from ".";
 import { useParams } from "react-router-dom";
 import { useModalDispatch } from "../../utils/context/modal";
 
-const DeleteModal = (props: IDangerZoneData) => {
+const DeleteModal = (props: IDangerZoneModalProps) => {
     const { projectId, userId } = useParams()
 
     const dispatchModal = useModalDispatch();

@@ -122,7 +122,7 @@ public class TicketController : ControllerBase
         }
         catch (Exception e)
         {
-            _logger.LogError(e.Message);
+            _logger.LogError(e,"");
             return HttpResult.InternalServerError();
         }
     }
@@ -168,7 +168,7 @@ public class TicketController : ControllerBase
         }
         catch (Exception e)
         {
-            _logger.LogError(e.Message);
+            _logger.LogError(e,"");
             return HttpResult.InternalServerError();
         }
     }
@@ -180,17 +180,22 @@ public class TicketController : ControllerBase
         {
             var userId = _auth.GetId(Request);
 
+            var userName = await _ctx.Users
+                .Where(u => u.Id == userId)
+                .Select(u => $"{u.FirstName} {u.LastName}")
+                .FirstOrDefaultAsync();
+
             var ticket = await _ctx.Tickets
                     .Where((t) => t.Id == ticketId)
                     .FirstOrDefaultAsync();
 
             if (ticket is null) return HttpResult.NotFound("ticket not found");
 
-            _ctx.Tickets.Remove(ticket);
-
             await _data.AddActivity(ticket.ProjectId,
-            $"ticket **{ticket.Name.Trim()}** deleted by [{ticket.Creator.User.FirstName} {ticket.Creator.User.LastName}](/users/{ticket.Creator.UserId})",
+            $"ticket **{ticket.Name.Trim()}** deleted by [{userName}](/users/{userId})",
              _ctx);
+
+            _ctx.Tickets.Remove(ticket);
 
             await _ctx.SaveChangesAsync();
 
@@ -198,7 +203,7 @@ public class TicketController : ControllerBase
         }
         catch (Exception e)
         {
-            _logger.LogError(e.Message);
+            _logger.LogError(e, "");
             return HttpResult.InternalServerError();
         }
     }

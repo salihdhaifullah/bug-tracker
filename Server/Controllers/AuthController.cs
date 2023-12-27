@@ -75,11 +75,11 @@ public class AuthController : Controller
                 isFound.avatarUrl,
                 isFound.email,
                 isFound.name,
-            }, redirectTo: $"/profile/{isFound.id}");
+            }, redirectTo: $"/users/{isFound.id}");
         }
         catch (Exception e)
         {
-            _logger.LogError(e.Message);
+            _logger.LogError(e,"");
             return HttpResult.InternalServerError();
         }
     }
@@ -161,7 +161,7 @@ public class AuthController : Controller
         }
         catch (Exception e)
         {
-            _logger.LogError(e.Message);
+            _logger.LogError(e,"");
             return HttpResult.InternalServerError();
         }
     }
@@ -189,7 +189,7 @@ public class AuthController : Controller
         }
         catch (Exception e)
         {
-            _logger.LogError(e.Message);
+            _logger.LogError(e,"");
             return HttpResult.InternalServerError();
         }
     }
@@ -242,7 +242,7 @@ public class AuthController : Controller
         }
         catch (Exception e)
         {
-            _logger.LogError(e.Message);
+            _logger.LogError(e,"");
             return HttpResult.InternalServerError();
         }
     }
@@ -277,7 +277,7 @@ public class AuthController : Controller
         }
         catch (Exception e)
         {
-            _logger.LogError(e.Message);
+            _logger.LogError(e,"");
             return HttpResult.InternalServerError();
         }
     }
@@ -311,7 +311,7 @@ public class AuthController : Controller
         }
         catch (Exception e)
         {
-            _logger.LogError(e.Message);
+            _logger.LogError(e,"");
             return HttpResult.InternalServerError();
         }
     }
@@ -326,7 +326,7 @@ public class AuthController : Controller
         }
         catch (Exception e)
         {
-            _logger.LogError(e.Message);
+            _logger.LogError(e,"");
             return HttpResult.InternalServerError();
         }
     }

@@ -1,5 +1,5 @@
 import { IProject } from '.'
-import { Link, useParams } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import Tag from '../../components/utils/Tag'
 import rolesColors from '../../utils/rolesColors'
 import formatDate from '../../utils/formatDate'
@@ -7,17 +7,15 @@ import { FiUsers } from 'react-icons/fi'
 import { BiTask } from 'react-icons/bi'
 
 const ProjectsRow = (props: IProject) => {
-  const {userId} = useParams();
-
   return (
     <div className="flex w-full max-w-xl rounded-md shadow-md dark:shadow-secondary/40 p-4 bg-white dark:bg-black flex-row gap-2 items-center justify-between">
 
       <div className="flex flex-col gap-2 justify-start">
-        <Link className="link text-2xl" to={`/users/${userId}/projects/${props.id}`}>{props.name}</Link>
+        <Link className="link text-2xl" to={`/users/${props.ownerId}/projects/${props.id}`}>{props.name}</Link>
 
         <div className="flex justify-start gap-2 items-center">
 
-          <div className={`font-bold px-1 py-px rounded-xl shadow-md dark:shadow-secondary/40 ${(rolesColors as any)[props.role]}`}>
+          <div className={`font-bold px-1 py-px rounded-xl shadow-md dark:shadow-secondary/40 ${rolesColors[props.role]}`}>
             <span title="your role in this project"> {props.role} </span>
           </div>
 

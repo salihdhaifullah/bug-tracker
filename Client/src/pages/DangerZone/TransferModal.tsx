@@ -2,17 +2,18 @@ import { useState } from "react";
 import Button from "../../components/utils/Button"
 import useFetchApi from "../../utils/hooks/useFetchApi";
 import SelectUser from "../../components/utils/SelectUser";
-import { IDangerZoneData } from ".";
+import { IDangerZoneModalProps } from ".";
 import { useParams } from "react-router-dom";
 import { useModalDispatch } from "../../utils/context/modal";
 
-const TransferModal = (props: IDangerZoneData) => {
+const TransferModal = (props: IDangerZoneModalProps) => {
     const {projectId, userId} = useParams()
     const [isSubmit, setIsSubmit] = useState(false);
     const [isValidId, setIsValidId] = useState(true);
     const [memberId, setMemberId] = useState("")
 
     const dispatchModal = useModalDispatch();
+
     const [transferProjectPayload, callTransferProject] = useFetchApi<unknown, { projectId: string, memberId: string }>("PATCH", `users/${userId}/projects/${projectId}/danger-zone/transfer`, [], () => {
         dispatchModal({type: "close", payload: null})
     });
@@ -28,7 +29,7 @@ const TransferModal = (props: IDangerZoneData) => {
                         </div>
 
                         <div className="flex flex-row items-center mt-10 justify-center w-full px-4">
-                            <Button isLoading={transferProjectPayload.isLoading} onClick={() => callTransferProject({ projectId: projectId!, memberId })} className="!bg-red-600">transfer</Button>
+                            <Button isLoading={transferProjectPayload.isLoading} onClick={() => callTransferProject({ projectId: projectId as string, memberId })} className="!bg-red-600">transfer</Button>
                         </div>
 
                     </>

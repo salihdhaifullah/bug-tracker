@@ -1,15 +1,16 @@
 import Button from "../../components/utils/Button"
 import useFetchApi from "../../utils/hooks/useFetchApi";
-import { IDangerZoneData } from ".";
+import { IDangerZoneModalProps } from ".";
 import { useParams } from "react-router-dom";
 import { useModalDispatch } from "../../utils/context/modal";
 
-const ArchiveModal = (props: IDangerZoneData) => {
+const ArchiveModal = (props: IDangerZoneModalProps) => {
     const { projectId, userId } = useParams()
     const dispatchModal = useModalDispatch();
 
     const [archiveProjectPayload, callArchiveProject] = useFetchApi("PATCH", `users/${userId}/projects/${projectId}/danger-zone/archive`, [props], () => {
         dispatchModal({ type: "close", payload: null })
+        props.call();
     });
 
     return (

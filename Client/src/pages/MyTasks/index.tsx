@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react"
+import { useEffect, useState, useMemo, useCallback } from "react"
 import useFetchApi from "../../utils/hooks/useFetchApi";
 import CircleProgress from "../../components/utils/CircleProgress";
 import { Link, useParams } from "react-router-dom";
@@ -8,6 +8,13 @@ import Button from "../../components/utils/Button";
 import SearchFiled from "../../components/utils/SearchFiled";
 import Droppable from "./Droppable";
 import { useModalDispatch } from "../../utils/context/modal";
+
+export enum Role
+{
+    owner = "owner",
+    project_manger = "project_manger",
+    developer = "developer",
+}
 
 export enum Status {
     review = "review",
@@ -45,32 +52,26 @@ const MyTasks = () => {
     const [ticketPriority, setTicketPriority] = useState("all");
 
     const [tasksPayload, callTasks] = useFetchApi<IItem[], unknown>("GET", `users/${userId}/projects/${projectId}/tickets/assigned?search=${search}&type=${ticketType}&priority=${ticketPriority}`, [search, ticketType, ticketPriority], (result) => { setData(result) })
-    const [_, callUpdate] = useFetchApi<unknown, { id: string, status: Status }>("PATCH", `users/${userId}/projects/${projectId}/tickets/assigned`, [])
+    const [, callUpdate] = useFetchApi<unknown, { id: string, status: Status }>("PATCH", `users/${userId}/projects/${projectId}/tickets/assigned`, [])
 
-    useEffect(() => { callTasks() }, [ticketType, ticketPriority])
+    useEffect(() => { callTasks() }, [ticketType, ticketPriority, callTasks])
 
     const handelSearch = () => {
         callTasks()
     }
 
-    const realScreenHeightOffset = useMemo(() => window.screen.height * 0.3, [window.screen.height]);
-    const realScreenHeightScroll = useMemo(() => window.screen.height * 0.01, [window.screen.height]);
+    const realScreenHeightOffset = useMemo(() => window.screen.height * 0.3, []);
+    const realScreenHeightScroll = useMemo(() => window.screen.height * 0.01, []);
 
-    const DragOverListener = (e: globalThis.DragEvent) => {
+    const DragOverListener = useCallback((e: globalThis.DragEvent) => {
         if ((e.screenY + realScreenHeightOffset) >= window.screen.height) window.scrollBy(0, realScreenHeightScroll + ((e.screenY + realScreenHeightOffset) - window.screen.height));
         if ((e.screenY - realScreenHeightOffset) <= 0) window.scrollBy(0, -realScreenHeightScroll + (e.screenY - realScreenHeightOffset));
-    }
+    }, [realScreenHeightOffset, realScreenHeightScroll])
 
     useEffect(() => {
         document.addEventListener("drag", DragOverListener);
         return () => document.removeEventListener("drag", DragOverListener)
-    }, [])
-
-    const getElementId = (ele: Element | null): string | null => {
-        if (ele === null || ele.id === "root") return null;
-        if (ele.id.startsWith("droppable-")) return ele.id.split("-")[1];
-        return getElementId(ele.parentElement);
-    }
+    }, [DragOverListener])
 
     const handelDrop = (index: number, col: string) => {
         if (!(col in Status)) return;

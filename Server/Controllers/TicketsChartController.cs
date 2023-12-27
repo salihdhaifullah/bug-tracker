@@ -56,7 +56,7 @@ public class TicketsChartController : ControllerBase
         }
         catch (Exception e)
         {
-            _logger.LogError(e.Message);
+            _logger.LogError(e,"");
             return HttpResult.InternalServerError();
         }
     }

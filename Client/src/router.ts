@@ -1,6 +1,5 @@
 import Layout from "./components/layout/Layout";
 import { createBrowserRouter } from "react-router-dom";
-
 import Login from "./pages/auth/Login";
 import SingUp from "./pages/auth/SingUp";
 import NotFound from "./pages/errors/NotFound";

@@ -11,7 +11,7 @@ import CircleProgress from "../../components/utils/CircleProgress";
 import { useUser } from "../../utils/context/user";
 import { useModalDispatch } from "../../utils/context/modal";
 
-export interface IDangerZoneData {
+interface IDangerZoneData {
     name: string;
     isPrivate: boolean;
     isReadOnly: boolean;
@@ -19,12 +19,22 @@ export interface IDangerZoneData {
     isMember: boolean;
 }
 
+export interface IDangerZoneModalProps {
+    name: string;
+    isPrivate: boolean;
+    isReadOnly: boolean;
+    isOwner: boolean;
+    isMember: boolean;
+    call: () => void;
+}
+
+
 const DangerZone = () => {
     const { projectId, userId } = useParams();
     const user = useUser();
     const [payload, call] = useFetchApi<IDangerZoneData>("GET", `users/${userId}/projects/${projectId}/danger-zone`);
 
-    useEffect(() => { call() }, [])
+    useEffect(() => { call() }, [call])
 
     const dispatchModal = useModalDispatch();
 
@@ -41,7 +51,7 @@ const DangerZone = () => {
                                     <p className="text-primary dark:text-secondary">This project is currently {payload.result.isPrivate ? "private" : "public"}.</p>
                                 </div>
                                 <Button
-                                    onClick={() => dispatchModal({ type: "open", payload: <VisibilityModal {...payload.result!} /> })}
+                                    onClick={() => dispatchModal({ type: "open", payload: <VisibilityModal {...payload.result as IDangerZoneData} call={() => call()} /> })}
                                     className="!text-red-700 hover:!bg-red-600 dark:!text-red-500 dark:hover:!bg-red-400">visibility</Button>
                             </div>
 
@@ -52,7 +62,7 @@ const DangerZone = () => {
                                     <p className="text-primary dark:text-secondary">transfer this project to another user</p>
                                 </div>
                                 <Button
-                                    onClick={() => dispatchModal({ type: "open", payload: <TransferModal {...payload.result!} /> })}
+                                    onClick={() => dispatchModal({ type: "open", payload: <TransferModal {...payload.result as IDangerZoneData} call={() => call()} /> })}
                                     className="!text-red-700 hover:!bg-red-600 dark:!text-red-500 dark:hover:!bg-red-400">transfer</Button>
                             </div>
 
@@ -63,7 +73,7 @@ const DangerZone = () => {
                                     <p className="text-primary dark:text-secondary">Mark this project as {payload.result.isReadOnly ? "unarchive and read-write" : "archived and read-only"}</p>
                                 </div>
                                 <Button
-                                    onClick={() => dispatchModal({ type: "open", payload: <ArchiveModal {...payload.result!} /> })}
+                                    onClick={() => dispatchModal({ type: "open", payload: <ArchiveModal {...payload.result as IDangerZoneData} call={() => call()} /> })}
                                     className="!text-red-700 hover:!bg-red-600 dark:!text-red-500 dark:hover:!bg-red-400">{payload.result.isReadOnly ? "unarchive" : "archive"}</Button>
                             </div>
 
@@ -73,7 +83,7 @@ const DangerZone = () => {
                                     <p className="text-primary dark:text-secondary">Once you delete a project, there is no going back. Please be certain.</p>
                                 </div>
                                 <Button
-                                    onClick={() => dispatchModal({ type: "open", payload: <DeleteModal {...payload.result!} /> })}
+                                    onClick={() => dispatchModal({ type: "open", payload: <DeleteModal {...payload.result as IDangerZoneData} call={() => call()} /> })}
                                     className="!text-red-700 hover:!bg-red-600 dark:!text-red-500 dark:hover:!bg-red-400">delete</Button>
                             </div>
                         </>
@@ -86,7 +96,7 @@ const DangerZone = () => {
                                 <p className="text-primary dark:text-secondary">When you leave a project, you will no longer be a member.</p>
                             </div>
                             <Button
-                                onClick={() => dispatchModal({ type: "open", payload: <LeaveModal {...payload.result!} /> })}
+                                onClick={() => dispatchModal({ type: "open", payload: <LeaveModal {...payload.result as IDangerZoneData} call={() => call()} /> })}
                                 className="!text-red-700 hover:!bg-red-600 dark:!text-red-500 dark:hover:!bg-red-400">leave</Button>
                         </div>
                     ) : null}

@@ -1,5 +1,5 @@
 import { Link, useParams } from "react-router-dom"
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import useFetchApi from "../../utils/hooks/useFetchApi";
 import formatDate from "../../utils/formatDate";
 import CircleProgress from "../../components/utils/CircleProgress";
@@ -28,7 +28,8 @@ const Project = () => {
     const { projectId, userId } = useParams();
     const [payload, call] = useFetchApi<IProject>("GET", `users/${userId}/projects/${projectId}`);
     const user = useUser();
-    const isOwner = user?.id == userId;
+
+    const isOwner = useMemo(() => user !== null && user.id === userId, [user, userId]);
 
     useEffect(() => { call() }, [call])
 
@@ -111,7 +112,7 @@ const Project = () => {
 
                             </div>
 
-                            {payload.result.owner.id === user?.id ? <Action call={() => call()} name={payload.result.name} /> : null}
+                            {isOwner ? <Action call={() => call()} name={payload.result.name} /> : null}
                         </div>
 
                         <div className="w-full h-full gap-4 flex flex-col p-4">

@@ -11,6 +11,7 @@ import CreateProjectModal from "./CreateProjectModal";
 import roles from "../../utils/roles";
 import ProjectsRow from "./ProjectsRow";
 import { useModalDispatch } from "../../utils/context/modal";
+import { Role } from "../MyTasks";
 
 export interface IProject {
   id: number;
@@ -19,8 +20,9 @@ export interface IProject {
   isPrivate: boolean;
   isReadOnly: boolean;
   members: number
-  role: string;
+  role: Role;
   tickets: number;
+  ownerId: string;
 }
 
 const take = 10;
