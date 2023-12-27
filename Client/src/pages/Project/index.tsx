@@ -17,6 +17,7 @@ interface IProject {
     createdAt: string;
     name: string;
     isReadOnly: boolean;
+    isMember: boolean;
     owner: {
         avatarUrl: string;
         name: string;
@@ -25,11 +26,15 @@ interface IProject {
 }
 
 const Project = () => {
-    const { projectId, userId } = useParams();
-    const [payload, call] = useFetchApi<IProject>("GET", `users/${userId}/projects/${projectId}`);
+    const { projectId } = useParams();
+    const [payload, call] = useFetchApi<IProject>("GET", `projects/${projectId}`);
     const user = useUser();
 
-    const isOwner = useMemo(() => user !== null && user.id === userId, [user, userId]);
+    const isOwner = useMemo(() => (
+        user !== null &&
+        payload.result !== null &&
+        user.id === payload.result.owner.id
+    ), [payload.result, user]);
 
     useEffect(() => { call() }, [call])
 
@@ -40,40 +45,44 @@ const Project = () => {
 
                 <div className="flex flex-wrap-reverse flex-row justify-end sm:ml-10 items-center sm:gap-6 gap-2 mb-6">
 
-                    <Link to={`/users/${userId}/projects/${projectId}/tickets/assigned`}>
-                        <Button className="flex-row flex gap-2 justify-center items-center">
-                            <p>your tasks</p>
-                            <FaTasks />
-                        </Button>
-                    </Link>
+                    {payload.result.isMember ? (
+                        <Link to={`/projects/${projectId}/tickets/assigned`}>
+                            <Button className="flex-row flex gap-2 justify-center items-center">
+                                <p>your tasks</p>
+                                <FaTasks />
+                            </Button>
+                        </Link>
+                    ) : null}
 
-                    <Link to={`/users/${userId}/projects/${projectId}/members`}>
+                    <Link to={`/projects/${projectId}/members`}>
                         <Button className="flex-row flex gap-2 justify-center items-center">
                             <p>members</p>
                             <FiUsers />
                         </Button>
                     </Link>
 
-                    <Link to={`/users/${userId}/projects/${projectId}/tickets`}>
+                    <Link to={`/projects/${projectId}/tickets`}>
                         <Button className="flex-row flex gap-2 justify-center items-center">
                             <p>tickets</p>
                             <FaListUl />
                         </Button>
                     </Link>
 
-                    <Link to={`/users/${userId}/projects/${projectId}/activities`}>
+                    <Link to={`/projects/${projectId}/activities`}>
                         <Button className="flex-row flex gap-2 justify-center items-center">
                             <p>activities</p>
                             <RxActivityLog />
                         </Button>
                     </Link>
 
-                    <Link to={`/users/${userId}/projects/${projectId}/danger-zone`}>
-                        <Button className="flex-row flex gap-2 justify-center items-center">
-                            <p>danger zone</p>
-                            <MdOutlineWarning />
-                        </Button>
-                    </Link>
+                    {payload.result.isMember ? (
+                        <Link to={`/projects/${projectId}/danger-zone`}>
+                            <Button className="flex-row flex gap-2 justify-center items-center">
+                                <p>danger zone</p>
+                                <MdOutlineWarning />
+                            </Button>
+                        </Link>
+                    ) : null}
 
                 </div>
 
@@ -127,7 +136,7 @@ const Project = () => {
                                 </div>
                             ) : null}
 
-                            <Content editable={isOwner} url={`users/${userId}/projects/${projectId}/content`} />
+                            <Content editable={isOwner} url={`projects/${projectId}/content`} />
 
                         </div>
 

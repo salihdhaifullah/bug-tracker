@@ -5,10 +5,10 @@ import { useParams } from "react-router-dom";
 import { useModalDispatch } from "../../utils/context/modal";
 
 const ArchiveModal = (props: IDangerZoneModalProps) => {
-    const { projectId, userId } = useParams()
+    const { projectId } = useParams();
     const dispatchModal = useModalDispatch();
 
-    const [archiveProjectPayload, callArchiveProject] = useFetchApi("PATCH", `users/${userId}/projects/${projectId}/danger-zone/archive`, [props], () => {
+    const [archiveProjectPayload, callArchiveProject] = useFetchApi("PATCH", `projects/${projectId}/danger-zone/archive`, [props], () => {
         dispatchModal({ type: "close", payload: null })
         props.call();
     });

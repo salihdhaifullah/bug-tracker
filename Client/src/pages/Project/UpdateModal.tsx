@@ -6,19 +6,19 @@ import TextFiled from "../../components/utils/TextFiled";
 import Button from "../../components/utils/Button";
 
 const UpdateModal = (props: { name: string, call: () => void }) => {
-    const { userId, projectId } = useParams();
+    const { projectId } = useParams();
     const [name, setName] = useState(props.name);
     const [isValidName, setIsValidName] = useState(false);
     const dispatchModal = useModalDispatch();
 
-    const [payload, call] = useFetchApi<unknown, { projectId: string, name: string }>("PATCH", `users/${userId}/projects/${projectId}`, [], () => {
+    const [payload, call] = useFetchApi<unknown, { projectId: string, name: string }>("PATCH", `projects/${projectId}`, [], () => {
         props.call()
         dispatchModal({ type: "close", payload: null })
     });
 
     const handelSubmit = (e: FormEvent) => {
         e.preventDefault();
-        call({ projectId: projectId!, name })
+        call({ projectId: projectId as string, name })
     }
 
     return (

@@ -14,7 +14,7 @@ interface IUpdateModalProps {
 }
 
 const UpdateModal = (props: IUpdateModalProps) => {
-    const {ticketId, userId, projectId} = useParams();
+    const {ticketId, projectId} = useParams();
 
     const [isFileChange, setIsFileChange] = useState(false)
     const [title, setTitle] = useState(props.title)
@@ -24,7 +24,7 @@ const UpdateModal = (props: IUpdateModalProps) => {
     const [fileName, setFileName] = useState("")
 
     const dispatchModal = useModalDispatch();
-    const [updatePayload, callUpdate] = useFetchApi<unknown, { title?: string, data?: string, contentType?: string }>("PATCH", `users/${userId}/projects/${projectId}/tickets/${ticketId}/attachments/${props.id}`, [], () => {
+    const [updatePayload, callUpdate] = useFetchApi<unknown, { title?: string, data?: string, contentType?: string }>("PATCH", `projects/${projectId}/tickets/${ticketId}/attachments/${props.id}`, [], () => {
         props.call();
         dispatchModal({type: "close", payload: null})
     })

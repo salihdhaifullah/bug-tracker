@@ -5,11 +5,11 @@ import { useParams } from "react-router-dom";
 import { useModalDispatch } from "../../utils/context/modal";
 
 const VisibilityModal = (props: IDangerZoneModalProps) => {
-    const { projectId, userId } = useParams()
+    const { projectId } = useParams()
 
     const dispatchModal = useModalDispatch();
 
-    const [visibilityProjectPayload, callVisibilityProject] = useFetchApi("PATCH", `users/${userId}/projects/${projectId}/danger-zone/visibility`, [props], () => {
+    const [visibilityProjectPayload, callVisibilityProject] = useFetchApi("PATCH", `projects/${projectId}/danger-zone/visibility`, [props], () => {
         dispatchModal({ type: "close", payload: null })
         props.call();
     });

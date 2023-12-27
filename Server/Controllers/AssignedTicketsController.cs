@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Buegee.Controllers;
 [Consumes("application/json")]
-[ApiRoute("users/{userId}/projects/{projectId}/tickets/assigned")]
+[ApiRoute("projects/{projectId}/tickets/assigned")]
 [ApiController]
 public class AssignedTicketsController : ControllerBase
 {
@@ -85,7 +85,7 @@ public class AssignedTicketsController : ControllerBase
             if (ticketStatus != ticket.Status)
             {
                 await _data.AddActivity(ticket.ProjectId,
-                $"changed ticket [{ticket.Name}](/users/{userId}/projects/{ticket.ProjectId}/tickets/{ticket.Id}) " +
+                $"changed ticket [{ticket.Name}](/projects/{ticket.ProjectId}/tickets/{ticket.Id}) " +
                 $"status from **{ticket.Status}** to **{ticketStatus}**", _ctx);
 
                 ticket.Status = ticketStatus;

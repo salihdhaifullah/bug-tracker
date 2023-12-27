@@ -53,7 +53,7 @@ public class UserProjectsController : ControllerBase
 
             await _ctx.SaveChangesAsync();
 
-            return HttpResult.Created("successfully created project", redirectTo: $"/users/{userId}/projects/{projectId}");
+            return HttpResult.Created("successfully created project", redirectTo: $"/projects/{projectId}");
         }
         catch (Exception e)
         {

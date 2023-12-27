@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Buegee.Controllers;
 [Consumes("application/json")]
-[ApiRoute("users/{userId}/projects/{projectId}/members/table")]
+[ApiRoute("projects/{projectId}/members/table")]
 [ApiController]
 public class MembersTableController : ControllerBase
 {

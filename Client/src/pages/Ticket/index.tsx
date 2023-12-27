@@ -37,9 +37,9 @@ interface ITicket {
 
 
 const Ticket = () => {
-    const { ticketId, projectId, userId } = useParams();
-    const [payload, call] = useFetchApi<ITicket>("GET", `users/${userId}/projects/${projectId}/tickets/${ticketId}`, []);
-    const [rolePayload, callRole] = useFetchApi<string>("GET", `users/${userId}/projects/${projectId}/members`);
+    const { ticketId, projectId } = useParams();
+    const [payload, call] = useFetchApi<ITicket>("GET", `projects/${projectId}/tickets/${ticketId}`, []);
+    const [rolePayload, callRole] = useFetchApi<string>("GET", `projects/${projectId}/members`);
 
     useEffect(() => { call() }, [call])
 
@@ -115,9 +115,9 @@ const Ticket = () => {
                             </>
                         ) : <p className="font-bold text-primary dark:text-secondary">unassigned</p>}
 
-                        <Link className="font-bold w-fit h-fit text-primary dark:text-secondary text-lg hover:underline" title="project" to={`/users/${userId}/projects/${payload.result.project.id}`}>{payload.result.project.name}</Link>
+                        <Link className="font-bold w-fit h-fit text-primary dark:text-secondary text-lg hover:underline" title="project" to={`/projects/${payload.result.project.id}`}>{payload.result.project.name}</Link>
 
-                        <Content editable={rolePayload.result !== null && ["owner", "project_manger"].includes(rolePayload.result) || payload.result.creator.id === user?.id} url={`users/${userId}/projects/${projectId}/tickets/${ticketId}/content`} />
+                        <Content editable={rolePayload.result !== null && ["owner", "project_manger"].includes(rolePayload.result) || payload.result.creator.id === user?.id} url={`projects/${projectId}/tickets/${ticketId}/content`} />
 
                         <Attachment isCreator={payload.result.creator.id === user?.id} />
                     </div>

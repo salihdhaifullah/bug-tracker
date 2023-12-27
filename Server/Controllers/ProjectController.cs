@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Buegee.Controllers;
 [Consumes("application/json")]
-[ApiRoute("users/{userId}/projects/{projectId}")]
+[ApiRoute("projects/{projectId}")]
 [ApiController]
 public class ProjectController : ControllerBase
 {
@@ -35,13 +35,14 @@ public class ProjectController : ControllerBase
             _auth.TryGetId(Request, out string? userId);
 
             var project = await _ctx.Projects
-                            .Where((p) => p.Id == projectId && (!p.IsPrivate || p.Members.Any(m => userId != null && m.UserId == userId)))
+                            .Where((p) => p.Id == projectId)
                             .Select((p) => new
                             {
                                 name = p.Name,
                                 id = p.Id,
                                 isReadOnly = p.IsReadOnly,
                                 createdAt = p.CreatedAt,
+                                isMember = userId != null && p.Members.Any(m => m.UserId == userId),
                                 owner = p.Members.Where(m => m.Role == Role.owner).Select(m => new
                                 {
                                     name = $"{m.User.FirstName} {m.User.LastName}",

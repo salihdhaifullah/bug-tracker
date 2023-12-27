@@ -7,14 +7,14 @@ import { useParams } from "react-router-dom";
 import { useModalDispatch } from "../../utils/context/modal";
 
 const TransferModal = (props: IDangerZoneModalProps) => {
-    const {projectId, userId} = useParams()
+    const {projectId } = useParams()
     const [isSubmit, setIsSubmit] = useState(false);
     const [isValidId, setIsValidId] = useState(true);
     const [memberId, setMemberId] = useState("")
 
     const dispatchModal = useModalDispatch();
 
-    const [transferProjectPayload, callTransferProject] = useFetchApi<unknown, { projectId: string, memberId: string }>("PATCH", `users/${userId}/projects/${projectId}/danger-zone/transfer`, [], () => {
+    const [transferProjectPayload, callTransferProject] = useFetchApi<unknown, { projectId: string, memberId: string }>("PATCH", `projects/${projectId}/danger-zone/transfer`, [], () => {
         dispatchModal({type: "close", payload: null})
     });
 

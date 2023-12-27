@@ -5,12 +5,13 @@ import { useParams } from "react-router-dom";
 import { useModalDispatch } from "../../utils/context/modal";
 
 const LeaveModal = (props: IDangerZoneModalProps) => {
-    const {projectId, userId} = useParams()
+    const { projectId } = useParams()
     const dispatchModal = useModalDispatch();
 
-    const [leaveProjectPayload, callLeaveProject] = useFetchApi("DELETE", `users/${userId}/projects/${projectId}/members`, [props], () => {
+    const [leaveProjectPayload, callLeaveProject] = useFetchApi("DELETE", `projects/${projectId}/members`, [props], () => {
         dispatchModal({type: "close", payload: null})
     });
+
 
     return (
             <div className="flex flex-col justify-center items-center pb-2 px-8 text-center h-full">

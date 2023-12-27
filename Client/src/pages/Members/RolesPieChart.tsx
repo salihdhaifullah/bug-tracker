@@ -11,13 +11,13 @@ interface IData {
 }
 
 const RolesPieChart = () => {
-    const { projectId, userId } = useParams();
+    const { projectId } = useParams();
 
     const [isNoMembers, setIsNoMembers] = useState(false);
 
-    const [rolesPayload, callRoles] = useFetchApi<IData>("GET", `users/${userId}/projects/${projectId}/members/chart/`);
+    const [rolesPayload, callRoles] = useFetchApi<IData>("GET", `projects/${projectId}/members/chart/`);
 
-    useEffect(() => { callRoles() }, [])
+    useEffect(() => { callRoles() }, [callRoles])
 
     ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -43,7 +43,7 @@ const RolesPieChart = () => {
     const getData = (result: { developers: number, projectMangers: number }) => {
         if (result.developers + result.projectMangers === 0) {
             setIsNoMembers(true)
-        };
+        }
         config.datasets[0].data = [result.developers, result.projectMangers]
         return config;
     }

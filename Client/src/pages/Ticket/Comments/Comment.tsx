@@ -12,7 +12,7 @@ interface ICommentProps {
 
 const Comment = (props: ICommentProps) => {
     const user = useUser();
-    const { userId, projectId, ticketId } = useParams();
+    const { projectId, ticketId } = useParams();
 
     return (
         <div className="flex flex-row w-full gap-3">
@@ -52,7 +52,7 @@ const Comment = (props: ICommentProps) => {
                 </div>
 
                 <div className="flex w-full h-full pl-2">
-                    <Content editable={props.comment.commenter.id === user?.id} url={`users/${userId}/projects/${projectId}/tickets/${ticketId}/comments/${props.comment.id}/content`} />
+                    <Content editable={props.comment.commenter.id === user?.id} url={`projects/${projectId}/tickets/${ticketId}/comments/${props.comment.id}/content`} />
                 </div>
             </div>
         </div>

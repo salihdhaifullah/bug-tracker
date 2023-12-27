@@ -19,12 +19,12 @@ export interface IComment {
 const commentTake = 10;
 
 const Comments = () => {
-    const { ticketId, projectId, userId } = useParams();
+    const { ticketId, projectId } = useParams();
 
     const [commentPage, setCommentPage] = useState(1);
 
-    const [commentPayload, callComment] = useFetchApi<IComment[]>("GET", `users/${userId}/projects/${projectId}/tickets/${ticketId}/comments`, [commentPage, commentTake]);
-    const [countPayload, callCount] = useFetchApi<number>("GET", `users/${userId}/projects/${projectId}/tickets/${ticketId}/comments/count`);
+    const [commentPayload, callComment] = useFetchApi<IComment[]>("GET", `projects/${projectId}/tickets/${ticketId}/comments`, [commentPage, commentTake]);
+    const [countPayload, callCount] = useFetchApi<number>("GET", `projects/${projectId}/tickets/${ticketId}/comments/count`);
 
     useEffect(() => { callCount() }, [callCount])
     useEffect(() => { callComment() }, [callComment, commentPage])

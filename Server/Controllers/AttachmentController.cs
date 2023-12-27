@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Buegee.Controllers;
 [Consumes("application/json")]
-[ApiRoute("users/{userId}/projects/{projectId}/tickets/{ticketId}/attachments/{attachmentId}")]
+[ApiRoute("projects/{projectId}/tickets/{ticketId}/attachments/{attachmentId}")]
 [ApiController]
 public class AttachmentController : ControllerBase
 {

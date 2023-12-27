@@ -12,10 +12,7 @@ interface ICreateModalProps {
 }
 
 const CreateModal = (props: ICreateModalProps) => {
-    const { ticketId } = useParams();
-    const { projectId } = useParams();
-    const { userId } = useParams();
-
+    const { ticketId, projectId } = useParams();
     const [title, setTitle] = useState("")
     const [isValidTitle, setIsValidTitle] = useState(false)
     const [data, setData] = useState("")
@@ -24,7 +21,7 @@ const CreateModal = (props: ICreateModalProps) => {
 
     const dispatchModal = useModalDispatch();
 
-    const [payload, call] = useFetchApi<unknown, { title: string, data: string, contentType: string }>("POST", `users/${userId}/projects/${projectId}/tickets/${ticketId}/attachments`, [], () => {
+    const [payload, call] = useFetchApi<unknown, { title: string, data: string, contentType: string }>("POST", `projects/${projectId}/tickets/${ticketId}/attachments`, [], () => {
         props.call();
         dispatchModal({type: "close", payload: null})
     })

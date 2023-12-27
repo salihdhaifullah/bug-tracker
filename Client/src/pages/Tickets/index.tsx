@@ -10,6 +10,7 @@ import SearchFiled from "../../components/utils/SearchFiled";
 import Charts from "./Chart";
 import TicketsRow from "./TicketsRow";
 import { useModalDispatch } from "../../utils/context/modal";
+import { Priority, Status, Type } from "../MyTasks";
 
 export interface ITypeChart {
     bugs: number;
@@ -42,9 +43,9 @@ export interface ITicket {
     createdAt: string;
     creator: { name: string, id: string };
     assignedTo: { name: string, id: string, memberId: string } | null;
-    priority: string;
-    status: string;
-    type: string;
+    priority: Priority;
+    status: Status;
+    type: Type;
     id: string;
 }
 
@@ -61,17 +62,17 @@ export const isData = (data: object): boolean => {
 }
 
 const Tickets = () => {
-    const {userId, projectId } = useParams();
+    const { projectId } = useParams();
     const [take, setTake] = useState(10);
     const [page, setPage] = useState(1);
     const [search, setSearch] = useState("");
     const [ticketType, setTicketType] = useState("all");
     const [ticketStatus, setTicketStatus] = useState("all");
     const [ticketPriority, setTicketPriority] = useState("all");
-    const [rolePayload, callRole] = useFetchApi<string>("GET", `users/${userId}/projects/${projectId}/members`);
+    const [rolePayload, callRole] = useFetchApi<string>("GET", `projects/${projectId}/members`);
 
-    const [countPayload, callCount] = useFetchApi<number>("GET", `users/${userId}/projects/${projectId}/tickets/table/count?search=${search}&type=${ticketType}&status=${ticketStatus}&priority=${ticketPriority}`, [search, ticketType, ticketStatus, ticketPriority]);
-    const [ticketsPayload, callTickets] = useFetchApi<ITicket[]>("GET", `users/${userId}/projects/${projectId}/tickets/table/${page}?take=${take}&search=${search}&type=${ticketType}&status=${ticketStatus}&priority=${ticketPriority}`, [page, take, search, ticketType, ticketStatus, ticketPriority]);
+    const [countPayload, callCount] = useFetchApi<number>("GET", `projects/${projectId}/tickets/table/count?search=${search}&type=${ticketType}&status=${ticketStatus}&priority=${ticketPriority}`, [search, ticketType, ticketStatus, ticketPriority]);
+    const [ticketsPayload, callTickets] = useFetchApi<ITicket[]>("GET", `projects/${projectId}/tickets/table/${page}?take=${take}&search=${search}&type=${ticketType}&status=${ticketStatus}&priority=${ticketPriority}`, [page, take, search, ticketType, ticketStatus, ticketPriority]);
 
     useEffect(() => { callRole() }, [callRole])
     useEffect(() => { callTickets() }, [page, take, ticketType, ticketStatus, ticketPriority, callTickets])

@@ -11,20 +11,18 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Buegee.Controllers;
 [Consumes("application/json")]
-[ApiRoute("users/{userId}/projects/{projectId}/tickets/{ticketId}/attachments")]
+[ApiRoute("projects/{projectId}/tickets/{ticketId}/attachments")]
 [ApiController]
 public class TicketAttachmentsController : ControllerBase
 {
     private readonly DataContext _ctx;
-    private readonly IAuthService _auth;
     private readonly IFirebaseService _firebase;
     private readonly ILogger<TicketAttachmentsController> _logger;
 
-    public TicketAttachmentsController(DataContext ctx, ILogger<TicketAttachmentsController> logger, IAuthService auth, IFirebaseService firebase)
+    public TicketAttachmentsController(DataContext ctx, ILogger<TicketAttachmentsController> logger, IFirebaseService firebase)
     {
         _ctx = ctx;
         _logger = logger;
-        _auth = auth;
         _firebase = firebase;
     }
 

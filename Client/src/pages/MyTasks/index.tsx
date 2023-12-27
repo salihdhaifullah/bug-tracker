@@ -45,14 +45,14 @@ export interface IItem {
 }
 
 const MyTasks = () => {
-    const { projectId, userId } = useParams();
+    const { projectId } = useParams();
     const [data, setData] = useState<IItem[]>([])
     const [search, setSearch] = useState("");
     const [ticketType, setTicketType] = useState("all");
     const [ticketPriority, setTicketPriority] = useState("all");
 
-    const [tasksPayload, callTasks] = useFetchApi<IItem[], unknown>("GET", `users/${userId}/projects/${projectId}/tickets/assigned?search=${search}&type=${ticketType}&priority=${ticketPriority}`, [search, ticketType, ticketPriority], (result) => { setData(result) })
-    const [, callUpdate] = useFetchApi<unknown, { id: string, status: Status }>("PATCH", `users/${userId}/projects/${projectId}/tickets/assigned`, [])
+    const [tasksPayload, callTasks] = useFetchApi<IItem[], unknown>("GET", `projects/${projectId}/tickets/assigned?search=${search}&type=${ticketType}&priority=${ticketPriority}`, [search, ticketType, ticketPriority], (result) => { setData(result) })
+    const [, callUpdate] = useFetchApi<unknown, { id: string, status: Status }>("PATCH", `projects/${projectId}/tickets/assigned`, [])
 
     useEffect(() => { callTasks() }, [ticketType, ticketPriority, callTasks])
 
@@ -106,7 +106,7 @@ const MyTasks = () => {
                 <div className="flex items-center justify-center gap-2">
                     <Button onClick={handelOpenModal}>create ticket</Button>
 
-                    <Link to={`/users/${userId}/projects/${projectId}`}>
+                    <Link to={`/projects/${projectId}`}>
                         <Button>project</Button>
                     </Link>
                 </div>

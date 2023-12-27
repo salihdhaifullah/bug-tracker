@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using Buegee.Data;
 using Buegee.Utils;
 using Buegee.Utils.Attributes;
@@ -7,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Buegee.Controllers;
 [Consumes("application/json")]
-[ApiRoute("users/{userId}/projects/{projectId}/activities")]
+[ApiRoute("projects/{projectId}/activities")]
 [ApiController]
 public class ActivitiesController : ControllerBase
 {

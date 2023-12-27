@@ -1,5 +1,5 @@
 import { ChangeEvent, useEffect, useState } from "react";
-import { useUser, useUserDispatch } from "../../utils/context/user";
+import { IUser, useUser, useUserDispatch } from "../../utils/context/user";
 import useFetchApi from "../../utils/hooks/useFetchApi";
 import toWEBPImage from "../../utils/toWEBPImage";
 import { IProfileResult } from ".";
@@ -14,13 +14,13 @@ const Image = (props: IImageProps) => {
     const { userId } = useParams();
     const [base64, setBase64] = useState("")
     const dispatchUser = useUserDispatch();
-    const user = useUser();
+    const user = useUser() as IUser;
 
-    const [_, call] = useFetchApi<{ avatarUrl: string }, { data: string, contentType: string }>("PATCH", `users/${userId}/avatar`, [], (payload) => {
+    const [, call] = useFetchApi<{ avatarUrl: string }, { data: string, contentType: string }>("PATCH", `users/${userId}/avatar`, [], (payload) => {
         dispatchUser({
             type: "add",
             payload: {
-                ...user!,
+                ...user,
                 avatarUrl: payload.avatarUrl
             }
         });
@@ -28,7 +28,7 @@ const Image = (props: IImageProps) => {
 
     useEffect(() => {
         if (base64.length) call({ data: base64, contentType: "webp" });
-    }, [base64]);
+    }, [base64, call]);
 
     const handelChangeImage = async (e: ChangeEvent<HTMLInputElement>) => {
         const file = e?.target?.files?.item(0);

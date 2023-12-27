@@ -15,12 +15,12 @@ interface IRoleModalProps {
 }
 
 const RoleModal = (props: IRoleModalProps) => {
-    const { projectId, userId } = useParams();
+    const { projectId } = useParams();
     const [role, setRole] = useState("");
 
     const dispatchModal = useModalDispatch();
 
-    const [payloadRole, callRole] = useFetchApi<any, { role: string }>("PATCH", `users/${userId}/projects/${projectId}/members/${props.member.id}`, [], () => {
+    const [payloadRole, callRole] = useFetchApi<unknown, { role: string }>("PATCH", `projects/${projectId}/members/${props.member.id}`, [], () => {
         props.call()
         dispatchModal({ type: "close", payload: null })
     })
@@ -45,7 +45,7 @@ const RoleModal = (props: IRoleModalProps) => {
                         <Link className="link" to={`/users/${props.member.id}`}>{props.member.name}</Link>
                     </div>
 
-                    <div className={`font-bold px-1 py-px rounded-xl shadow-md dark:shadow-secondary/40 ${(rolesColors as any)[props.member.role]}`}>
+                    <div className={`font-bold px-1 py-px rounded-xl shadow-md dark:shadow-secondary/40 ${rolesColors[props.member.role]}`}>
                         <span>{props.member.role}</span>
                     </div>
 

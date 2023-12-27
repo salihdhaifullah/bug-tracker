@@ -10,7 +10,7 @@ import { useModalDispatch } from '../../utils/context/modal'
 import { priorityOptions, statusOptions, typeOptions } from './CreateTicketModal'
 
 const TicketUpdateModal = (props: {ticket: ITicket, call?: () => void}) => {
-    const {userId, projectId} = useParams();
+    const { projectId } = useParams();
 
     const [name, setName] = useState(props.ticket.name);
     const [type, setType] = useState(props.ticket.type);
@@ -24,7 +24,7 @@ const TicketUpdateModal = (props: {ticket: ITicket, call?: () => void}) => {
 
     const dispatchModal = useModalDispatch();
 
-    const [updateTicketPayload, callUpdateTicket] = useFetchApi<unknown, { name: string, type: string, priority: string, status: string, memberId?: string }>("PATCH", `users/${userId}/projects/${projectId}/tickets/${props.ticket.id}`, [], () => {
+    const [updateTicketPayload, callUpdateTicket] = useFetchApi<unknown, { name: string, type: string, priority: string, status: string, memberId?: string }>("PATCH", `projects/${projectId}/tickets/${props.ticket.id}`, [], () => {
         props?.call && props.call();
         dispatchModal({type: "close", payload: null});
     });

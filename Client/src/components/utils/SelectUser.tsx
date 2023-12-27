@@ -34,7 +34,7 @@ const scrollToEle = (container: HTMLElement, ele: HTMLElement) => {
 
 const SelectUser = (props: ISelectUserProps) => {
     const id = useId();
-    const {userId, projectId} = useParams();
+    const { projectId } = useParams();
     const [isOpen, setIsOpen] = useState(false);
     const [activeOption, setActiveOption] = useState(0);
     const [search, setSearch] = useState(props.search || "");
@@ -44,11 +44,11 @@ const SelectUser = (props: ISelectUserProps) => {
 
     useOnClickOutside(targetRef, () => setIsOpen(false));
 
-    const [payload, call] = useFetchApi<Option[]>("GET", `users/${userId}/projects/${projectId}/members${props.members ? "" : "/none-members"}?email=${search}&not-me=${props.notMe || false}`, [search]);
+    const [payload, call] = useFetchApi<Option[]>("GET", `projects/${projectId}/members${props.members ? "" : "/none-members"}?email=${search}&not-me=${props.notMe || false}`, [search]);
 
     useEffect(() => {
         call();
-    }, [search])
+    }, [call, search])
 
     const onChange = (e: ChangeEvent<HTMLInputElement>) => {
         setSearch(e.target.value)
@@ -57,7 +57,7 @@ const SelectUser = (props: ISelectUserProps) => {
 
     useEffect(() => {
         if (!isOpen && !props.id) setSearch("");
-    }, [isOpen])
+    }, [isOpen, props.id])
 
     const choseOption = (optionIndex: number) => {
         setSearch(payload.result![optionIndex].name);
@@ -72,7 +72,7 @@ const SelectUser = (props: ISelectUserProps) => {
     useEffect(() => {
         const ele = document.getElementById(`${id}-option-${activeOption}`)
         if (dropdownRef.current && ele) scrollToEle(dropdownRef.current, ele);
-    }, [activeOption, isOpen])
+    }, [activeOption, id, isOpen])
 
     const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
         if (e.key === "ArrowDown" && activeOption !== (payload.result!.length - 1)) {
@@ -92,7 +92,7 @@ const SelectUser = (props: ISelectUserProps) => {
         }
     }
 
-    useEffect(() => { props?.setIsValid && props.setIsValid(Boolean(props.id)); }, [props.id])
+    useEffect(() => { props?.setIsValid && props.setIsValid(Boolean(props.id)); }, [props, props.id])
 
     return (
         <div

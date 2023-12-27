@@ -8,7 +8,6 @@ import LeaveModal from "./LeaveModal";
 import useFetchApi from "../../utils/hooks/useFetchApi";
 import { useParams } from "react-router-dom";
 import CircleProgress from "../../components/utils/CircleProgress";
-import { useUser } from "../../utils/context/user";
 import { useModalDispatch } from "../../utils/context/modal";
 
 interface IDangerZoneData {
@@ -16,23 +15,16 @@ interface IDangerZoneData {
     isPrivate: boolean;
     isReadOnly: boolean;
     isOwner: boolean;
-    isMember: boolean;
 }
 
-export interface IDangerZoneModalProps {
-    name: string;
-    isPrivate: boolean;
-    isReadOnly: boolean;
-    isOwner: boolean;
-    isMember: boolean;
+export interface IDangerZoneModalProps extends IDangerZoneData {
     call: () => void;
 }
 
 
 const DangerZone = () => {
-    const { projectId, userId } = useParams();
-    const user = useUser();
-    const [payload, call] = useFetchApi<IDangerZoneData>("GET", `users/${userId}/projects/${projectId}/danger-zone`);
+    const { projectId } = useParams();
+    const [payload, call] = useFetchApi<IDangerZoneData>("GET", `projects/${projectId}/danger-zone`);
 
     useEffect(() => { call() }, [call])
 
@@ -43,7 +35,7 @@ const DangerZone = () => {
             {payload.isLoading ? <CircleProgress size="lg" /> : payload.result === null ? null : (
                 <div className='w-full bg-white dark:bg-black border border-gray-500 shadow-md dark:shadow-secondary/40 rounded-md justify-center items-center flex flex-col p-2'>
 
-                    {user?.id != userId ? null : (
+                    {!payload.result.isOwner ? null : (
                         <>
                             <div className='flex flex-row w-full items-center justify-between p-2 border-b border-gray-500'>
                                 <div className="flex flex-col">
@@ -89,17 +81,15 @@ const DangerZone = () => {
                         </>
                     )}
 
-                    {payload.result.isMember ? (
-                        <div className='flex flex-row w-full items-center justify-between p-2'>
-                            <div className="flex flex-col">
-                                <h3 className="text-primary dark:text-secondary font-bold">leave project</h3>
-                                <p className="text-primary dark:text-secondary">When you leave a project, you will no longer be a member.</p>
-                            </div>
-                            <Button
-                                onClick={() => dispatchModal({ type: "open", payload: <LeaveModal {...payload.result as IDangerZoneData} call={() => call()} /> })}
-                                className="!text-red-700 hover:!bg-red-600 dark:!text-red-500 dark:hover:!bg-red-400">leave</Button>
+                    <div className='flex flex-row w-full items-center justify-between p-2'>
+                        <div className="flex flex-col">
+                            <h3 className="text-primary dark:text-secondary font-bold">leave project</h3>
+                            <p className="text-primary dark:text-secondary">When you leave a project, you will no longer be a member.</p>
                         </div>
-                    ) : null}
+                        <Button
+                            onClick={() => dispatchModal({ type: "open", payload: <LeaveModal {...payload.result as IDangerZoneData} call={() => call()} /> })}
+                            className="!text-red-700 hover:!bg-red-600 dark:!text-red-500 dark:hover:!bg-red-400">leave</Button>
+                    </div>
                 </div>
             )}
         </section>

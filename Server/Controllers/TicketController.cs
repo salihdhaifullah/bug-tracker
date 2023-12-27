@@ -1,10 +1,8 @@
 using System.Text;
 using Buegee.Data;
 using Buegee.DTO;
-using Buegee.Models;
 using Buegee.Services.AuthService;
 using Buegee.Services.DataService;
-using Buegee.Services.EmailService;
 using Buegee.Utils;
 using Buegee.Utils.Attributes;
 using Buegee.Utils.Enums;
@@ -13,7 +11,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Buegee.Controllers;
 [Consumes("application/json")]
-[ApiRoute("users/{userId}/projects/{projectId}/tickets/{ticketId}")]
+[ApiRoute("projects/{projectId}/tickets/{ticketId}")]
 [ApiController]
 public class TicketController : ControllerBase
 {
@@ -106,7 +104,7 @@ public class TicketController : ControllerBase
 
             if (changes.Count > 0)
             {
-                sb.Append($"ticket [{ticket.Name}](/users/{userId}/projects/{ticket.ProjectId}/tickets/{ticket.Id}) ");
+                sb.Append($"ticket [{ticket.Name}](/projects/{ticket.ProjectId}/tickets/{ticket.Id}) ");
 
                 for (var i = 0; i < changes.Count; i++)
                 {
@@ -199,7 +197,7 @@ public class TicketController : ControllerBase
 
             await _ctx.SaveChangesAsync();
 
-            return HttpResult.Ok("successfully deleted ticket", redirectTo: $"/users/{userId}/projects/{ticket.ProjectId}");
+            return HttpResult.Ok("successfully deleted ticket", redirectTo: $"/projects/{ticket.ProjectId}");
         }
         catch (Exception e)
         {

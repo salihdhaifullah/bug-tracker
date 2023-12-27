@@ -11,10 +11,10 @@ interface IDeleteModalProps {
 }
 
 const DeleteModal = (props: IDeleteModalProps) => {
-    const { projectId, userId } = useParams();
+    const { projectId } = useParams();
 
     const dispatchModal = useModalDispatch();
-    const [payloadDelete, callDelete] = useFetchApi("DELETE", `users/${userId}/projects/${projectId}/members/${props.member.id}`, [], () => {
+    const [payloadDelete, callDelete] = useFetchApi("DELETE", `projects/${projectId}/members/${props.member.id}`, [], () => {
         props.call()
         dispatchModal({ type: "close", payload: null })
     })
@@ -31,7 +31,7 @@ const DeleteModal = (props: IDeleteModalProps) => {
                         <Link className="link" to={`/users/${props.member.id}`}>{props.member.name}</Link>
                     </div>
 
-                    <div className={`font-bold px-1 py-px rounded-xl shadow-md dark:shadow-secondary/40 ${(rolesColors as any)[props.member.role]}`}>
+                    <div className={`font-bold px-1 py-px rounded-xl shadow-md dark:shadow-secondary/40 ${rolesColors[props.member.role]}`}>
                         <span>{props.member.role}</span>
                     </div>
 

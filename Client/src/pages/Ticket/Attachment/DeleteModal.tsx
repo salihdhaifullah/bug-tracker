@@ -10,11 +10,11 @@ interface IDeleteModalProps {
 }
 
 const DeleteModal = (props: IDeleteModalProps) => {
-    const { ticketId, userId, projectId } = useParams();
+    const { ticketId, projectId } = useParams();
 
     const dispatchModal = useModalDispatch();
 
-    const [deletePayload, callDelete] = useFetchApi("DELETE", `users/${userId}/projects/${projectId}/tickets/${ticketId}/attachments/${props.id}`, [], () => {
+    const [deletePayload, callDelete] = useFetchApi("DELETE", `projects/${projectId}/tickets/${ticketId}/attachments/${props.id}`, [], () => {
         props.call();
         dispatchModal({type: "close", payload: null})
     })

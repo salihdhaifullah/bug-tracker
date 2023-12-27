@@ -11,11 +11,11 @@ interface IActionProps {
 }
 
 const Action = (props: IActionProps) => {
-    const {userId, projectId, ticketId} = useParams();
+    const { projectId, ticketId} = useParams();
 
     const [isOpen, setIsOpen] = useState(false);
 
-    const [deletePayload, callDelete] = useFetchApi("DELETE", `users/${userId}/projects/${projectId}/tickets/${ticketId}/comments/${props.commentId}`, [], () => {
+    const [deletePayload, callDelete] = useFetchApi("DELETE", `projects/${projectId}/tickets/${ticketId}/comments/${props.commentId}`, [], () => {
         props.call();
     });
 

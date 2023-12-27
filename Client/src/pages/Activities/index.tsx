@@ -12,17 +12,17 @@ export interface IActivity {
 }
 
 const Activities = () => {
-    const { projectId, userId } = useParams();
+    const { projectId } = useParams();
     const [text, setText] = useState("");
     const [take, setTake] = useState(10);
     const [page, setPage] = useState(1);
     const [sort, setSort] = useState("latest");
 
-    const [activitiesPayload, callActivities] = useFetchApi<IActivity[]>("GET", `users/${userId}/projects/${projectId}/activities/${page}?take=${take}&sort=${sort}`, [take, page, sort]);
-    const [countPayload, callCount] = useFetchApi<number>("GET", `users/${userId}/projects/${projectId}/activities/count`);
+    const [activitiesPayload, callActivities] = useFetchApi<IActivity[]>("GET", `projects/${projectId}/activities/${page}?take=${take}&sort=${sort}`, [take, page, sort]);
+    const [countPayload, callCount] = useFetchApi<number>("GET", `projects/${projectId}/activities/count`);
 
-    useEffect(() => { callActivities() }, [take, page, sort])
-    useEffect(() => { callCount() }, [])
+    useEffect(() => { callActivities() }, [take, page, sort, callActivities])
+    useEffect(() => { callCount() }, [callCount])
 
     useMemo(() => {
         if (!activitiesPayload.result) return;

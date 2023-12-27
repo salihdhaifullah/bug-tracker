@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Buegee.Controllers;
 [Consumes("application/json")]
-[ApiRoute("users/{userId}/projects/{projectId}/tickets")]
+[ApiRoute("projects/{projectId}/tickets")]
 [ApiController]
 public class ProjectTicketsController : ControllerBase
 {
@@ -87,7 +87,7 @@ public class ProjectTicketsController : ControllerBase
 
             await _data.AddActivity(
                 projectId,
-                $"created ticket [{ticket.Entity.Name}](/users/{userId}/projects/{projectId}/tickets/{ticket.Entity.Id}) " +
+                $"created ticket [{ticket.Entity.Name}](/projects/{projectId}/tickets/{ticket.Entity.Id}) " +
                 $"of type **{ticket.Entity.Type.ToString()}**, " +
                 $"created by [{creator.name}](/users/{userId}), " +
                 $"{assignedToText}" +
@@ -97,7 +97,7 @@ public class ProjectTicketsController : ControllerBase
 
             await _ctx.SaveChangesAsync();
 
-            return HttpResult.Created("successfully created ticket", redirectTo: $"/users/{userId}/projects/{projectId}/tickets/{ticketId}");
+            return HttpResult.Created("successfully created ticket", redirectTo: $"/projects/{projectId}/tickets/{ticketId}");
         }
         catch (Exception e)
         {

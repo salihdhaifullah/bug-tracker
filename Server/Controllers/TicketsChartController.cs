@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Buegee.Controllers;
 [Consumes("application/json")]
-[ApiRoute("users/{userId}/projects/{projectId}/tickets/chart")]
+[ApiRoute("projects/{projectId}/tickets/chart")]
 [ApiController]
 public class TicketsChartController : ControllerBase
 {

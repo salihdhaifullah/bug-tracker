@@ -11,7 +11,7 @@ const ProjectsRow = (props: IProject) => {
     <div className="flex w-full max-w-xl rounded-md shadow-md dark:shadow-secondary/40 p-4 bg-white dark:bg-black flex-row gap-2 items-center justify-between">
 
       <div className="flex flex-col gap-2 justify-start">
-        <Link className="link text-2xl" to={`/users/${props.ownerId}/projects/${props.id}`}>{props.name}</Link>
+        <Link className="link text-2xl" to={`/projects/${props.id}`}>{props.name}</Link>
 
         <div className="flex justify-start gap-2 items-center">
 

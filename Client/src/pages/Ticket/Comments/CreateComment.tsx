@@ -8,17 +8,17 @@ interface ICreateCommentProps {
 }
 
 const CreateComment = (props: ICreateCommentProps) => {
-    const {userId, projectId, ticketId} = useParams();
+    const { projectId, ticketId} = useParams();
 
     const [md, setMd] = useState("");
     const files = useRef<{ base64: string, previewUrl: string }[]>([]);
 
-    const [createPayload, call] = useFetchApi<any, { markdown: string, files: { base64: string, previewUrl: string }[] }>("POST", `users/${userId}/projects/${projectId}/tickets/${ticketId}/comments`, [], () => {
+    const [createPayload, call] = useFetchApi<unknown, { markdown: string, files: { base64: string, previewUrl: string }[] }>("POST", `projects/${projectId}/tickets/${ticketId}/comments`, [], () => {
         if (props?.call) props.call();
     })
 
     const handelSubmit = () => {
-        for (const file of files.current) { URL.revokeObjectURL(file.previewUrl) };
+        for (const file of files.current) URL.revokeObjectURL(file.previewUrl);
         files.current = files.current.filter((file) => md.includes(file.previewUrl));
         call({ markdown: md, files: files.current });
         files.current = [];

@@ -16,8 +16,8 @@ interface IAttachment {
 }
 
 const Attachment = (props: { isCreator: boolean }) => {
-    const { ticketId, userId, projectId } = useParams();
-    const [attachmentsPayload, callAttachments] = useFetchApi<IAttachment[]>("GET", `users/${userId}/projects/${projectId}/tickets/${ticketId}/attachments`);
+    const { ticketId, projectId } = useParams();
+    const [attachmentsPayload, callAttachments] = useFetchApi<IAttachment[]>("GET", `projects/${projectId}/tickets/${ticketId}/attachments`);
 
     useEffect(() => { callAttachments() }, [callAttachments])
 

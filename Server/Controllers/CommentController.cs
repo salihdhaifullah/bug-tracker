@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Buegee.Controllers;
 [Consumes("application/json")]
-[ApiRoute("users/{userId}/projects/{projectId}/tickets/{ticketId}/comments")]
+[ApiRoute("projects/{projectId}/tickets/{ticketId}/comments")]
 [ApiController]
 public class CommentController : ControllerBase
 {

@@ -8,19 +8,19 @@ import StatusChart from "./StatusChart";
 import PriorityChart from "./PriorityChart";
 
 const Charts = () => {
-    const { projectId, userId } = useParams();
-    const [payload, call] = useFetchApi<IChartsData>("GET", `users/${userId}/projects/${projectId}/tickets/chart`);
+    const { projectId } = useParams();
+    const [payload, call] = useFetchApi<IChartsData>("GET", `projects/${projectId}/tickets/chart`);
 
-    useEffect(() => { call() }, [])
+    useEffect(() => { call() }, [call])
 
     return (
-        !payload.isLoading && !payload.result ? null :
+        !payload.isLoading && payload.result === null ? null :
             <div className="flex flex-row flex-wrap gap-2 justify-center items-center my-4">
-                {payload.isLoading ? <CircleProgress size="lg" /> : (
+                {payload.isLoading ? <CircleProgress size="lg" /> : payload.result === null ? null : (
                     <>
-                        {!isData(payload.result!.type) ? null : <TypeChart {...payload.result!.type} />}
-                        {!isData(payload.result!.status) ? null : <StatusChart {...payload.result!.status} />}
-                        {!isData(payload.result!.priority) ? null : <PriorityChart {...payload.result!.priority} />}
+                        {!isData(payload.result.type) ? null : <TypeChart {...payload.result.type} />}
+                        {!isData(payload.result.status) ? null : <StatusChart {...payload.result.status} />}
+                        {!isData(payload.result.priority) ? null : <PriorityChart {...payload.result.priority} />}
                     </>
                 )}
             </div>

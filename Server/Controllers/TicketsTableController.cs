@@ -1,7 +1,4 @@
 using Buegee.Data;
-using Buegee.Services.AuthService;
-using Buegee.Services.DataService;
-using Buegee.Services.EmailService;
 using Buegee.Utils;
 using Buegee.Utils.Attributes;
 using Buegee.Utils.Enums;
@@ -10,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Buegee.Controllers;
 [Consumes("application/json")]
-[ApiRoute("users/{userId}/projects/{projectId}/tickets/table")]
+[ApiRoute("projects/{projectId}/tickets/table")]
 [ApiController]
 public class TicketsTableController : ControllerBase
 {

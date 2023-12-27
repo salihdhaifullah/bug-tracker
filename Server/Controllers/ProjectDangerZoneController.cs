@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Buegee.Controllers;
 [Consumes("application/json")]
-[ApiRoute("users/{userId}/projects/{projectId}/danger-zone")]
+[ApiRoute("projects/{projectId}/danger-zone")]
 [ApiController]
 public class ProjectDangerZoneController : ControllerBase
 {
@@ -35,13 +35,13 @@ public class ProjectDangerZoneController : ControllerBase
             _auth.TryGetId(Request, out string? userId);
 
             var project = await _ctx.Projects
-                            .Where((p) => p.Id == projectId && (!p.IsPrivate || p.Members.Any(m => userId != null && m.UserId == userId)))
-                            .Select((p) => new
+                            .Where(p => p.Id == projectId)
+                            .Select(p => new
                             {
                                 name = p.Name,
                                 isPrivate = p.IsPrivate,
                                 isReadOnly = p.IsReadOnly,
-                                isMember = userId != null && p.Members.Any(m => m.UserId == userId)
+                                isOwner = userId != null && p.Members.Any(m => m.UserId == userId && m.Role == Role.owner),
                             })
                             .FirstOrDefaultAsync();
 
@@ -155,7 +155,7 @@ public class ProjectDangerZoneController : ControllerBase
 
             await _ctx.SaveChangesAsync();
 
-            return HttpResult.Ok("successfully transferred project");
+            return HttpResult.Ok("successfully transferred project", redirectTo: $"/projects/{projectId}");
         }
         catch (Exception e)
         {

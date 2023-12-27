@@ -1,6 +1,5 @@
 using Buegee.Data;
 using Buegee.DTO;
-using Buegee.Services.AuthService;
 using Buegee.Services.DataService;
 using Buegee.Utils;
 using Buegee.Utils.Attributes;
@@ -10,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Buegee.Controllers;
 [Consumes("application/json")]
-[ApiRoute("users/{userId}/projects/{projectId}/tickets/{ticketId}/content")]
+[ApiRoute("projects/{projectId}/tickets/{ticketId}/content")]
 [ApiController]
 public class TicketContentController : ControllerBase
 {

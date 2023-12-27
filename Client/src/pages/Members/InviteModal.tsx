@@ -15,16 +15,16 @@ interface IInviteModalProps {
 const InviteModal = (props: IInviteModalProps) => {
     const [invitedId, setInvitedId] = useState("");
     const [role, setRole] = useState("developer");
-    const { projectId, userId } = useParams();
+    const { projectId } = useParams();
 
     const [isValidRole, setIsValidRole] = useState(true);
     const [isValidId, setIsValidId] = useState(true);
 
     const dispatchModal = useModalDispatch();
 
-    const [payload, call] = useFetchApi<any, { invitedId: string, role: string }>("POST", `users/${userId}/projects/${projectId}/members`, [projectId], () => {
-        dispatchModal({ type: "close", payload: null })
+    const [payload, call] = useFetchApi<unknown, { invitedId: string, role: string }>("POST", `projects/${projectId}/members`, [projectId], () => {
         props.call();
+        dispatchModal({ type: "close", payload: null });
     });
 
     const handelSubmit = (e: FormEvent) => {
@@ -43,7 +43,7 @@ const InviteModal = (props: IInviteModalProps) => {
                     <FaAddressCard className="text-3xl text-primary dark:text-secondary font-extrabold" />
                 </div>
 
-                <SelectUser setIsValid={setIsValidId} required label="invite user" members={true} setId={setInvitedId} id={invitedId} />
+                <SelectUser setIsValid={setIsValidId} required label="invite user" members={false} setId={setInvitedId} id={invitedId} />
 
                 <Select
                     label="role for user to invite"

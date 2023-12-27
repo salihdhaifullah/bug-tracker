@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom"
 import Button from "../../components/utils/Button";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import useFetchApi from "../../utils/hooks/useFetchApi";
 import CircleProgress from "../../components/utils/CircleProgress";
 import { AiOutlineArrowLeft, AiOutlineArrowRight } from "react-icons/ai";
@@ -10,14 +10,14 @@ import roles from "../../utils/roles";
 import InviteModal from "./InviteModal";
 import MembersRow from "./MembersRow";
 import RolesPieChart from "./RolesPieChart";
-import { useUser } from "../../utils/context/user";
 import { useModalDispatch } from "../../utils/context/modal";
+import { Role } from "../MyTasks";
 
 export interface IMember {
     avatarUrl: string;
     email: string;
     name: string;
-    role: string;
+    role: Role;
     joinedAt: string;
     id: string;
 }
@@ -34,18 +34,24 @@ export interface IChangeRole {
 
 
 const Members = () => {
-    const { projectId, userId } = useParams();
-    const isOwner = userId === useUser()?.id;
+    const { projectId } = useParams();
     const [search, setSearch] = useState("");
     const [role, setRole] = useState("all");
     const [take, setTake] = useState(10);
     const [page, setPage] = useState(1);
 
-    const [membersPayload, callMembers] = useFetchApi<IMember[]>("GET", `users/${userId}/projects/${projectId}/members/table?take=${take}&page=${page}&role=${role}&search=${search}`, [take, page, role, search]);
-    const [countPayload, callCount] = useFetchApi<number>("GET", `users/${userId}/projects/${projectId}/members/table/count/${projectId}?role=${role}&search=${search}`, [role, search]);
+    const [membersPayload, callMembers] = useFetchApi<IMember[]>("GET", `projects/${projectId}/members/table?take=${take}&page=${page}&role=${role}&search=${search}`, [take, page, role, search]);
+    const [countPayload, callCount] = useFetchApi<number>("GET", `projects/${projectId}/members/table/count/${projectId}?role=${role}&search=${search}`, [role, search]);
+    const [rolePayload, callRole] = useFetchApi<Role>("GET", `projects/${projectId}/members/role`);
 
     useEffect(() => { callMembers() }, [take, page, role, callMembers])
     useEffect(() => { callCount() }, [callCount, role])
+    useEffect(() => { callRole() }, [callRole])
+
+    const isOwner = useMemo(() => (
+        rolePayload.result !== null &&
+        rolePayload.result === Role.owner
+    ), [rolePayload.result])
 
     const handelSearch = () => {
         callCount()

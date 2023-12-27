@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Buegee.Controllers;
 [Consumes("application/json")]
-[ApiRoute("users/{userId}/projects/{projectId}/members")]
+[ApiRoute("projects/{projectId}/members")]
 [ApiController]
 public class ProjectMembersController : ControllerBase
 {
@@ -183,14 +183,15 @@ public class ProjectMembersController : ControllerBase
     }
 
 
-    [HttpGet("role"), ProjectRead]
-    public async Task<IActionResult> GetRole([FromRoute] string projectId, [FromRoute] string memberId)
+    [HttpGet("role"), Authorized, ProjectRead]
+    public async Task<IActionResult> GetRole([FromRoute] string projectId)
     {
         try
         {
+            var userId = _auth.GetId(Request);
 
             var role = await _ctx.Members
-                .Where(m => m.ProjectId == projectId && m.Id == memberId)
+                .Where(m => m.ProjectId == projectId && m.UserId == userId)
                 .Select(m => m.Role.ToString())
                 .FirstOrDefaultAsync();
 

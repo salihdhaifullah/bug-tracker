@@ -19,7 +19,7 @@ interface ICreateTicket {
   priority: string;
   status: string;
   memberId?: string;
-};
+}
 
 const CreateTicketModal = () => {
   const [name, setName] = useState("");
@@ -28,7 +28,7 @@ const CreateTicketModal = () => {
   const [status, setStatus] = useState(statusOptions[0]);
   const [memberId, setMemberId] = useState("");
 
-  const { projectId, userId } = useParams()
+  const { projectId } = useParams()
 
   const [isValidName, setIsValidName] = useState(false);
   const [isValidType, setIsValidType] = useState(true);
@@ -37,7 +37,7 @@ const CreateTicketModal = () => {
 
   const dispatchModal = useModalDispatch();
 
-  const [payload, call] = useFetchApi<any, ICreateTicket>("POST", `users/${userId}/projects/${projectId}/tickets`, [], () => {
+  const [payload, call] = useFetchApi<unknown, ICreateTicket>("POST", `projects/${projectId}/tickets`, [], () => {
     dispatchModal({ type: "close", payload: null })
   });
 

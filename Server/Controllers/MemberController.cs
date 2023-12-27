@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Buegee.Controllers;
 [Consumes("application/json")]
-[ApiRoute("users/{userId}/projects/{projectId}/members/{memberId}")]
+[ApiRoute("projects/{projectId}/members/{memberId}")]
 [ApiController]
 public class MembersController : ControllerBase
 {
@@ -57,12 +57,12 @@ public class MembersController : ControllerBase
 
 
     [HttpPatch, Authorized, BodyValidation, ProjectArchive, ProjectRole(Role.owner)]
-    public async Task<IActionResult> UpdateMember([FromRoute] string projectId, [FromBody] ChangeRoleDTO dto)
+    public async Task<IActionResult> UpdateMember([FromRoute] string projectId, [FromRoute] string memberId, [FromBody] ChangeRoleDTO dto)
     {
         try
         {
             var member = await _ctx.Members
-                    .Where(m => m.ProjectId == projectId && m.UserId == dto.MemberId)
+                    .Where(m => m.ProjectId == projectId && m.UserId == memberId)
                     .Include(m => m.User)
                     .FirstOrDefaultAsync();
 
