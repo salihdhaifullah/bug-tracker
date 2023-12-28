@@ -43,6 +43,7 @@ const DangerZone = () => {
                                     <p className="text-primary dark:text-secondary">This project is currently {payload.result.isPrivate ? "private" : "public"}.</p>
                                 </div>
                                 <Button
+                                    isValid={!payload.result.isReadOnly}
                                     onClick={() => dispatchModal({ type: "open", payload: <VisibilityModal {...payload.result as IDangerZoneData} call={() => call()} /> })}
                                     className="!text-red-700 hover:!bg-red-600 dark:!text-red-500 dark:hover:!bg-red-400">visibility</Button>
                             </div>
@@ -54,6 +55,7 @@ const DangerZone = () => {
                                     <p className="text-primary dark:text-secondary">transfer this project to another user</p>
                                 </div>
                                 <Button
+                                    isValid={!payload.result.isReadOnly}
                                     onClick={() => dispatchModal({ type: "open", payload: <TransferModal {...payload.result as IDangerZoneData} call={() => call()} /> })}
                                     className="!text-red-700 hover:!bg-red-600 dark:!text-red-500 dark:hover:!bg-red-400">transfer</Button>
                             </div>
@@ -75,6 +77,7 @@ const DangerZone = () => {
                                     <p className="text-primary dark:text-secondary">Once you delete a project, there is no going back. Please be certain.</p>
                                 </div>
                                 <Button
+                                    isValid={!payload.result.isReadOnly}
                                     onClick={() => dispatchModal({ type: "open", payload: <DeleteModal {...payload.result as IDangerZoneData} call={() => call()} /> })}
                                     className="!text-red-700 hover:!bg-red-600 dark:!text-red-500 dark:hover:!bg-red-400">delete</Button>
                             </div>
@@ -87,6 +90,7 @@ const DangerZone = () => {
                             <p className="text-primary dark:text-secondary">When you leave a project, you will no longer be a member.</p>
                         </div>
                         <Button
+                            isValid={!payload.result.isReadOnly}
                             onClick={() => dispatchModal({ type: "open", payload: <LeaveModal {...payload.result as IDangerZoneData} call={() => call()} /> })}
                             className="!text-red-700 hover:!bg-red-600 dark:!text-red-500 dark:hover:!bg-red-400">leave</Button>
                     </div>

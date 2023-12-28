@@ -44,7 +44,7 @@ public class TicketContentController : ControllerBase
         };
     }
 
-    [HttpPatch, Authorized, BodyValidation, ProjectRole(Role.owner, Role.project_manger)]
+    [HttpPatch, Authorized, BodyValidation, ProjectArchive, ProjectRole(Role.owner, Role.project_manger)]
     public async Task<IActionResult> UpdateContent([FromBody] ContentDTO dto, [FromRoute] string ticketId)
     {
         try

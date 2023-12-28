@@ -3,6 +3,7 @@ import { DragEvent, ReactElement, useRef } from "react";
 interface IDraggableProps {
     children: ReactElement[] | ReactElement | string;
     index: number;
+    isReadOnly: boolean;
 }
 
 const Draggable = (props: IDraggableProps) => {
@@ -16,7 +17,7 @@ const Draggable = (props: IDraggableProps) => {
         <div
             id={props.index.toString()}
             ref={ref}
-            draggable={true}
+            draggable={!props.isReadOnly}
             onDragStart={dragStartHandler}
         >
             <div

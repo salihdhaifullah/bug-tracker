@@ -53,7 +53,9 @@ const MyTasks = () => {
     const [tasksPayload, callTasks] = useFetchApi<IItem[], unknown>("GET", `projects/${projectId}/tickets/assigned?search=${search}&type=${ticketType}&priority=${ticketPriority}`, [search, ticketType, ticketPriority], (result) => { setData(result) })
     const [, callUpdate] = useFetchApi<unknown, { id: string, status: Status }>("PATCH", `projects/${projectId}/tickets/assigned`, [])
     const [rolePayload, callRole] = useFetchApi<Role>("GET", `projects/${projectId}/members/role`, [])
+    const [projectPayload, callProject] = useFetchApi<{isReadOnly: boolean}>("GET", `projects/${projectId}/danger-zone`);
 
+    useLayoutEffect(() => { callProject() }, [callProject])
     useLayoutEffect(() => { callTasks() }, [ticketType, ticketPriority, callTasks])
     useLayoutEffect(() => { callRole() }, [callRole])
 
@@ -89,6 +91,11 @@ const MyTasks = () => {
         dispatchModal({ type: "open", payload: <CreateTicketModal /> })
     }
 
+    const isReadOnly = useMemo(() => (
+        projectPayload.result === null
+        || projectPayload.result.isReadOnly
+    ), [projectPayload.result])
+
     return (
         <div className="flex flex-col w-full p-2 py-10 my-10">
 
@@ -105,7 +112,7 @@ const MyTasks = () => {
                 </div>
 
                 <div className="flex items-center justify-center gap-2">
-                    {[Role.project_manger, Role.owner].includes(rolePayload?.result as Role) ? (
+                    {[Role.project_manger, Role.owner].includes(rolePayload?.result as Role) && !isReadOnly ? (
                         <Button onClick={handelOpenModal}>create ticket</Button>
                     ) : null}
 
@@ -117,15 +124,9 @@ const MyTasks = () => {
             </div>
 
             <div className="flex flex-wrap flex-row justify-center items-start my-6 gap-2">
-                {!tasksPayload.isLoading ? data.length ? (
-                    <>
-                        <Droppable handelDrop={handelDrop} items={data} col={Status.review} />
-                        <Droppable handelDrop={handelDrop} items={data} col={Status.active} />
-                        <Droppable handelDrop={handelDrop} items={data} col={Status.in_progress} />
-                        <Droppable handelDrop={handelDrop} items={data} col={Status.resolved} />
-                        <Droppable handelDrop={handelDrop} items={data} col={Status.closed} />
-                    </>
-                ) : (
+                {!tasksPayload.isLoading ? data.length ? Object.keys(Status).map((value, index) => (
+                    <Droppable isReadOnly={isReadOnly} handelDrop={handelDrop} items={data} col={value} key={index} />
+                )) : (
                     <h1 className="my-20 dark:text-white text-3xl"> no ticket assigned to you </h1>
                 ) : (
                     <CircleProgress size="lg" className="my-20" />

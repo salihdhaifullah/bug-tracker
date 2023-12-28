@@ -15,7 +15,7 @@ interface IAttachment {
     createdAt: string;
 }
 
-const Attachment = (props: { isCreator: boolean }) => {
+const Attachment = (props: { isOwnerOrManger: boolean }) => {
     const { ticketId, projectId } = useParams();
     const [attachmentsPayload, callAttachments] = useFetchApi<IAttachment[]>("GET", `projects/${projectId}/tickets/${ticketId}/attachments`);
 
@@ -25,7 +25,7 @@ const Attachment = (props: { isCreator: boolean }) => {
 
     return (
         <>
-            {props.isCreator && <div className="flex flex-row gap-4 w-full flex-wrap items-center pb-4 p-2 bg-white dark:bg-black justify-between">
+            {props.isOwnerOrManger && <div className="flex flex-row gap-4 w-full flex-wrap items-center pb-4 p-2 bg-white dark:bg-black justify-between">
                 <Button
                     onClick={() => dispatchModal({ type: "open", payload: <CreateAttachmentModal call={() => callAttachments()} /> })}
                 >add attachment</Button>
@@ -48,7 +48,7 @@ const Attachment = (props: { isCreator: boolean }) => {
 
                                 <p className="dark:text-gray-200 text-gray-800 w-[30%]"> {formatDate(attachment.createdAt)} </p>
 
-                                {props.isCreator && <Action call={() => callAttachments()} id={attachment.id} title={attachment.title} />}
+                                {props.isOwnerOrManger && <Action call={() => callAttachments()} id={attachment.id} title={attachment.title} />}
                             </div>
                         ))}
                     </div>

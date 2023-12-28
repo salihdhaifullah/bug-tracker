@@ -21,6 +21,7 @@ const Content = (props: IContentProps) => {
 
     const [createPayload, call] = useFetchApi<unknown, { markdown: string, files: { base64: string, previewUrl: string }[] }>("PATCH", props.url, [], () => {
         if (props?.call) props.call();
+        callGet()
     })
 
     const handelSubmit = () => {

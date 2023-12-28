@@ -44,7 +44,7 @@ public class ProjectContentController : ControllerBase
         };
     }
 
-    [HttpPatch, Authorized, BodyValidation, ProjectRole(Role.owner)]
+    [HttpPatch, Authorized, BodyValidation, ProjectRole(Role.owner), ProjectArchive]
     public async Task<IActionResult> UpdateContent([FromBody] ContentDTO dto, [FromRoute] string projectId)
     {
         try

@@ -22,6 +22,7 @@ const CreateComment = (props: ICreateCommentProps) => {
         files.current = files.current.filter((file) => md.includes(file.previewUrl));
         call({ markdown: md, files: files.current });
         files.current = [];
+        setMd("")
     }
 
     return (

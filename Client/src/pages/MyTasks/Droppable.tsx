@@ -8,6 +8,7 @@ interface IDroppableProps {
     items: IItem[] | null;
     col: string;
     handelDrop: (index: number, col: string) => void;
+    isReadOnly: boolean;
 }
 
 const Droppable = (props: IDroppableProps) => {
@@ -41,7 +42,7 @@ const Droppable = (props: IDroppableProps) => {
             <div className="flex gap-2 justify-start flex-col flex-1">
                 {props.items && props.items.map((item, index) => {
                     if (item.status === props.col) return (
-                        <Draggable index={index} key={index}>
+                        <Draggable isReadOnly={props.isReadOnly} index={index} key={index}>
                             <div className="flex flex-col gap-2 w-full">
 
                                 <Link className="link text-base" to={`/projects/${projectId}/tickets/${item.id}`}>{item.name}</Link>

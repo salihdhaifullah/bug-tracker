@@ -49,18 +49,6 @@ export interface ITicket {
     id: string;
 }
 
-export const isData = (data: object): boolean => {
-    const values = Object.values(data);
-
-    for (const value of values) {
-        if (value as number > 0) {
-            return true;
-        }
-    }
-
-    return false;
-}
-
 const Tickets = () => {
     const { projectId } = useParams();
     const [take, setTake] = useState(10);
@@ -73,8 +61,10 @@ const Tickets = () => {
     const [rolePayload, callRole] = useFetchApi<Role>("GET", `projects/${projectId}/members/role`);
     const [countPayload, callCount] = useFetchApi<number>("GET", `projects/${projectId}/tickets/table/count?search=${search}&type=${ticketType}&status=${ticketStatus}&priority=${ticketPriority}`, [search, ticketType, ticketStatus, ticketPriority]);
     const [ticketsPayload, callTickets] = useFetchApi<ITicket[]>("GET", `projects/${projectId}/tickets/table/${page}?take=${take}&search=${search}&type=${ticketType}&status=${ticketStatus}&priority=${ticketPriority}`, [page, take, search, ticketType, ticketStatus, ticketPriority]);
+    const [projectPayload, callProject] = useFetchApi<{isReadOnly: boolean}>("GET", `projects/${projectId}/danger-zone`);
 
     useLayoutEffect(() => { callRole() }, [callRole])
+    useLayoutEffect(() => { callProject() }, [callProject])
     useLayoutEffect(() => { callTickets() }, [page, take, ticketType, ticketStatus, ticketPriority, callTickets])
     useLayoutEffect(() => { callCount() }, [ticketType, ticketStatus, ticketPriority, callCount])
 
@@ -97,10 +87,12 @@ const Tickets = () => {
         dispatchModal({ type: "open", payload: <CreateTicketModal /> })
     }
 
-    const isOwnerOrManger = useMemo(() => (
+    const isOwnerOrMangerAndNotArchived = useMemo(() => (
         rolePayload.result !== null
         && [Role.owner, Role.project_manger].includes(rolePayload.result)
-    ), [rolePayload.result])
+        && projectPayload.result !== null
+        && !projectPayload.result.isReadOnly
+    ), [projectPayload.result, rolePayload.result])
 
     return (
         <section className="h-full w-full py-4 md:px-8 px-3 mt-10 gap-8 flex flex-col">
@@ -108,7 +100,7 @@ const Tickets = () => {
             <div className="w-full dark:bg-black bg-white border border-gray-500 shadow-md dark:shadow-secondary/40 rounded-md justify-center items-center flex flex-col p-2">
 
                 <div className="flex flex-row gap-4 w-full flex-wrap items-center pb-4 p-2 bg-white dark:bg-black justify-between">
-                    <Button onClick={handelOpenModal}>create ticket</Button>
+                    {isOwnerOrMangerAndNotArchived ? <Button onClick={handelOpenModal}>create ticket</Button> : null}
 
                     <div className="flex items-center justify-center gap-4 flex-wrap-reverse w-full md:w-auto">
                         <div className="max-w-[400px]">
@@ -137,13 +129,13 @@ const Tickets = () => {
                                             <th scope="col" className="px-6 py-3 min-w-[150px]"> priority </th>
                                             <th scope="col" className="px-6 py-3 min-w-[150px]"> status </th>
                                             <th scope="col" className="px-6 py-3 min-w-[150px]"> type </th>
-                                            {isOwnerOrManger ? <th scope="col" className="px-6 py-3  min-w-[150px]"> action </th> : null}
+                                            {isOwnerOrMangerAndNotArchived ? <th scope="col" className="px-6 py-3  min-w-[150px]"> action </th> : null}
                                         </tr>
                                     </thead>
 
                                     <tbody className="before:block before:h-4 after:block after:mb-2">
                                         {ticketsPayload.result !== null && ticketsPayload.result.map((ticket, index) => (
-                                            <TicketsRow key={index} isOwnerOrManger={isOwnerOrManger} ticket={ticket} call={() => callTickets()} />
+                                            <TicketsRow key={index} isOwnerOrManger={isOwnerOrMangerAndNotArchived} ticket={ticket} call={() => callTickets()} />
                                         ))}
                                     </tbody>
                                 </table>

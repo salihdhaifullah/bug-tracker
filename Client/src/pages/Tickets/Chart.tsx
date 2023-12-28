@@ -2,10 +2,22 @@ import { useLayoutEffect } from "react";
 import { useParams } from "react-router-dom";
 import useFetchApi from "../../utils/hooks/useFetchApi";
 import CircleProgress from "../../components/utils/CircleProgress";
-import { IChartsData, isData } from ".";
+import { IChartsData } from ".";
 import TypeChart from "./TypeChart";
 import StatusChart from "./StatusChart";
 import PriorityChart from "./PriorityChart";
+
+const isData = (data: object): boolean => {
+    const values = Object.values(data);
+
+    for (const value of values) {
+        if (value as number > 0) {
+            return true;
+        }
+    }
+
+    return false;
+}
 
 const Charts = () => {
     const { projectId } = useParams();

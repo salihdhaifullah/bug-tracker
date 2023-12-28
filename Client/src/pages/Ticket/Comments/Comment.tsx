@@ -7,6 +7,7 @@ import { IComment } from ".";
 
 interface ICommentProps {
     comment: IComment;
+    isReadOnly: boolean;
     call: () => void
 }
 
@@ -48,11 +49,13 @@ const Comment = (props: ICommentProps) => {
 
                         <p title="created at" className="text-gray-600 dark:text-gray-400 text-sm font-normal">{formatDate(props.comment.createdAt)}</p>
                     </div>
-                    <Action call={props.call} commentId={props.comment.id} />
+                    {user === null || props.isReadOnly ? null : (
+                        <Action call={props.call} commentId={props.comment.id} />
+                    )}
                 </div>
 
                 <div className="flex w-full h-full pl-2">
-                    <Content editable={props.comment.commenter.id === user?.id} url={`projects/${projectId}/tickets/${ticketId}/comments/${props.comment.id}/content`} />
+                    <Content editable={props.comment.commenter.id === user?.id && !props.isReadOnly} url={`projects/${projectId}/tickets/${ticketId}/comments/${props.comment.id}/content`} />
                 </div>
             </div>
         </div>

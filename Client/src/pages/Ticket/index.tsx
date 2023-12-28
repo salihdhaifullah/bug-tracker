@@ -1,15 +1,14 @@
 import { Link, useParams } from "react-router-dom";
 import useFetchApi from "../../utils/hooks/useFetchApi";
 import CircleProgress from "../../components/utils/CircleProgress";
-import { useLayoutEffect } from "react";
+import { useLayoutEffect, useMemo } from "react";
 import Content from "../../components/utils/Content";
 import formatDate from "../../utils/formatDate";
-import { useUser } from "../../utils/context/user";
 import labelsColors from "../../utils/labelsColors";
 import TicketAction from "../../components/utils/TicketAction";
 import Comments from "./Comments";
 import Attachment from "./Attachment";
-import { Priority, Status, Type } from "../MyTasks";
+import { Priority, Role, Status, Type } from "../MyTasks";
 
 interface ITicket {
     createdAt: string;
@@ -39,15 +38,20 @@ interface ITicket {
 const Ticket = () => {
     const { ticketId, projectId } = useParams();
     const [payload, call] = useFetchApi<ITicket>("GET", `projects/${projectId}/tickets/${ticketId}`, []);
-    const [rolePayload, callRole] = useFetchApi<string>("GET", `projects/${projectId}/members`);
+    const [rolePayload, callRole] = useFetchApi<Role>("GET", `projects/${projectId}/members/role`);
+    const [projectPayload, callProject] = useFetchApi<{isReadOnly: boolean}>("GET", `projects/${projectId}/danger-zone`);
 
     useLayoutEffect(() => { call() }, [call])
+    useLayoutEffect(() => { callRole() }, [callRole])
+    useLayoutEffect(() => { callProject() }, [callProject])
 
-    useLayoutEffect(() => {
-        if (payload.result) callRole();
-    }, [callRole, payload.result])
+    const isOwnerOrMangerAndNotArchived = useMemo(() => (
+        rolePayload.result !== null
+        && [Role.owner, Role.project_manger].includes(rolePayload.result)
+        && projectPayload.result !== null
+        && !projectPayload.result.isReadOnly
+    ), [projectPayload.result, rolePayload.result])
 
-    const user = useUser();
 
     return payload.isLoading ? <CircleProgress size="lg" /> : payload.result === null ? null : (
         <section className="flex flex-col w-full h-full my-10 p-2 flex-grow">
@@ -84,9 +88,9 @@ const Ticket = () => {
                             <p title="created at" className="text-gray-600 dark:text-gray-400 text-sm font-normal">{formatDate(payload.result.createdAt)}</p>
                         </div>
 
-                        {(rolePayload.result !== null && ["owner", "project_manger"].includes(rolePayload.result) || payload.result.creator.id === user?.id) ?
+                        {isOwnerOrMangerAndNotArchived ?
                             <TicketAction onUpdate={() => call()} ticket={{ ...payload.result, id: ticketId as string, projectId: payload.result.project.id }} />
-                            : null}
+                        : null}
 
                     </div>
 
@@ -96,9 +100,9 @@ const Ticket = () => {
                         <h2 className="text-3xl font-bold text-primary dark:text-secondary">{payload.result.name}</h2>
 
                         <div className="flex text-sm mb-2 flex-row justify-start gap-1 flex-wrap">
-                            <span title="type" className={`rounded-sm font-bold border-black w-fit p-1 text-white dark:border-white dark:text-black ${(labelsColors.TYPE)[payload.result.type]}`}>{payload.result.type}</span>
-                            <span title="priority" className={`rounded-sm font-bold border-black w-fit p-1 text-white dark:border-white dark:text-black ${(labelsColors.PRIORITY)[payload.result.priority]}`}>{payload.result.priority}</span>
-                            <span title="status" className={`rounded-sm font-bold border-black w-fit p-1 text-white dark:border-white dark:text-black ${(labelsColors.STATUS)[payload.result.status]}`}>{payload.result.status}</span>
+                            <span title="type" className={`rounded-sm font-bold border-black w-fit p-1 text-white dark:border-white dark:text-black ${labelsColors.TYPE[payload.result.type]}`}>{payload.result.type}</span>
+                            <span title="priority" className={`rounded-sm font-bold border-black w-fit p-1 text-white dark:border-white dark:text-black ${labelsColors.PRIORITY[payload.result.priority]}`}>{payload.result.priority}</span>
+                            <span title="status" className={`rounded-sm font-bold border-black w-fit p-1 text-white dark:border-white dark:text-black ${labelsColors.STATUS[payload.result.status]}`}>{payload.result.status}</span>
                         </div>
 
 
@@ -117,16 +121,16 @@ const Ticket = () => {
 
                         <Link className="font-bold w-fit h-fit text-primary dark:text-secondary text-lg hover:underline" title="project" to={`/projects/${payload.result.project.id}`}>{payload.result.project.name}</Link>
 
-                        <Content editable={rolePayload.result !== null && ["owner", "project_manger"].includes(rolePayload.result) || payload.result.creator.id === user?.id} url={`projects/${projectId}/tickets/${ticketId}/content`} />
+                        <Content editable={isOwnerOrMangerAndNotArchived} url={`projects/${projectId}/tickets/${ticketId}/content`} />
 
-                        <Attachment isCreator={payload.result.creator.id === user?.id} />
+                        <Attachment isOwnerOrManger={isOwnerOrMangerAndNotArchived} />
                     </div>
 
                 </div>
 
             </div>
 
-            <Comments />
+            <Comments isReadOnly={Boolean(projectPayload.result?.isReadOnly)}/>
 
         </section>
     )

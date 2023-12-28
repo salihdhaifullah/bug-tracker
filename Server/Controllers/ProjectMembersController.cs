@@ -35,14 +35,14 @@ public class ProjectMembersController : ControllerBase
     {
         try
         {
-            var userId = _auth.GetId(Request);
+            _auth.TryGetId(Request, out string? userId);
 
             var members = await _ctx.Members.Where(m =>
                     (EF.Functions.ILike(m.User.Email, $"%{email}%")
                     || EF.Functions.ILike(m.User.FirstName, $"%{email}%")
                     || EF.Functions.ILike(m.User.LastName, $"%{email}%"))
                     && m.ProjectId == projectId
-                    && (!notMe || m.UserId != userId)
+                    && (userId == null || !notMe || m.UserId != userId)
                     ).OrderBy((u) => u.JoinedAt)
                     .Select(u => new
                     {
@@ -106,7 +106,7 @@ public class ProjectMembersController : ControllerBase
         }
     }
 
-    [HttpDelete, Authorized]
+    [HttpDelete, Authorized, ProjectArchive]
     public async Task<IActionResult> LeaveProject([FromRoute] string projectId)
     {
         try

@@ -43,15 +43,19 @@ const Members = () => {
     const [membersPayload, callMembers] = useFetchApi<IMember[]>("GET", `projects/${projectId}/members/table?take=${take}&page=${page}&role=${role}&search=${search}`, [take, page, role, search]);
     const [countPayload, callCount] = useFetchApi<number>("GET", `projects/${projectId}/members/table/count?role=${role}&search=${search}`, [role, search]);
     const [rolePayload, callRole] = useFetchApi<Role>("GET", `projects/${projectId}/members/role`);
+    const [projectPayload, callProject] = useFetchApi<{isReadOnly: boolean}>("GET", `projects/${projectId}/danger-zone`);
 
     useLayoutEffect(() => { callMembers() }, [take, page, role, callMembers])
     useLayoutEffect(() => { callCount() }, [callCount, role])
     useLayoutEffect(() => { callRole() }, [callRole])
+    useLayoutEffect(() => { callProject() }, [callProject])
 
-    const isOwner = useMemo(() => (
-        rolePayload.result !== null &&
-        rolePayload.result === Role.owner
-    ), [rolePayload.result])
+    const isOwnerAndNotArchived = useMemo(() => (
+        rolePayload.result !== null
+        && rolePayload.result === Role.owner
+        && projectPayload.result !== null
+        && !projectPayload.result.isReadOnly
+    ), [projectPayload.result, rolePayload.result])
 
     const handelSearch = () => {
         callCount()
@@ -76,7 +80,7 @@ const Members = () => {
                 <div className="flex flex-row gap-4 w-full flex-wrap items-center pb-4 p-2 justify-between">
 
                     <div>
-                        {isOwner ? (
+                        {isOwnerAndNotArchived ? (
                             <Button
                                 onClick={() => dispatchModal({ type: "open", payload: <InviteModal call={handelSearch} /> })}
                             >invite member</Button>
@@ -105,13 +109,13 @@ const Members = () => {
                                             <th scope="col" className="px-6 py-3 min-w-[150px]"> full name </th>
                                             <th scope="col" className="px-6 py-3 min-w-[150px]"> email </th>
                                             <th scope="col" className="px-6 py-3 min-w-[150px]"> joined at </th>
-                                            {isOwner ? <th scope="col" className="px-6 py-3  min-w-[150px]"> action </th> : null}
+                                            {isOwnerAndNotArchived ? <th scope="col" className="px-6 py-3  min-w-[150px]"> action </th> : null}
                                         </tr>
                                     </thead>
 
                                     <tbody className="before:block before:h-4 after:block after:mb-2">
                                         {membersPayload.result !== null && membersPayload.result.map((member, index) => (
-                                            <MembersRow key={index} callMembers={() => callMembers()} member={member} isOwner={isOwner} />
+                                            <MembersRow key={index} callMembers={() => callMembers()} member={member} isOwner={isOwnerAndNotArchived} />
                                         ))}
                                     </tbody>
                                 </table>

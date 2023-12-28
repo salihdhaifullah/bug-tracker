@@ -47,7 +47,7 @@ public class CommentContentController : ControllerBase
         };
     }
 
-    [HttpPatch, Authorized, BodyValidation]
+    [HttpPatch, Authorized, ProjectArchive, BodyValidation]
     public async Task<IActionResult> UpdateContent([FromBody] ContentDTO dto, [FromRoute] string commentId)
     {
         try
