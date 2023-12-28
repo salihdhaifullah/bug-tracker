@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom"
 import Button from "../../components/utils/Button";
 import useFetchApi from "../../utils/hooks/useFetchApi";
-import { useLayoutEffect, useState } from "react";
+import { useLayoutEffect, useMemo, useState } from "react";
 import CircleProgress from "../../components/utils/CircleProgress";
 import { AiOutlineArrowLeft, AiOutlineArrowRight } from "react-icons/ai";
 import SelectButton from "../../components/utils/SelectButton";
@@ -10,7 +10,7 @@ import SearchFiled from "../../components/utils/SearchFiled";
 import Charts from "./Chart";
 import TicketsRow from "./TicketsRow";
 import { useModalDispatch } from "../../utils/context/modal";
-import { Priority, Status, Type } from "../MyTasks";
+import { Priority, Role, Status, Type } from "../MyTasks";
 
 export interface ITypeChart {
     bugs: number;
@@ -70,14 +70,13 @@ const Tickets = () => {
     const [ticketStatus, setTicketStatus] = useState("all");
     const [ticketPriority, setTicketPriority] = useState("all");
 
-    const [rolePayload, callRole] = useFetchApi<string>("GET", `projects/${projectId}/members`);
+    const [rolePayload, callRole] = useFetchApi<Role>("GET", `projects/${projectId}/members/role`);
     const [countPayload, callCount] = useFetchApi<number>("GET", `projects/${projectId}/tickets/table/count?search=${search}&type=${ticketType}&status=${ticketStatus}&priority=${ticketPriority}`, [search, ticketType, ticketStatus, ticketPriority]);
     const [ticketsPayload, callTickets] = useFetchApi<ITicket[]>("GET", `projects/${projectId}/tickets/table/${page}?take=${take}&search=${search}&type=${ticketType}&status=${ticketStatus}&priority=${ticketPriority}`, [page, take, search, ticketType, ticketStatus, ticketPriority]);
 
     useLayoutEffect(() => { callRole() }, [callRole])
     useLayoutEffect(() => { callTickets() }, [page, take, ticketType, ticketStatus, ticketPriority, callTickets])
     useLayoutEffect(() => { callCount() }, [ticketType, ticketStatus, ticketPriority, callCount])
-
 
     const handelSearch = () => {
         callCount()
@@ -95,8 +94,13 @@ const Tickets = () => {
     const dispatchModal = useModalDispatch();
 
     const handelOpenModal = () => {
-        dispatchModal({type: "open", payload: <CreateTicketModal />})
+        dispatchModal({ type: "open", payload: <CreateTicketModal /> })
     }
+
+    const isOwnerOrManger = useMemo(() => (
+        rolePayload.result !== null
+        && [Role.owner, Role.project_manger].includes(rolePayload.result)
+    ), [rolePayload.result])
 
     return (
         <section className="h-full w-full py-4 md:px-8 px-3 mt-10 gap-8 flex flex-col">
@@ -133,13 +137,13 @@ const Tickets = () => {
                                             <th scope="col" className="px-6 py-3 min-w-[150px]"> priority </th>
                                             <th scope="col" className="px-6 py-3 min-w-[150px]"> status </th>
                                             <th scope="col" className="px-6 py-3 min-w-[150px]"> type </th>
-                                            {rolePayload.result !== null && ["project_manger", "owner"].includes(rolePayload.result) ? <th scope="col" className="px-6 py-3  min-w-[150px]"> action </th> : null}
+                                            {isOwnerOrManger ? <th scope="col" className="px-6 py-3  min-w-[150px]"> action </th> : null}
                                         </tr>
                                     </thead>
 
                                     <tbody className="before:block before:h-4 after:block after:mb-2">
                                         {ticketsPayload.result !== null && ticketsPayload.result.map((ticket, index) => (
-                                            <TicketsRow key={index} isOwnerOrManger={rolePayload.result !== null && ["project_manger", "owner"].includes(rolePayload.result)} ticket={ticket} call={() => callTickets()}/>
+                                            <TicketsRow key={index} isOwnerOrManger={isOwnerOrManger} ticket={ticket} call={() => callTickets()} />
                                         ))}
                                     </tbody>
                                 </table>

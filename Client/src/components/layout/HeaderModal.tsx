@@ -25,17 +25,24 @@ const HeaderModal = () => {
 
     const [logoutPayload, callLogout] = useFetchApi("DELETE", "auth/logout", [], () => {
         userDispatch({ type: "logout" })
+        dispatchModal({ payload: null, type: "close" })
     });
 
     const handelSearch = () => {
         navigate(`/search?search=${search}`)
+        dispatchModal({payload: null, type: "close"})
+    }
+
+    const handelTheme = () => {
+        themeDispatch({ type: theme === "dark" ? "light" : "dark" })
+        dispatchModal({ payload: null, type: "close" })
     }
 
     return (
         <div className="rounded-xl bg-white dark:bg-black h-full flex-1 flex flex-col gap-4 p-2 items-start justify-evenly">
 
             <ButtonBase
-                onClick={() => themeDispatch({ type: theme === "dark" ? "light" : "dark" })}
+                onClick={() => handelTheme()}
                 className="w-full text-primary dark:text-secondary hover:bg-slate-200 dark:hover:bg-slate-800 transition-all ease-in-out rounded-md text-xl flex-row flex gap-1 items-center">
                 {theme === "dark" ? <FaMoon /> : <FaSun />}
                 <p>change theme</p>
@@ -44,7 +51,7 @@ const HeaderModal = () => {
             {user === null ? (
                 <Link
                     to="/auth/login"
-                    onClick={() => dispatchModal({payload: null, type: "close"})}
+                    onClick={() => dispatchModal({ payload: null, type: "close" })}
                     className="w-full text-primary dark:text-secondary hover:bg-slate-200 dark:hover:bg-slate-800 transition-all ease-in-out rounded-md text-xl flex-row flex gap-1 items-center">
                     <BiLogIn /> <p>login</p>
                 </Link>

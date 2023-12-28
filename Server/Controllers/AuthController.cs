@@ -321,7 +321,7 @@ public class AuthController : Controller
     {
         try
         {
-            Response.Cookies.Delete("token");
+            Response.Cookies.Delete("auth");
             return HttpResult.Ok("logged out successfully", null, "/");
         }
         catch (Exception e)

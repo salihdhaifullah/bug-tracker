@@ -12,12 +12,11 @@ export function useNotificationDispatch() {
     return useContext(NotificationDispatchContext);
 }
 
-
 export interface INotification {
     id: string;
     message: string;
     type: "error" | "ok";
-};
+}
 
 type INotificationAction = {
     type: "add" | "delete";
@@ -28,6 +27,10 @@ function notificationReducer(notification: INotification[], action: INotificatio
     switch (action.type) {
         case 'add': {
             if (!action.payload) return notification;
+            const lastNotification = notification.length ? notification[notification.length-1] : null;
+            if (lastNotification && lastNotification.message === action.payload.message) {
+                return notification;
+            }
             return [...notification, action.payload];
         }
         case 'delete': {

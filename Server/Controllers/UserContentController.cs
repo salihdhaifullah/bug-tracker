@@ -38,8 +38,6 @@ public class UserContentController : ControllerBase
                         .Select(u => new { markdown = u.Content.Markdown })
                         .FirstOrDefaultAsync();
 
-            if (content is null) return HttpResult.NotFound("content not found");
-
             return HttpResult.Ok(body: content);
         }
         catch (Exception e)

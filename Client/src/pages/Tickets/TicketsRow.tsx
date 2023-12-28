@@ -6,7 +6,7 @@ import labelsColors from '../../utils/labelsColors';
 
 interface ITicketsRowProps {
     ticket: ITicket;
-    isOwnerOrManger: boolean | null;
+    isOwnerOrManger: boolean;
     call: () => void;
 }
 

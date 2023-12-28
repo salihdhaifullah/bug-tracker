@@ -12,7 +12,6 @@ export const typeOptions = ["bug", "feature"];
 export const priorityOptions = ["low", "medium", "high", "critical"];
 export const statusOptions = ["review", "active", "in_progress", "resolved", "closed"];
 
-
 interface ICreateTicket {
   name: string;
   type: string;

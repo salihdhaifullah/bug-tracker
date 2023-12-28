@@ -16,27 +16,27 @@ interface IPayload<T> {
 
 
 export default function useFetchApi<R = undefined, B = undefined>
-(method: "POST" | "PATCH" | "GET" | "DELETE",
-url: string, deps: DependencyList = [],
-callback?: (arg: R) => void): [payload: IPayload<R>, call: (body?: B) => void] {
+    (method: "POST" | "PATCH" | "GET" | "DELETE",
+        url: string, deps: DependencyList = [],
+        callback?: (arg: R) => void): [payload: IPayload<R>, call: (body?: B) => void] {
 
     const dispatchNotification = useNotificationDispatch();
     const [result, setResult] = useState<R | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
 
-
     const init = useCallback(async (body?: B) => {
         setIsLoading(true);
 
         try {
-            const responseBlob = await fetch(`${window.origin}/api/${url}`, {
-                method: method,
-                body: body ? JSON.stringify(body) : undefined,
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            });
+            const responseBlob = await fetch(`${window.origin}/api/${url}`,
+                {
+                    method: method,
+                    body: body ? JSON.stringify(body) : undefined,
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                });
 
             const response = await responseBlob.json() as IResult<R>;
 
@@ -62,7 +62,7 @@ callback?: (arg: R) => void): [payload: IPayload<R>, call: (body?: B) => void] {
             setIsLoading(false);
         }
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, deps);
 
 
