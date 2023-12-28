@@ -1,7 +1,7 @@
 import { Link, useParams } from "react-router-dom";
 import useFetchApi from "../../utils/hooks/useFetchApi";
 import CircleProgress from "../../components/utils/CircleProgress";
-import { useEffect } from "react";
+import { useLayoutEffect } from "react";
 import Content from "../../components/utils/Content";
 import formatDate from "../../utils/formatDate";
 import { useUser } from "../../utils/context/user";
@@ -41,9 +41,9 @@ const Ticket = () => {
     const [payload, call] = useFetchApi<ITicket>("GET", `projects/${projectId}/tickets/${ticketId}`, []);
     const [rolePayload, callRole] = useFetchApi<string>("GET", `projects/${projectId}/members`);
 
-    useEffect(() => { call() }, [call])
+    useLayoutEffect(() => { call() }, [call])
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         if (payload.result) callRole();
     }, [callRole, payload.result])
 

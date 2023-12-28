@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useLayoutEffect, useState } from "react"
 import useFetchApi from "../../utils/hooks/useFetchApi"
 import CircleProgress from "../../components/utils/CircleProgress"
 import Pagination from "../../components/utils/Pagination";
@@ -29,8 +29,8 @@ const Search = () => {
   const [projectsPayload, callProjects] = useFetchApi<IProject[]>("GET", `explore/${page}/?take=${take}&search=${search}`, [page, take, search]);
   const [CountPayload, callCount] = useFetchApi<number>("GET", `explore/?take=${take}&search=${search}`, [take, search]);
 
-  useEffect(() => { callProjects() }, [page, take, search])
-  useEffect(() => { callCount() }, [take, search])
+  useLayoutEffect(() => { callProjects() }, [page, search, callProjects])
+  useLayoutEffect(() => { callCount() }, [search, callCount])
 
   return (
     <section className="flex flex-col justify-center items-center w-full gap-8 my-10">

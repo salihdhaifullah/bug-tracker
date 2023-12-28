@@ -9,7 +9,7 @@ import useFetchApi from '../../utils/hooks/useFetchApi'
 import { useModalDispatch } from '../../utils/context/modal'
 import { priorityOptions, statusOptions, typeOptions } from './CreateTicketModal'
 
-const TicketUpdateModal = (props: {ticket: ITicket, call?: () => void}) => {
+const TicketUpdateModal = (props: { ticket: ITicket, call?: () => void }) => {
     const { projectId } = useParams();
 
     const [name, setName] = useState(props.ticket.name);
@@ -18,15 +18,12 @@ const TicketUpdateModal = (props: {ticket: ITicket, call?: () => void}) => {
     const [status, setStatus] = useState(props.ticket.status);
     const [memberId, setMemberId] = useState(props.ticket.assignedTo?.memberId || "");
     const [isValidName, setIsValidName] = useState(true);
-    const [isValidType, setIsValidType] = useState(true);
-    const [isValidPriority, setIsValidPriority] = useState(true);
-    const [isValidStatus, setIsValidStatus] = useState(true);
 
     const dispatchModal = useModalDispatch();
 
     const [updateTicketPayload, callUpdateTicket] = useFetchApi<unknown, { name: string, type: string, priority: string, status: string, memberId?: string }>("PATCH", `projects/${projectId}/tickets/${props.ticket.id}`, [], () => {
         props?.call && props.call();
-        dispatchModal({type: "close", payload: null});
+        dispatchModal({ type: "close", payload: null });
     });
 
 
@@ -58,10 +55,6 @@ const TicketUpdateModal = (props: {ticket: ITicket, call?: () => void}) => {
                 <Select
                     value={type}
                     options={typeOptions}
-                    validation={[
-                        { validate: (str: string) => typeOptions.includes(str), massage: "un-valid ticket type" }
-                    ]}
-                    setIsValid={setIsValidType}
                     setValue={setType}
                     label="ticket type"
                 />
@@ -69,30 +62,28 @@ const TicketUpdateModal = (props: {ticket: ITicket, call?: () => void}) => {
                 <Select
                     value={priority}
                     options={priorityOptions}
-                    validation={[
-                        { validate: (str: string) => priorityOptions.includes(str), massage: "un-valid ticket priority" }
-                    ]}
                     setValue={setPriority}
-                    setIsValid={setIsValidPriority}
                     label="ticket priority"
                 />
 
                 <Select
                     value={status}
                     options={statusOptions}
-                    validation={[
-                        { validate: (str: string) => statusOptions.includes(str), massage: "un-valid ticket status" }
-                    ]}
                     setValue={setStatus}
-                    setIsValid={setIsValidStatus}
                     label="ticket status"
                 />
 
-                <SelectUser search={props.ticket.assignedTo?.name} label="assign to" members={true} setId={setMemberId} id={memberId} />
+                <SelectUser
+                    search={props.ticket.assignedTo?.name}
+                    label="assign to"
+                    members={true}
+                    setId={setMemberId}
+                    id={memberId}
+                />
 
                 <div className="flex flex-row items-center mt-4 justify-center w-full px-4">
                     <Button
-                        isValid={isValidName && isValidType && isValidStatus && isValidPriority}
+                        isValid={isValidName}
                         isLoading={updateTicketPayload.isLoading}
                         buttonProps={{ type: "submit" }}
                     >update</Button>

@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom"
 import Button from "../../components/utils/Button";
 import useFetchApi from "../../utils/hooks/useFetchApi";
-import { useEffect, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import CircleProgress from "../../components/utils/CircleProgress";
 import { AiOutlineArrowLeft, AiOutlineArrowRight } from "react-icons/ai";
 import SelectButton from "../../components/utils/SelectButton";
@@ -69,14 +69,14 @@ const Tickets = () => {
     const [ticketType, setTicketType] = useState("all");
     const [ticketStatus, setTicketStatus] = useState("all");
     const [ticketPriority, setTicketPriority] = useState("all");
-    const [rolePayload, callRole] = useFetchApi<string>("GET", `projects/${projectId}/members`);
 
+    const [rolePayload, callRole] = useFetchApi<string>("GET", `projects/${projectId}/members`);
     const [countPayload, callCount] = useFetchApi<number>("GET", `projects/${projectId}/tickets/table/count?search=${search}&type=${ticketType}&status=${ticketStatus}&priority=${ticketPriority}`, [search, ticketType, ticketStatus, ticketPriority]);
     const [ticketsPayload, callTickets] = useFetchApi<ITicket[]>("GET", `projects/${projectId}/tickets/table/${page}?take=${take}&search=${search}&type=${ticketType}&status=${ticketStatus}&priority=${ticketPriority}`, [page, take, search, ticketType, ticketStatus, ticketPriority]);
 
-    useEffect(() => { callRole() }, [callRole])
-    useEffect(() => { callTickets() }, [page, take, ticketType, ticketStatus, ticketPriority, callTickets])
-    useEffect(() => { callCount() }, [ticketType, ticketStatus, ticketPriority, callCount])
+    useLayoutEffect(() => { callRole() }, [callRole])
+    useLayoutEffect(() => { callTickets() }, [page, take, ticketType, ticketStatus, ticketPriority, callTickets])
+    useLayoutEffect(() => { callCount() }, [ticketType, ticketStatus, ticketPriority, callCount])
 
 
     const handelSearch = () => {

@@ -2,7 +2,7 @@ import { useParams } from "react-router-dom";
 import Pagination from "../../../components/utils/Pagination";
 import useFetchApi from "../../../utils/hooks/useFetchApi";
 import CircleProgress from "../../../components/utils/CircleProgress";
-import { useEffect, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import Comment from "./Comment";
 import CreateComment from "./CreateComment";
 
@@ -26,8 +26,8 @@ const Comments = () => {
     const [commentPayload, callComment] = useFetchApi<IComment[]>("GET", `projects/${projectId}/tickets/${ticketId}/comments`, [commentPage, commentTake]);
     const [countPayload, callCount] = useFetchApi<number>("GET", `projects/${projectId}/tickets/${ticketId}/comments/count`);
 
-    useEffect(() => { callCount() }, [callCount])
-    useEffect(() => { callComment() }, [callComment, commentPage])
+    useLayoutEffect(() => { callCount() }, [callCount])
+    useLayoutEffect(() => { callComment() }, [callComment, commentPage])
 
     const call = () => {
         callComment()

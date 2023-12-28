@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import useFetchApi from "../../utils/hooks/useFetchApi";
-import { useEffect, useMemo, useState } from "react";
+import { useLayoutEffect, useMemo, useState } from "react";
 import CircleProgress from "../../components/utils/CircleProgress";
 import SelectButton from "../../components/utils/SelectButton";
 import { AiOutlineArrowLeft, AiOutlineArrowRight } from "react-icons/ai";
@@ -21,8 +21,8 @@ const Activities = () => {
     const [activitiesPayload, callActivities] = useFetchApi<IActivity[]>("GET", `projects/${projectId}/activities/${page}?take=${take}&sort=${sort}`, [take, page, sort]);
     const [countPayload, callCount] = useFetchApi<number>("GET", `projects/${projectId}/activities/count`);
 
-    useEffect(() => { callActivities() }, [take, page, sort, callActivities])
-    useEffect(() => { callCount() }, [callCount])
+    useLayoutEffect(() => { callActivities() }, [take, page, sort, callActivities])
+    useLayoutEffect(() => { callCount() }, [callCount])
 
     useMemo(() => {
         if (!activitiesPayload.result) return;

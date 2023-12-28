@@ -31,9 +31,6 @@ const CreateTicketModal = () => {
   const { projectId } = useParams()
 
   const [isValidName, setIsValidName] = useState(false);
-  const [isValidType, setIsValidType] = useState(true);
-  const [isValidPriority, setIsValidPriority] = useState(true);
-  const [isValidStatus, setIsValidStatus] = useState(true);
 
   const dispatchModal = useModalDispatch();
 
@@ -71,10 +68,6 @@ const CreateTicketModal = () => {
           <Select
             value={type}
             options={typeOptions}
-            validation={[
-              { validate: (str: string) => typeOptions.includes(str), massage: "un-valid ticket type" }
-            ]}
-            setIsValid={setIsValidType}
             setValue={setType}
             label="ticket type"
           />
@@ -82,22 +75,14 @@ const CreateTicketModal = () => {
           <Select
             value={priority}
             options={priorityOptions}
-            validation={[
-              { validate: (str: string) => priorityOptions.includes(str), massage: "un-valid ticket priority" }
-            ]}
             setValue={setPriority}
-            setIsValid={setIsValidPriority}
             label="ticket priority"
           />
 
           <Select
             value={status}
             options={statusOptions}
-            validation={[
-              { validate: (str: string) => statusOptions.includes(str), massage: "un-valid ticket status" }
-            ]}
             setValue={setStatus}
-            setIsValid={setIsValidStatus}
             label="ticket status"
           />
 
@@ -107,7 +92,7 @@ const CreateTicketModal = () => {
             <Button
               buttonProps={{ type: "submit" }}
               isLoading={payload.isLoading}
-              isValid={isValidName && isValidType && isValidStatus && isValidPriority}
+              isValid={isValidName}
             >submit</Button>
           </div>
 

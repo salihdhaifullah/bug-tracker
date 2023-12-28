@@ -59,7 +59,6 @@ callback?: (arg: R) => void): [payload: IPayload<R>, call: (body?: B) => void] {
         } catch (err) {
             console.error(err)
         } finally {
-
             setIsLoading(false);
         }
 

@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom"
 import formatDate from "../../../utils/formatDate"
 import Button from "../../../components/utils/Button";
-import { useEffect } from "react";
+import { useLayoutEffect } from "react";
 import useFetchApi from "../../../utils/hooks/useFetchApi";
 import CircleProgress from "../../../components/utils/CircleProgress";
 import CreateAttachmentModal from "./CreateModal";
@@ -19,7 +19,7 @@ const Attachment = (props: { isCreator: boolean }) => {
     const { ticketId, projectId } = useParams();
     const [attachmentsPayload, callAttachments] = useFetchApi<IAttachment[]>("GET", `projects/${projectId}/tickets/${ticketId}/attachments`);
 
-    useEffect(() => { callAttachments() }, [callAttachments])
+    useLayoutEffect(() => { callAttachments() }, [callAttachments])
 
     const dispatchModal = useModalDispatch();
 

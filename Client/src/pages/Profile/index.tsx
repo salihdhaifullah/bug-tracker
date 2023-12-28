@@ -1,5 +1,5 @@
 import { Link, useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import Content from '../../components/utils/Content';
 import useFetchApi from "../../utils/hooks/useFetchApi";
 import CircleProgress from "../../components/utils/CircleProgress";
@@ -20,7 +20,7 @@ const Profile = () => {
   const user = useUser();
   const [payload, call] = useFetchApi<IProfileResult>("GET", `users/${userId}`)
 
-  useEffect(() => { call() }, [call])
+  useLayoutEffect(() => { call() }, [call])
 
   const [editable, setEditable] = useState(user !== null && user.id === userId);
 

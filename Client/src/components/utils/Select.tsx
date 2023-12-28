@@ -1,15 +1,13 @@
 import { KeyboardEvent, SetStateAction, useEffect, useId, useRef, useState } from "react";
 import { IconType } from "react-icons";
-import TextFiled, { IValidate } from "./TextFiled";
+import TextFiled from "./TextFiled";
 import useOnClickOutside from "../../utils/hooks/useOnClickOutside";
 
 interface ISelectProps {
     value: string
     setValue: (value: SetStateAction<string>) => void
     label: string
-    setIsValid?: (bool: boolean) => void;
     options: string[]
-    validation?: IValidate[]
     icon?: IconType
 }
 
@@ -80,11 +78,9 @@ const Select = (props: ISelectProps) => {
                     onKeyDown: handleKeyDown,
                     readOnly: true
                 }}
-                validation={props.validation}
                 icon={props.icon}
                 value={props.value}
                 label={props.label}
-                setIsValid={props.setIsValid}
             />
 
             <datalist

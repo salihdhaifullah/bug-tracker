@@ -1,5 +1,5 @@
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
-import { useEffect, useState } from 'react';
+import { useLayoutEffect, useState } from 'react';
 import { Pie } from 'react-chartjs-2';
 import { useParams } from 'react-router-dom';
 import useFetchApi from '../../utils/hooks/useFetchApi';
@@ -17,7 +17,7 @@ const RolesPieChart = () => {
 
     const [rolesPayload, callRoles] = useFetchApi<IData>("GET", `projects/${projectId}/members/chart/`);
 
-    useEffect(() => { callRoles() }, [callRoles])
+    useLayoutEffect(() => { callRoles() }, [callRoles])
 
     ChartJS.register(ArcElement, Tooltip, Legend);
 

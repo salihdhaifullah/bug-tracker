@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo, useCallback } from "react"
+import { useEffect, useState, useMemo, useCallback, useLayoutEffect } from "react"
 import useFetchApi from "../../utils/hooks/useFetchApi";
 import CircleProgress from "../../components/utils/CircleProgress";
 import { Link, useParams } from "react-router-dom";
@@ -9,8 +9,7 @@ import SearchFiled from "../../components/utils/SearchFiled";
 import Droppable from "./Droppable";
 import { useModalDispatch } from "../../utils/context/modal";
 
-export enum Role
-{
+export enum Role {
     owner = "owner",
     project_manger = "project_manger",
     developer = "developer",
@@ -53,8 +52,10 @@ const MyTasks = () => {
 
     const [tasksPayload, callTasks] = useFetchApi<IItem[], unknown>("GET", `projects/${projectId}/tickets/assigned?search=${search}&type=${ticketType}&priority=${ticketPriority}`, [search, ticketType, ticketPriority], (result) => { setData(result) })
     const [, callUpdate] = useFetchApi<unknown, { id: string, status: Status }>("PATCH", `projects/${projectId}/tickets/assigned`, [])
+    const [rolePayload, callRole] = useFetchApi<Role>("GET", `projects/${projectId}/members/role`, [])
 
-    useEffect(() => { callTasks() }, [ticketType, ticketPriority, callTasks])
+    useLayoutEffect(() => { callTasks() }, [ticketType, ticketPriority, callTasks])
+    useLayoutEffect(() => { callRole() }, [callRole])
 
     const handelSearch = () => {
         callTasks()
@@ -85,7 +86,7 @@ const MyTasks = () => {
     const dispatchModal = useModalDispatch();
 
     const handelOpenModal = () => {
-        dispatchModal({type: "open", payload: <CreateTicketModal />})
+        dispatchModal({ type: "open", payload: <CreateTicketModal /> })
     }
 
     return (
@@ -104,7 +105,9 @@ const MyTasks = () => {
                 </div>
 
                 <div className="flex items-center justify-center gap-2">
-                    <Button onClick={handelOpenModal}>create ticket</Button>
+                    {[Role.project_manger, Role.owner].includes(rolePayload?.result as Role) ? (
+                        <Button onClick={handelOpenModal}>create ticket</Button>
+                    ) : null}
 
                     <Link to={`/projects/${projectId}`}>
                         <Button>project</Button>
@@ -114,8 +117,7 @@ const MyTasks = () => {
             </div>
 
             <div className="flex flex-wrap flex-row justify-center items-start my-6 gap-2">
-
-                {!tasksPayload.isLoading ? (
+                {!tasksPayload.isLoading ? data.length ? (
                     <>
                         <Droppable handelDrop={handelDrop} items={data} col={Status.review} />
                         <Droppable handelDrop={handelDrop} items={data} col={Status.active} />
@@ -123,6 +125,8 @@ const MyTasks = () => {
                         <Droppable handelDrop={handelDrop} items={data} col={Status.resolved} />
                         <Droppable handelDrop={handelDrop} items={data} col={Status.closed} />
                     </>
+                ) : (
+                    <h1 className="my-20 dark:text-white text-3xl"> no ticket assigned to you </h1>
                 ) : (
                     <CircleProgress size="lg" className="my-20" />
                 )}

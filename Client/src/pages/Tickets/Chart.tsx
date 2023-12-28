@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useLayoutEffect } from "react";
 import { useParams } from "react-router-dom";
 import useFetchApi from "../../utils/hooks/useFetchApi";
 import CircleProgress from "../../components/utils/CircleProgress";
@@ -11,7 +11,7 @@ const Charts = () => {
     const { projectId } = useParams();
     const [payload, call] = useFetchApi<IChartsData>("GET", `projects/${projectId}/tickets/chart`);
 
-    useEffect(() => { call() }, [call])
+    useLayoutEffect(() => { call() }, [call])
 
     return (
         !payload.isLoading && payload.result === null ? null :

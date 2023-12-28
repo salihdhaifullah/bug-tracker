@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, KeyboardEvent, useId, ChangeEvent } from "react";
+import { useEffect, useRef, useState, KeyboardEvent, useId, ChangeEvent, useLayoutEffect } from "react";
 import useOnClickOutside from "../../utils/hooks/useOnClickOutside";
 import useFetchApi from "../../utils/hooks/useFetchApi";
 import TextFiled from "./TextFiled";
@@ -12,7 +12,6 @@ interface ISelectUserProps {
     required?: boolean;
     notMe?: boolean;
     search?: string;
-    setIsValid?: (bool: boolean) => void;
     label: string;
 }
 
@@ -46,9 +45,7 @@ const SelectUser = (props: ISelectUserProps) => {
 
     const [payload, call] = useFetchApi<Option[]>("GET", `projects/${projectId}/members${props.members ? "" : "/none-members"}?email=${search}&not-me=${props.notMe || false}`, [search]);
 
-    useEffect(() => {
-        call();
-    }, [call, search])
+    useLayoutEffect(() => { call() }, [call, search])
 
     const onChange = (e: ChangeEvent<HTMLInputElement>) => {
         setSearch(e.target.value)
@@ -91,8 +88,6 @@ const SelectUser = (props: ISelectUserProps) => {
             setActiveOption((prev) => prev - 1);
         }
     }
-
-    useEffect(() => { props?.setIsValid && props.setIsValid(Boolean(props.id)); }, [props, props.id])
 
     return (
         <div

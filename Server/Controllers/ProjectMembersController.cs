@@ -183,12 +183,12 @@ public class ProjectMembersController : ControllerBase
     }
 
 
-    [HttpGet("role"), Authorized, ProjectRead]
+    [HttpGet("role"), ProjectRead]
     public async Task<IActionResult> GetRole([FromRoute] string projectId)
     {
         try
         {
-            var userId = _auth.GetId(Request);
+            _auth.TryGetId(Request, out string? userId);
 
             var role = await _ctx.Members
                 .Where(m => m.ProjectId == projectId && m.UserId == userId)

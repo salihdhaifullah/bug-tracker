@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom"
 import Button from "../../components/utils/Button";
-import { useEffect, useMemo, useState } from "react";
+import { useLayoutEffect, useMemo, useState } from "react";
 import useFetchApi from "../../utils/hooks/useFetchApi";
 import CircleProgress from "../../components/utils/CircleProgress";
 import { AiOutlineArrowLeft, AiOutlineArrowRight } from "react-icons/ai";
@@ -41,12 +41,12 @@ const Members = () => {
     const [page, setPage] = useState(1);
 
     const [membersPayload, callMembers] = useFetchApi<IMember[]>("GET", `projects/${projectId}/members/table?take=${take}&page=${page}&role=${role}&search=${search}`, [take, page, role, search]);
-    const [countPayload, callCount] = useFetchApi<number>("GET", `projects/${projectId}/members/table/count/${projectId}?role=${role}&search=${search}`, [role, search]);
+    const [countPayload, callCount] = useFetchApi<number>("GET", `projects/${projectId}/members/table/count?role=${role}&search=${search}`, [role, search]);
     const [rolePayload, callRole] = useFetchApi<Role>("GET", `projects/${projectId}/members/role`);
 
-    useEffect(() => { callMembers() }, [take, page, role, callMembers])
-    useEffect(() => { callCount() }, [callCount, role])
-    useEffect(() => { callRole() }, [callRole])
+    useLayoutEffect(() => { callMembers() }, [take, page, role, callMembers])
+    useLayoutEffect(() => { callCount() }, [callCount, role])
+    useLayoutEffect(() => { callRole() }, [callRole])
 
     const isOwner = useMemo(() => (
         rolePayload.result !== null &&
@@ -75,9 +75,13 @@ const Members = () => {
 
                 <div className="flex flex-row gap-4 w-full flex-wrap items-center pb-4 p-2 justify-between">
 
-                    <Button
-                        onClick={() => dispatchModal({ type: "open", payload: <InviteModal call={handelSearch} /> })}
-                    >invite member</Button>
+                    <div>
+                        {isOwner ? (
+                            <Button
+                                onClick={() => dispatchModal({ type: "open", payload: <InviteModal call={handelSearch} /> })}
+                            >invite member</Button>
+                        ) : null}
+                    </div>
 
                     <div className="flex items-center justify-center w-full sm:w-auto">
 

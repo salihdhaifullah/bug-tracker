@@ -1,5 +1,5 @@
 import { Link, useParams } from "react-router-dom"
-import { useEffect, useMemo } from "react";
+import { useLayoutEffect, useMemo } from "react";
 import useFetchApi from "../../utils/hooks/useFetchApi";
 import formatDate from "../../utils/formatDate";
 import CircleProgress from "../../components/utils/CircleProgress";
@@ -36,7 +36,7 @@ const Project = () => {
         user.id === payload.result.owner.id
     ), [payload.result, user]);
 
-    useEffect(() => { call() }, [call])
+    useLayoutEffect(() => { call() }, [call])
 
     return payload.isLoading
         ? <CircleProgress size="lg" />

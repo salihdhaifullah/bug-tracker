@@ -25,8 +25,6 @@ const RoleModal = (props: IRoleModalProps) => {
         dispatchModal({ type: "close", payload: null })
     })
 
-    const [isValidRole, setIsValidRole] = useState(false);
-
     const handelSubmit = (e: FormEvent) => {
         e.preventDefault();
         callRole({ role });
@@ -58,17 +56,15 @@ const RoleModal = (props: IRoleModalProps) => {
                     options={roles.filter((r) => r !== props.member.role)}
                     setValue={setRole}
                     value={role}
-                    validation={[{ validate: (str) => roles.includes(str), massage: "un-valid member role" }]}
                     label="select new role"
-                    setIsValid={setIsValidRole}
                 />
             </div>
 
             <div className="flex flex-row items-center mt-4 justify-center w-full px-4">
                 <Button
                     isLoading={payloadRole.isLoading}
-                    isValid={isValidRole}
                     buttonProps={{ type: "submit" }}
+                    isValid={!!role}
                 >change</Button>
             </div>
         </form>

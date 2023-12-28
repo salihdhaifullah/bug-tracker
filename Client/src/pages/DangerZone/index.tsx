@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useLayoutEffect } from "react";
 import Button from "../../components/utils/Button"
 import DeleteModal from "./DeleteModal";
 import ArchiveModal from "./ArchiveModal";
@@ -26,7 +26,7 @@ const DangerZone = () => {
     const { projectId } = useParams();
     const [payload, call] = useFetchApi<IDangerZoneData>("GET", `projects/${projectId}/danger-zone`);
 
-    useEffect(() => { call() }, [call])
+    useLayoutEffect(() => { call() }, [call])
 
     const dispatchModal = useModalDispatch();
 

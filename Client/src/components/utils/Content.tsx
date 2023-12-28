@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import useFetchApi from "../../utils/hooks/useFetchApi";
 import { AiOutlineClose } from "react-icons/ai";
 import Editor from "./markdown";
@@ -17,15 +17,14 @@ const Content = (props: IContentProps) => {
     const [isEditing, setIsEditing] = useState(false);
     const [payload, callGet] = useFetchApi<{ markdown: string }>("GET", props.url, [])
 
-
     const files = useRef<{ base64: string, previewUrl: string }[]>([]);
 
-    const [createPayload, call] = useFetchApi<any, { markdown: string, files: { base64: string, previewUrl: string }[] }>("PATCH", props.url, [], () => {
+    const [createPayload, call] = useFetchApi<unknown, { markdown: string, files: { base64: string, previewUrl: string }[] }>("PATCH", props.url, [], () => {
         if (props?.call) props.call();
     })
 
     const handelSubmit = () => {
-        for (const file of files.current) { URL.revokeObjectURL(file.previewUrl) };
+        for (const file of files.current) URL.revokeObjectURL(file.previewUrl);
         files.current = files.current.filter((file) => md.includes(file.previewUrl));
         call({ markdown: md, files: files.current });
         files.current = [];
@@ -37,13 +36,11 @@ const Content = (props: IContentProps) => {
         setIsEditing(false)
     }
 
-    useEffect(() => {
-        callGet()
-    }, [])
+    useLayoutEffect(() => { callGet() }, [callGet])
 
     useEffect(() => {
         if (!payload.isLoading && payload.result) setMd(payload.result.markdown);
-    }, [payload.isLoading])
+    }, [payload.isLoading, payload.result])
 
     const jsx = useMarkdown(md);
 

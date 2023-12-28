@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useLayoutEffect, useState } from "react"
 import useFetchApi from "../../utils/hooks/useFetchApi"
 import CircleProgress from "../../components/utils/CircleProgress"
 import { useParams } from "react-router-dom";
@@ -38,8 +38,8 @@ const Projects = () => {
   const [projectsPayload, callProjects] = useFetchApi<IProject[]>("GET", `users/${userId}/projects/?take=${take}&page=${page}&search=${search}&role=${role}&status=${status}&type=${type}`, [page, take, userId, search, role, type, status]);
   const [CountPayload, callCount] = useFetchApi<number>("GET", `users/${userId}/projects/count/?take=${take}&search=${search}&role=${role}&status=${status}&type=${type}`, [take, userId, search, role, type, status]);
 
-  useEffect(() => { callProjects() }, [page, role, type, status, callProjects])
-  useEffect(() => { callCount() }, [role, type, status, callCount])
+  useLayoutEffect(() => { callProjects() }, [page, role, type, status, callProjects])
+  useLayoutEffect(() => { callCount() }, [role, type, status, callCount])
 
   const handelSearch = () => {
     callProjects()

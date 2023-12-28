@@ -9,7 +9,6 @@ import { useModalDispatch } from "../../utils/context/modal";
 const TransferModal = (props: IDangerZoneModalProps) => {
     const {projectId } = useParams()
     const [isSubmit, setIsSubmit] = useState(false);
-    const [isValidId, setIsValidId] = useState(true);
     const [memberId, setMemberId] = useState("")
 
     const dispatchModal = useModalDispatch();
@@ -41,8 +40,8 @@ const TransferModal = (props: IDangerZoneModalProps) => {
                         </div>
 
                         <div className="flex flex-col gap-8 p-2 w-full items-start">
-                            <SelectUser notMe setIsValid={setIsValidId} required label="select user" members={true} setId={setMemberId} id={memberId} />
-                            <Button isValid={isValidId} onClick={() => setIsSubmit(true)}>Transfer</Button>
+                            <SelectUser notMe required label="select user" members={true} setId={setMemberId} id={memberId} />
+                            <Button isValid={!!memberId} onClick={() => setIsSubmit(true)}>Transfer</Button>
                         </div>
                     </>
                 )}

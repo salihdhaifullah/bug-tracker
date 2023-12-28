@@ -7,6 +7,7 @@ import SelectUser from "../../components/utils/SelectUser";
 import roles from "../../utils/roles";
 import { FaAddressCard } from "react-icons/fa";
 import { useModalDispatch } from "../../utils/context/modal";
+import { Role } from "../MyTasks";
 
 interface IInviteModalProps {
     call: () => void;
@@ -14,11 +15,8 @@ interface IInviteModalProps {
 
 const InviteModal = (props: IInviteModalProps) => {
     const [invitedId, setInvitedId] = useState("");
-    const [role, setRole] = useState("developer");
+    const [role, setRole] = useState(Role.developer as string);
     const { projectId } = useParams();
-
-    const [isValidRole, setIsValidRole] = useState(true);
-    const [isValidId, setIsValidId] = useState(true);
 
     const dispatchModal = useModalDispatch();
 
@@ -43,22 +41,20 @@ const InviteModal = (props: IInviteModalProps) => {
                     <FaAddressCard className="text-3xl text-primary dark:text-secondary font-extrabold" />
                 </div>
 
-                <SelectUser setIsValid={setIsValidId} required label="invite user" members={false} setId={setInvitedId} id={invitedId} />
+                <SelectUser required label="invite user" members={false} setId={setInvitedId} id={invitedId} />
 
                 <Select
                     label="role for user to invite"
-                    validation={[{ validate: (str) => roles.includes(str), massage: "un-valid role" }]}
                     options={roles}
                     value={role}
                     setValue={setRole}
-                    setIsValid={setIsValidRole}
                 />
 
                 <div className="flex mt-2 flex-row justify-center items-center w-full">
                     <Button
                         buttonProps={{ type: "submit" }}
                         isLoading={payload.isLoading}
-                        isValid={isValidRole && isValidId}>Invite</Button>
+                        isValid={!!invitedId}>Invite</Button>
                 </div>
 
             </form>
