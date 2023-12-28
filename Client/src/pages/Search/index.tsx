@@ -27,7 +27,7 @@ const Search = () => {
   const [page, setPage] = useState(1)
 
   const [projectsPayload, callProjects] = useFetchApi<IProject[]>("GET", `explore/${page}/?take=${take}&search=${search}`, [page, take, search]);
-  const [CountPayload, callCount] = useFetchApi<number>("GET", `explore/?take=${take}&search=${search}`, [take, search]);
+  const [CountPayload, callCount] = useFetchApi<number>("GET", `explore/count/?take=${take}&search=${search}`, [take, search]);
 
   useLayoutEffect(() => { callProjects() }, [page, search, callProjects])
   useLayoutEffect(() => { callCount() }, [search, callCount])

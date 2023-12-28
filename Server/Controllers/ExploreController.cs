@@ -31,12 +31,20 @@ public class ExploreController : ControllerBase
             _auth.TryGetId(Request, out string? userId);
 
             var baseQuery = _ctx.Projects
-                .Where(p => p.Members.Any(m => m.UserId != userId))
-                .Where(p => !p.IsPrivate);
+            .Where(p => !p.IsPrivate || p.Members.Any(m => m.UserId == userId));
 
-            if (search != null && search.Length > 2) baseQuery = baseQuery
-                .Where(p => EF.Functions.ILike(p.Name, $"%{search}%")
-                || EF.Functions.ILike(p.Content.Markdown, $"%{search}%"));
+            if (search != null && search.Length > 2)
+            {
+                baseQuery = baseQuery.Where(p =>
+                        EF.Functions.ILike(p.Name, $"%{search}%") ||
+                        EF.Functions.ILike(p.Content.Markdown, $"%{search}%")
+                    );
+            }
+            else
+            {
+                baseQuery = baseQuery.Where(p => EF.Functions.ILike(p.Name, $"%{search}%"));
+            }
+
 
             var projects = await baseQuery
                 .OrderByDescending(p => p.Activities.Max(a => a.CreatedAt))
@@ -66,7 +74,7 @@ public class ExploreController : ControllerBase
         }
         catch (Exception e)
         {
-            _logger.LogError(e,"");
+            _logger.LogError(e, "");
             return HttpResult.InternalServerError();
         }
     }
@@ -88,7 +96,7 @@ public class ExploreController : ControllerBase
         }
         catch (Exception e)
         {
-            _logger.LogError(e,"");
+            _logger.LogError(e, "");
             return HttpResult.InternalServerError();
         }
     }

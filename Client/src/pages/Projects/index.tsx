@@ -1,4 +1,4 @@
-import { useLayoutEffect, useState } from "react"
+import { useLayoutEffect, useMemo, useState } from "react"
 import useFetchApi from "../../utils/hooks/useFetchApi"
 import CircleProgress from "../../components/utils/CircleProgress"
 import { useParams } from "react-router-dom";
@@ -12,6 +12,7 @@ import roles from "../../utils/roles";
 import ProjectsRow from "./ProjectsRow";
 import { useModalDispatch } from "../../utils/context/modal";
 import { Role } from "../MyTasks";
+import { useUser } from "../../utils/context/user";
 
 export interface IProject {
   id: number;
@@ -29,22 +30,27 @@ const take = 10;
 
 const Projects = () => {
   const { userId } = useParams();
+  const user = useUser()
   const [page, setPage] = useState(1)
   const [search, setSearch] = useState("");
   const [role, setRole] = useState("all");
   const [status, setStatus] = useState("all");
-  const [type, setType] = useState("all");
 
-  const [projectsPayload, callProjects] = useFetchApi<IProject[]>("GET", `users/${userId}/projects/?take=${take}&page=${page}&search=${search}&role=${role}&status=${status}&type=${type}`, [page, take, userId, search, role, type, status]);
-  const [CountPayload, callCount] = useFetchApi<number>("GET", `users/${userId}/projects/count/?take=${take}&search=${search}&role=${role}&status=${status}&type=${type}`, [take, userId, search, role, type, status]);
+  const [projectsPayload, callProjects] = useFetchApi<IProject[]>("GET", `users/${userId}/projects/?take=${take}&page=${page}&search=${search}&role=${role}&status=${status}`, [page, take, userId, search, role, status]);
+  const [CountPayload, callCount] = useFetchApi<number>("GET", `users/${userId}/projects/count/?take=${take}&search=${search}&role=${role}&status=${status}`, [take, userId, search, role, status]);
 
-  useLayoutEffect(() => { callProjects() }, [page, role, type, status, callProjects])
-  useLayoutEffect(() => { callCount() }, [role, type, status, callCount])
+  useLayoutEffect(() => { callProjects() }, [page, role, status, callProjects])
+  useLayoutEffect(() => { callCount() }, [role, status, callCount])
 
   const handelSearch = () => {
     callProjects()
     callCount()
   }
+
+  const isOwner = useMemo(() => (
+    user !== null
+    && user.id === userId
+  ), [user, userId])
 
   const dispatchModal = useModalDispatch();
 
@@ -66,16 +72,18 @@ const Projects = () => {
           <div className="flex gap-1 flex-row flex-wrap">
             <SelectButton value={role} setValue={setRole} label="role" options={["all", ...roles, "owner"]} />
             <SelectButton value={status} setValue={setStatus} label="status" options={["all", "archived", "unarchive"]} />
-            <SelectButton value={type} setValue={setType} label="type" options={["all", "private", "public"]} />
           </div>
 
         </div>
 
         <div className="flex items-center justify-center">
-          <Button size="md" onClick={handelOpenModal} className="flex-row flex justify-center items-center gap-1">
-            <MdOutlineCreateNewFolder />
-            <p>create projects</p>
-          </Button>
+          {isOwner ? (
+            <Button size="md" onClick={handelOpenModal} className="flex-row flex justify-center items-center gap-1">
+              <MdOutlineCreateNewFolder />
+              <p>create projects</p>
+            </Button>
+          ) : null}
+
         </div>
 
       </div>

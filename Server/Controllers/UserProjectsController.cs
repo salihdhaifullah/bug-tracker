@@ -64,21 +64,14 @@ public class UserProjectsController : ControllerBase
 
     [HttpGet]
     public async Task<IActionResult> GetUserProjects(
-        [FromRoute] string userId, [FromQuery(Name = "type")] string? type,
-        [FromQuery(Name = "role")] string? roleQuery,
-        [FromQuery] string? search, [FromQuery(Name = "status")] string? status,
-        [FromQuery] int take = 10,
-        [FromQuery] int page = 1)
+        [FromRoute] string userId, [FromQuery(Name = "role")] string? roleQuery, [FromQuery] string? search,
+        [FromQuery(Name = "status")] string? status, [FromQuery] int take = 10, [FromQuery] int page = 1)
     {
         try
         {
             _auth.TryGetId(Request, out string? currentUserId);
 
             var role = Helper.ParseEnum<Role>(roleQuery);
-
-            bool? isPrivate = null;
-            if (!string.IsNullOrEmpty(type) && type == "private") isPrivate = true;
-            else if (!string.IsNullOrEmpty(type) && type == "public") isPrivate = false;
 
             bool? isReadOnly = null;
             if (!string.IsNullOrEmpty(status) && status == "archived") isReadOnly = true;
@@ -87,7 +80,6 @@ public class UserProjectsController : ControllerBase
             var projects = await _ctx.Projects
                             .Where((p) => (!p.IsPrivate || (currentUserId != null && p.Members.Any(m => m.UserId == currentUserId)))
                             && p.Members.Any(m => m.UserId == userId && (role == null || m.Role == role))
-                            && (isPrivate == null || p.IsPrivate == isPrivate)
                             && (isReadOnly == null || p.IsReadOnly == isReadOnly)
                             && EF.Functions.ILike(p.Name, $"%{search}%")
                             ).OrderByDescending((p) => p.Activities.Max(a => a.CreatedAt))
@@ -118,19 +110,14 @@ public class UserProjectsController : ControllerBase
 
     [HttpGet("count")]
     public async Task<IActionResult> GetUserProjectsCount(
-        [FromRoute] string userId, [FromQuery(Name = "type")] string? type,
-        [FromQuery(Name = "role")] string? roleQuery, [FromQuery] string? search,
-        [FromQuery(Name = "status")] string? status, [FromQuery] int take = 10)
+        [FromRoute] string userId, [FromQuery(Name = "role")] string? roleQuery,
+        [FromQuery] string? search, [FromQuery(Name = "status")] string? status, [FromQuery] int take = 10)
     {
         try
         {
             _auth.TryGetId(Request, out string? currentUserId);
 
             var role = Helper.ParseEnum<Role>(roleQuery);
-
-            bool? isPrivate = null;
-            if (!string.IsNullOrEmpty(type) && type == "private") isPrivate = true;
-            else if (!string.IsNullOrEmpty(type) && type == "public") isPrivate = false;
 
             bool? isReadOnly = null;
             if (!string.IsNullOrEmpty(status) && status == "archived") isReadOnly = true;
@@ -139,11 +126,9 @@ public class UserProjectsController : ControllerBase
             var count = await _ctx.Projects.Where((p) =>
                             (!p.IsPrivate || (currentUserId != null && p.Members.Any(m => m.UserId == currentUserId)))
                             && p.Members.Any(m => m.UserId == userId && (role == null || m.Role == role))
-                            && (isPrivate == null || p.IsPrivate == isPrivate)
                             && (isReadOnly == null || p.IsReadOnly == isReadOnly)
                             && EF.Functions.ILike(p.Name, $"%{search}%")
-                            )
-                            .CountAsync();
+                            ).CountAsync();
 
             return HttpResult.Ok(body: count);
         }
