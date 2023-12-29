@@ -43,7 +43,7 @@ const Members = () => {
     const [membersPayload, callMembers] = useFetchApi<IMember[]>("GET", `projects/${projectId}/members/table?take=${take}&page=${page}&role=${role}&search=${search}`, [take, page, role, search]);
     const [countPayload, callCount] = useFetchApi<number>("GET", `projects/${projectId}/members/table/count?role=${role}&search=${search}`, [role, search]);
     const [rolePayload, callRole] = useFetchApi<Role>("GET", `projects/${projectId}/members/role`);
-    const [projectPayload, callProject] = useFetchApi<{isReadOnly: boolean}>("GET", `projects/${projectId}/danger-zone`);
+    const [projectPayload, callProject] = useFetchApi<{isReadOnly: boolean}>("GET", `projects/${projectId}/read-only`);
 
     useLayoutEffect(() => { callMembers() }, [take, page, role, callMembers])
     useLayoutEffect(() => { callCount() }, [callCount, role])

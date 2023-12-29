@@ -39,7 +39,7 @@ const Ticket = () => {
     const { ticketId, projectId } = useParams();
     const [payload, call] = useFetchApi<ITicket>("GET", `projects/${projectId}/tickets/${ticketId}`, []);
     const [rolePayload, callRole] = useFetchApi<Role>("GET", `projects/${projectId}/members/role`);
-    const [projectPayload, callProject] = useFetchApi<{isReadOnly: boolean}>("GET", `projects/${projectId}/danger-zone`);
+    const [projectPayload, callProject] = useFetchApi<{isReadOnly: boolean}>("GET", `projects/${projectId}/read-only`);
 
     useLayoutEffect(() => { call() }, [call])
     useLayoutEffect(() => { callRole() }, [callRole])

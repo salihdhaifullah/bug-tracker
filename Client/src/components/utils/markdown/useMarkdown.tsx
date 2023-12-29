@@ -125,7 +125,7 @@ export default function useMarkdown(md: string): JSX.Element {
 
       }
 
-      return <code className='bg-slate-100 dark:bg-slate-900 p-2 mx-1 rounded-md'>{children}</code>
+      return <code className='bg-slate-300 dark:bg-slate-700 px-2 py-1 m-1 rounded-md'>{children}</code>
     },
   };
 

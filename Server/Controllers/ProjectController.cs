@@ -66,6 +66,25 @@ public class ProjectController : ControllerBase
         }
     }
 
+    [HttpGet("read-only"), ProjectRead]
+    public async Task<IActionResult> GetReadOnlyProject([FromRoute] string projectId)
+    {
+        try
+        {
+            var project = await _ctx.Projects
+                            .Where((p) => p.Id == projectId)
+                            .Select((p) => new {isReadOnly = p.IsReadOnly })
+                            .FirstOrDefaultAsync();
+
+            return HttpResult.Ok(body: project);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e,"");
+            return HttpResult.InternalServerError();
+        }
+    }
+
     [HttpPatch, Authorized, BodyValidation, ProjectArchive, ProjectRole(Role.owner)]
     public async Task<IActionResult> UpdateProject([FromBody] ChangeProjectNameDTO dto)
     {

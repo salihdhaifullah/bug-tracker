@@ -61,7 +61,7 @@ const Tickets = () => {
     const [rolePayload, callRole] = useFetchApi<Role>("GET", `projects/${projectId}/members/role`);
     const [countPayload, callCount] = useFetchApi<number>("GET", `projects/${projectId}/tickets/table/count?search=${search}&type=${ticketType}&status=${ticketStatus}&priority=${ticketPriority}`, [search, ticketType, ticketStatus, ticketPriority]);
     const [ticketsPayload, callTickets] = useFetchApi<ITicket[]>("GET", `projects/${projectId}/tickets/table/${page}?take=${take}&search=${search}&type=${ticketType}&status=${ticketStatus}&priority=${ticketPriority}`, [page, take, search, ticketType, ticketStatus, ticketPriority]);
-    const [projectPayload, callProject] = useFetchApi<{isReadOnly: boolean}>("GET", `projects/${projectId}/danger-zone`);
+    const [projectPayload, callProject] = useFetchApi<{isReadOnly: boolean}>("GET", `projects/${projectId}/read-only`);
 
     useLayoutEffect(() => { callRole() }, [callRole])
     useLayoutEffect(() => { callProject() }, [callProject])

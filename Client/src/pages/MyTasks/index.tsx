@@ -53,7 +53,7 @@ const MyTasks = () => {
     const [tasksPayload, callTasks] = useFetchApi<IItem[], unknown>("GET", `projects/${projectId}/tickets/assigned?search=${search}&type=${ticketType}&priority=${ticketPriority}`, [search, ticketType, ticketPriority], (result) => { setData(result) })
     const [, callUpdate] = useFetchApi<unknown, { id: string, status: Status }>("PATCH", `projects/${projectId}/tickets/assigned`, [])
     const [rolePayload, callRole] = useFetchApi<Role>("GET", `projects/${projectId}/members/role`, [])
-    const [projectPayload, callProject] = useFetchApi<{isReadOnly: boolean}>("GET", `projects/${projectId}/danger-zone`);
+    const [projectPayload, callProject] = useFetchApi<{isReadOnly: boolean}>("GET", `projects/${projectId}/read-only`);
 
     useLayoutEffect(() => { callProject() }, [callProject])
     useLayoutEffect(() => { callTasks() }, [ticketType, ticketPriority, callTasks])
