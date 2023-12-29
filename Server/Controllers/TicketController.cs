@@ -1,6 +1,7 @@
 using System.Text;
 using Buegee.Data;
 using Buegee.DTO;
+using Buegee.Models;
 using Buegee.Services.AuthService;
 using Buegee.Services.DataService;
 using Buegee.Utils;
@@ -28,19 +29,8 @@ public class TicketController : ControllerBase
         _auth = auth;
     }
 
+    record AssignedTo(string Name, string UserId);
 
-    record AssignedTo(string email, string name, string userId);
-
-    private async Task<AssignedTo?> getAssignedTo(string id, string projectId)
-    {
-        var assignedTo = await _ctx.Members
-                    .Where(m => m.Id == id && m.ProjectId == projectId)
-                    .Select(m => new AssignedTo(m.User.Email, $"{m.User.FirstName} {m.User.LastName}", m.UserId))
-                    .FirstOrDefaultAsync();
-
-
-        return assignedTo;
-    }
     record Change(string Property, string OldValue, string NewValue);
 
     [HttpPatch, Authorized, ProjectArchive, ProjectRole(Role.owner, Role.project_manger)]
@@ -51,78 +41,74 @@ public class TicketController : ControllerBase
             var userId = _auth.GetId(Request);
 
             var ticket = await _ctx.Tickets
-                .Where((t) => t.Id == ticketId)
+                .Where(t => t.Id == ticketId)
                 .Include(t => t.AssignedTo != null ? t.AssignedTo.User : null)
                 .FirstOrDefaultAsync();
 
-            if (ticket is null) return HttpResult.NotFound("ticket not found");
+            if (ticket is null)
+                return HttpResult.NotFound("Ticket not found");
 
             AssignedTo? assignedTo = null;
 
             if (dto.MemberId is not null)
             {
-                assignedTo = await getAssignedTo(dto.MemberId, ticket.ProjectId);
-                if (assignedTo is null) return HttpResult.NotFound("user to assignee ticket to is not found");
+                assignedTo = await GetAssignedTo(dto.MemberId, ticket.ProjectId);
+                if (assignedTo is null)
+                    return HttpResult.NotFound("User to assign ticket to is not found");
             }
 
             var ticketType = Enum.Parse<TicketType>(dto.Type);
             var ticketStatus = Enum.Parse<Status>(dto.Status);
             var ticketPriority = Enum.Parse<Priority>(dto.Priority);
 
-            var sb = new StringBuilder("");
-
             var changes = new List<Change>();
 
-            if (ticket.Name != dto.Name)
-            {
-                changes.Add(new Change("name", $"**{ticket.Name.Trim()}**", $"**{dto.Name.Trim()}**"));
-                ticket.Name = dto.Name;
-            }
-            if (ticket.Type != ticketType)
-            {
-                changes.Add(new Change("type", $"**{ticket.Type.ToString()}**", $"**{ticketType.ToString()}**"));
-                ticket.Type = ticketType;
-            }
-            if (ticket.Status != ticketStatus)
-            {
-                changes.Add(new Change("status", $"**{ticket.Status.ToString()}**", $"**{ticketStatus.ToString()}**"));
-                ticket.Status = ticketStatus;
-            }
-            if (ticket.Priority != ticketPriority)
-            {
-                changes.Add(new Change("priority", $"**{ticket.Priority.ToString()}**", $"**{ticketPriority.ToString()}**"));
-                ticket.Priority = ticketPriority;
-            }
-            if (ticket.AssignedToId != dto.MemberId)
-            {
-                changes.Add(new Change("assignation",
-                ticket.AssignedTo != null ? $"[{ticket.AssignedTo.User.FirstName} {ticket.AssignedTo.User.LastName}](/users/{ticket.AssignedTo.UserId})" : "**none**",
-                assignedTo != null ? $"[{assignedTo.name}](/users/{assignedTo.userId})" : "**none**"));
-
-                ticket.AssignedToId = dto.MemberId;
-            }
+            AddChange("name", ticket.Name, dto.Name, changes, () => ticket.Name = dto.Name);
+            AddChange("type", ticket.Type.ToString(), ticketType.ToString(), changes, () => ticket.Type = ticketType);
+            AddChange("status", ticket.Status.ToString(), ticketStatus.ToString(), changes, () => ticket.Status = ticketStatus);
+            AddChange("priority", ticket.Priority.ToString(), ticketPriority.ToString(), changes, () => ticket.Priority = ticketPriority);
+            AddChange("assignation", GetAssignationValue(ticket.AssignedTo != null ? new AssignedTo($"{ticket.AssignedTo.User.FirstName} {ticket.AssignedTo.User.LastName}", ticket.AssignedTo.UserId) : null), GetAssignationValue(assignedTo), changes, () => ticket.AssignedToId = dto.MemberId);
 
             if (changes.Count > 0)
             {
-                sb.Append($"ticket [{ticket.Name}](/projects/{ticket.ProjectId}/tickets/{ticket.Id}) ");
-
-                for (var i = 0; i < changes.Count; i++)
-                {
-                    if (i != 0) sb.Append(", ");
-                    sb.Append($"{changes[i].Property} changed from {changes[i].OldValue} to {changes[i].NewValue}");
-                }
+                var sb = new StringBuilder($"ticket [{ticket.Name}](/projects/{ticket.ProjectId}/tickets/{ticket.Id}) ");
+                sb.Append(string.Join(", ", changes.Select(change => $"{change.Property} changed from {change.OldValue} to {change.NewValue}")));
 
                 await _data.AddActivity(ticket.ProjectId, sb.ToString(), _ctx);
                 await _ctx.SaveChangesAsync();
             }
 
-            return HttpResult.Ok("successfully updated ticket");
+            return HttpResult.Ok("Successfully updated ticket");
         }
         catch (Exception e)
         {
-            _logger.LogError(e,"");
+            _logger.LogError(e, "");
             return HttpResult.InternalServerError();
         }
+    }
+
+    private async Task<AssignedTo?> GetAssignedTo(string id, string projectId)
+    {
+        var assignedTo = await _ctx.Members
+            .Where(m => m.Id == id && m.ProjectId == projectId)
+            .Select(m => new AssignedTo($"{m.User.FirstName} {m.User.LastName}", m.UserId))
+            .FirstOrDefaultAsync();
+
+        return assignedTo;
+    }
+
+    private static void AddChange(string property, string oldValue, string newValue, List<Change> changes, Action updateAction)
+    {
+        if (oldValue != newValue)
+        {
+            changes.Add(new Change(property, $"**{oldValue.Trim()}**", $"**{newValue.Trim()}**"));
+            updateAction.Invoke();
+        }
+    }
+
+    private static string GetAssignationValue(AssignedTo? assignedTo)
+    {
+        return assignedTo != null ? $"[{assignedTo.Name}](/users/{assignedTo.UserId})" : "**none**";
     }
 
     [HttpGet, ProjectRead]
@@ -166,7 +152,7 @@ public class TicketController : ControllerBase
         }
         catch (Exception e)
         {
-            _logger.LogError(e,"");
+            _logger.LogError(e, "");
             return HttpResult.InternalServerError();
         }
     }

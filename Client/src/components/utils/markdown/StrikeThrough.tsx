@@ -12,10 +12,12 @@ const StrikeThrough = () => {
     let end = textarea.selectionEnd;
 
     if (start === end) {
-      const {boundaryStart, boundaryEnd} = findWordBoundaries(text, start);
+      const { boundaryStart, boundaryEnd } = findWordBoundaries(text, start);
       start = boundaryStart;
-      end = boundaryEnd + 1;
+      end = boundaryEnd;
     }
+
+    end++
 
     setRange(textarea, start);
     document.execCommand("insertText", false, TILDE);
