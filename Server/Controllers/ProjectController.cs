@@ -42,9 +42,10 @@ public class ProjectController : ControllerBase
                                 id = p.Id,
                                 isReadOnly = p.IsReadOnly,
                                 createdAt = p.CreatedAt,
-                                isMember = userId != null && p.Members.Any(m => m.UserId == userId),
-                                owner = p.Members.Where(m => m.Role == Role.owner).Select(m => new
-                                {
+                                isMember = p.Members.Any(m => m.UserId == userId),
+                                owner = p.Members
+                                .Where(m => m.Role == Role.owner)
+                                .Select(m => new {
                                     name = $"{m.User.FirstName} {m.User.LastName}",
                                     avatarUrl = m.User.AvatarUrl,
                                     id = m.UserId,

@@ -41,7 +41,7 @@ public class ProjectDangerZoneController : ControllerBase
                                 name = p.Name,
                                 isPrivate = p.IsPrivate,
                                 isReadOnly = p.IsReadOnly,
-                                isOwner = userId != null && p.Members.Any(m => m.UserId == userId && m.Role == Role.owner),
+                                isOwner = p.Members.Any(m => m.UserId == userId && m.Role == Role.owner),
                             })
                             .FirstOrDefaultAsync();
 

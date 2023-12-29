@@ -38,7 +38,6 @@ public class FirebaseService : IFirebaseService
     public async Task Delete(string url)
     {
         var uri = new Uri(url);
-        _logger.LogWarning($"\n\n\n the url is \n Url: \"{url}\" \n Name: \"{Path.GetFileName(uri.AbsolutePath)}\"  \n\n\n");
         await _storage.Child(Path.GetFileName(uri.AbsolutePath)).DeleteAsync();
     }
 

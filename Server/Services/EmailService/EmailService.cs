@@ -47,11 +47,11 @@ public class EmailService : IEmailService
 
     public void Verification(string to, string name, string code)
     {
-        Mail(to, "activate your account", new VerificationEmail(name, code, DateTime.UtcNow.ToString("dd-MM-yyyy hh:mm")).Get());
+        Mail(to, "activate your account", new VerificationEmail(name, code).Get());
     }
 
     public void ResetPassword(string to, string name, string code)
     {
-        Mail(to, "reset your password", new VerificationEmail(name, code, DateTime.UtcNow.ToString("dd-MM-yyyy hh:mm")).Get());
+        Mail(to, "reset your password", new VerificationEmail(name, code).Get());
     }
 }

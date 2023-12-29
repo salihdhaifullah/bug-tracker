@@ -1,7 +1,6 @@
 using Buegee.Data;
 using Buegee.DTO;
 using Buegee.Models;
-using Buegee.Services.AuthService;
 using Buegee.Services.FirebaseService;
 using Buegee.Utils;
 using Buegee.Utils.Attributes;

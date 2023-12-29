@@ -37,13 +37,14 @@ public class ProjectMembersController : ControllerBase
         {
             _auth.TryGetId(Request, out string? userId);
 
-            var members = await _ctx.Members.Where(m =>
-                    (EF.Functions.ILike(m.User.Email, $"%{email}%")
-                    || EF.Functions.ILike(m.User.FirstName, $"%{email}%")
-                    || EF.Functions.ILike(m.User.LastName, $"%{email}%"))
-                    && m.ProjectId == projectId
-                    && (userId == null || !notMe || m.UserId != userId)
-                    ).OrderBy((u) => u.JoinedAt)
+            var members = await _ctx.Members
+                    .Where(m => m.ProjectId == projectId)
+                    .Where(m => userId == null || !notMe || m.UserId != userId)
+                    .Where(m =>
+                        EF.Functions.ILike(m.User.Email, $"%{email}%")
+                        || EF.Functions.ILike(m.User.FirstName, $"%{email}%")
+                        || EF.Functions.ILike(m.User.LastName, $"%{email}%"))
+                    .OrderBy((u) => u.JoinedAt)
                     .Select(u => new
                     {
                         avatarUrl = u.User.AvatarUrl,
@@ -58,7 +59,7 @@ public class ProjectMembersController : ControllerBase
         }
         catch (Exception e)
         {
-            _logger.LogError(e,"");
+            _logger.LogError(e, "");
             return HttpResult.InternalServerError();
         }
     }
@@ -101,7 +102,7 @@ public class ProjectMembersController : ControllerBase
         }
         catch (Exception e)
         {
-            _logger.LogError(e,"");
+            _logger.LogError(e, "");
             return HttpResult.InternalServerError();
         }
     }
@@ -148,7 +149,7 @@ public class ProjectMembersController : ControllerBase
         }
         catch (Exception e)
         {
-            _logger.LogError(e,"");
+            _logger.LogError(e, "");
             return HttpResult.InternalServerError();
         }
     }
@@ -158,10 +159,13 @@ public class ProjectMembersController : ControllerBase
     {
         try
         {
-            var users = await _ctx.Users.Where(u =>
-                    EF.Functions.ILike(u.Email, $"%{email}%")
-                    && !u.MemberShips.Any(m => m.ProjectId == projectId)
-                    ).OrderBy((u) => u.CreatedAt)
+            var users = await _ctx.Users
+                    .Where(u =>
+                        EF.Functions.ILike(u.Email, $"%{email}%")
+                        || EF.Functions.ILike(u.FirstName, $"%{email}%")
+                        || EF.Functions.ILike(u.LastName, $"%{email}%"))
+                    .Where(u => !u.MemberShips.Any(m => m.ProjectId == projectId))
+                    .OrderBy((u) => u.CreatedAt)
                     .Select(u => new
                     {
                         avatarUrl = u.AvatarUrl,
@@ -176,7 +180,7 @@ public class ProjectMembersController : ControllerBase
         }
         catch (Exception e)
         {
-            _logger.LogError(e,"");
+            _logger.LogError(e, "");
             return HttpResult.InternalServerError();
         }
 
@@ -199,7 +203,7 @@ public class ProjectMembersController : ControllerBase
         }
         catch (Exception e)
         {
-            _logger.LogError(e,"");
+            _logger.LogError(e, "");
             return HttpResult.InternalServerError();
         }
     }
@@ -222,7 +226,7 @@ public class ProjectMembersController : ControllerBase
         }
         catch (Exception e)
         {
-            _logger.LogError(e,"");
+            _logger.LogError(e, "");
             return HttpResult.InternalServerError();
         }
     }

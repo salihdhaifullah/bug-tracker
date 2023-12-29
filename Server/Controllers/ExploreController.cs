@@ -84,13 +84,12 @@ public class ExploreController : ControllerBase
     {
         try
         {
-            _auth.TryGetId(Request, out string? currentUserId);
+            _auth.TryGetId(Request, out string? userId);
 
-            var count = await _ctx.Projects.Where((p) =>
-                            p.Members.Any(m => m.UserId != currentUserId)
-                            && !p.IsPrivate
-                            && EF.Functions.ILike(p.Name, $"%{search}%")
-                            ).CountAsync();
+            var count = await _ctx.Projects
+                            .Where(p => !p.IsPrivate || p.Members.Any(m => m.UserId == userId))
+                            .Where(p => EF.Functions.ILike(p.Name, $"%{search}%"))
+                            .CountAsync();
 
             return HttpResult.Ok(body: count);
         }

@@ -1,7 +1,6 @@
 using System.Text;
 using Buegee.Data;
 using Buegee.DTO;
-using Buegee.Models;
 using Buegee.Services.AuthService;
 using Buegee.Services.DataService;
 using Buegee.Utils;
@@ -32,6 +31,31 @@ public class TicketController : ControllerBase
     record AssignedTo(string Name, string UserId);
 
     record Change(string Property, string OldValue, string NewValue);
+
+    private async Task<AssignedTo?> GetAssignedTo(string id, string projectId)
+    {
+        var assignedTo = await _ctx.Members
+            .Where(m => m.Id == id && m.ProjectId == projectId)
+            .Select(m => new AssignedTo($"{m.User.FirstName} {m.User.LastName}", m.UserId))
+            .FirstOrDefaultAsync();
+
+        return assignedTo;
+    }
+
+    private static void AddChange(string property, string oldValue, string newValue, List<Change> changes, Action updateAction)
+    {
+        if (oldValue != newValue)
+        {
+            changes.Add(new Change(property, $"**{oldValue.Trim()}**", $"**{newValue.Trim()}**"));
+            updateAction.Invoke();
+        }
+    }
+
+    private static string GetAssignationValue(AssignedTo? assignedTo)
+    {
+        return assignedTo != null ? $"[{assignedTo.Name}](/users/{assignedTo.UserId})" : "**none**";
+    }
+
 
     [HttpPatch, Authorized, ProjectArchive, ProjectRole(Role.owner, Role.project_manger)]
     public async Task<IActionResult> UpdateTicket([FromRoute] string ticketId, [FromBody] UpdateTicketDTO dto)
@@ -85,30 +109,6 @@ public class TicketController : ControllerBase
             _logger.LogError(e, "");
             return HttpResult.InternalServerError();
         }
-    }
-
-    private async Task<AssignedTo?> GetAssignedTo(string id, string projectId)
-    {
-        var assignedTo = await _ctx.Members
-            .Where(m => m.Id == id && m.ProjectId == projectId)
-            .Select(m => new AssignedTo($"{m.User.FirstName} {m.User.LastName}", m.UserId))
-            .FirstOrDefaultAsync();
-
-        return assignedTo;
-    }
-
-    private static void AddChange(string property, string oldValue, string newValue, List<Change> changes, Action updateAction)
-    {
-        if (oldValue != newValue)
-        {
-            changes.Add(new Change(property, $"**{oldValue.Trim()}**", $"**{newValue.Trim()}**"));
-            updateAction.Invoke();
-        }
-    }
-
-    private static string GetAssignationValue(AssignedTo? assignedTo)
-    {
-        return assignedTo != null ? $"[{assignedTo.Name}](/users/{assignedTo.UserId})" : "**none**";
     }
 
     [HttpGet, ProjectRead]

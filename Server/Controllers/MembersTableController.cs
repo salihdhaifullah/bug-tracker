@@ -28,12 +28,13 @@ public class MembersTableController : ControllerBase
             var role = Helper.ParseEnum<Role>(roleQuery);
 
             var count = await _ctx.Members
-                    .Where(m => m.ProjectId == projectId
-                    && (role == null || m.Role == role)
-                    && (EF.Functions.ILike(m.User.Email, $"%{search}%")
-                    || EF.Functions.ILike(m.User.FirstName, $"%{search}%")
-                    || EF.Functions.ILike(m.User.LastName, $"%{search}%"))
-                    ).CountAsync();
+                    .Where(m => m.ProjectId == projectId)
+                    .Where(m => role == null || m.Role == role)
+                    .Where(m =>
+                        EF.Functions.ILike(m.User.Email, $"%{search}%")
+                        || EF.Functions.ILike(m.User.FirstName, $"%{search}%")
+                        || EF.Functions.ILike(m.User.LastName, $"%{search}%"))
+                    .CountAsync();
 
             return HttpResult.Ok(body: count);
         }
@@ -52,12 +53,13 @@ public class MembersTableController : ControllerBase
             var role = Helper.ParseEnum<Role>(roleQuery);
 
             var members = await _ctx.Members
-                        .Where(m => m.ProjectId == projectId
-                        && (role == null || m.Role == role)
-                        && (EF.Functions.ILike(m.User.Email, $"%{search}%")
+                        .Where(m => m.ProjectId == projectId)
+                        .Where(m => role == null || m.Role == role)
+                        .Where(m =>
+                        EF.Functions.ILike(m.User.Email, $"%{search}%")
                         || EF.Functions.ILike(m.User.FirstName, $"%{search}%")
                         || EF.Functions.ILike(m.User.LastName, $"%{search}%"))
-                        ).OrderBy((m) => m.JoinedAt)
+                        .OrderBy((m) => m.JoinedAt)
                         .Select(m => new
                         {
                             avatarUrl = m.User.AvatarUrl,

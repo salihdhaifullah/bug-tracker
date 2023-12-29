@@ -4,7 +4,6 @@ using Buegee.Services.AuthService;
 using Buegee.Services.DataService;
 using Buegee.Utils;
 using Buegee.Utils.Attributes;
-using Buegee.Utils.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 

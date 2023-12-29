@@ -30,11 +30,12 @@ public class TicketsTableController : ControllerBase
             var type = Helper.ParseEnum<TicketType>(typeQuery);
             var priority = Helper.ParseEnum<Priority>(priorityQuery);
 
-            var tickets = await _ctx.Tickets.Where(t => t.ProjectId == projectId
-                          && (status == null || t.Status == status)
-                          && (type == null || t.Type == type)
-                          && (priority == null || t.Priority == priority)
-                          && EF.Functions.ILike(t.Name, $"%{search}%"))
+            var tickets = await _ctx.Tickets
+                        .Where(t => t.ProjectId == projectId)
+                        .Where(t => status == null || t.Status == status)
+                        .Where(t => type == null || t.Type == type)
+                        .Where(t => priority == null || t.Priority == priority)
+                        .Where(t => EF.Functions.ILike(t.Name, $"%{search}%"))
                         .OrderBy(t => t.Status)
                         .ThenByDescending(t => t.Priority)
                         .ThenBy(t => t.Type)
@@ -67,7 +68,7 @@ public class TicketsTableController : ControllerBase
         }
         catch (Exception e)
         {
-            _logger.LogError(e,"");
+            _logger.LogError(e, "");
             return HttpResult.InternalServerError();
         }
     }
@@ -81,18 +82,20 @@ public class TicketsTableController : ControllerBase
             var type = Helper.ParseEnum<TicketType>(typeQuery);
             var priority = Helper.ParseEnum<Priority>(priorityQuery);
 
-            var count = await _ctx.Tickets.Where(t => t.ProjectId == projectId
-                                            && (status == null || t.Status == status)
-                                            && (type == null || t.Type == type)
-                                            && (priority == null || t.Priority == priority)
-                                            && EF.Functions.ILike(t.Name, $"%{search}%")).CountAsync();
+            var count = await _ctx.Tickets
+                            .Where(t => t.ProjectId == projectId)
+                            .Where(t => status == null || t.Status == status)
+                            .Where(t => type == null || t.Type == type)
+                            .Where(t => priority == null || t.Priority == priority)
+                            .Where(t => EF.Functions.ILike(t.Name, $"%{search}%"))
+                            .CountAsync();
 
 
             return HttpResult.Ok(body: count);
         }
         catch (Exception e)
         {
-            _logger.LogError(e,"");
+            _logger.LogError(e, "");
             return HttpResult.InternalServerError();
         }
     }

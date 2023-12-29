@@ -3,12 +3,10 @@ namespace Buegee.Services.EmailService;
 class ResetPasswordEmail
 {
     private readonly string _name;
-    private readonly string _date;
     private readonly string _code;
 
-    public ResetPasswordEmail(string name, string date, string code) {
+    public ResetPasswordEmail(string name, string code) {
         _name = name;
-        _date = date;
         _code = code;
     }
 
@@ -43,9 +41,10 @@ class ResetPasswordEmail
                         padding: 20px;
                     }}
                     .title {{
-                        font-size: 24px;
+                        font-size: 20px;
                         font-weight: bold;
                         margin-bottom: 10px;
+                        text-align: center;
                         color: #363636;
                     }}
                     .message {{
@@ -70,12 +69,12 @@ class ResetPasswordEmail
                         <h1>Reset Your Password</h1>
                     </div>
                     <div class='content'>
-                        <p class='title'>Hello, ${_name}</p>
+                        <p class='title'>Hello, {_name}</p>
                         <p class='message'>We have received a request to reset your password.</p>
-                        <h1>Code: '${_code}'</h1>
+                        <h1 class='title'>Code: {_code}</h1>
                         <p class='message'>This code will expire after 30 minutes.</p>
                         <p class='message'>If you did not request to reset your password, please ignore this email.</p>
-                        <p class='end'>date ${_date}<br> Sincerely,<br>Buegee Team.</p>
+                        <p class='end'>date {DateTime.UtcNow.ToString("yyyy MMM dd HH:mm", System.Globalization.CultureInfo.InvariantCulture)}<br> Sincerely,<br>Buegee Team.</p>
                     </div>
                 </div>
             </body>

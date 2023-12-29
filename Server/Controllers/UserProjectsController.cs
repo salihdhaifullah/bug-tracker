@@ -57,7 +57,7 @@ public class UserProjectsController : ControllerBase
         }
         catch (Exception e)
         {
-            _logger.LogError(e,"");
+            _logger.LogError(e, "");
             return HttpResult.InternalServerError();
         }
     }
@@ -75,14 +75,14 @@ public class UserProjectsController : ControllerBase
 
             bool? isReadOnly = null;
             if (!string.IsNullOrEmpty(status) && status == "archived") isReadOnly = true;
-            else if (!string.IsNullOrEmpty(status) && status == "unarchive") isReadOnly = false;
+            if (!string.IsNullOrEmpty(status) && status == "unarchive") isReadOnly = false;
 
             var projects = await _ctx.Projects
-                            .Where((p) => (!p.IsPrivate || (currentUserId != null && p.Members.Any(m => m.UserId == currentUserId)))
-                            && p.Members.Any(m => m.UserId == userId && (role == null || m.Role == role))
-                            && (isReadOnly == null || p.IsReadOnly == isReadOnly)
-                            && EF.Functions.ILike(p.Name, $"%{search}%")
-                            ).OrderByDescending((p) => p.Activities.Max(a => a.CreatedAt))
+                            .Where(p => !p.IsPrivate || p.Members.Any(m => m.UserId == currentUserId))
+                            .Where(p => p.Members.Any(m => m.UserId == userId && (role == null || m.Role == role)))
+                            .Where(p => isReadOnly == null || p.IsReadOnly == isReadOnly)
+                            .Where(p => EF.Functions.ILike(p.Name, $"%{search}%"))
+                            .OrderByDescending((p) => p.Activities.Max(a => a.CreatedAt))
                             .Select((p) => new
                             {
                                 createdAt = p.CreatedAt,
@@ -103,7 +103,7 @@ public class UserProjectsController : ControllerBase
         }
         catch (Exception e)
         {
-            _logger.LogError(e,"");
+            _logger.LogError(e, "");
             return HttpResult.InternalServerError();
         }
     }
@@ -118,23 +118,22 @@ public class UserProjectsController : ControllerBase
             _auth.TryGetId(Request, out string? currentUserId);
 
             var role = Helper.ParseEnum<Role>(roleQuery);
-
             bool? isReadOnly = null;
             if (!string.IsNullOrEmpty(status) && status == "archived") isReadOnly = true;
-            else if (!string.IsNullOrEmpty(status) && status == "unarchive") isReadOnly = false;
+            if (!string.IsNullOrEmpty(status) && status == "unarchive") isReadOnly = false;
 
-            var count = await _ctx.Projects.Where((p) =>
-                            (!p.IsPrivate || (currentUserId != null && p.Members.Any(m => m.UserId == currentUserId)))
-                            && p.Members.Any(m => m.UserId == userId && (role == null || m.Role == role))
-                            && (isReadOnly == null || p.IsReadOnly == isReadOnly)
-                            && EF.Functions.ILike(p.Name, $"%{search}%")
-                            ).CountAsync();
+            var count = await _ctx.Projects
+                            .Where(p => !p.IsPrivate || p.Members.Any(m => m.UserId == currentUserId))
+                            .Where(p => p.Members.Any(m => m.UserId == userId && (role == null || m.Role == role)))
+                            .Where(p => isReadOnly == null || p.IsReadOnly == isReadOnly)
+                            .Where(p => EF.Functions.ILike(p.Name, $"%{search}%"))
+                            .CountAsync();
 
             return HttpResult.Ok(body: count);
         }
         catch (Exception e)
         {
-            _logger.LogError(e,"");
+            _logger.LogError(e, "");
             return HttpResult.InternalServerError();
         }
     }

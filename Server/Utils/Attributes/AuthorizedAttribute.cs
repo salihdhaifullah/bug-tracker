@@ -3,13 +3,12 @@ using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Buegee.Utils.Attributes;
 
+[AttributeUsage(AttributeTargets.Method)]
 public class AuthorizedAttribute : Attribute, IAsyncActionFilter
 {
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
-        var jwt = context.HttpContext.RequestServices.GetService<IJWTService>();
-        if (jwt is null) throw new NullReferenceException("IJWTService is null");
-
+        var jwt = context.HttpContext.RequestServices.GetService<IJWTService>() ?? throw new NullReferenceException("IJWTService is null");
         if (!context.HttpContext.Request.Cookies.TryGetValue("auth", out var token) || String.IsNullOrEmpty(token))
         {
             context.Result = HttpResult.UnAuthorized();

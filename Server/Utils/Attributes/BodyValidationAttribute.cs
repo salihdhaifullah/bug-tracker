@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Buegee.Utils.Attributes;
 
+[AttributeUsage(AttributeTargets.Method)]
 public class BodyValidationAttribute : Attribute, IAsyncActionFilter
 {
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
