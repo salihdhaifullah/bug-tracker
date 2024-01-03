@@ -1,4 +1,5 @@
 using System.Text;
+using Microsoft.AspNetCore.StaticFiles;
 
 namespace Buegee.Utils;
 public static class Helper
@@ -44,5 +45,16 @@ public static class Helper
             result = parsedType;
         }
         return result;
+    }
+
+    public static string GetContentType(string fileName)
+    {
+        var provider = new FileExtensionContentTypeProvider();
+        if (provider.TryGetContentType(fileName, out var mimeMapping))
+        {
+            return mimeMapping;
+        }
+
+        return "application/octet-stream";
     }
 }

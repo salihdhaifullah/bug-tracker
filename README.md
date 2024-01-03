@@ -105,3 +105,18 @@ users/{userId}/projects/{projectId}/tickets/{ticketId}/comments/{page} GET
 users/{userId}/projects/{projectId}/tickets/{ticketId}/comments POST
 users/{userId}/projects/{projectId}/tickets/{ticketId}/comments/count GET
 users/{userId}/projects/{projectId}/tickets/{ticketId}/comments/{commentId} DELETE
+
+
+
+## to dump to database
+
+## make the dump file
+```sh
+PGSSLMODE=require PGPASSWORD=<your password> pg_dump -h <host> -U <user> -d <database> -p <port> -f <file name>.sql
+```
+
+## and then dump
+```sh
+sudo psql -h <host> -p <port> -d <database> -U <user>
+\i dump.sql
+```

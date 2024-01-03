@@ -1,7 +1,7 @@
 using Buegee.Data;
 using Buegee.DTO;
 using Buegee.Services.AuthService;
-using Buegee.Services.FirebaseService;
+using Buegee.Services.SupabaseService;
 using Buegee.Utils;
 using Buegee.Utils.Attributes;
 using Buegee.Utils.Enums;
@@ -15,12 +15,12 @@ namespace Buegee.Controllers;
 public class UserController : ControllerBase
 {
     private readonly DataContext _ctx;
-    private readonly IFirebaseService _firebase;
+    private readonly ISupabaseService _firebase;
     private readonly IAuthService _auth;
     private readonly ILogger<UserController> _logger;
 
 
-    public UserController(DataContext ctx, IFirebaseService firebase, IAuthService auth, ILogger<UserController> logger)
+    public UserController(DataContext ctx, ISupabaseService firebase, IAuthService auth, ILogger<UserController> logger)
     {
         _ctx = ctx;
         _auth = auth;

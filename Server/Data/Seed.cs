@@ -3,7 +3,7 @@ using Buegee.Services.CryptoService;
 using Buegee.Utils.Enums;
 using Buegee.Models;
 using Microsoft.EntityFrameworkCore;
-using Buegee.Services.FirebaseService;
+using Buegee.Services.SupabaseService;
 using Buegee.Services.DataService;
 
 namespace Buegee.Data;
@@ -14,7 +14,7 @@ public class Seed
     private readonly Data _dataSeed;
     private readonly ICryptoService _crypto;
     private readonly HttpClient _client;
-    private readonly IFirebaseService _firebase;
+    private readonly ISupabaseService _firebase;
     private readonly IDataService _data;
 
     public Seed(IServiceScope scope)
@@ -22,7 +22,7 @@ public class Seed
         var ctx = scope.ServiceProvider.GetRequiredService<DataContext>();
         var data = scope.ServiceProvider.GetRequiredService<IDataService>();
         var crypto = scope.ServiceProvider.GetRequiredService<ICryptoService>();
-        var firebase = scope.ServiceProvider.GetRequiredService<IFirebaseService>();
+        var firebase = scope.ServiceProvider.GetRequiredService<ISupabaseService>();
 
         Console.WriteLine("\n ************************************************************** \n");
         Console.WriteLine("************************************************************** \n");

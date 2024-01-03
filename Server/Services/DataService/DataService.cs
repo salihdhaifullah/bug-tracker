@@ -1,6 +1,6 @@
 using Buegee.Data;
 using Buegee.DTO;
-using Buegee.Services.FirebaseService;
+using Buegee.Services.SupabaseService;
 using Buegee.Utils.Enums;
 using Buegee.Models;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -9,9 +9,9 @@ namespace Buegee.Services.DataService;
 
 public class DataService : IDataService
 {
-    private readonly IFirebaseService _firebase;
+    private readonly ISupabaseService _firebase;
 
-    public DataService(IFirebaseService firebase)
+    public DataService(ISupabaseService firebase)
     {
         _firebase = firebase;
     }

@@ -1,7 +1,7 @@
 using Buegee.Data;
 using Buegee.DTO;
 using Buegee.Services.AuthService;
-using Buegee.Services.FirebaseService;
+using Buegee.Services.SupabaseService;
 using Buegee.Utils;
 using Buegee.Utils.Attributes;
 using Buegee.Utils.Enums;
@@ -15,10 +15,10 @@ namespace Buegee.Controllers;
 public class AttachmentController : ControllerBase
 {
     private readonly DataContext _ctx;
-    private readonly IFirebaseService _firebase;
+    private readonly ISupabaseService _firebase;
     private readonly ILogger<AttachmentController> _logger;
 
-    public AttachmentController(DataContext ctx, ILogger<AttachmentController> logger, IAuthService auth, IFirebaseService firebase)
+    public AttachmentController(DataContext ctx, ILogger<AttachmentController> logger, IAuthService auth, ISupabaseService firebase)
     {
         _ctx = ctx;
         _logger = logger;

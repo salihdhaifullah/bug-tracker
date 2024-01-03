@@ -3,9 +3,10 @@ using Buegee.Services.AuthService;
 using Buegee.Services.CryptoService;
 using Buegee.Services.DataService;
 using Buegee.Services.EmailService;
-using Buegee.Services.FirebaseService;
 using Buegee.Services.JWTService;
 using Buegee.Services.RedisCacheService;
+using Buegee.Services.SupabaseService;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,7 +18,7 @@ builder.Services.AddSingleton<ICryptoService, CryptoService>();
 builder.Services.AddSingleton<IEmailService, EmailService>();
 builder.Services.AddSingleton<IRedisCacheService, RedisCacheService>();
 builder.Services.AddSingleton<IAuthService, AuthService>();
-builder.Services.AddSingleton<IFirebaseService, FirebaseService>();
+builder.Services.AddSingleton<ISupabaseService, SupabaseService>();
 builder.Services.AddSingleton<IDataService, DataService>();
 
 var app = builder.Build();

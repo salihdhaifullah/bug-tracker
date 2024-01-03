@@ -1,7 +1,7 @@
 using Buegee.Data;
 using Buegee.DTO;
 using Buegee.Models;
-using Buegee.Services.FirebaseService;
+using Buegee.Services.SupabaseService;
 using Buegee.Utils;
 using Buegee.Utils.Attributes;
 using Buegee.Utils.Enums;
@@ -15,10 +15,10 @@ namespace Buegee.Controllers;
 public class TicketAttachmentsController : ControllerBase
 {
     private readonly DataContext _ctx;
-    private readonly IFirebaseService _firebase;
+    private readonly ISupabaseService _firebase;
     private readonly ILogger<TicketAttachmentsController> _logger;
 
-    public TicketAttachmentsController(DataContext ctx, ILogger<TicketAttachmentsController> logger, IFirebaseService firebase)
+    public TicketAttachmentsController(DataContext ctx, ILogger<TicketAttachmentsController> logger, ISupabaseService firebase)
     {
         _ctx = ctx;
         _logger = logger;

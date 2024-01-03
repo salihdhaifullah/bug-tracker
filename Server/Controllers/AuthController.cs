@@ -7,7 +7,7 @@ using Buegee.Data;
 using Buegee.Services.AuthService;
 using Buegee.Utils.Attributes;
 using Buegee.Models;
-using Buegee.Services.FirebaseService;
+using Buegee.Services.SupabaseService;
 using Buegee.Utils.Enums;
 using Buegee.Utils;
 
@@ -20,7 +20,7 @@ public class AuthController : Controller
     private readonly ICryptoService _crypto;
     private readonly IEmailService _email;
     private readonly IAuthService _auth;
-    private readonly IFirebaseService _firebase;
+    private readonly ISupabaseService _firebase;
     private readonly ILogger<AuthController> _logger;
 
     public AuthController(
@@ -28,7 +28,7 @@ public class AuthController : Controller
      ICryptoService crypto,
      IEmailService email,
      IAuthService auth,
-     IFirebaseService firebase,
+     ISupabaseService firebase,
      ILogger<AuthController> logger)
     {
         _ctx = ctx;

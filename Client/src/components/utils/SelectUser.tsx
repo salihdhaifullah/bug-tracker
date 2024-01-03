@@ -118,7 +118,9 @@ const SelectUser = (props: ISelectUserProps) => {
                     >
 
                         <div className="flex flex-row w-full gap-4">
-                            <img className="rounded-full flex shadow-md dark:shadow-secondary/40 w-10 h-10 object-cover" src={option.avatarUrl} alt={option.name} />
+                            <img className="rounded-full flex shadow-md dark:shadow-secondary/40 w-10 h-10 object-cover"
+                            src={option.avatarUrl}
+                             alt={option.name} />
                             <p className="font-bold">{option.name}</p>
                         </div>
                         <p className="text-sm font-light -mt-2 -ml-8">{option.email}</p>
