@@ -88,7 +88,7 @@ const MyTasks = () => {
     const dispatchModal = useModalDispatch();
 
     const handelOpenModal = () => {
-        dispatchModal({ type: "open", payload: <CreateTicketModal callback={callTasks}/> })
+        dispatchModal({ type: "open", payload: <CreateTicketModal callback={() => callTasks()}/> })
     }
 
     const isReadOnly = useMemo(() => (

@@ -84,7 +84,7 @@ const Tickets = () => {
     const dispatchModal = useModalDispatch();
 
     const handelOpenModal = () => {
-        dispatchModal({ type: "open", payload: <CreateTicketModal callback={callTickets}/> })
+        dispatchModal({ type: "open", payload: <CreateTicketModal callback={() => callTickets()}/> })
     }
 
     const isOwnerOrMangerAndNotArchived = useMemo(() => (

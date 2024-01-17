@@ -33,7 +33,8 @@ const CreateTicketModal = (props: {callback: () => void}) => {
 
   const dispatchModal = useModalDispatch();
 
-  const [payload, call] = useFetchApi<unknown, ICreateTicket>("POST", `projects/${projectId}/tickets`, [], () => {
+  const [payload, call] = useFetchApi<unknown, ICreateTicket>("POST", `projects/${projectId}/tickets`, [],
+  () => {
     props.callback()
     dispatchModal({ type: "close", payload: null })
   });
