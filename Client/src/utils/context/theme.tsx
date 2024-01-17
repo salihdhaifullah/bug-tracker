@@ -4,9 +4,9 @@ type Theme = "dark" | "light";
 
 const getTheme = (): Theme => {
     const theme = localStorage.getItem("theme");
-    if ((theme && theme === "dark") || window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        return "dark";
-    }
+
+    if (theme) return theme as Theme;
+    if (window.matchMedia('(prefers-color-scheme: dark)').matches) return "dark";
     else return "light";
 }
 

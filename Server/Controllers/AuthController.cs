@@ -70,7 +70,8 @@ public class AuthController : Controller
             _auth.LogIn(isFound.id, HttpContext);
 
             return HttpResult.Ok("logged in successfully",
-            new {
+            new
+            {
                 isFound.id,
                 isFound.avatarUrl,
                 isFound.email,
@@ -79,7 +80,7 @@ public class AuthController : Controller
         }
         catch (Exception e)
         {
-            _logger.LogError(e,"");
+            _logger.LogError(e, "");
             return HttpResult.InternalServerError();
         }
     }
@@ -89,7 +90,7 @@ public class AuthController : Controller
     {
         try
         {
-            var demo = "salehwebdev2004@gmail.com";
+            var demo = "JohnDoe@gmail.com";
 
             var isFound = await _ctx.Users
                 .Where(u => u.Email == demo)
@@ -104,67 +105,25 @@ public class AuthController : Controller
                 })
                 .FirstOrDefaultAsync();
 
-            if (isFound is null)
+            if (isFound is null) throw new Exception("JohnDoe is not found");
+
+            _auth.LogIn(isFound.id, HttpContext);
+
+            return HttpResult.Ok("logged in successfully as demo", new
             {
-                _crypto.Hash("salehwebdev2004@gmail.com", out byte[] hash, out byte[] salt);
-
-                string imageName;
-
-                var userId = Ulid.NewUlid().ToString();
-                var contentId = Ulid.NewUlid().ToString();
-
-                using (var client = new HttpClient())
-                {
-                    var imageBytes = await client.GetByteArrayAsync($"https://api.dicebear.com/6.x/identicon/svg?seed={userId}");
-                    imageName = await _firebase.Upload(imageBytes, ContentType.svg.ToString());
-                }
-
-                var content = await _ctx.Contents.AddAsync(new Content() { Id = contentId });
-
-                var user = await _ctx.Users.AddAsync(new User
-                {
-                    Email = demo,
-                    FirstName = "demo",
-                    LastName = "",
-                    PasswordHash = hash,
-                    PasswordSalt = salt,
-                    Id = userId,
-                    AvatarUrl = imageName,
-                    ContentId = contentId
-                });
-
-                await _ctx.SaveChangesAsync();
-
-                _auth.LogIn(userId, HttpContext);
-
-                return HttpResult.Created("logged in successfully as demo", new
-                {
-                    id = userId,
-                    avatarUrl = imageName,
-                    email = demo,
-                    name = "demo",
-                }, redirectTo: $"/users/{userId}");
-            }
-            else
-            {
-                _auth.LogIn(isFound.id, HttpContext);
-
-                return HttpResult.Ok("logged in successfully as demo", new
-                {
-                    isFound.id,
-                    isFound.avatarUrl,
-                    isFound.email,
-                    isFound.name,
-                }, redirectTo: $"/users/{isFound.id}");
-            }
-
+                isFound.id,
+                isFound.avatarUrl,
+                isFound.email,
+                isFound.name,
+            }, redirectTo: $"/users/{isFound.id}");
         }
         catch (Exception e)
         {
-            _logger.LogError(e,"");
+            _logger.LogError(e, "");
             return HttpResult.InternalServerError();
         }
     }
+
 
     [HttpPost("sing-up"), BodyValidation]
     public async Task<IActionResult> SingUp([FromBody] SingUpDTO dto)
@@ -189,7 +148,7 @@ public class AuthController : Controller
         }
         catch (Exception e)
         {
-            _logger.LogError(e,"");
+            _logger.LogError(e, "");
             return HttpResult.InternalServerError();
         }
     }
@@ -242,7 +201,7 @@ public class AuthController : Controller
         }
         catch (Exception e)
         {
-            _logger.LogError(e,"");
+            _logger.LogError(e, "");
             return HttpResult.InternalServerError();
         }
     }
@@ -277,7 +236,7 @@ public class AuthController : Controller
         }
         catch (Exception e)
         {
-            _logger.LogError(e,"");
+            _logger.LogError(e, "");
             return HttpResult.InternalServerError();
         }
     }
@@ -311,7 +270,7 @@ public class AuthController : Controller
         }
         catch (Exception e)
         {
-            _logger.LogError(e,"");
+            _logger.LogError(e, "");
             return HttpResult.InternalServerError();
         }
     }
@@ -326,7 +285,7 @@ public class AuthController : Controller
         }
         catch (Exception e)
         {
-            _logger.LogError(e,"");
+            _logger.LogError(e, "");
             return HttpResult.InternalServerError();
         }
     }

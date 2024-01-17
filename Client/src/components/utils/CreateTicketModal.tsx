@@ -20,7 +20,7 @@ interface ICreateTicket {
   memberId?: string;
 }
 
-const CreateTicketModal = () => {
+const CreateTicketModal = (props: {callback: () => void}) => {
   const [name, setName] = useState("");
   const [type, setType] = useState(typeOptions[0]);
   const [priority, setPriority] = useState(priorityOptions[1]);
@@ -34,6 +34,7 @@ const CreateTicketModal = () => {
   const dispatchModal = useModalDispatch();
 
   const [payload, call] = useFetchApi<unknown, ICreateTicket>("POST", `projects/${projectId}/tickets`, [], () => {
+    props.callback()
     dispatchModal({ type: "close", payload: null })
   });
 

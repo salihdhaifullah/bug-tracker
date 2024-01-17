@@ -18,6 +18,7 @@ const Droppable = (props: IDroppableProps) => {
 
     const dragOverHandler = (event: DragEvent<HTMLDivElement>) => {
         event.preventDefault();
+        console.log(event)
         event.dataTransfer.dropEffect = "move";
         setIsOver(true)
     };

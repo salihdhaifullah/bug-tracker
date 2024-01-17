@@ -97,7 +97,7 @@ public class ProjectTicketsController : ControllerBase
 
             await _ctx.SaveChangesAsync();
 
-            return HttpResult.Created("successfully created ticket", redirectTo: $"/projects/{projectId}/tickets/{ticketId}");
+            return HttpResult.Created("successfully created ticket");
         }
         catch (Exception e)
         {
