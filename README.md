@@ -31,8 +31,8 @@
 - ulid
 
 
-## demo
-![demo](/readmefiles/demo.webms)
+## video demo
+[![demo](https://img.youtube.com/vi/ZhMCs5tlHf4/0.jpg)](https://www.youtube.com/watch?v=ZhMCs5tlHf4)
 
 ## to build
 ```sh
