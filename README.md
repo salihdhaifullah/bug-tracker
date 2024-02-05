@@ -1,4 +1,38 @@
-# buegee is .NET core 7 and react project management web app
+# buegee project management web app
+
+
+### tools used
+#### client
+- react
+- tailwind css
+- yarn
+- react router
+- chart.js
+- react-icons
+- react-markdown
+- vite
+- full custom markdown editor
+- PWA
+- notification
+- WEBP converter
+- typescript
+
+#### server
+- c#
+- .NET
+- entity framework
+- docker
+- postgresql
+- redis
+- supabase file storage
+- jwt
+- crypto
+- smtp server
+- ulid
+
+
+## demo
+![demo](/readmefiles/demo.webms)
 
 ## to build
 ```sh
@@ -15,7 +49,6 @@ docker run -it --rm --entrypoint /bin/sh buegee
  docker run -d -p 5018:5018 buegee
 ```
 
-
 ## to make first migrations
 
 ```sh
@@ -27,96 +60,112 @@ dotnet ef migrations add InitialCreate
 dotnet ef database update
 ```
 
-### if project is private only members can see data related to the project
-### if project is archived no changes can be made to data related to the project
 
-### owner can add and remove new members, create tickets, update, delete, change setting of project, comment in tickets, view every thing in the project
-### project manger can create tickets, update, delete,  comment in tickets, view every thing in the project
-### developer can change status of tickets assigned to them,  comment in tickets, view every thing in the project
+# REST API
 
-## REST API
-auth/login POST
-auth/sing-up POST
-auth/demo GET
-auth/account-verification POST
-auth/forget-password POST
-auth/reset-password PATCH
-auth/logout DELETE
+```http
+GET /projects/{projectId}/activities/{page}?take={take}&sort={sort}
+```
 
-users/{userId} GET
-users/{userId}/avatar PATCH
-users/{userId}/bio PATCH
+#### Description:
+Retrieves a paginated list of activities for a specific project.
 
-contents/{contentId} GET
-contents/{contentId} PATCH
+#### Parameters:
+**projectId:** The identifier of the project.
+**page:** The page number of activities to retrieve.
+**take:** The number of activities to take per page.
+**sort:** The sorting order for activities (options: "oldest" or default sorting order "newest").
 
-users/{userId}/projects POST
-users/{userId}/projects/{page} GET
-users/{userId}/projects/count GET
+#### Auth:
+check if project public or private
+if private the user must be authorized and is a member of this project
 
-users/{userId}/projects/{projectId} GET
-users/{userId}/projects/{projectId} PATCH
-users/{userId}/projects/{projectId} DELETE
+#### Response:
+Status: 200 OK
+Body: JSON response with the paginated list of activities.
 
-users/{userId}/projects/{projectId}/danger-zone GET
-users/{userId}/projects/{projectId}/danger-zone/visibility PATCH
-users/{userId}/projects/{projectId}/danger-zone/archive PATCH
-users/{userId}/projects/{projectId}/danger-zone/transfer PATCH
+___
 
-explore/{page} GET
-explore/count GET
+```http
+GET /projects/{projectId}/activities/count
+```
 
-users/{userId}/projects/{projectId}/members/{page} GET
-users/{userId}/projects/{projectId}/members POST
-users/{userId}/projects/{projectId}/members DELETE
-users/{userId}/projects/{projectId}/members/none-members GET
-users/{userId}/projects/{projectId}/members/chart GET
+#### Description:
+Retrieves the count of activities for a specific project.
 
-users/{userId}/projects/{projectId}/members/table/count GET
-users/{userId}/projects/{projectId}/members/table GET
+#### Parameters:
+**projectId:** The identifier of the project.
 
-users/{userId}/projects/{projectId}/members/{memberId}/role GET
-users/{userId}/projects/{projectId}/members/{memberId} DELETE
-users/{userId}/projects/{projectId}/members/{memberId} PATCH
+#### Auth:
+check if project public or private
+if private the user must be authorized and is a member of this project
 
-users/{userId}/projects/{projectId}/activities/{page} GET
-users/{userId}/projects/{projectId}/activities/count GET
+#### Response:
+Status: 200 OK
+Body: JSON response with the count of activities for the specified project.
 
-users/{userId}/projects/{projectId}/tickets/{ticketId} POST
-users/{userId}/projects/{projectId}/tickets/{ticketId} PATCH
-users/{userId}/projects/{projectId}/tickets/{ticketId} GET
-users/{userId}/projects/{projectId}/tickets/{ticketId} DELETE
+___
 
-users/{userId}/projects/{projectId}/tickets/assigned/{userId} GET
-users/{userId}/projects/{projectId}/tickets/assigned/{userId}/{ticketId} PATCH
+```http
+GET /projects/{projectId}/tickets/assigned?type={type}&priority={priority}&search={search}
+```
 
-users/{userId}/projects/{projectId}/tickets/table/{page} GET
-users/{userId}/projects/{projectId}/tickets/table/count GET
+#### Description:
+Retrieves a list of assigned tickets for a specific project based on optional query parameters.
 
-users/{userId}/projects/{projectId}/tickets/{ticketId}/chart GET
+#### Parameters:
+**projectId:** The identifier of the project.
+**typeQuery:** Optional. Filter tickets by type.
+**priorityQuery:** Optional. Filter tickets by priority.
+**search:** Optional. Search term for filtering tickets by name.
 
-users/{userId}/projects/{projectId}/tickets/{ticketId}/attachments GET
-users/{userId}/projects/{projectId}/tickets/{ticketId}/attachments POST
+#### Auth:
+the user must be authorized and project member
 
-users/{userId}/projects/{projectId}/tickets/{ticketId}/attachments/{attachmentId} DELETE
-users/{userId}/projects/{projectId}/tickets/{ticketId}/attachments/{attachmentId} PATCH
+#### Response:
+Status: 200 OK
+Body: JSON response with the list of assigned tickets.
 
-users/{userId}/projects/{projectId}/tickets/{ticketId}/comments/{page} GET
-users/{userId}/projects/{projectId}/tickets/{ticketId}/comments POST
-users/{userId}/projects/{projectId}/tickets/{ticketId}/comments/count GET
-users/{userId}/projects/{projectId}/tickets/{ticketId}/comments/{commentId} DELETE
+___
+
+```http
+PATCH /projects/{projectId}/tickets/assigned
+```
+#### Description:
+Updates the status of an assigned ticket for a specific project.
+And add a log in activities table of this project that the user **(this user)** changed ticket **(this ticket)** status from old status to new status
+
+#### Request Body:
+Requires a JSON object containing the **ticketId** and **status** properties.
+
+#### Auth:
+the user must be authorized and project member
+the project must not be archived
+
+#### Response:
+Status: 200 OK
+Body: JSON response indicating successful status change.
+
+___
+
+# Roles
+##### if project is private only members can see data related to the project
+##### if project is archived no changes can be made to data related to the project
+
+##### owner can add and remove new members, create tickets, update, delete, change setting of project, comment in tickets, view every thing in the project
+##### project manger can create tickets, update, delete,  comment in tickets, view every thing in the project
+##### developer can change status of tickets assigned to them,  comment in tickets, view every thing in the project
 
 
 
-## to dump to database
-
-## make the dump file
-```sh
+## database
+##### make the dump file
+```bash
 PGSSLMODE=require PGPASSWORD=<your password> pg_dump -h <host> -U <user> -d <database> -p <port> -f <file name>.sql
 ```
 
-## and then dump
-```sh
+##### and then dump
+```bash
 sudo psql -h <host> -p <port> -d <database> -U <user>
 \i dump.sql
 ```
