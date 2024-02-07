@@ -303,7 +303,7 @@ ___
 #### Description: Retrieves the content of a comment.
 #### HTTP Method: `GET`
 #### URL: `/api/projects/{projectId}/tickets/{ticketId}/comments/{commentId}/content`
-#### Permissions Required: User must have read access to the project.
+#### Auth: User must have read access to the project.
 #### Parameters:
 #### Path Parameters:
 `{commentId}`: ID of the comment.
@@ -318,7 +318,7 @@ ___
 #### Description: Updates the content of a comment.
 #### HTTP Method: `PATCH`
 #### URL: `/api/projects/{projectId}/tickets/{ticketId}/comments/{commentId}/content`
-#### Permissions Required: User must be authorized and have permissions to edit the comment.
+#### Auth: User must be authorized and have permissions to edit the comment.
 #### Parameters:
 #### Path Parameters:
 `{commentId}`: ID of the comment.
@@ -338,7 +338,7 @@ ___
 #### Description: Creates a new comment on a ticket.
 #### HTTP Method: `POST`
 #### URL: `/api/projects/{projectId}/tickets/{ticketId}/comments`
-#### Permissions Required: User must be authorized, have read access to the project, and the project must not be archived.
+#### Auth: User must be authorized, have read access to the project, and the project must not be archived.
 #### Parameters:
 #### Path Parameters:
 `{ticketId}`: ID of the ticket.
@@ -359,7 +359,7 @@ ___
 #### Description: Deletes a comment.
 #### HTTP Method: `DELETE`
 #### URL: `/api/projects/{projectId}/tickets/{ticketId}/comments/{commentId}`
-#### Permissions Required: User must be authorized, have read access to the project, and be the commenter of the comment.
+#### Auth: User must be authorized, have read access to the project, and be the commenter of the comment.
 #### Parameters:
 #### Path Parameters:
 `{commentId}`: ID of the comment.
@@ -375,7 +375,7 @@ ___
 #### Description: Retrieves comments on a ticket.
 #### HTTP Method: `GET`
 #### URL: `/api/projects/{projectId}/tickets/{ticketId}/comments`
-#### Permissions Required: User must have read access to the project.
+#### Auth: User must have read access to the project.
 #### Parameters:
 #### Path Parameters:
 `{ticketId}`: ID of the ticket.
@@ -391,7 +391,7 @@ ___
 #### Description: Retrieves the total count of comments on a ticket.
 #### HTTP Method: `GET`
 #### URL: `/api/projects/{projectId}/tickets/{ticketId}/comments/count
-#### Permissions Required: User must have read access to the project.
+#### Auth: User must have read access to the project.
 #### Parameters:
 #### Path Parameters:
 `{ticketId}`: ID of the ticket.
@@ -401,17 +401,744 @@ ___
 
 ___
 
+
+
+## Explore Page
+### Description: Retrieves a page of projects matching the search criteria.
+### HTTP Method: `GET`
+### URL: `/api/explore/{page}`
+
+### Path Parameters:
+`{page}`: Page number for pagination.
+
+### Query Parameters:
+`search (optional)`: Search query to filter projects.
+`take (optional, default: 10)`: Number of projects to retrieve per page.
+
+### Responses:
+`200 OK`: Projects retrieved successfully. Returns a list of projects.
+`500 Internal Server Error`: Unexpected error.
+
+___
+
+## Explore Count
+### Description: Retrieves the total count of projects matching the search criteria.
+### HTTP Method: `GET`
+### URL: `/api/explore/count`
+
+### Query Parameters:
+`search (optional)`: Search query to filter projects.
+
+### Responses:
+`200 OK`: Projects count retrieved successfully. Returns the total count of projects.
+`500 Internal Server Error`: Unexpected error.
+
 ___
 
 
+## Delete Member
+### Description: Removes a member from a project.
+### HTTP Method: `DELETE`
+### URL: `/api/projects/{projectId}/members/{memberId}`
+### Auth: User must be authorized, the project must not be archived, and the user must be an owner of the project.
+### Path Parameters:
+`{projectId}`: ID of the project.
+`{memberId}`: ID of the member to delete.
+
+### Responses:
+`200 OK`: Member deleted successfully.
+`404 Not Found`: Member not found.
+`500 Internal Server Error`: Unexpected error.
+
+___
+
+## Update Member
+### Description: Updates the role of a member in a project.
+### HTTP Method: `PATCH`
+### URL: `/api/projects/{projectId}/members/{memberId}`
+### Auth: User must be authorized, the project must not be archived, and the user must be an owner of the project.
+
+### Path Parameters:
+{projectId}: ID of the project.
+{memberId}: ID of the member to update.
+
+### Request Body (JSON):
+```` json
+{
+  "role": "developer" // or "project_manger"
+}
+````
+
+### Responses:
+`200 OK`: Member role updated successfully.
+`404 Not Found`: Member not found.
+`500 Internal Server Error`: Unexpected error.
+___
+
+
+## Get Members Table Count
+### Description: Retrieves the total count of members in the project matching the specified criteria.
+### HTTP Method: `GET`
+### URL: `/api/projects/{projectId}/members/table/count`
+### Auth: User must have read access to the project.
+
+### Path Parameters:
+`{projectId}`: ID of the project.
+
+### Query Parameters:
+`role (optional)`: Filter members by role (e.g., "owner", "project_manager").
+`search (optional)`: Search query to filter members by email or name.
+
+### Responses:
+`200 OK`: Members count retrieved successfully. Returns the total count of members.
+`500 Internal Server Error`: Unexpected error.
+
+___
+
+## Get Members Table
+### Description: Retrieves a table of members associated with the project matching the specified criteria.
+### HTTP Method: `GET`
+### URL: `/api/projects/{projectId}/members/table`
+### Auth: User must have read access to the project.
+### Path Parameters:
+`{projectId}`: ID of the project.
+
+### Query Parameters:
+`role (optional)`: Filter members by role (e.g., "owner", "project_manager").
+`search (optional)`: Search query to filter members by email or name.
+`take (optional, default: 10)`: Number of members to retrieve per page.
+`page (optional, default: 1)`: Page number for pagination.
+
+### Responses:
+`200 OK`: Members retrieved successfully. Returns a list of members.
+`500 Internal Server Error`: Unexpected error.
+___
+
+## Get Project Content
+### Description: Retrieves the content of the project.
+### HTTP Method: `GET`
+### URL: `/api/projects/{projectId}/content`
+### Auth: User must have read access to the project.
+### Path Parameters:
+`{projectId}`: ID of the project.
+
+### Responses:
+`200 OK`: Content retrieved successfully. Returns the content of the project.
+`500 Internal Server Error`: Unexpected error.
+
+___
+
+## Update Project Content
+### Description: Updates the content of the project.
+### HTTP Method: `PATCH`
+### URL: `/api/projects/{projectId}/content`
+
+### Auth: User must be the owner of the project.
+### Path Parameters:
+`{projectId}`: ID of the project.
+
+### Request Body: JSON object containing the updated content.
+
+### Responses:
+`200 OK`: Content updated successfully.
+`404 Not Found`: Content not found.
+`500 Internal Server Error`: Unexpected error.
 
 ___
 
 
+## Get Project
+### Description: Retrieves information about a specific project.
+### HTTP Method: `GET`
+### URL: `/api/projects/{projectId}`
+### Auth: User must have read access to the project.
+### Path Parameters:
+`{projectId}`: ID of the project.
+
+### Responses:
+`200 OK`: Project information retrieved successfully.
+`404 Not Found`: Project not found.
+`500 Internal Server Error`: Unexpected error.
+
+___
+
+## Get Read-Only Project
+### Description: Retrieves information about whether the project is read-only or not.
+### HTTP Method: `GET`
+### URL: `/api/projects/{projectId}/read-only`
+### Auth: User must have read access to the project.
+
+### Path Parameters:
+`{projectId}`: ID of the project.
+
+### Responses:
+`200 OK`: Read-only status retrieved successfully.
+`500 Internal Server Error`: Unexpected error.
+
+___
+
+## Update Project
+### Description: Updates the name of the project.
+### HTTP Method: `PATCH`
+### URL: `/api/projects/{projectId}`
+### Auth: User must be the owner of the project.
+
+### Path Parameters:
+`{projectId}`: ID of the project.
+
+### Request Body: JSON object containing the new name of the project.
+
+### Responses:
+`200 OK`: Project name updated successfully.
+`404 Not Found`: Project not found.
+`500 Internal Server Error`: Unexpected error.
+
 ___
 
 
+## Delete Project
+### Description: Deletes a project.
+### HTTP Method: `DELETE`
+### URL: `/api/projects/{projectId}`
+### Auth: User must be the owner of the project.
 
+### Path Parameters:
+`{projectId}`: ID of the project.
+
+### Responses:
+`200 OK`: Project deleted successfully.
+`404 Not Found`: Project not found.
+`500 Internal Server Error`: Unexpected error.
+
+___
+
+## Get Danger Zone
+### Description: Retrieves information about the danger zone settings of a specific project.
+### HTTP Method: `GET`
+### URL: `/api/projects/{projectId}/danger-zone`
+### Auth: User must be a member of the project.
+### Path Parameters:
+`{projectId}`: ID of the project.
+
+### Responses:
+`200 OK`: Danger zone settings retrieved successfully.
+`404 Not Found`: Project not found.
+`500 Internal Server Error`: Unexpected error.
+
+___
+
+
+## Update Visibility
+### Description: Changes the visibility of the project (public or private).
+### HTTP Method: `PATCH`
+### URL: `/api/projects/{projectId}/danger-zone/visibility`
+### Auth: User must be the owner of the project.
+### Path Parameters:
+`{projectId}`: ID of the project.
+
+### Responses:
+`200 OK`: Project visibility updated successfully.
+`404 Not Found`: Project not found.
+`500 Internal Server Error`: Unexpected error.
+
+___
+
+## Update Archive
+### Description: Archives or restores the project.
+### HTTP Method: `PATCH`
+### URL: `/api/projects/{projectId}/danger-zone/archive`
+### Auth: User must be the owner of the project.
+### Path Parameters:
+`{projectId}`: ID of the project.
+
+### Responses:
+`200 OK`: Project archived/restored successfully.
+`404 Not Found`: Project not found.
+`500 Internal Server Error`: Unexpected error.
+
+___
+
+## Transfer Project Ownership
+### Description: Transfers project ownership to another member.
+### HTTP Method: `PATCH`
+### URL: `/api/projects/{projectId}/danger-zone/transfer`
+### Auth: User must be the owner of the project.
+### Path Parameters:
+`{projectId}`: ID of the project.
+
+### Request Body: JSON object containing the ID of the member to whom ownership will be transferred.
+
+### Responses:
+`200 OK`: Project ownership transferred successfully.
+`403 Forbidden`: User is not allowed to perform this action.
+`404 Not Found`: Project or user not found.
+`500 Internal Server Error`: Unexpected error.
+
+___
+
+## Get Members
+### Description: Retrieves project members.
+### HTTP Method: `GET`
+### URL: `/api/projects/{projectId}/members`
+### Auth: User must be a member of the project.
+### Path Parameters:
+`{projectId}`: ID of the project.
+
+### Query Parameters:
+`email (optional)`: Filter members by email.
+`not-me (optional)`: Exclude the current user from the results.
+
+### Responses:
+`200 OK`: Members retrieved successfully.
+`500 Internal Server Error`: Unexpected error.
+
+___
+
+## Add Member
+### Description: Adds a new member to the project.
+### HTTP Method: `POST`
+### URL: `/api/projects/{projectId}/members`
+### Auth: User must be the owner of the project.
+### Path Parameters:
+`{projectId}`: ID of the project.
+
+### Request Body: JSON object containing information about the user to be invited (ID and role).
+
+### Responses:
+`201 Created`: User successfully invited to join the project.
+`400 Bad Request`: User to invite does not exist.
+`403 Forbidden`: User is not authorized to invite users.
+`500 Internal Server Error`: Unexpected error.
+
+___
+
+## Leave Project
+### Description: Allows a member to leave the project.
+### HTTP Method: `DELETE`
+### URL: `/api/projects/{projectId}/members`
+### Auth: User must be a member of the project.
+### Path Parameters:
+`{projectId}`: ID of the project.
+
+### Responses:
+`200 OK`: User successfully left the project.
+`400 Bad Request`: Account not found.
+`404 Not Found`: Project not found.
+`500 Internal Server Error`: Unexpected error.
+
+___
+
+## Get Non-Members
+### Description: Retrieves users who are not members of the project.
+### HTTP Method: `GET`
+### URL: `/api/projects/{projectId}/members/none-members`
+### Auth: User must be a member of the project.
+### Path Parameters:
+`{projectId}`: ID of the project.
+
+### Query Parameters:
+`email (optional)`: Filter users by email.
+
+### Responses:
+`200 OK`: Non-members retrieved successfully.
+`500 Internal Server Error`: Unexpected error.
+
+___
+
+## Get Role
+### Description: Retrieves the role of user requesting this api.
+### HTTP Method: `GET`
+### URL: `/api/projects/{projectId}/members/role`
+### Auth: User must be a member of the project.
+### Path Parameters:
+`{projectId}`: ID of the project.
+
+### Responses:
+`200 OK`: Role retrieved successfully.
+`500 Internal Server Error`: Unexpected error.
+
+___
+
+### Get Members Chart
+### Description: Retrieves data for generating member charts.
+### HTTP Method: `GET`
+### URL: `/api/projects/{projectId}/members/chart`
+### Auth: User must be a member of the project.
+### Path Parameters:
+`{projectId}`: ID of the project.
+
+### Responses:
+`200 OK`: Data retrieved successfully.
+`500 Internal Server Error`: Unexpected error.
+
+___
+
+
+## Create Ticket
+### Description: Creates a new ticket in the project.
+### HTTP Method: `POST`
+### URL: `/api/projects/{projectId}/tickets`
+### Auth: User must be a project owner or project manager.
+
+### Path Parameters:
+`{projectId}`: ID of the project.
+
+### Request Body: JSON object containing ticket details (name, type, status, priority, assigned member ID).
+
+### Responses:
+`201 Created`: Ticket successfully created.
+`400 Bad Request`: Invalid request body format.
+`403 Forbidden`: User is not authorized to create a ticket in the project.
+`404 Not Found`: User to assign the ticket to is not found.
+`500 Internal Server Error`: Unexpected error.
+
+___
+
+
+## Get Ticket Attachments
+### Description: Retrieves all attachments associated with a specific ticket.
+### HTTP Method: `GET`
+### URL: `/api/projects/{projectId}/tickets/{ticketId}/attachments`
+### Auth: User must have read access to the project.
+### Path Parameters:
+`{projectId}`: ID of the project.
+`{ticketId}`: ID of the ticket.
+
+### Responses:
+`200 OK`: Attachments successfully retrieved.
+`500 Internal Server Error`: Unexpected error.
+
+__
+
+## Upload Ticket Attachment
+### Description: Uploads a new attachment for a specific ticket.
+### HTTP Method: `POST`
+### URL: `/api/projects/{projectId}/tickets/{ticketId}/attachments`
+### Auth: User must be a project owner or project manager.
+### Path Parameters:
+`{projectId}`: ID of the project.
+`{ticketId}`: ID of the ticket.
+
+### Request Body: JSON object containing attachment details (title, data, content type).
+
+### Responses:
+`201 Created`: Attachment successfully uploaded.
+`400 Bad Request`: Invalid request body format.
+`403 Forbidden`: User is not authorized to upload attachments in the project.
+`500 Internal Server Error`: Unexpected error.
+
+___
+
+## Get Ticket Content
+### Description: Retrieves the content (markdown) of a specific ticket.
+### HTTP Method: `GET`
+### URL: `/api/projects/{projectId}/tickets/{ticketId}/content`
+### Auth: User must have read access to the project.
+### Path Parameters:
+`{projectId}`: ID of the project.
+`{ticketId}`: ID of the ticket.
+
+### Responses:
+`200 OK`: Content successfully retrieved.
+`500 Internal Server Error`: Unexpected error.
+
+___
+
+## Update Ticket Content
+### Description: Updates the content of a specific ticket.
+### HTTP Method: `PATCH`
+### URL: `/api/projects/{projectId}/tickets/{ticketId}/content`
+### Auth: User must be a project owner or project manager.
+### Path Parameters:
+`{projectId}`: ID of the project.
+`{ticketId}`: ID of the ticket.
+
+### Request Body: JSON object containing the updated content (markdown).
+
+### Responses:
+`200 OK`: Content successfully updated.
+`400 Bad Request`: Invalid request body format.
+`403 Forbidden`: User is not authorized to update content in the project.
+`500 Internal Server Error`: Unexpected error.
+___
+
+
+## Create Ticket
+### Description: Creates a new ticket within a project.
+### HTTP Method: `POST`
+### URL: `/api/projects/{projectId}/tickets/{ticketId}`
+### Auth: User must be a project owner or project manager.
+
+### Path Parameters:
+`{projectId}`: ID of the project.
+`{ticketId}`: ID of the ticket.
+
+### Request Body: JSON object containing ticket details.
+
+### Responses:
+`201 Created`: Ticket successfully created.
+`400 Bad Request`: Invalid request body format.
+`403 Forbidden`: User is not authorized to create a ticket in the project.
+`500 Internal Server Error`: Unexpected error.
+
+___
+
+## Update Ticket
+### Description: Updates an existing ticket within a project.
+### HTTP Method: `PATCH`
+### URL: `/api/projects/{projectId}/tickets/{ticketId}`
+### Auth: User must be a project owner or project manager.
+
+### Path Parameters:
+`{projectId}`: ID of the project.
+`{ticketId}`: ID of the ticket.
+
+### Request Body: JSON object containing updated ticket details.
+
+### Responses:
+`200 OK`: Ticket successfully updated.
+`400 Bad Request`: Invalid request body format.
+`403 Forbidden`: User is not authorized to update the ticket in the project.
+`500 Internal Server Error`: Unexpected error.
+
+___
+
+## Get Ticket
+### Description: Retrieves details of a specific ticket within a project.
+### HTTP Method: `GET`
+### URL: `/api/projects/{projectId}/tickets/{ticketId}`
+### Auth: User must have read access to the project.
+
+### Path Parameters:
+`{projectId}`: ID of the project.
+`{ticketId}`: ID of the ticket.
+
+### Responses:
+`200 OK`: Ticket details successfully retrieved.
+`404 Not Found`: Ticket not found.
+`500 Internal Server Error`: Unexpected error.
+
+___
+
+## Delete Ticket
+### Description: Deletes a specific ticket within a project.
+### HTTP Method: `DELETE`
+### URL: `/api/projects/{projectId}/tickets/{ticketId}`
+### Auth: User must be a project owner or project manager.
+
+### Path Parameters:
+`{projectId}`: ID of the project.
+`{ticketId}`: ID of the ticket.
+
+### Responses:
+`200 OK`: Ticket successfully deleted.
+`404 Not Found`: Ticket not found.
+`500 Internal Server Error`: Unexpected error.
+___
+
+
+## Get Tickets Chart
+### Description: Retrieves statistical data about the tickets in a project for visualization purposes.
+### HTTP Method: `GET`
+### URL: `/api/projects/{projectId}/tickets/chart`
+### Auth: User must have read access to the project.
+### Path Parameters:
+`{projectId}`: ID of the project.
+
+### Responses:
+`200 OK`: Statistical data successfully retrieved.
+`404 Not Found`: Project not found.
+`500 Internal Server Error`: Unexpected error.
+___
+
+
+## Get Tickets Table
+### Description: Retrieves paginated data about tickets in a project based on specified filters and search keyword.
+### HTTP Method: `GET`
+### URL: `/api/projects/{projectId}/tickets/table/{page}`
+### Auth: User must have read access to the project.
+### Path Parameters:
+`{projectId}`: ID of the project.
+`{page}`: Page number for pagination.
+
+### Query Parameters:
+`status`: Filter by ticket status.
+`type`: Filter by ticket type.
+`priority`: Filter by ticket priority.
+`search`: Search keyword to filter tickets by name.
+`take (optional)`: Number of items to take per page (default is 10).
+
+### Responses:
+`200 OK`: Paginated data about tickets successfully retrieved.
+`404 Not Found`: Project not found.
+`500 Internal Server Error`: Unexpected error.
+
+___
+
+## Get Tickets Table Count
+### Description: Retrieves the total count of tickets in a project based on specified filters and search keyword.
+### HTTP Method: `GET`
+### URL: `/api/projects/{projectId}/tickets/table/count`
+### Auth: User must have read access to the project.
+### Path Parameters:
+`{projectId}`: ID of the project.
+
+### Query Parameters:
+`status`: Filter by ticket status.
+`type`: Filter by ticket type.
+`priority`: Filter by ticket priority.
+`search`: Search keyword to filter tickets by name.
+
+### Responses:
+`200 OK`: Total count of tickets successfully retrieved.
+`404 Not Found`: Project not found.
+`500 Internal Server Error`: Unexpected error.
+
+___
+
+## Get Content
+### Description: Retrieves content associated with a user profile.
+### HTTP Method: `GET`
+### URL: `/api/users/{userId}/content`
+### Auth: None
+### Path Parameters:
+`{userId}`: ID of the user.
+
+### Responses:
+`200 OK`: Content successfully retrieved.
+`404 Not Found`: Content not found for the specified user.
+`500 Internal Server Error`: Unexpected error.
+
+___
+
+## Update Content
+### Description: Updates content associated with a user profile.
+### HTTP Method: `PATCH`
+### URL: `/api/users/{userId}/content`
+### Auth: User must be authenticated and authorized to update their own content.
+### Path Parameters:
+`{userId}`: ID of the user.
+
+### Request Body:
+ContentDTO: Data Transfer Object containing the updated content.
+
+### Responses:
+`200 OK`: Content successfully updated.
+`400 Bad Request`: Invalid request body.
+`403 Forbidden`: User is not authorized to update the content.
+`404 Not Found`: Content not found for the specified user.
+`500 Internal Server Error`: Unexpected error.
+___
+
+## Get User
+### Description: Retrieves user profile information.
+### HTTP Method: `GET`
+### URL: `/api/users/{userId}`
+### Auth: None
+### Path Parameters:
+`{userId}`: ID of the user.
+
+### Responses:
+`200 OK`: User profile information successfully retrieved.
+`404 Not Found`: User not found.
+`500 Internal Server Error`: Unexpected error.
+
+___
+
+## Update Avatar
+### Description: Updates the user's avatar.
+### HTTP Method: `PATCH`
+### URL: `/api/users/{userId}/avatar`
+### Auth: User must be authenticated and authorized to update their own avatar.
+### Path Parameters:
+`{userId}`: ID of the user.
+
+### Request Body:
+### AvatarDTO: Data Transfer Object containing the new avatar data.
+
+### Responses:
+`200 OK`: Avatar successfully updated.
+`400 Bad Request`: Invalid request body.
+`401 Unauthorized`: User is not authorized to update the avatar.
+`500 Internal Server Error`: Unexpected error.
+
+___
+
+## Update Bio
+### Description: Updates the user's bio.
+### HTTP Method: `PATCH`
+### URL: `/api/users/{userId}/bio`
+### Auth: User must be authenticated and authorized to update their own bio.
+### Path Parameters:
+`{userId}`: ID of the user.
+
+### Request Body:
+### BioDTO: Data Transfer Object containing the new bio data.
+
+### Responses:
+`200 OK`: Bio successfully updated.
+`400 Bad Request`: Invalid request body.
+`401 Unauthorized`: User is not authorized to update the bio.
+`500 Internal Server Error`: Unexpected error.
+___
+
+## Create Project
+### Description: Creates a new project.
+### HTTP Method: `POST`
+### URL: `/api/users/{userId}/projects`
+### Auth: User must be authenticated.
+### Path Parameters:
+`{userId}`: ID of the user.
+
+### Request Body:
+### CreateProjectDTO: Data Transfer Object containing project creation information.
+
+### Responses:
+`201 Created`: Project successfully created.
+`400 Bad Request`: Invalid request body.
+`401 Unauthorized`: User is not authenticated.
+`500 Internal Server Error`: Unexpected error.
+
+___
+
+## Get User Projects
+### Description: Retrieves projects associated with a user, with optional filtering and pagination.
+### HTTP Method: `GET`
+### URL: `/api/users/{userId}/projects`
+### Auth: None
+### Path Parameters:
+`{userId}`: ID of the user.
+
+### Query Parameters:
+`role`: Role filter (optional).
+`search`: Search filter (optional).
+`status`: Status filter (optional).
+`take`: Number of projects to retrieve per page (default is 10).
+`page`: Page number for pagination (default is 1).
+
+### Responses:
+`200 OK`: Projects successfully retrieved.
+`500 Internal Server Error`: Unexpected error.
+
+___
+
+## Get User Projects Count
+### Description: Retrieves the total count of projects associated with a user, with optional filtering.
+### HTTP Method: `GET`
+### URL: `/api/users/{userId}/projects/count`
+### Auth: None
+### Path Parameters:
+`{userId}`: ID of the user.
+
+### Query Parameters:
+`role`: Role filter (optional).
+`search`: Search filter (optional).
+`status`: Status filter (optional).
+`take`: Number of projects to retrieve per page (default is 10).
+
+### Responses:
+`200 OK`: Total count of projects successfully retrieved.
+`500 Internal Server Error`: Unexpected error.
 ___
 
 
